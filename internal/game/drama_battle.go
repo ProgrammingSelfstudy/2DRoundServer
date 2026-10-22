@@ -192,7 +192,7 @@ func settleDrama(s *gateway.Session, st *store.Store) error {
 	}
 	rewards := []proto.Message{}
 	for _, g := range reward {
-		rewards = append(rewards, proto.Message{"bid": g.ID, "is_bind": 0, "num": g.Amount, "id": 0})
+		rewards = append(rewards, proto.Message{"bid": g.ID, "is_bind": 1, "num": g.Amount, "id": 0})
 	}
 	stats, mvpBID, mvpHurt, totalHurt, err := damageTable(st, role)
 	if err != nil {
@@ -207,7 +207,7 @@ func settleDrama(s *gateway.Session, st *store.Store) error {
 		return err
 	}
 	if err := s.Send(13001, proto.Message{"mode": next.Mode, "chapter_id": next.ChapterID, "dun_id": next.DunID, "status": next.Status,
-		"is_first": b2i(next.IsFirst), "cool_time": 0, "max_dun_id": next.MaxDunID}); err != nil {
+		"is_first": b2i(next.IsFirst), "cool_time": 0, "max_dun_id": clearedMax(next)}); err != nil {
 		return err
 	}
 	if next.ChapterID != d.ChapterID {

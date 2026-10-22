@@ -23,9 +23,25 @@ type Role struct {
 
 const roleCols = `rid,account_id,srv_id,name,lev,sex,career,face_id,status,created_at,last_login_at,renamed,last_logout_at,vip_lev`
 
+// DefaultFaceID is the face (avatar) of a role that never chose one. The original
+// server gives a new role the first hero's bid, 10401 (the 10301 of a new role in
+// capture original-2026-10-22), and the client shows the head of that hero; with
+// face_id 0 it draws an empty circle in chat, the friend list and the rankings.
+// Only the male starter's number was seen; no female role was captured.
+const DefaultFaceID = 10401
+
+// faceOrDefault is what is sent for a stored face_id.
+func faceOrDefault(face int) int {
+	if face == 0 {
+		return DefaultFaceID
+	}
+	return face
+}
+
 func scanRole(sc interface{ Scan(...any) error }) (*Role, error) {
 	var r Role
 	err := sc.Scan(&r.RID, &r.AccountID, &r.SrvID, &r.Name, &r.Lev, &r.Sex, &r.Career, &r.FaceID, &r.Status, &r.CreatedAt, &r.LastLoginAt, &r.Renamed, &r.LastLogoutAt, &r.VIPLev)
+	r.FaceID = faceOrDefault(r.FaceID)
 	return &r, wrapNoRows(err)
 }
 

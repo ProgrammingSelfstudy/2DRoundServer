@@ -18,7 +18,7 @@ var roleExpJSON []byte
 
 type expRow struct {
 	Lev      int   `json:"lev"`
-	ExpTotal int64 `json:"exp_total"` // running sum of exp_max up to and including Lev
+	ExpTotal int64 `json:"exp_total"` // running sum of exp_max up to and including Lev (the client's own number at the anomalies)
 	ExpMax   int64 `json:"exp_max"`
 	// Reward is what reaching this level pays: (asset or item id, amount) pairs.
 	Reward [][2]int64 `json:"reward"`
@@ -27,9 +27,24 @@ type expRow struct {
 var expTable = func() []expRow {
 	var f struct {
 		Levels []expRow `json:"levels"`
+		// Anomalies are the levels whose exp_total in the client's table is not the
+		// running sum of exp_max. The original server sends the client's own number
+		// (capture original-2026-10-22: a level 124 role got exp_total_nextlev
+		// 238279300, the running sum would be 204591100), so that number is what the
+		// 10301 field shows. Level 24 is the other such level in the table and is
+		// treated the same, but was not captured. Levelling itself goes by exp_max alone.
+		Anomalies []struct {
+			Lev            int   `json:"lev"`
+			ClientExpTotal int64 `json:"client_exp_total"`
+		} `json:"anomalies_in_client_data"`
 	}
 	if err := json.Unmarshal(roleExpJSON, &f); err != nil || len(f.Levels) == 0 {
 		panic("game: bad role_exp.json")
+	}
+	for _, a := range f.Anomalies {
+		if a.Lev >= 1 && a.Lev <= len(f.Levels) {
+			f.Levels[a.Lev-1].ExpTotal = a.ClientExpTotal
+		}
 	}
 	return f.Levels
 }()

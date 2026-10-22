@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"strconv"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -17,7 +18,7 @@ import (
 var milestonesJSON []byte
 
 type milestone struct {
-	Limit int64      `json:"limit"` // reached when max_dun_id >= Limit (the client's own test)
+	Limit int64      `json:"limit"` // reached when the cleared max_dun_id >= Limit (the client's own test)
 	Items [][2]int64 `json:"items"`
 }
 
@@ -31,9 +32,22 @@ var milestones = func() map[int64]milestone {
 	return f.Rewards
 }()
 
-// maxMilestoneAmount is a sanity limit (our policy): the client's reward 1 lists
-// 4,000,000,000 gems, which can only be a test value, and is refused.
-const maxMilestoneAmount = 100_000_000
+// The client's table lists four things for reward 1 (4,000,000,000 gems among
+// them), but the original server paid only 200,000,000 captain exp (asset 5): the
+// claim in capture original-2026-10-22 sent 12742 with that one asset, the diamond
+// count did not move, and the client's own window shows only the EXP icon. So
+// reward 1 is that one asset here; the rest of the table is paid as listed.
+func init() {
+	if m, ok := milestones[1]; ok {
+		m.Items = [][2]int64{{5, 200_000_000}}
+		milestones[1] = m
+	}
+}
+
+// maxMilestoneAmount is a sanity limit (our policy) for what one entry may pay.
+// It is above the 200,000,000 captain exp of reward 1, below the client's other
+// test values (4,000,000,000), which are refused.
+const maxMilestoneAmount = 200_000_000
 
 // RegisterDramaMilestones registers 13008 (the milestone rewards already taken)
 // and 13009 (take one, once the dungeon it needs has been reached).
@@ -70,7 +84,7 @@ func RegisterDramaMilestones(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if d.MaxDunID < m.Limit {
+		if clearedMax(d) < m.Limit { // the client's own test on the max_dun_id it was told
 			return reply(0, "尚未通关指定关卡")
 		}
 		assets, items := map[int64]int64{}, map[int64]int64{}
@@ -86,7 +100,12 @@ func RegisterDramaMilestones(r *gateway.Router, st *store.Store) {
 			}
 			return err
 		}
-		if err := reply(1, "领取成功"); err != nil {
+		// the original tells the gain with 12742 (the client's "恭喜获得" window) and
+		// answers 13009 with an empty msg (capture original-2026-10-22)
+		if err := sendAssetGain(s, assets); err != nil {
+			return err
+		}
+		if err := reply(1, ""); err != nil {
 			return err
 		}
 		if err := sendAssets(s, st, role.RID); err != nil {
@@ -94,4 +113,18 @@ func RegisterDramaMilestones(r *gateway.Router, st *store.Store) {
 		}
 		return sendBackpack(s, st)
 	})
+}
+
+// sendAssetGain sends 12742, the client's "you got these" window for assets
+// (mainui_controller handle12742). num is a string on the wire; source 0, is_bind
+// 1, id 0 and move_to 0 are what the original sent. Nothing is sent for no assets.
+func sendAssetGain(s *gateway.Session, assets map[int64]int64) error {
+	if len(assets) == 0 {
+		return nil
+	}
+	list := make([]proto.Message, 0, len(assets))
+	for _, k := range mergedKeys(assets, nil) {
+		list = append(list, proto.Message{"bid": k, "is_bind": 1, "num": strconv.FormatInt(assets[k], 10), "id": 0, "move_to": 0})
+	}
+	return s.Send(12742, proto.Message{"asset_list": list, "source": 0})
 }

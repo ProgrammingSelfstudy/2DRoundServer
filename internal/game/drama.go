@@ -61,6 +61,23 @@ func dramaState(st *store.Store, rid int64) (store.Drama, error) {
 		Status: dungeonNotCleared, MaxDunID: first.ID, IsFirst: true}, nil
 }
 
+// clearedMax is the max_dun_id the client is told: the highest dungeon the role has
+// *cleared*, 0 for a role that has not cleared any. The original sends exactly that
+// (capture original-2026-10-22: a new role is at dungeon 10010 with max_dun_id 0, and
+// the 13001 for the win sends 10010; original-2026-10-20: at 10050 with max_dun_id
+// 10040). We store the highest dungeon *reached* (MaxDunID, the frontier), which is
+// one further until the last dungeon of the chain is cleared. The client builds the
+// main-city buildings and tests the milestone rewards (limit_id) from what it is told.
+func clearedMax(d store.Drama) int64 {
+	if d.DunID == d.MaxDunID && d.Status == dungeonCleared { // the last dungeon of the chain
+		return d.MaxDunID
+	}
+	if i, ok := dungeonIndex[d.MaxDunID]; ok && i > 0 {
+		return dramaChain.Dungeons[i-1].ID
+	}
+	return 0
+}
+
 // pushDrama sends 13000, the campaign state. Nobody requests it: the client has
 // no sender for it, so the server pushes it after login. The client builds the
 // main-city buildings from max_dun_id (main_scene_controller.lua createBuildVo
@@ -76,7 +93,7 @@ func pushDrama(s *gateway.Session, st *store.Store, rid int64) error {
 	}
 	return s.Send(13000, proto.Message{
 		"mode": d.Mode, "chapter_id": d.ChapterID, "dun_id": d.DunID, "status": d.Status,
-		"is_first": b2i(d.IsFirst), "cool_time": 0, "max_dun_id": d.MaxDunID,
+		"is_first": b2i(d.IsFirst), "cool_time": 0, "max_dun_id": clearedMax(d),
 		// auto_num is today's sweeps used out of auto_num_max (the original sends
 		// 10 for the latter, capture original-2026-10-20); the client decides from it
 		// whether a sweep is still free and whether the button is still open

@@ -50,8 +50,13 @@ func TestChallengeAdvancesTheCampaign(t *testing.T) {
 	if res.Int("result") != 1 || res.Int("combat_type") != 3 || len(res.Arr("item_rewards")) != 4 {
 		t.Fatalf("13016: %v", res)
 	}
+	for _, it := range res.Arr("item_rewards") { // every reward of both captures is bound
+		if it.Int("is_bind") != 1 {
+			t.Fatalf("item_rewards is_bind: %v", it)
+		}
+	}
 	up := c.recv(13001)
-	if up.Int("dun_id") != first.Next || up.Int("max_dun_id") != first.Next || up.Int("is_first") != 0 {
+	if up.Int("dun_id") != first.Next || up.Int("max_dun_id") != first.ID || up.Int("is_first") != 0 { // max_dun_id: the dungeon just cleared
 		t.Fatalf("13001: %v", up)
 	}
 	c.recv(10302)

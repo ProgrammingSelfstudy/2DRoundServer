@@ -232,7 +232,13 @@ func (l *Login) rename(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	s.SetRole(updated)
-	return reply(codeOK, "改名成功", updated)
+	// the original answers the first (free) rename with an empty msg, so the client
+	// shows no toast (capture original-2026-10-22); later renames keep ours
+	msg := "改名成功"
+	if fresh.Renamed == 0 {
+		msg = ""
+	}
+	return reply(codeOK, msg, updated)
 }
 
 func heartbeat(s *gateway.Session, _ proto.Message) error {

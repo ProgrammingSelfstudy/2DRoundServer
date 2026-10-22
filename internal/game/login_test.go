@@ -251,7 +251,8 @@ func TestFullLoginFlow(t *testing.T) {
 	if as := c2.recv(10302); as.Int("lev") != 1 || as.Str("gold") != "0" || as.Str("coin") != "0" {
 		t.Fatalf("10302: %v", as)
 	}
-	if dr := c2.recv(13000); dr.Int("mode") != 1 || dr.Int("chapter_id") != 1 || dr.Int("dun_id") != 10010 || dr.Int("max_dun_id") != 10010 || dr.Int("is_first") != 1 {
+	if dr := c2.recv(13000); dr.Int("mode") != 1 || dr.Int("chapter_id") != 1 || dr.Int("dun_id") != 10010 || dr.Int("max_dun_id") != 0 || dr.Int("is_first") != 1 || dr.Int("status") != 2 {
+		// max_dun_id is the highest dungeon cleared: 0 for a new role (capture original-2026-10-22)
 		t.Fatalf("13000 must give a new player the first dungeon: %v", dr)
 	}
 	if enter := c2.recv(10304); enter.Int("play_video") != 0 {
@@ -539,9 +540,18 @@ func TestExpTableMatchesClientData(t *testing.T) {
 	if m, tot := expFor(2); m != 360 || tot != 480 {
 		t.Fatalf("lev2: %d %d", m, tot)
 	}
-	// the client's own exp_total for lev 24 is wrong (911300); we use the running sum
-	if _, tot := expFor(24); tot != 472100 {
-		t.Fatalf("lev24 running total: %d", tot)
+	// the client's own exp_total for lev 24 and 124 is not the running sum (911300 and
+	// 238279300 instead of 472100 and 204591100). The original sends the client's number
+	// in 10301 (seen for lev 124, capture original-2026-10-22); exp_max, which decides
+	// levelling, is untouched.
+	if m, tot := expFor(24); m != 64800 || tot != 911300 {
+		t.Fatalf("lev24: %d %d", m, tot)
+	}
+	if m, tot := expFor(124); m != 6286800 || tot != 238279300 {
+		t.Fatalf("lev124: %d %d", m, tot)
+	}
+	if _, tot := expFor(123); tot != 198304300 { // a normal level keeps the running sum
+		t.Fatalf("lev123: %d", tot)
 	}
 	if m, tot := expFor(0); m != 0 || tot != 0 {
 		t.Fatal("out of range must be 0")
@@ -715,10 +725,13 @@ func TestRename10343(t *testing.T) {
 	if got.Int("code") != 1 || got.Str("name") != "路飞" || got.Int("sex") != 1 || got.Int("is_first_rename") != 0 {
 		t.Fatalf("first rename: %v", got)
 	}
+	if got.Str("msg") != "" { // the original sends no toast for the free first rename
+		t.Fatalf("first rename msg: %q", got.Str("msg"))
+	}
 	// second rename keeps the sex, even if the request asks for another
 	c.send(10343, proto.Message{"name": "草帽", "sex": 0})
 	got = c.recv(10343)
-	if got.Int("code") != 1 || got.Str("name") != "草帽" || got.Int("sex") != 1 || got.Int("is_first_rename") != 0 {
+	if got.Int("code") != 1 || got.Str("name") != "草帽" || got.Int("sex") != 1 || got.Int("is_first_rename") != 0 || got.Str("msg") != "改名成功" {
 		t.Fatalf("second rename: %v", got)
 	}
 	bad("草帽", 1, "新名字与当前名字相同")
@@ -730,6 +743,10 @@ func TestRename10343(t *testing.T) {
 	base := c.recv(10301)
 	if base.Str("name") != "草帽" || base.Int("sex") != 1 || base.Int("is_first_rename") != 0 {
 		t.Fatalf("10301 after rename: %v", base)
+	}
+	// a role that never chose a face gets the first hero's bid, like the original's new roles
+	if base.Int("face_id") != 10401 {
+		t.Fatalf("10301 face_id: %v", base.Int("face_id"))
 	}
 }
 

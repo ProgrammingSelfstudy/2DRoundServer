@@ -291,6 +291,7 @@ func (s *Store) RankRoles(srvID string) ([]RankRole, error) {
 		if err := rows.Scan(&r.RID, &r.Name, &r.Lev, &r.FaceID, &r.MaxDunID, &r.DramaAt); err != nil {
 			return nil, err
 		}
+		r.FaceID = faceOrDefault(r.FaceID)
 		out = append(out, r)
 	}
 	return out, rows.Err()

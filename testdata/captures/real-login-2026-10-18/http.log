@@ -1,0 +1,10 @@
+2026/10/18 21:18:14.244470 login http listening on 127.0.0.1:8081
+2026/10/18 21:18:15.324718 http POST /index.php/userlogin/userLogins2?&&&username=probe&password=REDACTED from 127.0.0.1:61456
+2026/10/18 21:20:40.111043 http GET /update/config/url_config_demo.lua?build_ver=0&package_ver=1.0&1792383640 from 127.0.0.1:61582
+2026/10/18 21:23:47.049200 login http listening on 127.0.0.1:8081
+2026/10/18 21:23:48.056333 http GET / from 127.0.0.1:61752
+2026/10/18 21:26:31.207163 http GET /update/config/url_config_demo.lua?build_ver=0&package_ver=1.0&1792383991 from 127.0.0.1:61855
+2026/10/18 21:26:56.666005 http POST /index.php/userlogin/userLogins2?&&&username=80566037&password=REDACTED&action=login&acc_idfa=sszg1792384016k164732sr5JG from 127.0.0.1:61887
+2026/10/18 21:26:56.736493 http GET /api/serverlist?account=80566037&platform=symlf&channel=symlf&srv= from 127.0.0.1:61887
+2026/10/18 21:26:56.919391 http GET /api/serverlist?account=80566037&platform=symlf&channel=symlf&srv= from 127.0.0.1:61887
+2026/10/18 21:27:26.775802 http POST /index.php/userlogin/yxmmdasba?&&&username=80566037&timestamp=1792384046 from 127.0.0.1:61887

@@ -1,0 +1,13 @@
+proto loaded
+Start -> userdata: 0x7eebb7d7d8
+Connect -> 1
+sent 1197 -> true
+sent 1164 -> true
+sent 1164 -> true
+sent 10191 -> true
+sent 10192 -> true
+sent 1169 -> true
+RECV cmd=10192 id=1 ok=true good=true {code=1, msg=ok, timestamp=16909060, world_lev=1286}
+RECV cmd=1164 id=1 ok=true good=true {code=1, least_career=9, msg=, roles={1={career=772, face_id=84281096, is_online=1, lev=258, name=路飞, rid=168496141, sex=1, srv_id=a_1}}}
+all sent
+disconnected 1

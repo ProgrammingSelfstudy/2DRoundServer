@@ -1,0 +1,9 @@
+{"event": "listening"}
+{"t": 1792374657.825, "event": "connected", "peer": ["127.0.0.1", 56623]}
+{"t": 1792374658.359, "event": "frame", "flags": 0, "cmd": 1197, "payload_len": 16, "payload_hex": "0004414243440102030405060708090a"}
+{"t": 1792374658.844, "event": "frame", "flags": 0, "cmd": 1164, "payload_len": 19, "payload_hex": "000200026b310002763100026b320003763276"}
+{"t": 1792374659.342, "event": "frame", "flags": 0, "cmd": 1164, "payload_len": 2, "payload_hex": "0000"}
+{"t": 1792374659.841, "event": "frame", "flags": 0, "cmd": 10191, "payload_len": 8, "payload_hex": "0100000102000170"}
+{"t": 1792374660.346, "event": "frame", "flags": 0, "cmd": 10192, "payload_len": 9, "payload_hex": "112233440003615f31"}
+{"t": 1792374660.842, "event": "frame", "flags": 0, "cmd": 1169, "payload_len": 0, "payload_hex": ""}
+{"t": 1792374660.843, "event": "sent_replies", "n": 2}

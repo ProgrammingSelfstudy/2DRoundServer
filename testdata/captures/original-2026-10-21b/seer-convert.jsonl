@@ -1,0 +1,16 @@
+{"t": "2026-10-21T11:07:07.683454Z", "dir": "c2s", "cmd": 23234}
+{"t": "2026-10-21T11:07:07.73871Z", "dir": "s2c", "cmd": 23235, "msg": {"flag": 1, "msg": ""}}
+{"t": "2026-10-21T11:07:07.73871Z", "dir": "s2c", "cmd": 23234, "msg": {"flag": 1, "msg": ""}}
+{"t": "2026-10-21T11:07:08.581094Z", "dir": "c2s", "cmd": 23214}
+{"t": "2026-10-21T11:07:08.651262Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 0, "partner_id": 0, "partner_ids": [{"id": 1}]}}
+{"t": "2026-10-21T11:07:10.876207Z", "dir": "c2s", "cmd": 23215, "msg": {"action": 1, "partner_id": 15}}
+{"t": "2026-10-21T11:07:10.973713Z", "dir": "s2c", "cmd": 10512, "msg": {"item_list": [{"all_score": 0, "attr": [], "base_id": 14002, "bind": 1, "enchant": 0, "expire_time": 0, "expire_type": 0, "extra": [{"extra_k": 11, "extra_v": 0}], "extra_attr": [], "gemstones": [], "holy_eqm_attr": [], "id": 19, "main_attr": [], "pos": 17, "quantity": 320, "score": 0, "storage": 1}]}}
+{"t": "2026-10-21T11:07:11.002536Z", "dir": "s2c", "cmd": 11002, "msg": {"atk": 122, "atk2": 4937, "bid": 10401, "break_lev": 0, "crit_rate": 0, "crit_ratio": 1500, "def": 61, "def2": 4646, "def_p": 0, "def_s": 0, "dodge_magic": 0, "dodge_rate": 0, "end_time": 0, "hit_magic": 0, "hit_rate": 1000, "horcrux_lev": 0, "horcrux_status": 0, "hp": 896, "hp2": 41123, "is_lock": [{"is_lock": 1, "lock_type": 2}], "lev": 6, "partner_id": 15, "power": 1436, "resonate_break_lev": 0, "resonate_lev": 0, "skills": [{"pos": 1, "skill_bid": 200001}, {"pos": 2, "skill_bid": 200101}], "speed": 105, "speed2": 3640, "star": 5, "use_skin": 0}}
+{"t": "2026-10-21T11:07:11.002536Z", "dir": "s2c", "cmd": 28701, "msg": {"list": [{"end_time": 1792598399, "finish": 1, "id": 50025, "target_val": 1, "type": 7, "value": 1}]}}
+{"t": "2026-10-21T11:07:11.002536Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 10509, "partner_id": 15, "partner_ids": [{"id": 1}]}}
+{"t": "2026-10-21T11:07:11.002536Z", "dir": "s2c", "cmd": 23215, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-10-21T11:07:12.380344Z", "dir": "c2s", "cmd": 23215, "msg": {"action": 2, "partner_id": 15}}
+{"t": "2026-10-21T11:07:12.45171Z", "dir": "s2c", "cmd": 11001, "msg": {"partners": [{"artifacts": [], "atk": 155, "atk2": 7045, "bid": 10509, "break_lev": 0, "crit_rate": 0, "crit_ratio": 1500, "def": 86, "def2": 6618, "def_p": 0, "def_s": 0, "dodge_magic": 0, "dodge_rate": 0, "dower_skill": [], "end_time": 0, "eqms": [], "hit_magic": 0, "hit_rate": 1000, "horcrux_lev": 0, "horcrux_status": 0, "hp": 1177, "hp2": 58725, "is_lock": [], "lev": 6, "partner_id": 522, "power": 1937, "resonate_break_lev": 0, "resonate_lev": 0, "skills": [{"pos": 1, "skill_bid": 240001}, {"pos": 2, "skill_bid": 240101}], "speed": 145, "speed2": 5200, "star": 5, "use_skin": 0}]}}
+{"t": "2026-10-21T11:07:12.45171Z", "dir": "s2c", "cmd": 11006, "msg": {"expend2": [{"partner_id": 15}]}}
+{"t": "2026-10-21T11:07:12.50906Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 0, "partner_id": 0, "partner_ids": [{"id": 1}]}}
+{"t": "2026-10-21T11:07:12.50906Z", "dir": "s2c", "cmd": 23215, "msg": {"code": 1, "msg": ""}}

@@ -1,0 +1,9 @@
+2026/10/18 21:35:37.919726 login http listening on CLIENT
+2026/10/18 21:36:51.879031 http GET /update/config/url_config_demo.lua?build_ver=0&package_ver=1.0&1792384611 from CLIENT
+2026/10/18 21:37:19.677046 http POST /index.php/userlogin/userLogins2?&&&username=80566037&password=REDACTED&action=login&acc_idfa=sszg17923846396CL5n7955711 from CLIENT
+2026/10/18 21:37:19.757013 http GET /api/serverlist?account=80566037&platform=symlf&channel=symlf&srv= from CLIENT
+2026/10/18 21:37:19.933716 http GET /api/serverlist?account=80566037&platform=symlf&channel=symlf&srv= from CLIENT
+2026/10/18 21:37:35.366338 http POST /index.php/userlogin/yxmmdasba?&&&username=80566037&timestamp=1792384655 from CLIENT
+2026/10/18 21:38:27.559144 http POST /index.php/userlogin/yxmmdasba?&&&username=80566037&timestamp=1792384707 from CLIENT
+2026/10/18 21:38:57.423257 http POST /index.php/userlogin/yxmmdasba?&&&username=80566037&timestamp=1792384737 from CLIENT
+2026/10/18 21:40:45.907760 http POST /index.php/userlogin/yxmmdasba?&&&username=80566037&timestamp=1792384845 from CLIENT

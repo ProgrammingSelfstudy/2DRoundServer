@@ -1,0 +1,47 @@
+# Commands found by tapping main-city navigation: cmd requests payload_bytes
+# Commands with a real handler are not listed here: 20060 (internal/game/battle.go),
+# 26555 (internal/game/elfin.go).
+# role level 30 (set in the test database): modules unlock by level and ask for data at login
+ 23800     1     0
+ 23805     1     0
+ 25100     1     0
+ 28603     1     0
+ 28616     1     0
+# guild tab -> guild list (request carries page/flag/num/name, reply echoes them)
+ 13501     1     7
+# after 13000 (campaign state) the main city builds its buildings; more modules ask for data
+ 20063     1     0
+ 23900     1     0
+ 23906     1     0
+ 23912     1     0
+# summon building ("伟大召唤") opened
+ 23234     1     0
+# role level 100 + last campaign dungeon (set in the scratch database): everything unlocks and asks at login
+ 11211     1     1
+ 20600     1     0
+ 20601     1     0
+ 20604     1     0
+ 20634     1     0
+ 24100     1     0
+ 24120     1     0
+ 26013     1     0
+ 26017     1     0
+ 26018     1     0
+ 26200     1     0
+ 26213     1     0
+ 26500     1     0
+ 26510     1     0
+ 26550     1     0
+ 27215     1     0
+ 27220     1     0
+# main-city entries: 奖杯 (12902), 充值 (16700, 21005), 录像 (19902)
+ 12902     1     1
+ 16700     1     0
+ 19902     1    10
+ 21005     1     0
+# found at login with the level-100 test role
+ 26201     1     0
+# arena (20208, 20201) and prison (11327) windows, opened after a correct 20060 reply
+ 11327     1     0
+ 20201     1     0
+ 20208     1     0

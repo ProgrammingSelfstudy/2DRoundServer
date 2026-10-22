@@ -1,0 +1,6 @@
+# Commands the real client sent after the role reached level 30 that had no handler yet
+# (gateway log of the device session, 2026-10-19)
+ 20200     1     0
+ 20250     1     0
+ 20223     1     0
+ 20251     1     0

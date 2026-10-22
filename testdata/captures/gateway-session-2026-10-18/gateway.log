@@ -1,0 +1,10 @@
+2026/10/18 21:40:42.479005 gateway symlf_1 listening on CLIENT
+2026/10/18 21:40:45.888169 gw CLIENT connected
+2026/10/18 21:40:45.931464 gw CLIENT <- cmd 1164 (577 bytes)
+2026/10/18 21:40:45.933077 gw CLIENT -> cmd 1164 (6 bytes)
+2026/10/18 21:41:02.185613 gw CLIENT <- cmd 10191 (12 bytes)
+2026/10/18 21:41:02.186654 gw CLIENT -> cmd 10191 (29 bytes)
+2026/10/18 21:41:02.197577 gw CLIENT <- cmd 10192 (13 bytes)
+2026/10/18 21:41:02.197819 gw CLIENT -> cmd 10192 (9 bytes)
+2026/10/18 21:41:02.212618 gw CLIENT <- cmd 10300 (0 bytes)
+2026/10/18 21:41:02.212655 10300 from rid=1: role data push is not implemented

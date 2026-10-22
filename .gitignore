@@ -1,0 +1,13 @@
+# runtime data: database, backups, logs
+/data/
+
+# LAN config holds a private jwt_secret and this machine's address; copy configs/lan.example.yaml
+/configs/lan.yaml
+
+# device screenshots (large, not code)
+*.png
+
+# build output / editor files
+*.exe
+*.test
+.DS_Store

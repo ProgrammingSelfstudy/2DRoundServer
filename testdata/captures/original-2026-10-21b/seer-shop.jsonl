@@ -1,0 +1,7 @@
+{"t": "2026-10-21T11:16:42.84684Z", "dir": "c2s", "cmd": 13401, "msg": {"type": 31}}
+{"t": "2026-10-21T11:16:42.92716Z", "dir": "s2c", "cmd": 13401, "msg": {"code": 1, "is_half": 0, "item_list": [], "msg": "", "type": 31}}
+{"t": "2026-10-21T11:16:55.576784Z", "dir": "c2s", "cmd": 13402, "msg": {"eid": 31055, "num": 1}}
+{"t": "2026-10-21T11:16:55.664202Z", "dir": "s2c", "cmd": 10510, "msg": {"item_list": [{"all_score": 0, "attr": [], "base_id": 27800, "bind": 1, "enchant": 0, "expire_time": 0, "expire_type": 0, "extra": [{"extra_k": 11, "extra_v": 0}], "extra_attr": [], "gemstones": [], "holy_eqm_attr": [], "id": 102, "main_attr": [], "pos": 65, "quantity": 30, "score": 0, "storage": 1}]}}
+{"t": "2026-10-21T11:16:55.664202Z", "dir": "s2c", "cmd": 12761, "msg": {"msg": "获得<div fontcolor=#d63cfc>布鲁诺碎片</div><div fontcolor=#289b14>x</div><div fontcolor=#289b14>30</div>", "channel": 64}}
+{"t": "2026-10-21T11:16:55.664202Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "获得<div fontcolor=#d63cfc>布鲁诺碎片</div><div fontcolor=#289b14>x</div><div fontcolor=#289b14>30</div>"}}
+{"t": "2026-10-21T11:16:55.664202Z", "dir": "s2c", "cmd": 13402, "msg": {"code": 1, "eid": 31055, "ext": [], "is_half": 0, "msg": "", "type": 31}}

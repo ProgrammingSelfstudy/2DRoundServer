@@ -1,0 +1,34 @@
+# 后端路线图（目标：完整联网游戏，2026-10-21）
+
+目标是把客户端的全部玩法接到服务端和后台，不只是单机内容。数字来自 `docs/CLIENT_COVERAGE.md`：客户端发出 1102 个请求协议，服务端真实处理 101 个，只有空回复 115 个，什么都没有 886 个，待做合计约 1000 个。
+
+## 待做按系列
+
+| 系列 | 请求总数 | 待做 | 最大的模块（待做数） |
+|---|---|---|---|
+| 限时活动 | 228 | 226 | action 88、welfare 19、actionyearmonster 16、returnaction 16、actiontermbegins 11 |
+| 核心已有模块 | 306 | 210 | hero 64、role 62、market 16、battle 11、vip 10、elitesummon 8 |
+| 玩法副本/养成 | 204 | 203 | adventure 35、elfin 27、planesafk 18、hallows 15、planes 14、emoguoshi 14、endless_trail 14、heaven 14 |
+| 竞技场/跨服对战 | 170 | 170 | arenateam 32、arena 25、arenamanypeople 24、elitematch 23、arenapeakchampion 18、crossarena 17、crosschampion 16、ladder 15 |
+| 其他小玩法 | 100 | 96 | smashegg、practisetower、voyage、godbattle…（每个 4~6 个） |
+| 公会系 | 74 | 74 | guild 28、guildsecretarea 11、guildwar 11、guildskill 11、guildboss 9 |
+| 家园 | 28 | 28 | homeworld 16、homepet 12 |
+
+## 顺序
+
+0. **联网地基**（做别的之前先有，边做边补）：按角色或公会广播推送、跨角色读写（别人的资料和阵容）、定时任务（每日 05:00 / 0:00 重置、周榜赛季轮换、活动起止）、统一的“模块状态”存取、后台对应的管理页。
+1. **核心缺口**：hero（64）、role（62）、market、battle、vip、mall、chat、充值与 VIP 经验。别的系列都依赖角色和英雄的数据。
+2. **公会系**：公会本体（建会、成员、职位、捐献、公会商店）先做，再做技能、秘境、战争、Boss；别的玩法有不少挂在公会上。
+3. **竞技场和跨服对战**：需要“和别人的阵容对战”的战斗脚本（现在只有打关卡怪物的脚本）和排行榜。
+4. **玩法副本/养成**：adventure、elfin（宠物）、hallows（神器）、planes、emoguoshi、endless_trail 等，彼此独立，可以逐个做。
+5. **限时活动**：先做活动调度（配置、起止时间、状态），再逐个做活动；action 一个模块就 88 个协议。
+6. **家园和其余小玩法**。
+
+## 做法（每个模块一轮）
+
+读客户端该模块的 Lua，列出请求和它期待的回包字段 → 实现服务端和存储 → 单元测试 → `cmd/bot` 冒烟 → Samsung 上点一遍 → 有原服务器账号能点到的部分再抓包核对 → 更新 `OPEN_QUESTIONS.md` 和本表。没有抓包的规则一律标“未确认”。
+
+## 要先说明的限制
+
+- 原服务器的规则，只有抓得到的才能核对。联网玩法里很多需要对手、公会、赛季，一个账号抓不全，这部分只能照客户端代码实现并标“未确认”。
+- 工作量很大：约 1000 个协议，每个模块都要读代码、写存储、写测试、上真机。不会一次做完，按上面的顺序逐模块推进，进度用 `CLIENT_COVERAGE.md` 的数字对账。

@@ -1,0 +1,29 @@
+db_path: data/2droundserver.db
+
+login_http:
+  addr: 127.0.0.1:8081
+  auto_register: true
+  token_ttl_hours: 24
+  public_base: http://127.0.0.1:8081
+
+gateway:
+  tcp_addr: 127.0.0.1:8800
+  # ws_addr: 127.0.0.1:8802   # enable for mini-game clients (put wss behind a TLS proxy)
+  srv_id: symlf_1
+  idle_seconds: 120
+  admin_addr: 127.0.0.1:8801
+  empty_replies: true   # answer not-yet-implemented post-login commands with empty data
+
+admin:
+  addr: 127.0.0.1:8080
+  # dev only. Production needs its own random secret of at least 32 characters.
+  jwt_secret: dev-only-secret-not-for-production-use-0123456789abcdef
+  ttl_hours: 12
+
+# Confirmed on a real device (testdata/captures/wire-probe-2026-10-18/NOTES.md).
+codec:
+  byte_order: big
+  str_len_bytes: 2
+  arr_len_bytes: 2
+  str_null_term: false
+  confirmed: true

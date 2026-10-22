@@ -1,0 +1,36 @@
+# LAN development: reachable from other devices on the same network.
+# Holds a private random jwt_secret: CHANGE-ME-random-at-least-32-characters
+db_path: data/2droundserver.db
+log_dir: data/logs     # empty = terminal only
+log_max_mb: 20
+log_keep: 5
+
+login_http:
+  addr: 0.0.0.0:8081
+  auto_register: true
+  token_ttl_hours: 24
+  public_base: http://YOUR-LAN-IP:8081
+
+gateway:
+  tcp_addr: 0.0.0.0:8800
+  srv_id: symlf_1
+  idle_seconds: 120
+  login_timeout_seconds: 20   # drop connections that do not log in within this time
+  max_conns_per_ip: 50        # 0 = no cap
+  # the control endpoint has no authentication: it must stay on loopback
+  admin_addr: 127.0.0.1:8801
+  empty_replies: true
+
+admin:
+  addr: 0.0.0.0:8090
+  jwt_secret: CHANGE-ME-random-at-least-32-characters
+  ttl_hours: 12
+  backup_every_hours: 24   # 0 = no automatic backups
+  backup_keep: 14
+
+codec:
+  byte_order: big
+  str_len_bytes: 2
+  arr_len_bytes: 2
+  str_null_term: false
+  confirmed: true

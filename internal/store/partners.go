@@ -74,6 +74,15 @@ func (s *Store) GrantStarterPartners(rid int64, seeds []PartnerSeed) (bool, erro
 	return true, tx.Commit()
 }
 
+// StarterGranted reports whether the role has already received its starter heroes.
+func (s *Store) StarterGranted(rid int64) (bool, error) {
+	var n int
+	if err := s.db.QueryRow(`SELECT partners_init FROM roles WHERE rid=?`, rid).Scan(&n); err != nil {
+		return false, wrapNoRows(err)
+	}
+	return n != 0, nil
+}
+
 // PartnerByID returns one hero of the role, or ErrNotFound.
 func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	var p Partner

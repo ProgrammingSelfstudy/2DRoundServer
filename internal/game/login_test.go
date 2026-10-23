@@ -721,6 +721,17 @@ func TestRename10343(t *testing.T) {
 
 	// first rename: free, sets the sex
 	c.send(10343, proto.Message{"name": "路飞", "sex": 1})
+	// the starter hero comes first, then the answer (capture original-2026-10-22)
+	if h := c.recv(11001).Arr("partners"); len(h) != 1 || h[0].Int("bid") != starterMale {
+		t.Fatalf("starter hero push: %v", h)
+	}
+	c.recv(11211)
+	if rb := c.recv(10301); rb.Str("name") != "路飞" || rb.Int("sex") != 1 || rb.Int("is_first_rename") != 0 {
+		t.Fatalf("10301 at the first rename: %v", rb)
+	}
+	if pw := c.recv(10306); pw.Int("power") <= 0 || pw.Int("power") != pw.Int("max_power") {
+		t.Fatalf("10306 at the first rename: %v", pw)
+	}
 	got := c.recv(10343)
 	if got.Int("code") != 1 || got.Str("name") != "路飞" || got.Int("sex") != 1 || got.Int("is_first_rename") != 0 {
 		t.Fatalf("first rename: %v", got)
@@ -806,5 +817,93 @@ func TestOpenDayReply10906(t *testing.T) {
 	c.send(10906, proto.Message{})
 	if r := c.recv(10906); r.Int("open_day") < 1 || r.Int("open_day") > 2 {
 		t.Fatalf("open_day with no open_time: %v", r)
+	}
+}
+
+// The first rename grants the starter hero once; the heroes a role already owns are
+// not doubled, and a later rename pushes nothing but its answer.
+func TestFirstRenameGrantsTheStarterOnce(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	// "甲" was created with a name already, so it has not used its free rename
+	if got, _ := e.st.PartnersOf(role.RID); len(got) != 0 {
+		t.Fatalf("heroes before the rename: %v", got)
+	}
+	c.send(10343, proto.Message{"name": "乙", "sex": 1})
+	c.recv(11001)
+	c.recv(11211)
+	c.recv(10301)
+	c.recv(10306)
+	if r := c.recv(10343); r.Int("code") != 1 {
+		t.Fatalf("10343: %v", r)
+	}
+	if got, _ := e.st.PartnersOf(role.RID); len(got) != 1 || got[0].BID != starterMale {
+		t.Fatalf("heroes after the rename: %v", got)
+	}
+	// a second rename: only the answer
+	c.send(10343, proto.Message{"name": "丙", "sex": 1})
+	if r := c.recv(10343); r.Int("code") != 1 || r.Str("msg") != "改名成功" {
+		t.Fatalf("second rename: %v", r)
+	}
+	if got, _ := e.st.PartnersOf(role.RID); len(got) != 1 {
+		t.Fatalf("a second rename changed the heroes: %v", got)
+	}
+}
+
+// enterCity sends 10300 and reads up to 10304 (the main city is up); it then reports
+// whether the next frame within a moment is 10342, the naming window.
+func enterCityAndSeeName(c *client) (asked bool) {
+	c.t.Helper()
+	c.send(10300, proto.Message{})
+	c.recv(10301)
+	c.recv(10302)
+	c.recv(13000)
+	c.recv(10304)
+	c.c.SetReadDeadline(time.Now().Add(400 * time.Millisecond))
+	fr, err := proto.ReadFrame(c.br)
+	if err != nil {
+		return false // nothing more: not asked
+	}
+	return fr.Command == 10342
+}
+
+// With the switch on, a brand-new role (never named, no starter hero) is asked to name
+// itself once its main city is up; with it off, or for a role that has played, it is not.
+func TestNewRoleFlowAsksOnlyBrandNewRoles(t *testing.T) {
+	// off: nothing is pushed, whatever the role
+	e := newEnv(t, time.Minute)
+	c, _ := e.enter("off", "甲")
+	if enterCityAndSeeName(c) {
+		t.Fatal("10342 pushed with the switch off")
+	}
+
+	// on: a brand-new role is asked
+	e = newEnv(t, time.Minute)
+	e.login.NewRoleFlow = true
+	c, _ = e.enter("new", "乙")
+	if !enterCityAndSeeName(c) {
+		t.Fatal("a brand-new role was not asked to name itself")
+	}
+
+	// on: a role that already got its starter hero is not
+	e = newEnv(t, time.Minute)
+	e.login.NewRoleFlow = true
+	c, role := e.enter("old", "丙")
+	if _, err := e.st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+		t.Fatal(err)
+	}
+	if enterCityAndSeeName(c) {
+		t.Fatal("a role that has heroes was asked to name itself")
+	}
+
+	// on: a role that has already named itself is not
+	e = newEnv(t, time.Minute)
+	e.login.NewRoleFlow = true
+	c, role = e.enter("named", "丁")
+	if _, err := e.st.RenameRole(role.RID, "丁丁", 1); err != nil {
+		t.Fatal(err)
+	}
+	if enterCityAndSeeName(c) {
+		t.Fatal("a role that was already named was asked again")
 	}
 }

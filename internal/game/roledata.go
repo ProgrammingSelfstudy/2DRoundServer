@@ -113,10 +113,30 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 	if err := s.Send(10304, proto.Message{"play_video": 0}); err != nil {
 		return err
 	}
+	if err := l.askForName(s, fresh); err != nil {
+		return err
+	}
 	if l.Chat != nil {
 		return l.Chat.Deliver(s)
 	}
 	return nil
+}
+
+// askForName pushes 10342 to a brand-new role when the flow is switched on: the client
+// opens its naming window (role_controller.lua rgp_hander10342), and the first rename
+// (10343) grants the starter hero. "Brand new" is: never renamed and no starter hero yet,
+// so roles that were created before the switch, and every role that has played, are left
+// alone. The original pushes it from its story (capture original-2026-10-22, in the
+// middle of the 10010 story); here it comes with the main city.
+func (l *Login) askForName(s *gateway.Session, role *store.Role) error {
+	if !l.NewRoleFlow || role.Renamed != 0 {
+		return nil
+	}
+	granted, err := l.Store.StarterGranted(role.RID)
+	if err != nil || granted {
+		return err
+	}
+	return s.Send(10342, proto.Message{})
 }
 
 func init() {

@@ -41,6 +41,8 @@ type Login struct {
 	OnlineGift *OnlineGiftService
 	// Chat, when set, hands the role its offline private messages once the main city is up.
 	Chat *ChatService
+	// NewRoleFlow asks a brand-new role to name itself (10342) once its main city is up.
+	NewRoleFlow bool
 }
 
 func (l *Login) Register(r *gateway.Router) {
@@ -237,8 +239,51 @@ func (l *Login) rename(s *gateway.Session, req proto.Message) error {
 	msg := "改名成功"
 	if fresh.Renamed == 0 {
 		msg = ""
+		// The original hands out the starter hero here, before it answers: the first
+		// rename ends the new-role story, and the hero is what the guide then points at.
+		if err := l.giveStarter(s, updated); err != nil {
+			return err
+		}
 	}
 	return reply(codeOK, msg, updated)
+}
+
+// giveStarter grants a role its starter hero when it has none yet and tells the
+// client the way the original does at the first rename (capture
+// original-2026-10-22, 08:38:50): 11001 with the hero, 11211 with the campaign team,
+// 10301 with the role data (it carries the sex just chosen) and 10306 with the power;
+// the original follows the rename reply with 11099, which is answered on request here.
+// A role that already has heroes is left alone (GrantStarterPartners grants once).
+func (l *Login) giveStarter(s *gateway.Session, role *store.Role) error {
+	granted, err := l.Store.GrantStarterPartners(role.RID, starterSeeds(role.Sex))
+	if err != nil || !granted {
+		return err
+	}
+	heroes, err := l.Store.PartnersOf(role.RID)
+	if err != nil {
+		return err
+	}
+	msgs := make([]proto.Message, 0, len(heroes))
+	for _, h := range heroes {
+		if _, ok := partnerTable[h.BID]; ok {
+			msgs = append(msgs, partnerMessage(h))
+		}
+	}
+	if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
+		return err
+	}
+	f, err := formationOf(l.Store, role.RID, formDrama)
+	if err != nil {
+		return err
+	}
+	if err := s.Send(11211, formationMessage(f)); err != nil {
+		return err
+	}
+	if err := s.Send(10301, roleBase(role)); err != nil {
+		return err
+	}
+	power := rolePower(heroes)
+	return s.Send(10306, proto.Message{"power": power, "max_power": power})
 }
 
 func heartbeat(s *gateway.Session, _ proto.Message) error {

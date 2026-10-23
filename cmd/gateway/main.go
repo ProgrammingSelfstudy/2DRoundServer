@@ -72,7 +72,7 @@ func main() {
 		gw.OnDisconnect = func(s *gateway.Session) { friends.Disconnected(s); online.Disconnected(s) }
 		chat := &game.ChatService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, MinInterval: time.Second}
 		chat.Register(gw.Router)
-		(&game.Login{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, MaxRoles: 3, Friends: friends, OnlineGift: online, Chat: chat}).Register(gw.Router)
+		(&game.Login{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, MaxRoles: 3, Friends: friends, OnlineGift: online, Chat: chat, NewRoleFlow: cfg.Gateway.NewRoleFlow}).Register(gw.Router)
 		mail := &game.MailService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger}
 		mail.Register(gw.Router)
 		notices := &game.NoticeService{Store: st, Hub: gw.Hub, Log: logger}

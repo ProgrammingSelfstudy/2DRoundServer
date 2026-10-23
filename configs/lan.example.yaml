@@ -20,6 +20,7 @@ gateway:
   # the control endpoint has no authentication: it must stay on loopback
   admin_addr: 127.0.0.1:8801
   empty_replies: true
+  new_role_flow: false   # new roles are asked to name themselves (10342); the first rename hands out the starter hero
 
 admin:
   addr: 0.0.0.0:8090

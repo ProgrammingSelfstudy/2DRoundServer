@@ -51,6 +51,11 @@ type Config struct {
 		// EmptyReplies answers the commands in game/empty_gen.go with empty messages
 		// so the client can get past loading. Development aid; off by default.
 		EmptyReplies bool `yaml:"empty_replies"`
+		// NewRoleFlow makes a brand-new role (never named, no starter hero yet) get the
+		// original's "please name yourself" push (10342) once its main city is up, so the
+		// naming window opens and the first rename hands out the starter hero. Off by
+		// default: the guide that follows in the original is not built yet.
+		NewRoleFlow bool `yaml:"new_role_flow"`
 	} `yaml:"gateway"`
 
 	Admin struct {

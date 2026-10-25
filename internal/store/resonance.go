@@ -184,3 +184,131 @@ func (s *Store) UnlockResonance(rid int64, byGold bool, from int, assets, items 
 	}
 	return tx.Commit()
 }
+
+// ensureResonanceRow makes sure the role has its role_resonance row.
+func (s *Store) ensureResonanceRow(rid int64) error {
+	_, err := s.db.Exec(`INSERT INTO role_resonance(rid) VALUES(?) ON CONFLICT(rid) DO NOTHING`, rid)
+	return err
+}
+
+// StoneOf reads the stone tablet level and the highest total of stars the offering heroes ever had.
+func (s *Store) StoneOf(rid int64) (lev, maxStars int, err error) {
+	err = s.db.QueryRow(`SELECT stone_lev,max_stars FROM role_resonance WHERE rid=?`, rid).Scan(&lev, &maxStars)
+	if errors.Is(err, sql.ErrNoRows) {
+		return 1, 0, nil
+	}
+	return lev, maxStars, err
+}
+
+// RaiseMaxStars records a new highest total of stars (it never goes down).
+func (s *Store) RaiseMaxStars(rid int64, stars int) error {
+	if err := s.ensureResonanceRow(rid); err != nil {
+		return err
+	}
+	_, err := s.db.Exec(`UPDATE role_resonance SET max_stars=? WHERE rid=? AND max_stars<?`, stars, rid, stars)
+	return err
+}
+
+// LevelUpStone raises the stone tablet one level if it is still at `from`, and pays for it.
+// ErrConflict, changing nothing, when it is not or the role cannot pay.
+func (s *Store) LevelUpStone(rid int64, from int, assets, items map[int64]int64) error {
+	if err := s.ensureResonanceRow(rid); err != nil {
+		return err
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	res, err := tx.Exec(`UPDATE role_resonance SET stone_lev=stone_lev+1 WHERE rid=? AND stone_lev=?`, rid, from)
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return ErrConflict
+	}
+	if err := spendTx(tx, rid, assets, items); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// Extract is the alchemy batch of a role.
+type Extract struct{ Total, Start, PerSec, Collected int64 }
+
+// ExtractOf reads the batch; ok is false when none is running.
+func (s *Store) ExtractOf(rid int64) (e Extract, ok bool, err error) {
+	err = s.db.QueryRow(`SELECT total,start_time,per_sec,collected FROM resonance_extract WHERE rid=?`, rid).Scan(&e.Total, &e.Start, &e.PerSec, &e.Collected)
+	if errors.Is(err, sql.ErrNoRows) {
+		return e, false, nil
+	}
+	return e, err == nil, err
+}
+
+// StartExtract puts hero exp in: a new batch of `total` units, paid now. ErrConflict when a batch
+// is running or the role cannot pay.
+func (s *Store) StartExtract(rid, total, now, perSec int64, assets, items map[int64]int64) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if _, err := tx.Exec(`INSERT INTO resonance_extract(rid,total,start_time,per_sec) VALUES(?,?,?,?)`, rid, total, now, perSec); err != nil {
+		if isUnique(err) {
+			return ErrConflict
+		}
+		return err
+	}
+	if err := spendTx(tx, rid, assets, items); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// RetrieveExtract ends the unfinished part of the batch: it keeps `done` units (finished at now) and
+// pays the exp of the rest back. ErrConflict when the batch is gone or changed (total / collected).
+func (s *Store) RetrieveExtract(rid, wasTotal, done int64, gainAssets, gainItems map[int64]int64) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	res, err := tx.Exec(`UPDATE resonance_extract SET total=? WHERE rid=? AND total=?`, done, rid, wasTotal)
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return ErrConflict
+	}
+	if _, err := tx.Exec(`DELETE FROM resonance_extract WHERE rid=? AND total<=collected`, rid); err != nil {
+		return err
+	}
+	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// CollectExtract takes `ready` finished units out of the batch (the batch ends when all are
+// collected) and pays the items. ErrConflict when the batch is gone or `collected` changed.
+func (s *Store) CollectExtract(rid, wasCollected, ready int64, gainAssets, gainItems map[int64]int64) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	res, err := tx.Exec(`UPDATE resonance_extract SET collected=collected+? WHERE rid=? AND collected=?`, ready, rid, wasCollected)
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return ErrConflict
+	}
+	if _, err := tx.Exec(`DELETE FROM resonance_extract WHERE rid=? AND collected>=total`, rid); err != nil {
+		return err
+	}
+	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
+		return err
+	}
+	return tx.Commit()
+}

@@ -25,6 +25,11 @@ var resonate = func() struct {
 		Item [][2]int64
 		Gold [][2]int64
 	}
+	Refine   [][2]int64
+	Alchemy  int64
+	AmpStars int
+	Levels   []stoneLevel
+	StarRio  map[int]int64
 } {
 	var r struct {
 		CellInit, CellMax, CoolMinutes int
@@ -34,6 +39,11 @@ var resonate = func() struct {
 			Item [][2]int64
 			Gold [][2]int64
 		}
+		Refine   [][2]int64
+		Alchemy  int64
+		AmpStars int
+		Levels   []stoneLevel
+		StarRio  map[int]int64
 	}
 	// the JSON keys are cell_init, cell_max, cool_minutes, ...
 	var raw map[string]json.RawMessage
@@ -51,11 +61,25 @@ var resonate = func() struct {
 	get("flush", &r.Flush)
 	get("star", &r.Star)
 	get("cost", &r.Cost)
-	if r.CellMax == 0 || len(r.Cost) == 0 {
+	get("refine", &r.Refine)
+	get("alchemy", &r.Alchemy)
+	get("amp_stars", &r.AmpStars)
+	get("levels", &r.Levels)
+	get("star_rio", &r.StarRio)
+	if r.CellMax == 0 || len(r.Cost) == 0 || len(r.Levels) == 0 || len(r.Refine) == 0 {
 		panic("game: bad resonate.json")
 	}
 	return r
 }()
+
+// stoneLevel is one row of the stone tablet's level table.
+type stoneLevel struct {
+	Lev     int
+	Expend  [][2]int64
+	Attr    [][]any
+	Limit   int64 // the most alchemy units in one batch
+	Seconds int64 // seconds one alchemy unit takes
+}
 
 const (
 	crystalHeroes = 5   // heroes that set the crystal's level (con_list)

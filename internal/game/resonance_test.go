@@ -157,3 +157,110 @@ func TestResonanceCrystal(t *testing.T) {
 		t.Fatalf("unlock: %v", r)
 	}
 }
+
+func TestResonanceStone(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	seeds := []store.PartnerSeed{}
+	for i := 0; i < 5; i++ {
+		seeds = append(seeds, store.PartnerSeed{BID: 10501, Star: 10}) // 5 x 10 stars = 50
+	}
+	if ok, err := e.st.GrantStarterPartners(role.RID, seeds); err != nil || !ok {
+		t.Fatal(ok, err)
+	}
+	gift := func(assets map[int64]int64, items map[int64]int64) {
+		var atts []store.Attachment
+		for id, n := range assets {
+			atts = append(atts, store.Attachment{Kind: store.AttachAsset, ItemID: id, Num: n})
+		}
+		for id, n := range items {
+			atts = append(atts, store.Attachment{Kind: store.AttachItem, ItemID: id, Num: n})
+		}
+		m := e.sendMail(store.Mail{Subject: "g", Attachments: atts}, role.RID)
+		c.send(10801, proto.Message{"id": m.ID, "srv_id": "symlf_1"})
+		c.recv(10801)
+		c.recv(10302)
+		c.recv(10500)
+	}
+	c.send(26400, proto.Message{})
+	info := c.recv(26400)
+	attr := info.Arr("attr")
+	if info.Int("lev") != 1 || len(info.Arr("list")) != 5 || info.Int("max_partner_lev") != 50 ||
+		len(attr) != 3 || attr[0].Int("attr_id") != 104 || attr[0].Int("attr_val") != 38000 || attr[1].Int("attr_id") != 101 || attr[1].Int("attr_val") != 3000 || attr[2].Int("attr_id") != 107 || attr[2].Int("attr_val") != 2000 {
+		t.Fatalf("26400 (the numbers of the capture at level 1): %v", info)
+	}
+	// level up: one 10095 and 3000 coin
+	c.send(26402, proto.Message{})
+	if r := c.recv(26402); r.Int("result") != 0 {
+		t.Fatalf("no material: %v", r)
+	}
+	gift(map[int64]int64{1: 3000}, map[int64]int64{10095: 1})
+	c.send(26402, proto.Message{})
+	c.recv(10302)
+	c.recv(10500)
+	if m := c.recv(26400); m.Int("lev") != 2 {
+		t.Fatalf("level after: %v", m)
+	}
+	if r := c.recv(26402); r.Int("result") != 1 {
+		t.Fatalf("level up: %v", r)
+	}
+
+	// alchemy at level 2: up to 55 units of 30000 hero exp, 240 seconds each
+	c.send(26410, proto.Message{})
+	if m := c.recv(26410); m.Int("all_num") != 0 || m.Int("is_point") != 1 {
+		t.Fatalf("idle: %v", m)
+	}
+	put := func(n int64) proto.Message {
+		c.send(26411, proto.Message{"all_num": n})
+		return c.recv(26411)
+	}
+	if r := put(56); r.Int("result") != 0 {
+		t.Fatalf("over the limit: %v", r)
+	}
+	if r := put(3); r.Int("result") != 0 {
+		t.Fatalf("no exp: %v", r)
+	}
+	gift(map[int64]int64{22: 90000}, nil)
+	c.send(26411, proto.Message{"all_num": 3})
+	c.recv(10302)
+	st := c.recv(26410)
+	if st.Int("all_num") != 3 || st.Int("do_num") != 0 || st.Int("do_end_time") < time.Now().Unix()+200 {
+		t.Fatalf("started: %v", st)
+	}
+	if r := c.recv(26411); r.Int("result") != 1 {
+		t.Fatalf("put: %v", r)
+	}
+	if r := put(1); r.Int("result") != 0 {
+		t.Fatalf("a batch is running: %v", r)
+	}
+	c.send(26413, proto.Message{})
+	if r := c.recv(26413); r.Int("result") != 0 {
+		t.Fatalf("nothing finished: %v", r)
+	}
+	e.advance(500 * time.Second) // two units are done
+	c.send(26410, proto.Message{})
+	if m := c.recv(26410); m.Int("do_num") != 2 || m.Int("get_num") != 0 || m.Int("is_point") != 1 {
+		t.Fatalf("two ready: %v", m)
+	}
+	c.send(26413, proto.Message{})
+	c.recv(10302)
+	c.recv(10500)
+	if m := c.recv(26410); m.Int("do_num") != 0 || m.Int("get_num") != 2 || m.Int("all_num") != 3 {
+		t.Fatalf("after the collect: %v", m)
+	}
+	if r := c.recv(26413); r.Int("result") != 1 {
+		t.Fatalf("collect: %v", r)
+	}
+	// take back the third unit's exp: the batch ends
+	c.send(26412, proto.Message{})
+	c.recv(10302)
+	if m := c.recv(26410); m.Int("all_num") != 0 {
+		t.Fatalf("after the retrieve: %v", m)
+	}
+	if r := c.recv(26412); r.Int("result") != 1 {
+		t.Fatalf("retrieve: %v", r)
+	}
+	if _, ok, _ := e.st.ExtractOf(role.RID); ok {
+		t.Fatal("the batch must be over")
+	}
+}

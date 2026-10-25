@@ -187,6 +187,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterReset(r, st)
 	RegisterReturn(r, st)
 	RegisterResonance(r, st)
+	RegisterResonanceStone(r, st)
 	RegisterSkin(r, st)
 	RegisterSeerpalace(r, st)
 	RegisterVIPGifts(r, st)

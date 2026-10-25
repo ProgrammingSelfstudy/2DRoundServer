@@ -18,7 +18,7 @@ type planesFightPlan struct {
 
 // planesFight makes the fight of a formation of the roster (hp in per cent, own and hired heroes) against a scaled copy of
 // the role's own best heroes whose power is `power`. A non-empty message says why it cannot be fought.
-func planesFight(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message) (*planesFightPlan, string, error) {
+func planesFight(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64) (*planesFightPlan, string, error) {
 	if formType == 0 {
 		formType = 1
 	}
@@ -100,7 +100,7 @@ func planesFight(db *store.Store, fights *FightService, role *store.Role, roster
 		}
 	}
 	intro := proto.Message{
-		"combat_type": combatPlanes, "formation": []proto.Message{{"group": 1, "formation_type": formType, "formation_lev": 1}, {"group": 2, "formation_type": oform, "formation_lev": 1}},
+		"combat_type": combat, "formation": []proto.Message{{"group": 1, "formation_type": formType, "formation_lev": 1}, {"group": 2, "formation_type": oform, "formation_lev": 1}},
 		"objects": append(objects, foeObjects...), "is_auto": 0, "current_wave": 1, "total_wave": 1, "play_speed": 1,
 		"extra_args": extra, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name,
 		"target_role_name": foeName, "suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},

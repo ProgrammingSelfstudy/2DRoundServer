@@ -21,7 +21,7 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 	r.Handle(21322, func(s *gateway.Session, _ proto.Message) error {
 		return s.Send(21322, proto.Message{"code": 0})
 	})
-	registerBattleLeftovers(r)
+	registerBattleLeftovers(r, st)
 	registerHeroStubs(r)
 	registerNoPaymentStubs(r)
 }
@@ -31,12 +31,17 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 // fight to leave or to speed up; they get code 1), 20026 map loaded (no drama to resume),
 // player-to-player challenges 20014-20016 and replays 20034 / 20036 (refused: no challenge invites and
 // no replays are kept), and the combat log 10958 (no reply). Our rules, not captured.
-func registerBattleLeftovers(r *gateway.Router) {
+func registerBattleLeftovers(r *gateway.Router, st *store.Store) {
 	for _, cmd := range []uint16{20008, 20009, 20022, 20028} {
 		cmd := cmd
 		r.Handle(cmd, func(s *gateway.Session, _ proto.Message) error {
 			if s.Role() == nil {
 				return nil
+			}
+			if cmd == 20008 { // leaving a fight ends the runs that go on from fight to fight
+				if h, ok := fightExitHooks.Load(st); ok {
+					h.(func(*gateway.Session))(s)
+				}
 			}
 			return s.Send(cmd, proto.Message{"code": 1, "msg": ""})
 		})

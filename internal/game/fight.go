@@ -174,6 +174,25 @@ type fightState struct {
 	won    bool // how the script ends: the heroes win, or lose when they are all down or the rounds run out
 	cur    int
 	stage  fightStage
+	// combat is the client's fight type (0 = the campaign) and settle what ends the fight (nil = the
+	// campaign's own settling, passed by the caller).
+	combat int64
+	settle func(s *gateway.Session, won bool) error
+}
+
+func (st *fightState) combatType() int64 {
+	if st.combat == 0 {
+		return combatDrama
+	}
+	return st.combat
+}
+
+var fightServices sync.Map // *store.Store -> *FightService
+
+// fightServiceOf is the one fight service of a store, shared by the campaign and the other modes that play fights.
+func fightServiceOf(st *store.Store) *FightService {
+	v, _ := fightServices.LoadOrStore(st, &FightService{Store: st})
+	return v.(*FightService)
 }
 
 // FightService plays the campaign fights. It keeps one fight per role.
@@ -700,19 +719,21 @@ func buildFight(team []fightUnit, monsters []fightUnit, rng *rand.Rand) ([]fight
 
 // fightSetup collects the fighters of a role: its campaign formation against the
 // wave, and the 20027 message that introduces them.
-func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) ([]fightRound, bool, proto.Message, error) {
+// teamSide makes a role's own side of a fight: its campaign formation, and the 20027 objects (the spirit and
+// the heroes).
+func (f *FightService) teamSide(role *store.Role) ([]fightUnit, []proto.Message, store.Formation, error) {
 	// the starter hero is normally granted when the hero list is first opened; a
 	// role that fights before that gets it now (granted once, never twice)
 	if _, err := f.Store.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
-		return nil, false, nil, err
+		return nil, nil, store.Formation{}, err
 	}
 	form, err := formationOf(f.Store, role.RID, formDrama)
 	if err != nil {
-		return nil, false, nil, err
+		return nil, nil, store.Formation{}, err
 	}
 	heroes, err := f.Store.PartnersOf(role.RID)
 	if err != nil {
-		return nil, false, nil, err
+		return nil, nil, store.Formation{}, err
 	}
 	byID := map[int64]store.Partner{}
 	for _, h := range heroes {
@@ -726,33 +747,16 @@ func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) (
 		"object_bid": 1, "object_id": 1, "object_name": "精灵", "object_type": 5, "owner_id": 0, "owner_srv_id": "", "pos": spiritPos,
 		"sex": 0, "skills": []proto.Message{}, "sprites": []proto.Message{{"item_bid": 0, "pos": 1}}, "star": 0,
 	}}
-	var team, foes []fightUnit
-	for _, sl := range slots {
-		h, ok := byID[sl.PartnerID]
-		if !ok || len(team) == formMaxHeroes {
-			continue
-		}
-		info, known := partnerTable[h.BID]
-		if !known {
-			continue
-		}
-		m := partnerMessage(h)
-		pos := battleCell(form.FormationType, sl.Pos)
-		skills := []proto.Message{}
-		var sids []int64
-		for _, sk := range m.Arr("skills") {
-			sids = append(sids, sk.Int("skill_bid"))
-			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
-		}
-		team = append(team, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"),
-			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: true})
-		objects = append(objects, proto.Message{
-			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": 0}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
-			"face_id": 0, "group": 1, "hp": m.Int("hp"), "hp_max": m.Int("hp"), "lev": h.Lev, "object_bid": h.BID, "object_id": h.PartnerID,
-			"object_name": info.Name, "object_type": 2, "owner_id": role.RID, "owner_srv_id": role.SrvID, "pos": pos, "sex": 0, "skills": skills,
-			"sprites": []proto.Message{}, "star": h.Star,
-		})
+	team, heroObjects := sideUnits(role.RID, role.SrvID, slots, form.FormationType, byID, true)
+	return team, append(objects, heroObjects...), form, nil
+}
+
+func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) ([]fightRound, bool, proto.Message, error) {
+	team, objects, form, err := f.teamSide(role)
+	if err != nil {
+		return nil, false, nil, err
 	}
+	var foes []fightUnit
 	// the monsters of the dungeon that is being challenged
 	wave, ok := dungeonUnits[d.DunID]
 	if !ok || len(wave.Monsters) == 0 {
@@ -783,6 +787,44 @@ func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) (
 	}
 	rounds, won := buildFight(team, foes, rng)
 	return rounds, won, start, nil
+}
+
+// sideUnits makes the fighters and their 20027 objects for the heroes in a formation: ours stand on the
+// left (group 1), the others on the right (group 2, ten cells further).
+func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, formType int64, byID map[int64]store.Partner, ours bool) ([]fightUnit, []proto.Message) {
+	group, shift := 1, int64(0)
+	if !ours {
+		group, shift = 2, 10
+	}
+	var units []fightUnit
+	var objects []proto.Message
+	for _, sl := range slots {
+		h, ok := byID[sl.PartnerID]
+		if !ok || len(units) == formMaxHeroes {
+			continue
+		}
+		info, known := partnerTable[h.BID]
+		if !known {
+			continue
+		}
+		m := partnerMessage(h)
+		pos := battleCell(formType, sl.Pos) + shift
+		skills := []proto.Message{}
+		var sids []int64
+		for _, sk := range m.Arr("skills") {
+			sids = append(sids, sk.Int("skill_bid"))
+			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
+		}
+		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"),
+			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours})
+		objects = append(objects, proto.Message{
+			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": 0}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
+			"face_id": 0, "group": group, "hp": m.Int("hp"), "hp_max": m.Int("hp"), "lev": h.Lev, "object_bid": h.BID, "object_id": h.PartnerID,
+			"object_name": info.Name, "object_type": 2, "owner_id": ownerRID, "owner_srv_id": ownerSrv, "pos": pos, "sex": 0, "skills": skills,
+			"sprites": []proto.Message{}, "star": h.Star,
+		})
+	}
+	return units, objects
 }
 
 var errNoHeroes = errors.New("no hero can fight")
@@ -817,9 +859,32 @@ func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama
 	return nil
 }
 
-func roundStart(r fightRound, n int) proto.Message {
+// begin starts a fight that was made elsewhere: the map and the fight data (no 13003, which is the campaign's own).
+func (f *FightService) begin(s *gateway.Session, role *store.Role, combat int64, intro proto.Message, rounds []fightRound, won bool, settle func(*gateway.Session, bool) error) error {
+	f.mu.Lock()
+	if f.active == nil {
+		f.active = map[int64]*fightState{}
+	}
+	f.active[role.RID] = &fightState{rounds: rounds, won: won, combat: combat, settle: settle}
+	f.mu.Unlock()
+	for _, m := range []struct {
+		cmd  uint16
+		body proto.Message
+	}{
+		{20063, proto.Message{"type_list": []proto.Message{}}},
+		{20000, proto.Message{"combat_map": fightMap, "combat_type": combat}},
+		{20027, intro},
+	} {
+		if err := s.Send(m.cmd, m.body); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func roundStart(r fightRound, n int, combat int64) proto.Message {
 	return proto.Message{
-		"action_count": n + 1, "all_alive": posList(r.alive), "combat_type": combatDrama, "countdown_time": 0,
+		"action_count": n + 1, "all_alive": posList(r.alive), "combat_type": combat, "countdown_time": 0,
 		"hallows_list": []proto.Message{{"group": 1, "val": n + 1}, {"group": 2, "val": n + 1}},
 		"owner_id":     0, "owner_srv_id": "", "pos": 0, "round_buff": []proto.Message{}, "skill_plays": nonNil(r.start),
 		"sprite_cd_info": []proto.Message{{"cd_info": []proto.Message{}, "pos": spiritPos}},
@@ -851,6 +916,9 @@ func (f *FightService) skip(s *gateway.Session, settle func(won bool) error) err
 	if err := s.Send(20062, proto.Message{"code": 1, "msg": ""}); err != nil {
 		return err
 	}
+	if st.settle != nil {
+		return st.settle(s, st.won)
+	}
 	return settle(st.won)
 }
 
@@ -873,23 +941,26 @@ func (f *FightService) advance(s *gateway.Session, cmd uint16, settle func(won b
 		if err := s.Send(20001, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
-		return s.Send(20002, roundStart(st.rounds[0], 0))
+		return s.Send(20002, roundStart(st.rounds[0], 0, st.combatType()))
 	case cmd == 20019 && st.stage == waitRoundOver:
 		st.stage = waitPlayed
 		r := st.rounds[st.cur]
 		return s.Send(20004, proto.Message{
-			"action_count": st.cur + 1, "combat_type": combatDrama, "round_buff": []proto.Message{}, "skill_plays": r.plays,
+			"action_count": st.cur + 1, "combat_type": st.combatType(), "round_buff": []proto.Message{}, "skill_plays": r.plays,
 			"sprite_cd_info": []proto.Message{{"cd_info": []proto.Message{}, "pos": spiritPos}}, "star_list": []proto.Message{},
 		})
 	case cmd == 20005 && st.stage == waitPlayed:
 		if st.cur+1 < len(st.rounds) {
 			st.cur++
 			st.stage = waitRoundOver
-			return s.Send(20002, roundStart(st.rounds[st.cur], st.cur))
+			return s.Send(20002, roundStart(st.rounds[st.cur], st.cur, st.combatType()))
 		}
 		f.mu.Lock()
 		delete(f.active, role.RID)
 		f.mu.Unlock()
+		if st.settle != nil {
+			return st.settle(s, st.won)
+		}
 		return settle(st.won)
 	}
 	return nil

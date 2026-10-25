@@ -84,7 +84,7 @@ func clearDungeon(d store.Drama) (next store.Drama, reward []sellGain, msg strin
 // it, a win sends the result (13016) and the new progress (13001), a loss only the
 // result.
 func RegisterDramaBattle(r *gateway.Router, st *store.Store) {
-	fights := &FightService{Store: st}
+	fights := fightServiceOf(st)
 	r.Handle(13003, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
 		if role == nil {

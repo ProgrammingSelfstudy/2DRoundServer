@@ -19,3 +19,12 @@ func TestBattleLeftoversRegistered(t *testing.T) {
 		}
 	}
 }
+
+func TestHeroStubsRegistered(t *testing.T) {
+	e := newEnv(t, 0)
+	for _, c := range []uint16{11018, 11030, 11086, 11401, 25220, 26420, 26432} {
+		if !e.gw.Router.Has(c) {
+			t.Errorf("%d has no handler", c)
+		}
+	}
+}

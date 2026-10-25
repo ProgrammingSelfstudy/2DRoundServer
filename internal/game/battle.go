@@ -22,6 +22,7 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 		return s.Send(21322, proto.Message{"code": 0})
 	})
 	registerBattleLeftovers(r)
+	registerHeroStubs(r)
 }
 
 // registerBattleLeftovers answers the battle commands of a fight the client plays (20008 leave, 20009

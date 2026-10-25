@@ -10,3 +10,12 @@ func TestRoleExtraRegistered(t *testing.T) {
 		}
 	}
 }
+
+func TestBattleLeftoversRegistered(t *testing.T) {
+	e := newEnv(t, 0)
+	for _, c := range []uint16{10958, 20008, 20009, 20014, 20015, 20016, 20022, 20026, 20028, 20034, 20036} {
+		if !e.gw.Router.Has(c) {
+			t.Errorf("%d has no handler", c)
+		}
+	}
+}

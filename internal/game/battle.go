@@ -21,6 +21,48 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 	r.Handle(21322, func(s *gateway.Session, _ proto.Message) error {
 		return s.Send(21322, proto.Message{"code": 0})
 	})
+	registerBattleLeftovers(r)
+}
+
+// registerBattleLeftovers answers the battle commands of a fight the client plays (20008 leave, 20009
+// skip the first team, 20022 speed, 20028 ready again: our fights are settled at once, so there is no
+// fight to leave or to speed up; they get code 1), 20026 map loaded (no drama to resume),
+// player-to-player challenges 20014-20016 and replays 20034 / 20036 (refused: no challenge invites and
+// no replays are kept), and the combat log 10958 (no reply). Our rules, not captured.
+func registerBattleLeftovers(r *gateway.Router) {
+	for _, cmd := range []uint16{20008, 20009, 20022, 20028} {
+		cmd := cmd
+		r.Handle(cmd, func(s *gateway.Session, _ proto.Message) error {
+			if s.Role() == nil {
+				return nil
+			}
+			return s.Send(cmd, proto.Message{"code": 1, "msg": ""})
+		})
+	}
+	r.Handle(20026, func(s *gateway.Session, _ proto.Message) error {
+		if s.Role() == nil {
+			return nil
+		}
+		return s.Send(20026, proto.Message{"drama_id": 0})
+	})
+	for _, cmd := range []uint16{20014, 20015, 20036} {
+		cmd := cmd
+		r.Handle(cmd, func(s *gateway.Session, _ proto.Message) error {
+			if s.Role() == nil {
+				return nil
+			}
+			return s.Send(cmd, proto.Message{"code": 0, "msg": "暂不支持"})
+		})
+	}
+	r.Handle(20034, func(s *gateway.Session, _ proto.Message) error {
+		if s.Role() == nil {
+			return nil
+		}
+		return s.Send(20034, proto.Message{"result": 0, "msg": "录像不存在"})
+	})
+	for _, cmd := range []uint16{20016, 10958} {
+		r.Handle(cmd, func(*gateway.Session, proto.Message) error { return nil })
+	}
 }
 
 // partnerHolyEquipment answers 11092 (the holy equipment worn by heroes): every

@@ -357,3 +357,24 @@ func TestHeroLevelUpPartlyAffordable(t *testing.T) {
 		t.Fatalf("nothing left: %v", r)
 	}
 }
+
+func TestHeroAttributeList(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, _ := e.enter("ua", "船长")
+	c.send(11000, proto.Message{})
+	heroes := c.waitFor(11000).Arr("partners")
+	if len(heroes) == 0 {
+		t.Fatal("no starter hero")
+	}
+	h := heroes[0]
+	c.send(11063, proto.Message{"partner_id": h.Int("partner_id")})
+	r := c.waitFor(11063)
+	if r.Int("partner_id") != h.Int("partner_id") || r.Int("atk") != h.Int("atk") || r.Int("hp") != h.Int("hp") || r.Int("speed") != h.Int("speed") {
+		t.Fatalf("11063 %v differs from the entry %v", r, h)
+	}
+	c.send(11063, proto.Message{"partner_id": 999999}) // not ours: no answer, the next one still comes
+	c.send(11063, proto.Message{"partner_id": h.Int("partner_id")})
+	if r := c.waitFor(11063); r.Int("partner_id") != h.Int("partner_id") {
+		t.Fatalf("after a foreign id: %v", r)
+	}
+}

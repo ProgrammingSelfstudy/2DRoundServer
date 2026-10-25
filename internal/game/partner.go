@@ -191,6 +191,34 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterSkin(r, st)
 	RegisterSeerpalace(r, st)
 	RegisterVIPGifts(r, st)
+	// 11063 the attribute list of one hero (the tips panel behind its numbers): the same numbers the hero entry
+	// carries, the rest from the hero's table; what we do not model is 0.
+	r.Handle(11063, func(s *gateway.Session, req proto.Message) error {
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		p, err := st.PartnerByID(role.RID, req.Int("partner_id"))
+		if errors.Is(err, store.ErrNotFound) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if _, ok := partnerTable[p.BID]; !ok {
+			return nil
+		}
+		m := partnerMessage(*p)
+		a := partnerTable[p.BID].Attr
+		out := proto.Message{"partner_id": p.PartnerID, "ext_data": []proto.Message{}}
+		for _, k := range []string{"atk", "def_p", "def_s", "hp", "speed", "hit_rate", "dodge_rate", "crit_rate", "crit_ratio", "hit_magic", "dodge_magic", "def"} {
+			out[k] = m[k]
+		}
+		for _, k := range []string{"dam", "res", "cure", "be_cure", "tenacity", "dam_p", "dam_s", "res_p", "res_s"} {
+			out[k] = a[k]
+		}
+		return s.Send(11063, out)
+	})
 	r.Handle(11026, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
 		if role == nil {

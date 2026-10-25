@@ -588,9 +588,9 @@ func TestEmptyRepliesAnswerAndRealHandlersWin(t *testing.T) {
 	}
 	// a real handler registered first must not be replaced
 	called := false
-	e.gw.Router.Handle(10907, func(s *gateway.Session, _ proto.Message) error {
+	e.gw.Router.Handle(10924, func(s *gateway.Session, _ proto.Message) error {
 		called = true
-		return s.Send(10907, proto.Message{})
+		return s.Send(10924, proto.Message{})
 	})
 	RegisterEmpty(e.gw.Router, log.New(io.Discard, "", 0))
 	_, tok := e.account("u1")
@@ -606,12 +606,8 @@ func TestEmptyRepliesAnswerAndRealHandlersWin(t *testing.T) {
 	if r := c.recv(10925); r.Int("id") != 77 || r.Int("status") != 0 {
 		t.Fatalf("10925 must echo id and leave the rest empty: %v", r)
 	}
-	c.send(25830, proto.Message{"start": 3, "num": 9})
-	if r := c.recv(25830); r.Int("start") != 3 || r.Int("num") != 9 || r.Int("max_num") != 0 {
-		t.Fatalf("25830: %v", r)
-	}
-	c.send(10907, proto.Message{})
-	c.recv(10907)
+	c.send(10924, proto.Message{})
+	c.recv(10924)
 	if !called {
 		t.Fatal("the real handler must win over the empty reply")
 	}

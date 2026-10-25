@@ -100,6 +100,7 @@ func main() {
 		game.RegisterEmoguoshi(gw.Router, st)
 		game.RegisterEndless(gw.Router, st)
 		game.RegisterHeaven(gw.Router, st)
+		game.RegisterHallows(gw.Router, st)
 		game.RegisterStoneDungeon(gw.Router, st)
 		game.RegisterForge(gw.Router, st)
 		game.RegisterDramaBattle(gw.Router, st)

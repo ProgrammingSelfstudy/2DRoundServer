@@ -538,6 +538,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 			return err
 		}
 		return fights.begin(s, role, combatGuildDun, intro, rounds, damage >= fightHP, func(s *gateway.Session, _ bool) error {
+			lifeCount(g.Store, role.RID, "evt_guild_dun_fight", 1)
 			out, err := g.bossSettle(role, gd, st, boss, damage, s.Now())
 			if err != nil {
 				return err

@@ -620,6 +620,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 		a.ContWin = 0
 	}
 	a.Battles++
+	lifeCount(st, role.RID, "evt_arena_fight", 1)
 	if err := st.SaveArenaPlayer(a); err != nil {
 		return err
 	}

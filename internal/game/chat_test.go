@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"2droundserver/internal/proto"
+	"2droundserver/internal/store"
 )
 
 // intoCity reads what follows 10300 up to the main city push, so the next frame
@@ -199,7 +200,7 @@ func TestWorldChatRefusals(t *testing.T) {
 			t.Fatalf("want %q, got %v", want, r)
 		}
 	}
-	bad(4, "公会", "该频道暂未开放")    // guild
+	bad(4, "公会", "你还没有加入公会")   // guild, without being in one
 	bad(7, "好友", "该频道暂未开放")    // friend channel goes through 12720
 	bad(1024, "跨服", "该频道暂未开放") // cross-server
 	bad(1, "", "消息内容不合法")
@@ -315,5 +316,50 @@ func TestBroadcastReachesEveryoneOnline(t *testing.T) {
 	}
 	if code, out := post("x"); code != 200 || out["pushed"] != float64(0) {
 		t.Fatalf("nobody online: %d %v", code, out)
+	}
+}
+
+func TestGuildChat(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	ca, a := e.enter("a", "甲")
+	cb, b := e.enter("b", "乙")
+	cc, c := e.enter("c", "丙")
+	say := func(cl *client, r *store.Role, ch int64, text string) {
+		cl.send(12762, proto.Message{"channel": ch, "len": 0, "msg": text, "sign": chatSign(r.RID, "symlf_1", ch, 0, text)})
+	}
+	say(ca, a, 4, "没有公会")
+	if r := ca.recv(12762); r.Int("code") != 0 {
+		t.Fatalf("without a guild: %v", r)
+	}
+	gid, err := e.st.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "海贼联盟", LeaderRID: a.RID}, 1, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.JoinGuild(gid, b.RID, 2, 15); err != nil {
+		t.Fatal(err)
+	}
+	say(ca, a, 4, "会内的话")
+	for _, cl := range []*client{ca, cb} {
+		m := cl.recv(12761)
+		who := m.Arr("role_list")
+		if m.Int("channel") != 4 || m.Str("msg") != "会内的话" || len(who) != 1 || who[0].Str("g_name") != "海贼联盟" || who[0].Int("gid") != gid {
+			t.Fatalf("guild push: %v", m)
+		}
+	}
+	if r := ca.recv(12762); r.Int("code") != 1 {
+		t.Fatalf("reply: %v", r)
+	}
+	cc.expectNothing() // the outsider heard nothing
+	say(cc, c, 4, "我不在会里")
+	if r := cc.recv(12762); r.Int("code") != 0 {
+		t.Fatalf("outsider: %v", r)
+	}
+	cb.send(12766, proto.Message{"channel": 4})
+	if h := cb.recv(12766); len(h.Arr("msg_list")) != 1 {
+		t.Fatalf("history: %v", h)
+	}
+	cc.send(12766, proto.Message{"channel": 4})
+	if h := cc.recv(12766); len(h.Arr("msg_list")) != 0 {
+		t.Fatalf("history of an outsider: %v", h)
 	}
 }

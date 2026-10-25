@@ -16,8 +16,11 @@ import (
 	"2droundserver/internal/store"
 )
 
-// Chat channels are bits (chat_const.lua Channel); only the world channel exists.
-const chatWorld = 1
+// Chat channels are bits (chat_const.lua Channel); the world and the guild channel exist.
+const (
+	chatWorld = 1
+	chatGuild = 4 // Channel.Gang
+)
 
 // Policy values that are our choice, not protocol.
 const (
@@ -26,8 +29,9 @@ const (
 	chatOfflineKeep = 50  // private messages kept per offline recipient
 )
 
-// ChatService implements private chat (12720 -> 12721, offline 12722) and the
-// world channel (12762 -> 12761, history 12766). Other channels (guild, scene,
+// ChatService implements private chat (12720 -> 12721, offline 12722), the
+// world channel (12762 -> 12761, history 12766) and the guild channel (the same
+// commands on channel 4, only for the members of the speaker's guild). Other channels (scene,
 // team, cross-server), voice (12725/12726) and the @ notices are not implemented.
 type ChatService struct {
 	Store *store.Store
@@ -39,7 +43,8 @@ type ChatService struct {
 
 	mu        sync.Mutex
 	lastSpeak map[int64]time.Time
-	history   []proto.Message // newest last
+	history   []proto.Message           // newest last
+	guildHist map[int64][]proto.Message // the guild channel's messages by guild, newest last
 }
 
 func (c *ChatService) Register(r *gateway.Router) {
@@ -188,8 +193,16 @@ func (c *ChatService) world(s *gateway.Session, req proto.Message) error {
 	}
 	reply := func(ok bool, msg string) error { return s.Send(12762, proto.Message{"code": b2i(ok), "msg": msg}) }
 	channel, flag, text := req.Int("channel"), req.Int("len"), req.Str("msg")
+	var gid int64
+	if channel == chatGuild {
+		gd, _, err := c.Store.GuildOfRole(me.RID)
+		if err != nil {
+			return reply(false, "你还没有加入公会")
+		}
+		gid = gd.GID
+	}
 	switch {
-	case channel != chatWorld:
+	case channel != chatWorld && channel != chatGuild:
 		return reply(false, "该频道暂未开放")
 	case !validChatMsg(text):
 		return reply(false, "消息内容不合法")
@@ -200,18 +213,48 @@ func (c *ChatService) world(s *gateway.Session, req proto.Message) error {
 	if req.Str("sign") != chatSign(me.RID, me.SrvID, channel, flag, text) {
 		c.Log.Printf("chat: role %d: channel message sign mismatch", me.RID)
 	}
-	msg := proto.Message{"role_list": []proto.Message{speaker(me)}, "channel": chatWorld, "len": flag, "msg": text, "tick": s.Now().Unix()}
+	who := speaker(me)
+	if channel == chatGuild {
+		if gd, _, err := c.Store.GuildOfRole(me.RID); err == nil {
+			who["gid"], who["gsrv_id"], who["g_name"] = gd.GID, gd.SrvID, gd.Name
+		}
+	}
+	msg := proto.Message{"role_list": []proto.Message{who}, "channel": channel, "len": flag, "msg": text, "tick": s.Now().Unix()}
 	c.mu.Lock()
-	c.history = append(c.history, msg)
-	if len(c.history) > chatHistory {
-		c.history = c.history[len(c.history)-chatHistory:]
+	if channel == chatGuild {
+		if c.guildHist == nil {
+			c.guildHist = map[int64][]proto.Message{}
+		}
+		h := append(c.guildHist[gid], msg)
+		if len(h) > chatHistory {
+			h = h[len(h)-chatHistory:]
+		}
+		c.guildHist[gid] = h
+	} else {
+		c.history = append(c.history, msg)
+		if len(c.history) > chatHistory {
+			c.history = c.history[len(c.history)-chatHistory:]
+		}
 	}
 	c.mu.Unlock()
-	c.Hub.Each(func(rid int64, sess *gateway.Session) {
+	push := func(rid int64, sess *gateway.Session) {
 		if err := sess.Send(12761, msg); err != nil {
 			c.Log.Printf("chat: push to role %d: %v", rid, err)
 		}
-	})
+	}
+	if channel == chatGuild {
+		members, err := c.Store.MembersOf(gid)
+		if err != nil {
+			return err
+		}
+		for _, m := range members {
+			if sess := c.Hub.Online(m.RID); sess != nil {
+				push(m.RID, sess)
+			}
+		}
+	} else {
+		c.Hub.Each(push)
+	}
 	return reply(true, "")
 }
 
@@ -220,10 +263,17 @@ func (c *ChatService) historyOf(s *gateway.Session, req proto.Message) error {
 		return nil
 	}
 	list := []proto.Message{}
-	if req.Int("channel") == chatWorld {
+	switch req.Int("channel") {
+	case chatWorld:
 		c.mu.Lock()
 		list = append(list, c.history...)
 		c.mu.Unlock()
+	case chatGuild:
+		if gd, _, err := c.Store.GuildOfRole(s.Role().RID); err == nil {
+			c.mu.Lock()
+			list = append(list, c.guildHist[gd.GID]...)
+			c.mu.Unlock()
+		}
 	}
 	return s.Send(12766, proto.Message{"channel": req.Int("channel"), "msg_list": list})
 }

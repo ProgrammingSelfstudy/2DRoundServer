@@ -225,3 +225,28 @@ func TestNoticesForRoleVisibilityAndReadState(t *testing.T) {
 		t.Errorf("read rows left behind: %d", n)
 	}
 }
+
+func TestModuleStateRoundTrip(t *testing.T) {
+	st, err := Open(":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer st.Close()
+	type doc struct {
+		N int
+		S []string
+	}
+	var got doc
+	if ok, err := st.LoadGlobal("s1", "m", &got); ok || err != nil {
+		t.Fatalf("empty global: %v %v", ok, err)
+	}
+	if err := st.SaveGlobal("s1", "m", doc{3, []string{"a"}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := st.SaveGlobal("s1", "m", doc{4, []string{"b", "c"}}); err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := st.LoadGlobal("s1", "m", &got); !ok || err != nil || got.N != 4 || len(got.S) != 2 {
+		t.Fatalf("global: %v %v %+v", ok, err, got)
+	}
+}

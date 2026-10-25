@@ -171,8 +171,9 @@ type mailReq struct {
 
 const (
 	maxAttachments = 8
-	maxGrantItems  = 20 // entries in one direct grant
-	maxGrantHeroes = 20 // heroes in one direct hero grant
+	maxGrantItems  = 20   // entries in one direct grant
+	maxGrantHeroes = 20   // heroes in one direct hero grant
+	maxSkinDays    = 3650 // days of a timed skin grant
 	maxAmount      = 1_000_000_000
 	maxRecipients  = 500
 )

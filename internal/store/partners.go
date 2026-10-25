@@ -9,8 +9,10 @@ import (
 type Partner struct {
 	PartnerID, RID, BID int64
 	Lev, Star, BreakLev int
-	Locked              bool    // locked by the owner: not to be consumed
-	Equips              []Equip // worn pieces, by slot
+	UseSkin             int64    // the skin worn (0 = none)
+	Locked              bool     // locked by the owner: not to be consumed
+	Equips              []Equip  // worn pieces, by slot
+	Talents             []Talent // learned talent skills, by slot
 }
 
 // Equip is one worn piece of equipment.
@@ -24,7 +26,7 @@ type PartnerSeed struct {
 
 // PartnersOf lists a role's heroes, oldest first.
 func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
-	rows, err := s.db.Query(`SELECT partner_id,rid,bid,lev,star,break_lev,locked FROM partners WHERE rid=? ORDER BY partner_id`, rid)
+	rows, err := s.db.Query(`SELECT partner_id,rid,bid,lev,star,break_lev,locked,use_skin FROM partners WHERE rid=? ORDER BY partner_id`, rid)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +34,7 @@ func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
 	var out []Partner
 	for rows.Next() {
 		var p Partner
-		if err := rows.Scan(&p.PartnerID, &p.RID, &p.BID, &p.Lev, &p.Star, &p.BreakLev, &p.Locked); err != nil {
+		if err := rows.Scan(&p.PartnerID, &p.RID, &p.BID, &p.Lev, &p.Star, &p.BreakLev, &p.Locked, &p.UseSkin); err != nil {
 			return nil, err
 		}
 		out = append(out, p)
@@ -45,8 +47,13 @@ func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
 	if err != nil {
 		return nil, err
 	}
+	tl, err := s.talentsOf(`partner_id IN (SELECT partner_id FROM partners WHERE rid=?)`, rid)
+	if err != nil {
+		return nil, err
+	}
 	for i := range out {
 		out[i].Equips = eq[out[i].PartnerID]
+		out[i].Talents = tl[out[i].PartnerID]
 	}
 	return out, nil
 }
@@ -86,8 +93,8 @@ func (s *Store) StarterGranted(rid int64) (bool, error) {
 // PartnerByID returns one hero of the role, or ErrNotFound.
 func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	var p Partner
-	err := s.db.QueryRow(`SELECT partner_id,rid,bid,lev,star,break_lev,locked FROM partners WHERE partner_id=? AND rid=?`, partnerID, rid).
-		Scan(&p.PartnerID, &p.RID, &p.BID, &p.Lev, &p.Star, &p.BreakLev, &p.Locked)
+	err := s.db.QueryRow(`SELECT partner_id,rid,bid,lev,star,break_lev,locked,use_skin FROM partners WHERE partner_id=? AND rid=?`, partnerID, rid).
+		Scan(&p.PartnerID, &p.RID, &p.BID, &p.Lev, &p.Star, &p.BreakLev, &p.Locked, &p.UseSkin)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, ErrNotFound
 	}
@@ -96,6 +103,11 @@ func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	}
 	eq, err := s.equipsOf(`partner_id=?`, partnerID)
 	p.Equips = eq[partnerID]
+	if err != nil {
+		return &p, err
+	}
+	tl, err := s.talentsOf(`partner_id=?`, partnerID)
+	p.Talents = tl[partnerID]
 	return &p, err
 }
 
@@ -246,7 +258,7 @@ func (s *Store) Summon(rid int64, r SummonResult) ([]Partner, error) {
 
 // PartnersOfServer lists the heroes of every role of one server, by role id.
 func (s *Store) PartnersOfServer(srvID string) (map[int64][]Partner, error) {
-	rows, err := s.db.Query(`SELECT p.partner_id,p.rid,p.bid,p.lev,p.star,p.break_lev,p.locked FROM partners p JOIN roles r ON r.rid=p.rid WHERE r.srv_id=? ORDER BY p.partner_id`, srvID)
+	rows, err := s.db.Query(`SELECT p.partner_id,p.rid,p.bid,p.lev,p.star,p.break_lev,p.locked,p.use_skin FROM partners p JOIN roles r ON r.rid=p.rid WHERE r.srv_id=? ORDER BY p.partner_id`, srvID)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +266,7 @@ func (s *Store) PartnersOfServer(srvID string) (map[int64][]Partner, error) {
 	out := map[int64][]Partner{}
 	for rows.Next() {
 		var p Partner
-		if err := rows.Scan(&p.PartnerID, &p.RID, &p.BID, &p.Lev, &p.Star, &p.BreakLev, &p.Locked); err != nil {
+		if err := rows.Scan(&p.PartnerID, &p.RID, &p.BID, &p.Lev, &p.Star, &p.BreakLev, &p.Locked, &p.UseSkin); err != nil {
 			return nil, err
 		}
 		out[p.RID] = append(out[p.RID], p)

@@ -32,7 +32,7 @@ func AssetLabelNames() []string {
 //	POST /push/notice?id=N         show (10950) or drop (10951) notice N for the online roles
 //	POST /push/notice/remove?id=N  tell the online roles notice N was deleted (10951)
 //	POST /push/broadcast?msg=TEXT  scroll TEXT across the top of every online player's screen
-//	POST /push/refresh?rid=N[&heroes=1,2]  resend the currencies (10302) and backpack (10500) of an online role, and the heroes with those partner ids (11001)
+//	POST /push/refresh?rid=N[&heroes=1,2][&skins=1]  resend the currencies (10302) and backpack (10500) of an online role, the heroes with those partner ids (11001) and, with skins=1, its skins (11020)
 //	POST /kick?rid=N       disconnect an online role (used after a ban)
 //	GET  /online           number of roles online
 //	GET  /online?rid=N     whether role N is online
@@ -111,6 +111,12 @@ func (m *MailService) AdminHandler() http.Handler {
 				}
 				if p, err := m.Store.PartnerByID(rid, pid); err == nil {
 					heroes = append(heroes, partnerMessage(*p))
+				}
+			}
+			if r.URL.Query().Get("skins") == "1" {
+				if err := sendSkins(sess, m.Store, rid); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
 				}
 			}
 			if len(heroes) > 0 {

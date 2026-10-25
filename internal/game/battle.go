@@ -14,8 +14,6 @@ const combatDrama = 3
 // RegisterBattle registers the battle commands that have a defined meaning.
 func RegisterBattle(r *gateway.Router, st *store.Store) {
 	r.Handle(20060, func(s *gateway.Session, req proto.Message) error { return combatType(s, st, req) })
-	r.Handle(11099, partnerDowerSkills)
-	r.Handle(11067, partnerResetCount)
 	r.Handle(11092, partnerHolyEquipment)
 	// 10397: the client says whether it is watching a replay; there is no reply.
 	r.Handle(10397, func(*gateway.Session, proto.Message) error { return nil })
@@ -23,24 +21,6 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 	r.Handle(21322, func(s *gateway.Session, _ proto.Message) error {
 		return s.Send(21322, proto.Message{"code": 0})
 	})
-}
-
-// partnerDowerSkills answers 11099, which the formation panel sends for the heroes
-// on the field. The original server answers every id with an empty dower_skill
-// list (capture original-2026-10-20); the feature itself is not implemented.
-func partnerDowerSkills(s *gateway.Session, req proto.Message) error {
-	out := []proto.Message{}
-	for _, p := range req.Arr("partner_ids") {
-		out = append(out, proto.Message{"partner_id": p.Int("partner_id"), "dower_skill": []proto.Message{}})
-	}
-	return s.Send(11099, proto.Message{"partner_ids": out})
-}
-
-// partnerResetCount answers 11067 (how often a hero may still be reset): the hero
-// is echoed with no reset pending (end_time 0) and no use today (day_num 0). Hero
-// reset itself is not implemented.
-func partnerResetCount(s *gateway.Session, req proto.Message) error {
-	return s.Send(11067, proto.Message{"partner_id": req.Int("partner_id"), "end_time": 0, "day_num": 0})
 }
 
 // partnerHolyEquipment answers 11092 (the holy equipment worn by heroes): every

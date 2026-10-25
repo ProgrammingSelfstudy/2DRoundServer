@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 	"unicode/utf8"
 
@@ -51,7 +52,7 @@ func (s *Server) meta(w http.ResponseWriter, r *http.Request, p *principal) {
 		id, _ := game.AssetLabelID(n)
 		assets = append(assets, map[string]any{"name": n, "label": id})
 	}
-	writeJSON(w, 200, map[string]any{"assets": assets, "heroes": game.HeroOptions(), "roles": []string{"viewer", "operator", "superadmin"}, "mail_types": []int{1, 3}})
+	writeJSON(w, 200, map[string]any{"assets": assets, "heroes": game.HeroOptions(), "skins": game.SkinChoices(), "roles": []string{"viewer", "operator", "superadmin"}, "mail_types": []int{1, 3}})
 }
 
 // ---- admins ----
@@ -732,6 +733,58 @@ func (s *Server) grantHeroes(w http.ResponseWriter, r *http.Request, p *principa
 		resp["refreshed"] = out.Refreshed
 	}
 	s.audit(r, p, "role.heroes", role.Name, map[string]any{"rid": rid, "srv_id": role.SrvID, "heroes": granted})
+	writeJSON(w, 200, resp)
+}
+
+// grantSkin gives a role a hero skin, for good or for `days` days. An online role is sent its
+// skin list (11020) at once, which also opens the client's "new skin" window.
+func (s *Server) grantSkin(w http.ResponseWriter, r *http.Request, p *principal) {
+	rid, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	var q struct {
+		SkinID int64 `json:"skin_id"`
+		Days   int   `json:"days"`
+	}
+	if !decode(w, r, &q) {
+		return
+	}
+	if !game.SkinKnown(q.SkinID) {
+		fail(w, http.StatusUnprocessableEntity, fmt.Sprintf("no skin %d", q.SkinID))
+		return
+	}
+	if q.Days < 0 || q.Days > maxSkinDays {
+		fail(w, http.StatusUnprocessableEntity, fmt.Sprintf("days must be 0 (for good) to %d", maxSkinDays))
+		return
+	}
+	role, err := s.Store.RoleByID(rid)
+	if errors.Is(err, store.ErrNotFound) {
+		fail(w, 404, "no such role")
+		return
+	}
+	if err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	var end int64
+	if q.Days > 0 {
+		end = time.Now().Add(time.Duration(q.Days) * 24 * time.Hour).Unix()
+	}
+	if err := s.Store.GrantSkin(rid, q.SkinID, end); err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	resp := map[string]any{"ok": true, "skin_id": q.SkinID, "end_time": end, "refreshed": nil}
+	var out struct {
+		Refreshed bool `json:"refreshed"`
+	}
+	if err := s.gateway("POST", fmt.Sprintf("/push/refresh?rid=%d&skins=1", rid), &out); err != nil {
+		resp["push_error"] = err.Error() // stored: the role sees it when it logs in
+	} else {
+		resp["refreshed"] = out.Refreshed
+	}
+	s.audit(r, p, "role.skin", role.Name, map[string]any{"rid": rid, "srv_id": role.SrvID, "skin_id": q.SkinID, "days": q.Days})
 	writeJSON(w, 200, resp)
 }
 

@@ -119,6 +119,7 @@ func (s *Server) Handler() http.Handler {
 	route("POST /api/roles/{id}/vip", levWrite, s.setRoleVIP)
 	route("POST /api/roles/{id}/grant", levWrite, s.grantRole)
 	route("POST /api/roles/{id}/heroes", levWrite, s.grantHeroes)
+	route("POST /api/roles/{id}/skins", levWrite, s.grantSkin)
 	route("POST /api/roles/{id}/ban", levWrite, s.banRole)
 	route("POST /api/roles/{id}/unban", levWrite, s.unbanRole)
 

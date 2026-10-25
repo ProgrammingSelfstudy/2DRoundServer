@@ -20,11 +20,13 @@ type brachStep struct {
 	LevMax int        `json:"lev_max"`
 	Add    [4]int64   `json:"add"`
 	Expend [][2]int64 `json:"expend"`
+	Get    [][2]int64 `json:"get"`   // what a reset gives back of the steps before this one
 	Limit  bool       `json:"limit"` // the step has an extra condition the client does not spell out
 }
 
 type growthTables struct {
 	Costs [][]sellGain // Costs[lev-1]: what going from lev to lev+1 costs
+	Gets  [][]sellGain // Gets[lev-1]: what a reset gives back of the levels below lev
 	Brach map[string]brachStep
 }
 
@@ -32,6 +34,7 @@ var growth = func() growthTables {
 	var f struct {
 		Lev []struct {
 			Expend [][2]int64 `json:"expend"`
+			Get    [][2]int64 `json:"get"`
 		} `json:"lev"`
 		Brach map[string]brachStep `json:"brach"`
 	}
@@ -45,6 +48,7 @@ var growth = func() growthTables {
 			c = append(c, sellGain{e[0], e[1]})
 		}
 		g.Costs = append(g.Costs, c)
+		g.Gets = append(g.Gets, gains(l.Get))
 	}
 	return g
 }()

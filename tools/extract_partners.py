@@ -89,8 +89,10 @@ json.dump({"source": "restored client partner_data.lua (data_partner_base, data_
 # growth tables: what a level costs, and the break (branch) steps with their level caps
 lev = []
 lb = block("data_partner_lev", "Config.PartnerData.data_partner_brach_length")
-for m in re.finditer(r"\t\{\n\t\tlev = (\d+),\n\t\texpend = \{(.*?)\n\t\t\},\n\t\tget_item", lb, re.S):
-    lev.append({"lev": int(m.group(1)), "expend": [[int(a), int(b)] for a, b in re.findall(r"\{\s*(\d+),\s*(\d+),?\s*\}", m.group(2))]})
+for m in re.finditer(r"\t\{\n\t\tlev = (\d+),\n\t\texpend = \{(.*?)\n\t\t\},\n\t\tget_item = \{(.*?)\}\s*,\n\t\},", lb, re.S):
+    pairs = lambda t: [[int(a), int(b)] for a, b in re.findall(r"\{\s*(\d+),\s*(\d+),?\s*\}", t)]
+    # get_item: what resetting a hero that stands at this level gives back (cumulative)
+    lev.append({"lev": int(m.group(1)), "expend": pairs(m.group(2)), "get": pairs(m.group(3))})
 assert len(lev) == declared("data_partner_lev"), len(lev)
 assert [l["lev"] for l in lev] == list(range(1, len(lev) + 1))
 brach = {}
@@ -99,7 +101,9 @@ for m in re.finditer(r'\t\["(\d+)_(\d+)_(\d+)"\] = \{\n(.*?)\n\t\},', bb, re.S):
     body = m.group(4)
     f = {k: int(v) for k, v in re.findall(r"\t\t(\w+) = (-?\d+),", body)}
     ex = re.search(r"\t\texpend = \{(.*?)\n\t\t\},", body, re.S)
+    gi = re.search(r"\t\tget_item = \{(?:\}|(.*?)\n\t\t\})", body, re.S)
     brach["%s_%s_%s" % m.group(1, 2, 3)] = {
+        "get": [[int(a), int(b)] for a, b in re.findall(r"\{\s*(\d+),\s*(\d+),?\s*\}", gi.group(1))] if gi and gi.group(1) else [],
         "lev_max": f["lev_max"], "add": [f["add_hp"], f["add_atk"], f["add_def"], f["add_speed"]],
         "expend": [[int(a), int(b)] for a, b in re.findall(r"\{\s*(\d+),\s*(\d+),?\s*\}", ex.group(1))] if ex else [],
         "limit": "limit = {}" not in body}

@@ -353,3 +353,42 @@ func TestGrantHeroes(t *testing.T) {
 		t.Fatalf("audit: %v", e.auditActions())
 	}
 }
+
+func TestGrantSkin(t *testing.T) {
+	e := newEnv(t)
+	viewer, operator, _ := e.tokens()
+	e.seedServer("symlf_1")
+	r := e.seedRole("p1", "symlf_1", "路飞")
+	path := fmt.Sprintf("/api/roles/%d/skins", r.RID)
+	if res := e.do(viewer, "POST", path, map[string]any{"skin_id": 107}); res.Status != 403 {
+		t.Fatalf("a viewer must not grant: %d", res.Status)
+	}
+	for name, b := range map[string]map[string]any{
+		"unknown skin":  {"skin_id": 1},
+		"negative days": {"skin_id": 107, "days": -1},
+		"too long":      {"skin_id": 107, "days": 99999},
+	} {
+		if res := e.do(operator, "POST", path, b); res.Status != 422 {
+			t.Fatalf("%s: %d %s", name, res.Status, res.Body)
+		}
+	}
+	if res := e.do(operator, "POST", "/api/roles/999999/skins", map[string]any{"skin_id": 107}); res.Status != 404 {
+		t.Fatalf("unknown role: %d", res.Status)
+	}
+	if got, _ := e.st.SkinsOf(r.RID, 0); len(got) != 0 {
+		t.Fatalf("refused calls gave skins: %v", got)
+	}
+	if res := e.do(operator, "POST", path, map[string]any{"skin_id": 107}); res.Status != 200 || res.JSON()["end_time"].(float64) != 0 {
+		t.Fatalf("grant: %d %s", res.Status, res.Body)
+	}
+	if res := e.do(operator, "POST", path, map[string]any{"skin_id": 117, "days": 7}); res.Status != 200 || res.JSON()["end_time"].(float64) == 0 {
+		t.Fatalf("timed grant: %d %s", res.Status, res.Body)
+	}
+	got, _ := e.st.SkinsOf(r.RID, 0)
+	if len(got) != 2 || got[0].ID != 107 || got[0].EndTime != 0 || got[1].EndTime == 0 {
+		t.Fatalf("skins: %v", got)
+	}
+	if len(e.gw.skinPushes) != 2 || e.gw.skinPushes[0] != "1" {
+		t.Fatalf("push asks %v", e.gw.skinPushes)
+	}
+}

@@ -112,13 +112,13 @@ func partnerMessage(p store.Partner) proto.Message {
 	return proto.Message{
 		"partner_id": p.PartnerID, "bid": p.BID, "lev": p.Lev, "star": p.Star, "skills": skills,
 		"break_lev": p.BreakLev, "power": atk + def + hp/10 + speed,
-		"is_lock": lockList(p), "use_skin": 0, "end_time": 0,
+		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": 0,
 		"resonate_lev": 0, "resonate_break_lev": 0, "horcrux_status": 0, "horcrux_lev": 0,
 		"atk": atk, "def_p": def, "def_s": def, "hp": hp, "speed": speed,
 		"hit_rate": a["hit_rate"], "dodge_rate": a["dodge_rate"], "crit_rate": a["crit_rate"], "crit_ratio": a["crit_ratio"],
 		"hit_magic": a["hit_magic"], "dodge_magic": a["dodge_magic"], "def": def,
 		"atk2": 0, "hp2": 0, "def2": 0, "speed2": 0,
-		"eqms": eqmsOf(p), "artifacts": []proto.Message{}, "dower_skill": []proto.Message{},
+		"eqms": eqmsOf(p), "artifacts": []proto.Message{}, "dower_skill": talentMessages(p.Talents),
 	}
 }
 
@@ -181,6 +181,9 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterSummon(r, st)
 	RegisterEliteSummon(r, st)
 	RegisterHeroLock(r, st)
+	RegisterTalent(r, st)
+	RegisterReset(r, st)
+	RegisterSkin(r, st)
 	RegisterSeerpalace(r, st)
 	RegisterVIPGifts(r, st)
 	r.Handle(11026, func(s *gateway.Session, req proto.Message) error {

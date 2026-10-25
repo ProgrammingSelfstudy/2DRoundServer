@@ -25,6 +25,7 @@ type gatewayStub struct {
 	kicks                     []string
 	refreshes                 []string
 	heroPushes                []string // the heroes= of each refresh
+	skinPushes                []string // the skins= of each refresh
 	refreshed                 bool     // what POST /push/refresh answers
 	noticePushes, noticeDrops []string
 	broadcasts                []string
@@ -57,6 +58,7 @@ func (g *gatewayStub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "/push/refresh":
 		g.refreshes = append(g.refreshes, r.URL.Query().Get("rid"))
 		g.heroPushes = append(g.heroPushes, r.URL.Query().Get("heroes"))
+		g.skinPushes = append(g.skinPushes, r.URL.Query().Get("skins"))
 		json.NewEncoder(w).Encode(map[string]bool{"refreshed": g.refreshed})
 	case "/kick":
 		g.kicks = append(g.kicks, r.URL.Query().Get("rid"))

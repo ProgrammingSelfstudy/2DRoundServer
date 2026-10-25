@@ -190,3 +190,69 @@ func TestSkins(t *testing.T) {
 	}
 	c.recv(11019)
 }
+
+func TestReturn(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	// 10501: camp 1, first star 5; star 12 -> 10 gives 4 copies and the "12_1" materials
+	if ok, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: 10501, Star: 12}, {BID: 10501, Star: 5}}); err != nil || !ok {
+		t.Fatal(ok, err)
+	}
+	hs, _ := e.st.PartnersOf(role.RID)
+	hero, low := hs[0].PartnerID, hs[1].PartnerID
+	if err := e.st.UpgradePartner(role.RID, hero, 1, 0, 300, 6, nil, nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.ChangeTalent(role.RID, hero, 3, 0, 700061, nil, nil, nil, nil); err != nil { // slot 3 opens at star 13
+		t.Fatal(err)
+	}
+	ask := func(cmd uint16, pid int64) proto.Message {
+		c.send(cmd, proto.Message{"partner_id": pid})
+		return c.recv(cmd)
+	}
+	if r := ask(11066, low); r.Int("code") != 0 || r.Str("msg") == "" {
+		t.Fatalf("a 5-star hero cannot return: %v", r)
+	}
+	pre := ask(11066, hero)
+	if pre.Int("code") != 1 {
+		t.Fatalf("preview: %v", pre)
+	}
+	first := pre.Arr("list")[0]
+	if first.Int("is_partner") != 1 || first.Int("id") != 10501 || first.Int("num") != 4 {
+		t.Fatalf("preview copies: %v", pre.Arr("list"))
+	}
+	var stones int64
+	for _, m := range pre.Arr("list") {
+		if m.Int("id") == 16007 {
+			stones = m.Int("num")
+		}
+	}
+	if stones != 1 {
+		t.Fatalf("the slot-3 talent comes back: %v", pre.Arr("list"))
+	}
+	if r := ask(11065, hero); r.Int("result") != 0 { // no 37005 yet
+		t.Fatalf("no cost item: %v", r)
+	}
+	e.give(c, role, map[int64]int64{37005: 5})
+	c.send(11065, proto.Message{"partner_id": hero})
+	c.recv(10302)
+	c.recv(10500)
+	if r := c.recv(11001); len(r.Arr("partners")) != 4 {
+		t.Fatalf("copies: %v", r)
+	}
+	if r := c.recv(11002); r.Int("star") != 10 || r.Int("lev") != 255 || r.Int("break_lev") != 6 {
+		t.Fatalf("hero after return: %v", r)
+	}
+	if r := c.recv(11065); r.Int("result") != 1 || len(r.Arr("list")) != len(pre.Arr("list")) {
+		t.Fatalf("return: %v", r)
+	}
+	if p, _ := e.st.PartnerByID(role.RID, hero); p.Star != 10 || len(p.Talents) != 0 {
+		t.Fatalf("saved hero: %+v", p)
+	}
+	if hs, _ := e.st.PartnersOf(role.RID); len(hs) != 6 {
+		t.Fatalf("2 + 4 copies, got %d", len(hs))
+	}
+	if r := ask(11065, hero); r.Int("result") != 0 { // star 10 is below the condition
+		t.Fatalf("again: %v", r)
+	}
+}

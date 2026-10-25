@@ -76,3 +76,52 @@ func (s *Store) OfferPartners(rid int64, ids []int64, gainAssets, gainItems map[
 	}
 	return tx.Commit()
 }
+
+// ReturnPartner sets a hero back to a lower star (the "回退"): it takes the new star, level and
+// break step, closes the talent slots that no longer open (their talents are dropped), pays the
+// cost and the refund and adds the returned copies of the hero, in one transaction. It returns
+// ErrConflict, changing nothing, when the hero is no longer at (fromStar, fromLev, fromBreak),
+// the role cannot pay, or the copies would overfill the role's hero slots (capacity).
+func (s *Store) ReturnPartner(rid, partnerID int64, fromStar, fromLev, fromBreak, toStar, toLev, toBreak int, dropTalentPos []int64, copies []PartnerSeed, capacity int, spendAssets, spendItems, gainAssets, gainItems map[int64]int64) ([]Partner, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	res, err := tx.Exec(`UPDATE partners SET star=?, lev=?, break_lev=? WHERE partner_id=? AND rid=? AND star=? AND lev=? AND break_lev=?`,
+		toStar, toLev, toBreak, partnerID, rid, fromStar, fromLev, fromBreak)
+	if err != nil {
+		return nil, err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, ErrConflict
+	}
+	for _, pos := range dropTalentPos {
+		if _, err := tx.Exec(`DELETE FROM partner_talents WHERE partner_id=? AND pos=?`, partnerID, pos); err != nil {
+			return nil, err
+		}
+	}
+	var have int
+	if err := tx.QueryRow(`SELECT COUNT(*) FROM partners WHERE rid=?`, rid).Scan(&have); err != nil {
+		return nil, err
+	}
+	if have+len(copies) > capacity {
+		return nil, ErrConflict
+	}
+	if err := spendTx(tx, rid, spendAssets, spendItems); err != nil {
+		return nil, err
+	}
+	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
+		return nil, err
+	}
+	out := make([]Partner, 0, len(copies))
+	for _, sd := range copies {
+		r, err := tx.Exec(`INSERT INTO partners(rid,bid,lev,star,created_at) VALUES(?,?,1,?,?)`, rid, sd.BID, sd.Star, s.unix())
+		if err != nil {
+			return nil, err
+		}
+		id, _ := r.LastInsertId()
+		out = append(out, Partner{PartnerID: id, RID: rid, BID: sd.BID, Lev: 1, Star: sd.Star})
+	}
+	return out, tx.Commit()
+}

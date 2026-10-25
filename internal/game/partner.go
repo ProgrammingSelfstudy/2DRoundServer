@@ -183,6 +183,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterHeroLock(r, st)
 	RegisterTalent(r, st)
 	RegisterReset(r, st)
+	RegisterReturn(r, st)
 	RegisterSkin(r, st)
 	RegisterSeerpalace(r, st)
 	RegisterVIPGifts(r, st)

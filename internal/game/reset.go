@@ -38,21 +38,26 @@ func refund(p store.Partner) (assets, items map[int64]int64) {
 		add(gains(b.Get))
 	}
 	for _, t := range p.Talents {
-		// the learn cost of the first level, then each level-up the skill went through
-		for id, n := t.SkillID, 0; n < 16; n++ {
-			prev, ok := talent.Prev[id]
-			if !ok {
-				add(gains(talent.Learn[id].Cost))
-				break
-			}
-			add(gains(talent.Level[prev].Cost))
-			id = prev
-		}
+		refundTalent(t, add)
 	}
 	for _, e := range p.Equips {
 		items[e.BaseID]++
 	}
 	return
+}
+
+// refundTalent gives back what a learned talent cost: the learn stone of its first level, then each
+// level-up it went through.
+func refundTalent(t store.Talent, add func([]sellGain)) {
+	for id, n := t.SkillID, 0; n < 16; n++ {
+		prev, ok := talent.Prev[id]
+		if !ok {
+			add(gains(talent.Learn[id].Cost))
+			return
+		}
+		add(gains(talent.Level[prev].Cost))
+		id = prev
+	}
 }
 
 // refundList is a refund as the {id, num} list the client shows, by id.

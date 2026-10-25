@@ -25,16 +25,46 @@ type lookInfo struct {
 	Loss    [][2]int64
 }
 
+// modelInfo is a role model of the client's table: the hero (and star), role level or skin it needs.
+type modelInfo struct {
+	Name      string
+	Partner   int64
+	Star, Lev int
+	Skin      int64
+}
+
+var looksModels map[int64]modelInfo
+
 var looksTable = func() map[string]map[int64]lookInfo {
 	var f struct {
 		Avatar map[int64]lookInfo
 		Title  map[int64]lookInfo
+		Model  map[int64]modelInfo
 	}
-	if err := json.Unmarshal(looksJSON, &f); err != nil || len(f.Avatar) == 0 || len(f.Title) == 0 {
+	if err := json.Unmarshal(looksJSON, &f); err != nil || len(f.Avatar) == 0 || len(f.Title) == 0 || len(f.Model) == 0 {
 		panic("game: bad looks.json")
 	}
+	looksModels = f.Model
 	return map[string]map[int64]lookInfo{store.LookAvatar: f.Avatar, store.LookTitle: f.Title}
 }()
+
+func sortedModelIDs() []int64 {
+	ids := make([]int64, 0, len(looksModels))
+	for id := range looksModels {
+		ids = append(ids, id)
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	return ids
+}
+
+// defaultLookID is the role model a role uses before it chose one: 1 and the face's number (110401 for
+// head 10401 in every level-1 10301 of the original's captures).
+func defaultLookID(face int) int64 {
+	if face >= 10000 {
+		return int64(100000 + face)
+	}
+	return 0
+}
 
 // LookChoice is a cosmetic as the admin page offers it.
 type LookChoice struct {
@@ -139,8 +169,10 @@ func withSettings(st *store.Store, rid int64, m proto.Message) (proto.Message, e
 	m["backdrop_id"], m["avatar_base_id"] = cfg.BackdropID, cfg.AvatarID
 	// the same on every level-1 role of the original server (capture original-2026-10-22)
 	m["room_bbs_set"], m["is_open_home"] = 1, 0
-	if face, _ := m["face_id"].(int); face >= 10000 { // 110401 for head 10401
-		m["look_id"] = 100000 + face
+	if cfg.LookID != 0 {
+		m["look_id"] = cfg.LookID
+	} else if face, _ := m["face_id"].(int); face >= 10000 { // 110401 for head 10401
+		m["look_id"] = defaultLookID(face)
 	}
 	return m, nil
 }

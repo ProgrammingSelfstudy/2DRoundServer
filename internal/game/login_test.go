@@ -88,6 +88,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterPartner(gw.Router, st)
 	RegisterQuest(gw.Router, st)
 	RegisterLooks(gw.Router, st)
+	RegisterRoleMisc(gw.Router, st)
 	RegisterShop(gw.Router, st)
 	RegisterDramaBattle(gw.Router, st)
 	RegisterDramaExtras(gw.Router, st)

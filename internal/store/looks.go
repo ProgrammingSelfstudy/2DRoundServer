@@ -16,6 +16,7 @@ type RoleSettings struct {
 	Signature                               string
 	ShowVIP, AutoPK                         int
 	BackdropID, AvatarID, BubbleID, TitleID int64
+	LookID                                  int64 // role model in use; 0 = the one the face gives
 }
 
 // lookColumn maps a kind to the settings column that holds the one in use.
@@ -31,8 +32,8 @@ const (
 // SettingsOf reads a role's settings (the defaults when it never changed any).
 func (s *Store) SettingsOf(rid int64) (RoleSettings, error) {
 	var v RoleSettings
-	err := s.db.QueryRow(`SELECT signature,show_vip,auto_pk,backdrop_id,avatar_id,bubble_id,title_id FROM role_settings WHERE rid=?`, rid).
-		Scan(&v.Signature, &v.ShowVIP, &v.AutoPK, &v.BackdropID, &v.AvatarID, &v.BubbleID, &v.TitleID)
+	err := s.db.QueryRow(`SELECT signature,show_vip,auto_pk,backdrop_id,avatar_id,bubble_id,title_id,look_id FROM role_settings WHERE rid=?`, rid).
+		Scan(&v.Signature, &v.ShowVIP, &v.AutoPK, &v.BackdropID, &v.AvatarID, &v.BubbleID, &v.TitleID, &v.LookID)
 	if wrapIsNoRows(err) {
 		return RoleSettings{AutoPK: DefaultAutoPK, AvatarID: DefaultAvatarID}, nil
 	}
@@ -65,6 +66,7 @@ func (s *Store) EnsureLook(rid int64, kind string, id int64) error {
 func (s *Store) SetSignature(rid int64, v string) error { return s.setSetting(rid, "signature", v) }
 func (s *Store) SetShowVIP(rid int64, v int) error      { return s.setSetting(rid, "show_vip", v) }
 func (s *Store) SetAutoPK(rid int64, v int) error       { return s.setSetting(rid, "auto_pk", v) }
+func (s *Store) SetLookID(rid, v int64) error           { return s.setSetting(rid, "look_id", v) }
 
 // UseLook sets the cosmetic of that kind the role uses (0 = none). ErrConflict when the role does
 // not own it (or it ran out at now) and the id is not 0.

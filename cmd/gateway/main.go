@@ -88,6 +88,7 @@ func main() {
 		game.RegisterPartner(gw.Router, st)
 		game.RegisterQuest(gw.Router, st)
 		game.RegisterLooks(gw.Router, st)
+		game.RegisterRoleMisc(gw.Router, st)
 		game.RegisterShop(gw.Router, st)
 		game.RegisterDramaBattle(gw.Router, st)
 		game.RegisterDramaExtras(gw.Router, st)

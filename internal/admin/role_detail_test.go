@@ -426,3 +426,50 @@ func TestGrantLook(t *testing.T) {
 		t.Fatalf("titles: %v", got)
 	}
 }
+
+func TestRedeemCodes(t *testing.T) {
+	e := newEnv(t)
+	viewer, operator, _ := e.tokens()
+	body := func(m map[string]any) map[string]any {
+		out := map[string]any{"code": "Spring2026", "grants": []map[string]any{{"kind": "item", "item_id": 16001, "num": 3}}}
+		for k, v := range m {
+			out[k] = v
+		}
+		return out
+	}
+	if res := e.do(viewer, "POST", "/api/redeem-codes", body(nil)); res.Status != 403 {
+		t.Fatalf("a viewer must not create: %d", res.Status)
+	}
+	for name, b := range map[string]map[string]any{
+		"short code": body(map[string]any{"code": "ab"}),
+		"bad chars":  body(map[string]any{"code": "no spaces!"}),
+		"no rewards": body(map[string]any{"grants": []any{}}),
+		"bad item":   body(map[string]any{"grants": []map[string]any{{"kind": "item", "item_id": 1, "num": 1}}}),
+		"neg uses":   body(map[string]any{"max_uses": -1}),
+		"bad days":   body(map[string]any{"days": 99999}),
+	} {
+		if res := e.do(operator, "POST", "/api/redeem-codes", b); res.Status != 422 {
+			t.Fatalf("%s: %d %s", name, res.Status, res.Body)
+		}
+	}
+	if res := e.do(operator, "POST", "/api/redeem-codes", body(map[string]any{"max_uses": 5, "days": 7})); res.Status != 200 || res.JSON()["code"] != "SPRING2026" {
+		t.Fatalf("create: %d %s", res.Status, res.Body)
+	}
+	if res := e.do(operator, "POST", "/api/redeem-codes", body(map[string]any{"code": "spring2026"})); res.Status != 409 {
+		t.Fatalf("the same code: %d", res.Status)
+	}
+	res := e.do(viewer, "GET", "/api/redeem-codes", nil)
+	items, _ := res.JSON()["items"].([]any)
+	if res.Status != 200 || len(items) != 1 {
+		t.Fatalf("list: %d %s", res.Status, res.Body)
+	}
+	if res := e.do(operator, "DELETE", "/api/redeem-codes/nope", nil); res.Status != 404 {
+		t.Fatalf("delete unknown: %d", res.Status)
+	}
+	if res := e.do(operator, "DELETE", "/api/redeem-codes/spring2026", nil); res.Status != 200 {
+		t.Fatalf("delete: %d %s", res.Status, res.Body)
+	}
+	if res := e.do(viewer, "GET", "/api/reports", nil); res.Status != 200 {
+		t.Fatalf("reports: %d %s", res.Status, res.Body)
+	}
+}

@@ -124,6 +124,11 @@ func (s *Server) Handler() http.Handler {
 	route("POST /api/roles/{id}/ban", levWrite, s.banRole)
 	route("POST /api/roles/{id}/unban", levWrite, s.unbanRole)
 
+	route("GET /api/redeem-codes", levRead, s.listRedeemCodes)
+	route("POST /api/redeem-codes", levWrite, s.createRedeemCode)
+	route("DELETE /api/redeem-codes/{code}", levWrite, s.deleteRedeemCode)
+	route("GET /api/reports", levRead, s.listReports)
+
 	route("GET /api/notices", levRead, s.listNotices)
 	route("POST /api/notices", levWrite, s.createNotice)
 	route("PUT /api/notices/{id}", levWrite, s.updateNotice)

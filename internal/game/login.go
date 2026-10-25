@@ -195,8 +195,11 @@ func (l *Login) enter(s *gateway.Session, req proto.Message, cmd uint16) error {
 	if l.OnlineGift != nil {
 		l.OnlineGift.Entered(role.RID, s.Now())
 	}
-	// world_lev (world level) has no source yet, so 0.
-	return s.Send(cmd, proto.Message{"code": codeOK, "msg": "", "timestamp": s.Now().Unix(), "world_lev": 0})
+	worldLev, err := l.Store.WorldLevel(l.SrvID)
+	if err != nil {
+		return err
+	}
+	return s.Send(cmd, proto.Message{"code": codeOK, "msg": "", "timestamp": s.Now().Unix(), "world_lev": worldLev})
 }
 
 // rename implements 10343. The client shows msg as a toast and, when code is 1,

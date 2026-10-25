@@ -379,3 +379,39 @@ func (s *Store) SetPartnerLocked(rid, partnerID int64, locked bool) error {
 	}
 	return nil
 }
+
+// ConsumePartners deletes heroes (releasing their equipment), takes a cost and pays a reward, in one transaction. It
+// returns ErrConflict, changing nothing, when a hero is gone, locked or in a resonance slot, or the role cannot pay.
+func (s *Store) ConsumePartners(rid int64, ids []int64, spendAssets, spendItems, gainAssets, gainItems map[int64]int64) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	for _, id := range ids {
+		var locked bool
+		if err := tx.QueryRow(`SELECT locked FROM partners WHERE partner_id=? AND rid=?`, id, rid).Scan(&locked); err != nil {
+			return ErrConflict
+		}
+		if locked {
+			return ErrConflict
+		}
+		if err := releaseEquipsTx(tx, rid, id); err != nil {
+			return err
+		}
+		res, err := tx.Exec(`DELETE FROM partners WHERE partner_id=? AND rid=?`, id, rid)
+		if err != nil {
+			return err
+		}
+		if n, _ := res.RowsAffected(); n == 0 {
+			return ErrConflict
+		}
+	}
+	if err := spendTx(tx, rid, spendAssets, spendItems); err != nil {
+		return err
+	}
+	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
+		return err
+	}
+	return tx.Commit()
+}

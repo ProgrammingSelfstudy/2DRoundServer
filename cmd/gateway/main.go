@@ -97,6 +97,7 @@ func main() {
 		game.RegisterAdventure(gw.Router, st)
 		game.RegisterPlanesafk(gw.Router, st)
 		game.RegisterPlanes(gw.Router, st)
+		game.RegisterEmoguoshi(gw.Router, st)
 		game.RegisterStoneDungeon(gw.Router, st)
 		game.RegisterForge(gw.Router, st)
 		game.RegisterDramaBattle(gw.Router, st)

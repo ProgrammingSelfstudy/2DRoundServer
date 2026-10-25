@@ -104,6 +104,7 @@ func main() {
 		game.RegisterExpedition(gw.Router, st)
 		game.RegisterMonopoly(gw.Router, st)
 		game.RegisterEscort(gw.Router, st)
+		game.RegisterPracticeTower(gw.Router, st)
 		game.RegisterStoneDungeon(gw.Router, st)
 		game.RegisterForge(gw.Router, st)
 		game.RegisterDramaBattle(gw.Router, st)

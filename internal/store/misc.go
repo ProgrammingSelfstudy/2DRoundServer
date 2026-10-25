@@ -179,3 +179,36 @@ func (s *Store) WorldLevel(srvID string) (int, error) {
 	}
 	return sum / n, rows.Err()
 }
+
+// ForgeLog is one compose record of the forge house; Items is the game's JSON of what was made.
+type ForgeLog struct {
+	Time, Coin int64
+	Items      string
+}
+
+// AddForgeLog appends a record, keeping the last 50 of the role.
+func (s *Store) AddForgeLog(rid int64, l ForgeLog) error {
+	if _, err := s.db.Exec(`INSERT INTO forge_logs(rid,time,coin,items) VALUES(?,?,?,?)`, rid, l.Time, l.Coin, l.Items); err != nil {
+		return err
+	}
+	_, err := s.db.Exec(`DELETE FROM forge_logs WHERE rid=? AND id NOT IN (SELECT id FROM forge_logs WHERE rid=? ORDER BY id DESC LIMIT 50)`, rid, rid)
+	return err
+}
+
+// ForgeLogs lists a role's compose records, the newest first.
+func (s *Store) ForgeLogs(rid int64) ([]ForgeLog, error) {
+	rows, err := s.db.Query(`SELECT time,coin,items FROM forge_logs WHERE rid=? ORDER BY id DESC`, rid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var out []ForgeLog
+	for rows.Next() {
+		var l ForgeLog
+		if err := rows.Scan(&l.Time, &l.Coin, &l.Items); err != nil {
+			return nil, err
+		}
+		out = append(out, l)
+	}
+	return out, rows.Err()
+}

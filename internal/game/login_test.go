@@ -94,6 +94,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterMarket(gw.Router, st)
 	RegisterArena(gw.Router, st)
 	RegisterStarTower(gw.Router, st)
+	RegisterAdventure(gw.Router, st)
 	RegisterStoneDungeon(gw.Router, st)
 	RegisterForge(gw.Router, st)
 	RegisterDramaBattle(gw.Router, st)

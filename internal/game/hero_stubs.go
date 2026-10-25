@@ -65,7 +65,9 @@ func registerHeroStubs(r *gateway.Router) {
 		26420: fixed(proto.Message{"star": 0, "num": 0}),
 		26421: refuse("result", nil),
 		26422: fixed(proto.Message{"skills": []proto.Message{}}),
-		26423: func(req proto.Message) proto.Message { return proto.Message{"partner_id": req.Int("partner_id"), "power": 0} },
+		26423: func(req proto.Message) proto.Message {
+			return proto.Message{"partner_id": req.Int("partner_id"), "power": 0}
+		},
 		26430: refuse("result", nil), 26431: refuse("result", proto.Message{"power": 0}), 26432: refuse("result", nil),
 	})
 }

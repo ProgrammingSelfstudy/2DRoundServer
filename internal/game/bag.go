@@ -126,6 +126,27 @@ func backpackItems(ledger map[int64]int64) []proto.Message {
 	return out
 }
 
+// spriteBag lists the sprites, eggs and sprite items of the ledger (types 36-38) as the sprite bag (10503).
+func spriteBag(ledger map[int64]int64) []proto.Message {
+	ids := make([]int64, 0)
+	for id, n := range ledger {
+		if info, ok := itemTable[id]; ok && n > 0 && info.Type >= 36 && info.Type <= 38 {
+			ids = append(ids, id)
+		}
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	out := make([]proto.Message, 0, len(ids))
+	for i, id := range ids {
+		out = append(out, proto.Message{
+			"id": id, "base_id": id, "bind": 0, "quantity": ledger[id], "pos": i + 1,
+			"expire_type": itemTable[id].ExpireType, "expire_time": 0,
+			"main_attr": []proto.Message{}, "enchant": 0, "attr": []proto.Message{}, "extra_attr": []proto.Message{},
+			"score": 0, "all_score": 0, "extra": []proto.Message{},
+		})
+	}
+	return out
+}
+
 func bagReply(s *gateway.Session, items []proto.Message) proto.Message {
 	if items == nil {
 		items = []proto.Message{}
@@ -136,15 +157,23 @@ func bagReply(s *gateway.Session, items []proto.Message) proto.Message {
 }
 
 // RegisterBag registers the bag commands: 10500 (backpack, from the item ledger)
-// and 10502-10503 (home, sprite bags: empty; the equipment bag 10501 is in equipment.go).
+// 10502 (home bag: empty) and 10503 (the sprite bag; the equipment bag 10501 is in equipment.go).
 func RegisterBag(r *gateway.Router, st *store.Store) {
 	r.Handle(10500, func(s *gateway.Session, _ proto.Message) error { return sendBackpack(s, st) })
 	r.Handle(10521, sellPreview(st))
 	r.Handle(10522, sell(st))
-	for _, cmd := range []uint16{10502, 10503} {
-		cmd := cmd
-		r.Handle(cmd, func(s *gateway.Session, _ proto.Message) error { return s.Send(cmd, bagReply(s, nil)) })
-	}
+	r.Handle(10502, func(s *gateway.Session, _ proto.Message) error { return s.Send(10502, bagReply(s, nil)) })
+	r.Handle(10503, func(s *gateway.Session, _ proto.Message) error {
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		ledger, err := st.RoleItems(role.RID)
+		if err != nil {
+			return err
+		}
+		return s.Send(10503, bagReply(s, spriteBag(ledger)))
+	})
 }
 
 // sendBackpack answers 10500 for the session's role (also used to refresh the
@@ -165,7 +194,27 @@ func sendBackpack(s *gateway.Session, st *store.Store) error {
 	if err := s.Send(10500, bagReply(s, backpackItems(ledger))); err != nil {
 		return err
 	}
-	return s.Send(10501, bagReply(s, equipmentBag(ledger)))
+	if err := s.Send(10501, bagReply(s, equipmentBag(ledger))); err != nil {
+		return err
+	}
+	// the sprite bag follows only when there is something in it; the sprite handlers always send it
+	if sprites := spriteBag(ledger); len(sprites) > 0 {
+		return s.Send(10503, bagReply(s, sprites))
+	}
+	return nil
+}
+
+// sendSpriteBag sends the sprite bag (10503) whatever is in it.
+func sendSpriteBag(s *gateway.Session, st *store.Store) error {
+	role := s.Role()
+	if role == nil {
+		return nil
+	}
+	ledger, err := st.RoleItems(role.RID)
+	if err != nil {
+		return err
+	}
+	return s.Send(10503, bagReply(s, spriteBag(ledger)))
 }
 
 // ItemSummary is what the admin pages show about an item.

@@ -106,7 +106,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterFeat(gw.Router, st)
 	RegisterCompose(gw.Router, st)
 	RegisterBattle(gw.Router, st)
-	RegisterElfin(gw.Router)
+	RegisterElfin(gw.Router, st)
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)

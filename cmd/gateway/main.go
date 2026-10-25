@@ -106,7 +106,7 @@ func main() {
 		game.RegisterFeat(gw.Router, st)
 		game.RegisterCompose(gw.Router, st)
 		game.RegisterBattle(gw.Router, st)
-		game.RegisterElfin(gw.Router)
+		game.RegisterElfin(gw.Router, st)
 		if cfg.Gateway.EmptyReplies {
 			game.RegisterEmpty(gw.Router, logger) // after the real handlers, which always win
 		}

@@ -107,6 +107,7 @@ func main() {
 		game.RegisterPracticeTower(gw.Router, st)
 		game.RegisterSmashegg(gw.Router, st)
 		game.RegisterVoyage(gw.Router, st)
+		game.RegisterEncounter(gw.Router, st)
 		game.RegisterStoneDungeon(gw.Router, st)
 		game.RegisterForge(gw.Router, st)
 		game.RegisterDramaBattle(gw.Router, st)

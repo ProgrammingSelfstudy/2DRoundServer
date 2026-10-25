@@ -11,6 +11,8 @@ import (
 // Rank types of the client's RankConstant.Rank_Type that this server can fill.
 const (
 	rankDrama = 2 // campaign progress: val1 is the furthest dungeon id
+	rankTower = 3 // star tower: val1 is the highest floor
+	rankArena = 5 // arena: val1 is the score
 	rankPower = 6 // power: val1 is the power
 )
 
@@ -81,6 +83,34 @@ func ranking(st *store.Store, srvID string, typ int64) ([]rankEntry, error) {
 			}
 			return out[i].role.RID < out[j].role.RID
 		})
+	case rankTower, rankArena:
+		var rows []struct{ rid, val int64 }
+		if typ == rankTower {
+			top, err := st.TowerTop(srvID, rankMaxLen)
+			if err != nil {
+				return nil, err
+			}
+			for _, t := range top {
+				rows = append(rows, struct{ rid, val int64 }{t.RID, t.Tower})
+			}
+		} else {
+			top, err := st.ArenaTop(srvID, rankMaxLen)
+			if err != nil {
+				return nil, err
+			}
+			for _, t := range top {
+				rows = append(rows, struct{ rid, val int64 }{t.RID, t.Score})
+			}
+		}
+		byRID := map[int64]store.RankRole{}
+		for _, r := range roles {
+			byRID[r.RID] = r
+		}
+		for _, row := range rows { // already in order
+			if r, ok := byRID[row.rid]; ok {
+				out = append(out, rankEntry{r, row.val})
+			}
+		}
 	default:
 		return nil, nil
 	}
@@ -97,7 +127,7 @@ func rankRow(e rankEntry, srvID string, idx int) proto.Message {
 }
 
 // RegisterRank registers the rankings: 12900 (a list), 12901 (when it was last
-// refreshed) and 12902 (the first place of each ranking). Only the campaign and
+// refreshed) and 12902 (the first place of each ranking). Only the campaign, star tower, arena and
 // power rankings of the role's own server are filled; any other type is an empty list.
 func RegisterRank(r *gateway.Router, st *store.Store) {
 	r.Handle(12900, func(s *gateway.Session, req proto.Message) error {
@@ -136,7 +166,7 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		out := []proto.Message{}
-		for _, typ := range []int64{rankDrama, rankPower} {
+		for _, typ := range []int64{rankDrama, rankTower, rankArena, rankPower} {
 			list, err := ranking(st, role.SrvID, typ)
 			if err != nil {
 				return err

@@ -62,11 +62,43 @@ func (f *FriendService) profile(s *gateway.Session, req proto.Message) error {
 	if gd, _, err := f.Store.GuildOfRole(t.RID); err == nil {
 		gname = gd.Name
 	}
+	cfg, err := f.Store.SettingsOf(t.RID)
+	if err != nil {
+		return err
+	}
+	fans, err := f.Store.FansOf(t.RID)
+	if err != nil {
+		return err
+	}
+	fansRank, err := f.Store.FansRank(t.SrvID, t.RID)
+	if err != nil {
+		return err
+	}
+	var iFollow, followsMe bool
+	if t.RID != me.RID {
+		if iFollow, err = f.Store.Follows(me.RID, t.RID); err != nil {
+			return err
+		}
+		if followsMe, err = f.Store.Follows(t.RID, me.RID); err != nil {
+			return err
+		}
+	}
+	_, worn, err := f.Store.BadgesOf(t.RID)
+	if err != nil {
+		return err
+	}
+	badges := []proto.Message{}
+	for pos := int64(1); pos <= 8; pos++ {
+		if id, ok := worn[pos]; ok {
+			badges = append(badges, proto.Message{"pos": pos, "id": id, "time": 0})
+		}
+	}
 	return s.Send(10315, proto.Message{
 		"rid": t.RID, "srv_id": t.SrvID, "name": t.Name, "gname": gname, "lev": t.Lev,
 		"face_id": t.FaceID, "power": power, "sex": t.Sex,
 		"partner_list": shown, "room_partner_list": []proto.Message{},
-		"honor_list": []proto.Message{}, "use_badges": []proto.Message{}, "sprites": []proto.Message{},
-		"is_friend": b2i(isFriend),
+		"honor_list": []proto.Message{}, "use_badges": badges, "sprites": []proto.Message{},
+		"is_friend": b2i(isFriend), "is_fanse": b2i(iFollow), "is_be_fanse": b2i(followsMe), "fans_num": fans, "fans_rank": fansRank,
+		"city_id": cfg.CityID, "room_bbs_set": cfg.BBSSet,
 	})
 }

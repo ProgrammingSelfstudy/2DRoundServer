@@ -178,7 +178,8 @@ func withSettings(st *store.Store, rid int64, m proto.Message) (proto.Message, e
 		m["guild_quit_time"] = quit
 	}
 	// the same on every level-1 role of the original server (capture original-2026-10-22)
-	m["room_bbs_set"], m["is_open_home"] = 1, 0
+	m["room_bbs_set"], m["is_open_home"] = cfg.BBSSet, 0
+	m["city_id"] = cfg.CityID
 	if cfg.LookID != 0 {
 		m["look_id"] = cfg.LookID
 	} else if face, _ := m["face_id"].(int); face >= 10000 { // 110401 for head 10401

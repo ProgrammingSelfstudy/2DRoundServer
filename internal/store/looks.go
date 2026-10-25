@@ -17,6 +17,8 @@ type RoleSettings struct {
 	ShowVIP, AutoPK                         int
 	BackdropID, AvatarID, BubbleID, TitleID int64
 	LookID                                  int64 // role model in use; 0 = the one the face gives
+	CityID                                  int64 // the home city shown in the personal space
+	BBSSet                                  int   // who may write on the message board: 1 everyone, 2 friends
 }
 
 // lookColumn maps a kind to the settings column that holds the one in use.
@@ -32,10 +34,10 @@ const (
 // SettingsOf reads a role's settings (the defaults when it never changed any).
 func (s *Store) SettingsOf(rid int64) (RoleSettings, error) {
 	var v RoleSettings
-	err := s.db.QueryRow(`SELECT signature,show_vip,auto_pk,backdrop_id,avatar_id,bubble_id,title_id,look_id FROM role_settings WHERE rid=?`, rid).
-		Scan(&v.Signature, &v.ShowVIP, &v.AutoPK, &v.BackdropID, &v.AvatarID, &v.BubbleID, &v.TitleID, &v.LookID)
+	err := s.db.QueryRow(`SELECT signature,show_vip,auto_pk,backdrop_id,avatar_id,bubble_id,title_id,look_id,city_id,bbs_set FROM role_settings WHERE rid=?`, rid).
+		Scan(&v.Signature, &v.ShowVIP, &v.AutoPK, &v.BackdropID, &v.AvatarID, &v.BubbleID, &v.TitleID, &v.LookID, &v.CityID, &v.BBSSet)
 	if wrapIsNoRows(err) {
-		return RoleSettings{AutoPK: DefaultAutoPK, AvatarID: DefaultAvatarID}, nil
+		return RoleSettings{AutoPK: DefaultAutoPK, AvatarID: DefaultAvatarID, BBSSet: 1}, nil
 	}
 	return v, err
 }
@@ -67,6 +69,8 @@ func (s *Store) SetSignature(rid int64, v string) error { return s.setSetting(ri
 func (s *Store) SetShowVIP(rid int64, v int) error      { return s.setSetting(rid, "show_vip", v) }
 func (s *Store) SetAutoPK(rid int64, v int) error       { return s.setSetting(rid, "auto_pk", v) }
 func (s *Store) SetLookID(rid, v int64) error           { return s.setSetting(rid, "look_id", v) }
+func (s *Store) SetCityID(rid, v int64) error           { return s.setSetting(rid, "city_id", v) }
+func (s *Store) SetBBSSet(rid int64, v int) error       { return s.setSetting(rid, "bbs_set", v) }
 
 // UseLook sets the cosmetic of that kind the role uses (0 = none). ErrConflict when the role does
 // not own it (or it ran out at now) and the id is not 0.

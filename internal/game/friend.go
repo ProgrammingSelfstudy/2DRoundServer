@@ -39,6 +39,7 @@ func (f *FriendService) Register(r *gateway.Router) {
 	r.Handle(13316, f.gift)
 	r.Handle(13317, f.giftBatch)
 	f.registerProfile(r)
+	f.registerSpace(r)
 }
 
 // ---- field builders ----

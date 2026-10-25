@@ -463,13 +463,13 @@ func TestUnknownCommandsAndBadSignatureAreSurvivable(t *testing.T) {
 	_, tok := e.account("u1")
 	c := e.dial(true)
 	// a command with a send schema but no handler, then a mismatching 1197
-	c.send(10345, proto.Message{}) // role model info: not implemented yet
+	c.send(23304, proto.Message{}) // title composing: not implemented yet
 	c.send(1164, loginArgs("u1", tok), true)
 	if r := c.recv(1164); r.Int("code") != 1 {
 		t.Fatalf("login after unknown command / bad signature: %v", r)
 	}
 	logs := e.logs.String()
-	if !strings.Contains(logs, "cmd 10345: no handler") || !strings.Contains(logs, "cmd 1164: 1197 signature mismatch") {
+	if !strings.Contains(logs, "cmd 23304: no handler") || !strings.Contains(logs, "cmd 1164: 1197 signature mismatch") {
 		t.Fatalf("expected both events to be logged:\n%s", logs)
 	}
 }
@@ -592,9 +592,9 @@ func TestEmptyRepliesAnswerAndRealHandlersWin(t *testing.T) {
 	c.send(1164, loginArgs("u1", tok))
 	c.recv(1164)
 
-	c.send(10303, proto.Message{}) // an empty-reply command
-	if r := c.recv(10303); r.Int("klb") != 0 {
-		t.Fatalf("10303: %v", r)
+	c.send(10922, proto.Message{}) // an empty-reply command
+	if r := c.recv(10922); len(r) != 0 && r.Int("status") != 0 {
+		t.Fatalf("10922: %v", r)
 	}
 	c.send(10925, proto.Message{"id": 77}) // a request with a payload: the key is echoed
 	if r := c.recv(10925); r.Int("id") != 77 || r.Int("status") != 0 {

@@ -137,6 +137,11 @@ func withSettings(st *store.Store, rid int64, m proto.Message) (proto.Message, e
 	}
 	m["signature"], m["is_show_vip"], m["auto_pk"] = cfg.Signature, cfg.ShowVIP, cfg.AutoPK
 	m["backdrop_id"], m["avatar_base_id"] = cfg.BackdropID, cfg.AvatarID
+	// the same on every level-1 role of the original server (capture original-2026-10-22)
+	m["room_bbs_set"], m["is_open_home"] = 1, 0
+	if face, _ := m["face_id"].(int); face >= 10000 { // 110401 for head 10401
+		m["look_id"] = 100000 + face
+	}
 	return m, nil
 }
 
@@ -263,6 +268,11 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 		return m
 	}
 	listOf := func(s *gateway.Session, kind string) ([]proto.Message, error) {
+		if kind == store.LookAvatar { // everyone has the free "冒险徽章"
+			if err := st.EnsureLook(s.Role().RID, kind, store.DefaultAvatarID); err != nil {
+				return nil, err
+			}
+		}
 		owned, err := st.LooksOf(s.Role().RID, kind, s.Now().Unix())
 		if err != nil {
 			return nil, err
@@ -314,6 +324,11 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 				return nil
 			}
 			id := req.Int("base_id")
+			if f.kind == store.LookAvatar {
+				if err := st.EnsureLook(role.RID, f.kind, store.DefaultAvatarID); err != nil {
+					return err
+				}
+			}
 			if err := st.UseLook(role.RID, f.kind, id, s.Now().Unix()); err != nil {
 				if errors.Is(err, store.ErrConflict) {
 					return nil // not owned: the client sent it for an item it shows as usable, there is no refusal message

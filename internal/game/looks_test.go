@@ -106,20 +106,14 @@ func TestRoleCosmetics(t *testing.T) {
 		t.Fatalf("not saved: %+v", cfg)
 	}
 
-	// avatar frames: 1000 costs nothing, 2000 costs one 50001
+	// avatar frames: 1000 is everybody's, 2000 costs one 50001
 	c.send(21500, proto.Message{})
-	if l := c.recv(21500).Arr("avatar_frame"); len(l) != 0 {
-		t.Fatalf("no frames yet: %v", l)
+	if l := c.recv(21500).Arr("avatar_frame"); len(l) != 1 || l[0].Int("base_id") != 1000 {
+		t.Fatalf("only the free frame: %v", l)
 	}
 	activate := func(id int64) proto.Message {
 		c.send(21503, proto.Message{"base_id": id})
 		return c.recv(21503)
-	}
-	c.send(21503, proto.Message{"base_id": 1000})
-	c.recv(10302)
-	c.recv(10500)
-	if l := c.recv(21503).Arr("avatar_frame"); len(l) != 1 || l[0].Int("base_id") != 1000 {
-		t.Fatalf("free frame: %v", l)
 	}
 	if l := activate(2000).Arr("avatar_frame"); len(l) != 1 { // no 50001: nothing changes
 		t.Fatalf("unpaid frame: %v", l)
@@ -156,6 +150,29 @@ func TestRoleCosmetics(t *testing.T) {
 	c2, _ := e.dialSameRole("u1", role)
 	c2.send(10300, proto.Message{})
 	if m := c2.recv(10301); m.Int("avatar_base_id") != 2000 || m.Int("backdrop_id") != 4242 {
+		t.Fatalf("10301: %v", m)
+	}
+}
+
+func TestRoleDefaults(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	_ = c
+	cfg, _ := e.st.SettingsOf(role.RID)
+	if cfg.AvatarID != 1000 || cfg.AutoPK != 1 || cfg.ShowVIP != 0 || cfg.BackdropID != 0 {
+		t.Fatalf("a new role starts like the original's: %+v", cfg)
+	}
+	// changing one setting keeps the other defaults
+	if err := e.st.SetSignature(role.RID, "hi"); err != nil {
+		t.Fatal(err)
+	}
+	if cfg, _ = e.st.SettingsOf(role.RID); cfg.AvatarID != 1000 || cfg.AutoPK != 1 || cfg.Signature != "hi" {
+		t.Fatalf("after a signature: %+v", cfg)
+	}
+	c2, _ := e.dialSameRole("u1", role)
+	c2.send(10300, proto.Message{})
+	m := c2.recv(10301)
+	if m.Int("avatar_base_id") != 1000 || m.Int("auto_pk") != 1 || m.Int("room_bbs_set") != 1 || m.Int("look_id") != 100000+int64(store.DefaultFaceID) {
 		t.Fatalf("10301: %v", m)
 	}
 }

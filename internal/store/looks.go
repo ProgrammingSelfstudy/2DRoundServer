@@ -21,13 +21,20 @@ type RoleSettings struct {
 // lookColumn maps a kind to the settings column that holds the one in use.
 var lookColumn = map[string]string{LookBackdrop: "backdrop_id", LookAvatar: "avatar_id", LookBubble: "bubble_id", LookTitle: "title_id"}
 
+// What a new role starts with, from the 10301 of a level-1 role of the original server (capture
+// original-2026-10-22): the free frame "冒险徽章" is in use and auto fight is on.
+const (
+	DefaultAvatarID = 1000
+	DefaultAutoPK   = 1
+)
+
 // SettingsOf reads a role's settings (the defaults when it never changed any).
 func (s *Store) SettingsOf(rid int64) (RoleSettings, error) {
 	var v RoleSettings
 	err := s.db.QueryRow(`SELECT signature,show_vip,auto_pk,backdrop_id,avatar_id,bubble_id,title_id FROM role_settings WHERE rid=?`, rid).
 		Scan(&v.Signature, &v.ShowVIP, &v.AutoPK, &v.BackdropID, &v.AvatarID, &v.BubbleID, &v.TitleID)
 	if wrapIsNoRows(err) {
-		return RoleSettings{}, nil
+		return RoleSettings{AutoPK: DefaultAutoPK, AvatarID: DefaultAvatarID}, nil
 	}
 	return v, err
 }
@@ -35,7 +42,23 @@ func (s *Store) SettingsOf(rid int64) (RoleSettings, error) {
 // setSetting writes one column of the role's settings row, creating the row. col comes from the
 // code, never from a request.
 func (s *Store) setSetting(rid int64, col string, val any) error {
-	_, err := s.db.Exec(fmt.Sprintf(`INSERT INTO role_settings(rid,%[1]s) VALUES(?,?) ON CONFLICT(rid) DO UPDATE SET %[1]s=excluded.%[1]s`, col), rid, val)
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if _, err := tx.Exec(`INSERT INTO role_settings(rid,auto_pk,avatar_id) VALUES(?,?,?) ON CONFLICT(rid) DO NOTHING`, rid, DefaultAutoPK, DefaultAvatarID); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(fmt.Sprintf(`UPDATE role_settings SET %s=? WHERE rid=?`, col), val, rid); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// EnsureLook gives the role a cosmetic for good unless it already has a row for it.
+func (s *Store) EnsureLook(rid int64, kind string, id int64) error {
+	_, err := s.db.Exec(`INSERT INTO role_looks(rid,kind,base_id,end_time) VALUES(?,?,?,0) ON CONFLICT(rid,kind,base_id) DO NOTHING`, rid, kind, id)
 	return err
 }
 

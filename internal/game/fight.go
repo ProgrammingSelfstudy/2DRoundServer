@@ -301,7 +301,9 @@ type fightSim struct {
 	round    int
 	nextBuff int64
 	maxEnemy int64
-	teamSize int64 // heroes at the start; the monsters hit lighter when there are fewer
+	// realDamage turns off the campaign's floor on the heroes' damage (a boss fight counts the damage)
+	realDamage bool
+	teamSize   int64 // heroes at the start; the monsters hit lighter when there are fewer
 }
 
 // teamShare is how many of the five hero places a dungeon is made for are filled
@@ -624,7 +626,7 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 			base := int64(1)
 			if u.ours {
 				base = atkOf(u)
-				if half := (f.maxEnemy + 1) / 2; base < half {
+				if half := (f.maxEnemy + 1) / 2; base < half && !f.realDamage {
 					base = half
 				}
 			} else if d := t.maxHP / 40 * f.teamShare() / 5; d > base {
@@ -680,7 +682,20 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 // when every hero is down or the monsters outlast maxFightRounds; the second result
 // says which.
 func buildFight(team []fightUnit, monsters []fightUnit, rng *rand.Rand) ([]fightRound, bool) {
-	f := &fightSim{units: append(append([]fightUnit(nil), team...), monsters...), rng: rng, teamSize: int64(len(team))}
+	rounds, won, _ := playFight(team, monsters, rng, maxFightRounds)
+	return rounds, won
+}
+
+// playFight is buildFight with its own round limit; it also returns the simulation, whose units tell what
+// is left of each side (a boss fight counts the damage).
+func playFight(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRounds int) ([]fightRound, bool, *fightSim) {
+	return playFightOpts(team, monsters, rng, maxRounds, false)
+}
+
+// playFightOpts: with realDamage the heroes hit for their own attack; otherwise they hit at least half of the
+// strongest monster's hp, which makes the campaign winnable (see act).
+func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRounds int, realDamage bool) ([]fightRound, bool, *fightSim) {
+	f := &fightSim{units: append(append([]fightUnit(nil), team...), monsters...), rng: rng, teamSize: int64(len(team)), realDamage: realDamage}
 	for i := range f.units {
 		f.units[i].lastCast = map[int64]int{}
 	}
@@ -690,7 +705,7 @@ func buildFight(team []fightUnit, monsters []fightUnit, rng *rand.Rand) ([]fight
 		}
 	}
 	var rounds []fightRound
-	for len(rounds) < maxFightRounds && len(f.alive(false)) > 0 && len(f.alive(true)) > 0 {
+	for len(rounds) < maxRounds && len(f.alive(false)) > 0 && len(f.alive(true)) > 0 {
 		f.round = len(rounds) + 1
 		var r fightRound
 		if f.round > 1 {
@@ -714,7 +729,7 @@ func buildFight(team []fightUnit, monsters []fightUnit, rng *rand.Rand) ([]fight
 		}
 		rounds = append(rounds, r)
 	}
-	return rounds, len(f.alive(false)) == 0 && len(f.alive(true)) > 0
+	return rounds, len(f.alive(false)) == 0 && len(f.alive(true)) > 0, f
 }
 
 // fightSetup collects the fighters of a role: its campaign formation against the
@@ -731,15 +746,21 @@ func (f *FightService) teamSide(role *store.Role) ([]fightUnit, []proto.Message,
 	if err != nil {
 		return nil, nil, store.Formation{}, err
 	}
+	team, objects, err := f.teamFor(role, form.FormationType, form.Slots)
+	return team, objects, form, err
+}
+
+// teamFor makes a role's side of a fight from the heroes it puts in the given places.
+func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []store.FormationSlot) ([]fightUnit, []proto.Message, error) {
 	heroes, err := f.Store.PartnersOf(role.RID)
 	if err != nil {
-		return nil, nil, store.Formation{}, err
+		return nil, nil, err
 	}
 	byID := map[int64]store.Partner{}
 	for _, h := range heroes {
 		byID[h.PartnerID] = h
 	}
-	slots := append([]store.FormationSlot(nil), form.Slots...)
+	slots := append([]store.FormationSlot(nil), formSlots...)
 	sort.SliceStable(slots, func(i, j int) bool { return slots[i].Pos < slots[j].Pos })
 
 	objects := []proto.Message{{
@@ -747,8 +768,8 @@ func (f *FightService) teamSide(role *store.Role) ([]fightUnit, []proto.Message,
 		"object_bid": 1, "object_id": 1, "object_name": "精灵", "object_type": 5, "owner_id": 0, "owner_srv_id": "", "pos": spiritPos,
 		"sex": 0, "skills": []proto.Message{}, "sprites": []proto.Message{{"item_bid": 0, "pos": 1}}, "star": 0,
 	}}
-	team, heroObjects := sideUnits(role.RID, role.SrvID, slots, form.FormationType, byID, true)
-	return team, append(objects, heroObjects...), form, nil
+	team, heroObjects := sideUnits(role.RID, role.SrvID, slots, formType, byID, true)
+	return team, append(objects, heroObjects...), nil
 }
 
 func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) ([]fightRound, bool, proto.Message, error) {

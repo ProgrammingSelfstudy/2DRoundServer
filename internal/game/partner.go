@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"math"
 	"strconv"
 
 	"2droundserver/internal/gateway"
@@ -99,9 +100,16 @@ func partnerStats(p store.Partner) (hp, atk, def, speed int64) {
 	return
 }
 
+// heroPower is the power a hero shows. The weights were fitted to the 22 captured heroes up to level 16
+// (original-2026-10-21/22, 19 of them exact and the rest off by one): atk 2, hp 0.4, def 2.65, speed 6.4. From
+// level 30 on the original adds more (skills, break steps), so its numbers come out higher than ours. Our
+// own attributes (partnerStats) are 7-15% under the captured ones at low levels, so our powers are too.
+func heroPower(atk, hp, def, speed int64) int64 {
+	return int64(math.Round(2*float64(atk) + 0.4*float64(hp) + 2.65*float64(def) + 6.4*float64(speed)))
+}
+
 // partnerMessage builds one hero entry for 11000 / 11025 / 11026 / 11007 (the
-// encoder sends only the fields a command's table has). power is a plain sum of
-// our own, not the client's formula.
+// encoder sends only the fields a command's table has).
 func partnerMessage(p store.Partner) proto.Message {
 	info := partnerTable[p.BID]
 	a := info.Attr
@@ -113,7 +121,7 @@ func partnerMessage(p store.Partner) proto.Message {
 	}
 	return proto.Message{
 		"partner_id": p.PartnerID, "bid": p.BID, "lev": shownLev, "star": p.Star, "skills": skills,
-		"break_lev": shownBreak, "power": atk + def + hp/10 + speed,
+		"break_lev": shownBreak, "power": heroPower(atk, hp, def, speed),
 		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": 0,
 		"resonate_lev": b2i(p.ResSlot > 0), "resonate_break_lev": 0, "horcrux_status": 0, "horcrux_lev": 0,
 		"atk": atk, "def_p": def, "def_s": def, "hp": hp, "speed": speed,

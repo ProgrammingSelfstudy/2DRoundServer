@@ -378,3 +378,16 @@ func TestHeroAttributeList(t *testing.T) {
 		t.Fatalf("after a foreign id: %v", r)
 	}
 }
+
+// heroPower reproduces the power the original shows for the stats it shows (captures original-2026-10-21 and
+// -22; levels up to 16, where the weights were fitted).
+func TestHeroPowerMatchesCaptures(t *testing.T) {
+	for _, c := range []struct{ atk, hp, def, speed, power int64 }{
+		{54, 452, 36, 77, 877}, {82, 696, 61, 95, 1212}, {59, 471, 35, 80, 911}, {39, 220, 18, 35, 437},
+		{122, 896, 61, 105, 1436}, {316, 1487, 132, 201, 2864}, {153, 788, 49, 116, 1493},
+	} {
+		if got := heroPower(c.atk, c.hp, c.def, c.speed); got < c.power-2 || got > c.power+2 {
+			t.Errorf("stats %+v: power %d, the original shows %d", c, got, c.power)
+		}
+	}
+}

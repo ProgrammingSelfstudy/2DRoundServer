@@ -65,8 +65,8 @@ type arenaOpp struct {
 // arenaLogEntry is one line of the fight log as it is stored: Type 1 is a challenge by the role, 2 one against it;
 // Ret 1 is a win of the role, 2 a loss; Score is the role's change.
 type arenaLogEntry struct {
-	RID, Lev, Sex, Face, Power, Score, Type, Ret int64
-	SrvID, Name                                  string
+	RID, Lev, Sex, Face, Power, Score, Type, Ret, ReplayID int64
+	SrvID, Name                                            string
 }
 
 // arenaSeason names the season of a moment by the Monday it began and gives its first and last second.
@@ -508,7 +508,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			var e arenaLogEntry
 			if json.Unmarshal([]byte(l.Info), &e) == nil {
 				out = append(out, proto.Message{"rid": e.RID, "srv_id": e.SrvID, "name": e.Name, "lev": e.Lev, "sex": e.Sex, "face": e.Face, "avatar_id": 0,
-					"power": e.Power, "score": e.Score, "type": e.Type, "ret": e.Ret, "replay_id": 0, "time": l.Time, "face_update_time": 0, "face_file": ""})
+					"power": e.Power, "score": e.Score, "type": e.Type, "ret": e.Ret, "replay_id": e.ReplayID, "time": l.Time, "face_update_time": 0, "face_file": ""})
 			}
 		}
 		if a.LogSeen != int64(len(logs)) {
@@ -589,14 +589,21 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		idx := slot.Idx
+		face := int64(role.FaceID)
+		if face == 0 {
+			face = store.DefaultFaceID
+		}
+		_, _, power, _ := lineupOf(st, role.RID)
+		replayID := recordReplay(st, combatArena, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType},
+			replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform}, intro, rounds, won, s.Now().Unix())
 		return fights.begin(s, role, combatArena, intro, rounds, won, func(s *gateway.Session, won bool) error {
-			return settleArena(s, st, idx, opp, won)
+			return settleArena(s, st, idx, opp, won, replayID)
 		})
 	})
 }
 
 // settleArena pays and records a finished arena fight and sends the result (20210).
-func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, won bool) error {
+func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, won bool, replayID int64) error {
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -632,7 +639,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	}
 	now := s.Now().Unix()
 	logOf := func(typ, ret, change int64, name string, lev, sex, face, power int64, rid int64, srv string) string {
-		raw, _ := json.Marshal(arenaLogEntry{RID: rid, SrvID: srv, Name: name, Lev: lev, Sex: sex, Face: face, Power: power, Score: change, Type: typ, Ret: ret})
+		raw, _ := json.Marshal(arenaLogEntry{RID: rid, SrvID: srv, Name: name, Lev: lev, Sex: sex, Face: face, Power: power, Score: change, Type: typ, Ret: ret, ReplayID: replayID})
 		return string(raw)
 	}
 	if err := st.AddArenaLog(role.RID, logOf(1, result, gain, opp.Name, opp.Lev, opp.Sex, opp.Face, opp.Power, opp.RID, opp.SrvID), now); err != nil {
@@ -670,7 +677,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	}
 	if err := s.Send(20210, proto.Message{"result": result, "score": a.Score, "get_score": gain, "items": []proto.Message{{"bid": 1, "num": coin}},
 		"tar_name": opp.Name, "tar_lev": opp.Lev, "tar_face": opp.Face, "face_update_time": 0, "face_file": "", "tar_score": opp.Score - lose, "lose_score": lose,
-		"target_role_name": opp.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": 0,
+		"target_role_name": opp.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": replayID,
 		"partner_bid": bid, "partner_hurt": hurt, "partner_total_hurt": total}); err != nil {
 		return err
 	}

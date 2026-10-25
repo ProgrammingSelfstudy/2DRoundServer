@@ -912,6 +912,14 @@ func roundStart(r fightRound, n int, combat int64) proto.Message {
 	}
 }
 
+// roundPlays is the 20004 of a round: the attacks.
+func roundPlays(r fightRound, n int, combat int64) proto.Message {
+	return proto.Message{
+		"action_count": n + 1, "combat_type": combat, "round_buff": []proto.Message{}, "skill_plays": r.plays,
+		"sprite_cd_info": []proto.Message{{"cd_info": []proto.Message{}, "pos": spiritPos}}, "star_list": []proto.Message{},
+	}
+}
+
 func posList(ps []int64) []proto.Message {
 	out := make([]proto.Message, 0, len(ps))
 	for _, p := range ps {
@@ -966,10 +974,7 @@ func (f *FightService) advance(s *gateway.Session, cmd uint16, settle func(won b
 	case cmd == 20019 && st.stage == waitRoundOver:
 		st.stage = waitPlayed
 		r := st.rounds[st.cur]
-		return s.Send(20004, proto.Message{
-			"action_count": st.cur + 1, "combat_type": st.combatType(), "round_buff": []proto.Message{}, "skill_plays": r.plays,
-			"sprite_cd_info": []proto.Message{{"cd_info": []proto.Message{}, "pos": spiritPos}}, "star_list": []proto.Message{},
-		})
+		return s.Send(20004, roundPlays(r, st.cur, st.combatType()))
 	case cmd == 20005 && st.stage == waitPlayed:
 		if st.cur+1 < len(st.rounds) {
 			st.cur++

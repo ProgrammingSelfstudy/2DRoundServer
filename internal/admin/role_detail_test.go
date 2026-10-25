@@ -392,3 +392,37 @@ func TestGrantSkin(t *testing.T) {
 		t.Fatalf("push asks %v", e.gw.skinPushes)
 	}
 }
+
+func TestGrantLook(t *testing.T) {
+	e := newEnv(t)
+	viewer, operator, _ := e.tokens()
+	e.seedServer("symlf_1")
+	r := e.seedRole("p1", "symlf_1", "路飞")
+	path := fmt.Sprintf("/api/roles/%d/looks", r.RID)
+	if res := e.do(viewer, "POST", path, map[string]any{"kind": "title", "base_id": 90003}); res.Status != 403 {
+		t.Fatalf("a viewer must not grant: %d", res.Status)
+	}
+	for name, b := range map[string]map[string]any{
+		"bad kind":      {"kind": "hat", "base_id": 1},
+		"unknown title": {"kind": "title", "base_id": 1},
+		"unknown frame": {"kind": "avatar", "base_id": 1},
+		"bad days":      {"kind": "title", "base_id": 90003, "days": -3},
+	} {
+		if res := e.do(operator, "POST", path, b); res.Status != 422 {
+			t.Fatalf("%s: %d %s", name, res.Status, res.Body)
+		}
+	}
+	if res := e.do(operator, "POST", "/api/roles/999999/looks", map[string]any{"kind": "title", "base_id": 90003}); res.Status != 404 {
+		t.Fatalf("unknown role: %d", res.Status)
+	}
+	if res := e.do(operator, "POST", path, map[string]any{"kind": "title", "base_id": 90003}); res.Status != 200 {
+		t.Fatalf("grant: %d %s", res.Status, res.Body)
+	}
+	if res := e.do(operator, "POST", path, map[string]any{"kind": "face", "base_id": 2007, "days": 5}); res.Status != 200 || res.JSON()["end_time"].(float64) == 0 {
+		t.Fatalf("timed grant: %d %s", res.Status, res.Body)
+	}
+	got, _ := e.st.LooksOf(r.RID, "title", 0)
+	if len(got) != 1 || got[0].ID != 90003 || got[0].EndTime != 0 {
+		t.Fatalf("titles: %v", got)
+	}
+}

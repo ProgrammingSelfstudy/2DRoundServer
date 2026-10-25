@@ -90,7 +90,7 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 	if err != nil {
 		return err
 	}
-	if err := s.Send(10301, roleBase(fresh)); err != nil {
+	if err := sendRoleBase(l.Store, s, fresh); err != nil {
 		return err
 	}
 	ledger, err := l.Store.RoleAssets(fresh.RID)
@@ -197,3 +197,12 @@ func vipExpFor(lev int) int64 {
 
 // MaxRoleLevel is the highest level of the client's level table.
 func MaxRoleLevel() int { return len(expTable) }
+
+// sendRoleBase sends 10301 with the role's stored settings (signature, backdrop, avatar frame, ...).
+func sendRoleBase(st *store.Store, s *gateway.Session, r *store.Role) error {
+	m, err := withSettings(st, r.RID, roleBase(r))
+	if err != nil {
+		return err
+	}
+	return s.Send(10301, m)
+}

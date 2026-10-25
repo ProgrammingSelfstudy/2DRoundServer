@@ -30,6 +30,12 @@ const roleCols = `rid,account_id,srv_id,name,lev,sex,career,face_id,status,creat
 // Only the male starter's number was seen; no female role was captured.
 const DefaultFaceID = 10401
 
+// SetRoleFace sets the face (head) the role shows.
+func (s *Store) SetRoleFace(rid int64, face int) error {
+	_, err := s.db.Exec(`UPDATE roles SET face_id=? WHERE rid=?`, face, rid)
+	return err
+}
+
 // faceOrDefault is what is sent for a stored face_id.
 func faceOrDefault(face int) int {
 	if face == 0 {

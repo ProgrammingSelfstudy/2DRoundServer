@@ -52,7 +52,7 @@ func (s *Server) meta(w http.ResponseWriter, r *http.Request, p *principal) {
 		id, _ := game.AssetLabelID(n)
 		assets = append(assets, map[string]any{"name": n, "label": id})
 	}
-	writeJSON(w, 200, map[string]any{"assets": assets, "heroes": game.HeroOptions(), "skins": game.SkinChoices(), "roles": []string{"viewer", "operator", "superadmin"}, "mail_types": []int{1, 3}})
+	writeJSON(w, 200, map[string]any{"assets": assets, "heroes": game.HeroOptions(), "skins": game.SkinChoices(), "looks": game.LookChoices(), "roles": []string{"viewer", "operator", "superadmin"}, "mail_types": []int{1, 3}})
 }
 
 // ---- admins ----
@@ -786,6 +786,56 @@ func (s *Server) grantSkin(w http.ResponseWriter, r *http.Request, p *principal)
 	}
 	s.audit(r, p, "role.skin", role.Name, map[string]any{"rid": rid, "srv_id": role.SrvID, "skin_id": q.SkinID, "days": q.Days})
 	writeJSON(w, 200, resp)
+}
+
+// grantLook gives a role a cosmetic (a head, space backdrop, avatar frame, chat bubble or title), for
+// good or for `days` days. The client reads these lists when the panel opens, so nothing is pushed.
+func (s *Server) grantLook(w http.ResponseWriter, r *http.Request, p *principal) {
+	rid, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	var q struct {
+		Kind   string `json:"kind"`
+		BaseID int64  `json:"base_id"`
+		Days   int    `json:"days"`
+	}
+	if !decode(w, r, &q) {
+		return
+	}
+	switch q.Kind {
+	case store.LookFace, store.LookBackdrop, store.LookAvatar, store.LookBubble, store.LookTitle:
+	default:
+		fail(w, http.StatusUnprocessableEntity, "kind must be face, backdrop, avatar, bubble or title")
+		return
+	}
+	if !game.LookKnown(q.Kind, q.BaseID) {
+		fail(w, http.StatusUnprocessableEntity, fmt.Sprintf("no %s %d", q.Kind, q.BaseID))
+		return
+	}
+	if q.Days < 0 || q.Days > maxSkinDays {
+		fail(w, http.StatusUnprocessableEntity, fmt.Sprintf("days must be 0 (for good) to %d", maxSkinDays))
+		return
+	}
+	role, err := s.Store.RoleByID(rid)
+	if errors.Is(err, store.ErrNotFound) {
+		fail(w, 404, "no such role")
+		return
+	}
+	if err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	var end int64
+	if q.Days > 0 {
+		end = time.Now().Add(time.Duration(q.Days) * 24 * time.Hour).Unix()
+	}
+	if err := s.Store.GrantLook(rid, q.Kind, q.BaseID, end); err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	s.audit(r, p, "role.look", role.Name, map[string]any{"rid": rid, "srv_id": role.SrvID, "kind": q.Kind, "base_id": q.BaseID, "days": q.Days})
+	writeJSON(w, 200, map[string]any{"ok": true, "kind": q.Kind, "base_id": q.BaseID, "end_time": end})
 }
 
 // kickRole disconnects an online role without banning it.

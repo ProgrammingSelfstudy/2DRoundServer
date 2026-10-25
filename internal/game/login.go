@@ -279,7 +279,7 @@ func (l *Login) giveStarter(s *gateway.Session, role *store.Role) error {
 	if err := s.Send(11211, formationMessage(f)); err != nil {
 		return err
 	}
-	if err := s.Send(10301, roleBase(role)); err != nil {
+	if err := sendRoleBase(l.Store, s, role); err != nil {
 		return err
 	}
 	power := rolePower(heroes)

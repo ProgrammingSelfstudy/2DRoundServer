@@ -69,3 +69,30 @@ func registerHeroStubs(r *gateway.Router) {
 		26430: refuse("result", nil), 26431: refuse("result", proto.Message{"power": 0}), 26432: refuse("result", nil),
 	})
 }
+
+// registerNoPaymentStubs answers the recharge side of vip and mall. There is no payment here (ROADMAP),
+// so the lists are empty, the cards are not owned and every claim is refused. This is the intended end
+// state, not a missing feature.
+func registerNoPaymentStubs(r *gateway.Router) {
+	registerStubs(r, map[uint16]func(proto.Message) proto.Message{
+		16700: fixed(proto.Message{"list": []proto.Message{}}),
+		16707: fixed(proto.Message{"status": 0}),
+		16708: refuse("code", nil),
+		16712: fixed(proto.Message{"charge_sum": 0, "list": []proto.Message{}}),
+		16713: refuse("code", proto.Message{"list": []proto.Message{}}),
+		21005: fixed(proto.Message{"count": 0, "gold": 0, "next_gold": 0}),
+		21006: fixed(proto.Message{"first_gift": []proto.Message{}}),
+		21035: fixed(proto.Message{}),
+		24501: refuse("code", nil),
+		24502: fixed(proto.Message{"list": []proto.Message{}}),
+		13419: refuse("code", nil),
+		16660: fixed(proto.Message{"holiday_exchanges": []proto.Message{}}),
+		16661: func(req proto.Message) proto.Message {
+			return proto.Message{"code": 0, "msg": notOpen, "bid": req.Int("bid"), "aim": req.Int("aim"), "buy_count": 0}
+		},
+		21022: fixed(proto.Message{"open_id": []proto.Message{}}),
+		21023: refuse("code", nil),
+		27800: fixed(proto.Message{"list": []proto.Message{}}),
+		27801: refuse("code", nil),
+	})
+}

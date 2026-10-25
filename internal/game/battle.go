@@ -23,6 +23,7 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 	})
 	registerBattleLeftovers(r)
 	registerHeroStubs(r)
+	registerNoPaymentStubs(r)
 }
 
 // registerBattleLeftovers answers the battle commands of a fight the client plays (20008 leave, 20009

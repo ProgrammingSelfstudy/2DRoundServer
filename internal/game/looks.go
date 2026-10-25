@@ -167,6 +167,16 @@ func withSettings(st *store.Store, rid int64, m proto.Message) (proto.Message, e
 	}
 	m["signature"], m["is_show_vip"], m["auto_pk"] = cfg.Signature, cfg.ShowVIP, cfg.AutoPK
 	m["backdrop_id"], m["avatar_base_id"] = cfg.BackdropID, cfg.AvatarID
+	gd, mem, err := st.GuildOfRole(rid)
+	switch {
+	case err == nil:
+		m["gid"], m["gsrv_id"], m["position"], m["gname"], m["guild_lev"] = gd.GID, gd.SrvID, mem.Post, gd.Name, gd.Lev
+	case !errors.Is(err, store.ErrNotFound):
+		return m, err
+	}
+	if quit, _, err := st.CooldownOf(rid); err == nil {
+		m["guild_quit_time"] = quit
+	}
 	// the same on every level-1 role of the original server (capture original-2026-10-22)
 	m["room_bbs_set"], m["is_open_home"] = 1, 0
 	if cfg.LookID != 0 {

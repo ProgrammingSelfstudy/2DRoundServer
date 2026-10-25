@@ -68,6 +68,7 @@ func main() {
 		online := &game.OnlineGiftService{Store: st, Hub: gw.Hub, Log: logger}
 		online.Register(gw.Router)
 		(&game.CheckinService{Store: st}).Register(gw.Router)
+		(&game.GuildService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger}).Register(gw.Router)
 		(&game.InviteService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger}).Register(gw.Router)
 		gw.OnDisconnect = func(s *gateway.Session) { friends.Disconnected(s); online.Disconnected(s) }
 		chat := &game.ChatService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, MinInterval: time.Second}

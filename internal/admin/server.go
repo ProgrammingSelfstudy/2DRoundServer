@@ -128,6 +128,8 @@ func (s *Server) Handler() http.Handler {
 	route("POST /api/redeem-codes", levWrite, s.createRedeemCode)
 	route("DELETE /api/redeem-codes/{code}", levWrite, s.deleteRedeemCode)
 	route("GET /api/reports", levRead, s.listReports)
+	route("GET /api/guilds", levRead, s.listGuilds)
+	route("POST /api/guilds/{id}/disband", levWrite, s.disbandGuild)
 
 	route("GET /api/notices", levRead, s.listNotices)
 	route("POST /api/notices", levWrite, s.createNotice)

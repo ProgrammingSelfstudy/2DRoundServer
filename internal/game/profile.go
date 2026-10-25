@@ -58,8 +58,12 @@ func (f *FriendService) profile(s *gateway.Session, req proto.Message) error {
 			return err
 		}
 	}
+	gname := ""
+	if gd, _, err := f.Store.GuildOfRole(t.RID); err == nil {
+		gname = gd.Name
+	}
 	return s.Send(10315, proto.Message{
-		"rid": t.RID, "srv_id": t.SrvID, "name": t.Name, "gname": "", "lev": t.Lev,
+		"rid": t.RID, "srv_id": t.SrvID, "name": t.Name, "gname": gname, "lev": t.Lev,
 		"face_id": t.FaceID, "power": power, "sex": t.Sex,
 		"partner_list": shown, "room_partner_list": []proto.Message{},
 		"honor_list": []proto.Message{}, "use_badges": []proto.Message{}, "sprites": []proto.Message{},

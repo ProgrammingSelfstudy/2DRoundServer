@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"2droundserver/internal/game"
 	"2droundserver/internal/store"
@@ -471,5 +472,34 @@ func TestRedeemCodes(t *testing.T) {
 	}
 	if res := e.do(viewer, "GET", "/api/reports", nil); res.Status != 200 {
 		t.Fatalf("reports: %d %s", res.Status, res.Body)
+	}
+}
+
+func TestAdminGuilds(t *testing.T) {
+	e := newEnv(t)
+	viewer, operator, _ := e.tokens()
+	e.seedServer("symlf_1")
+	leader := e.seedRole("p1", "symlf_1", "会长")
+	gid, err := e.st.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "海贼联盟", LeaderRID: leader.RID, ApplyLev: 1}, time.Now().Unix(), nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res := e.do(viewer, "GET", "/api/guilds?srv_id=symlf_1", nil)
+	items, _ := res.JSON()["items"].([]any)
+	if res.Status != 200 || len(items) != 1 || items[0].(map[string]any)["name"] != "海贼联盟" || items[0].(map[string]any)["leader"] != "会长" {
+		t.Fatalf("list: %d %s", res.Status, res.Body)
+	}
+	path := fmt.Sprintf("/api/guilds/%d/disband", gid)
+	if res := e.do(viewer, "POST", path, nil); res.Status != 403 {
+		t.Fatalf("a viewer must not disband: %d", res.Status)
+	}
+	if res := e.do(operator, "POST", "/api/guilds/99999/disband", nil); res.Status != 404 {
+		t.Fatalf("unknown guild: %d", res.Status)
+	}
+	if res := e.do(operator, "POST", path, nil); res.Status != 200 {
+		t.Fatalf("disband: %d %s", res.Status, res.Body)
+	}
+	if _, err := e.st.GuildByID(gid); err == nil {
+		t.Fatal("the guild must be gone")
 	}
 }

@@ -116,3 +116,71 @@ func (s *Server) listReports(w http.ResponseWriter, r *http.Request, p *principa
 	}
 	writeJSON(w, 200, map[string]any{"items": out})
 }
+
+// listGuilds shows the guilds of a server (srv_id, default every server), biggest first.
+func (s *Server) listGuilds(w http.ResponseWriter, r *http.Request, p *principal) {
+	srv := r.URL.Query().Get("srv_id")
+	limit, offset := page(r)
+	servers, err := s.Store.ListServers()
+	if err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	type row struct {
+		GID       int64  `json:"gid"`
+		SrvID     string `json:"srv_id"`
+		Name      string `json:"name"`
+		Lev       int64  `json:"lev"`
+		Members   int    `json:"members"`
+		Leader    string `json:"leader"`
+		LeaderRID int64  `json:"leader_rid"`
+		CreatedAt int64  `json:"created_at"`
+	}
+	out := []row{}
+	for _, sv := range servers {
+		if srv != "" && sv.SrvID != srv {
+			continue
+		}
+		rows, _, err := s.Store.GuildsOf(sv.SrvID, r.URL.Query().Get("q"), 1, 1000)
+		if err != nil {
+			internalErr(w, s, err)
+			return
+		}
+		for _, g := range rows {
+			out = append(out, row{g.GID, g.SrvID, g.Name, g.Lev, g.Members, g.LeaderName, g.LeaderRID, g.CreatedAt})
+		}
+	}
+	total := len(out)
+	if offset > len(out) {
+		offset = len(out)
+	}
+	out = out[offset:]
+	if len(out) > limit {
+		out = out[:limit]
+	}
+	writeJSON(w, 200, map[string]any{"items": out, "total": total})
+}
+
+// disbandGuild dissolves a guild. Its members see it the next time they log in (a role that is online
+// keeps the old guild on screen until then).
+func (s *Server) disbandGuild(w http.ResponseWriter, r *http.Request, p *principal) {
+	id, ok := pathID(w, r)
+	if !ok {
+		return
+	}
+	g, err := s.Store.GuildByID(id)
+	if errors.Is(err, store.ErrNotFound) {
+		fail(w, 404, "no such guild")
+		return
+	}
+	if err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	if err := s.Store.DisbandGuild(id, time.Now().Unix()); err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	s.audit(r, p, "guild.disband", g.Name, map[string]any{"gid": id, "srv_id": g.SrvID})
+	writeJSON(w, 200, map[string]any{"ok": true})
+}

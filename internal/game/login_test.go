@@ -71,6 +71,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	og := &OnlineGiftService{Store: st, Hub: gw.Hub, Log: lg}
 	og.Register(gw.Router)
 	(&CheckinService{Store: st}).Register(gw.Router)
+	(&GuildService{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: lg}).Register(gw.Router)
 	inv := &InviteService{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: lg}
 	inv.Register(gw.Router)
 	gw.OnDisconnect = func(s *gateway.Session) { fs.Disconnected(s); og.Disconnected(s) }
@@ -599,10 +600,6 @@ func TestEmptyRepliesAnswerAndRealHandlersWin(t *testing.T) {
 	c.send(10925, proto.Message{"id": 77}) // a request with a payload: the key is echoed
 	if r := c.recv(10925); r.Int("id") != 77 || r.Int("status") != 0 {
 		t.Fatalf("10925 must echo id and leave the rest empty: %v", r)
-	}
-	c.send(13501, proto.Message{"page": 2, "flag": 1, "num": 10, "name": "海贼"}) // strings are echoed too
-	if r := c.recv(13501); r.Int("page") != 2 || r.Int("flag") != 1 || r.Int("num") != 10 || r.Str("name") != "海贼" || len(r.Arr("guilds")) != 0 {
-		t.Fatalf("13501: %v", r)
 	}
 	c.send(25830, proto.Message{"start": 3, "num": 9})
 	if r := c.recv(25830); r.Int("start") != 3 || r.Int("num") != 9 || r.Int("max_num") != 0 {

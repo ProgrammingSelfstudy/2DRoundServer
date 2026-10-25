@@ -335,6 +335,7 @@ func (g *GuildService) Register(r *gateway.Router) {
 	g.registerBasics(r)
 	g.registerMembers(r)
 	g.registerDonate(r)
+	g.registerSkills(r)
 }
 
 var errNoGuild = errors.New("no guild")

@@ -636,6 +636,9 @@ func (g *GuildService) registerDonate(r *gateway.Router) {
 			return err
 		}
 		g.pushLog(gd.GID, guildLogDonate, role.RID, role.Name, "进行了"+d.Name, s.Now().Unix())
+		if err := g.Store.AddGuildVitality(gd.GID, vitalityDonate); err != nil {
+			return err
+		}
 		if err := sendAssets(s, g.Store, role.RID); err != nil {
 			return err
 		}

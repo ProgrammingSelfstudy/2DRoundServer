@@ -206,6 +206,9 @@ func (g *GuildService) bossSettle(role *store.Role, gd *store.Guild, st *store.B
 		return bossOutcome{}, err
 	}
 	out := bossOutcome{damage: damage, applied: applied, killed: killed, rewards: pairsOf(chap.Challenge)}
+	if err := g.Store.AddGuildVitality(gd.GID, vitalityBoss); err != nil {
+		return out, err
+	}
 	if killed {
 		first, err := g.Store.ClaimBossKill(role.RID, boss.BossID)
 		if err != nil {

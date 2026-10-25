@@ -182,6 +182,10 @@ func (g *GuildService) infoMessage(gd *store.Guild, day int64) (proto.Message, e
 	if err != nil {
 		return nil, err
 	}
+	vitality, err := g.Store.GuildVitality(gd.GID)
+	if err != nil {
+		return nil, err
+	}
 	dayExp, recruit := gd.DayExp, gd.RecruitNum
 	if gd.DayExpDay != day {
 		dayExp = 0
@@ -192,7 +196,7 @@ func (g *GuildService) infoMessage(gd *store.Guild, day int64) (proto.Message, e
 	return proto.Message{
 		"gid": gd.GID, "gsrv_id": gd.SrvID, "name": gd.Name, "lev": gd.Lev, "members_num": n, "members_max": guildCapacity(gd.Lev),
 		"leader_name": leader.Name, "rid": leader.RID, "srv_id": leader.SrvID, "sign": gd.Sign, "exp": gd.Exp, "day_exp": dayExp,
-		"apply_type": gd.ApplyType, "apply_lev": gd.ApplyLev, "recruit_num": recruit, "vitality": 0, "apply_power": gd.ApplyPower, "rank_idx": -1,
+		"apply_type": gd.ApplyType, "apply_lev": gd.ApplyLev, "recruit_num": recruit, "vitality": vitality, "apply_power": gd.ApplyPower, "rank_idx": -1,
 	}, nil
 }
 
@@ -337,6 +341,7 @@ func (g *GuildService) Register(r *gateway.Router) {
 	g.registerDonate(r)
 	g.registerSkills(r)
 	g.registerBoss(r)
+	g.registerSecret(r)
 }
 
 var errNoGuild = errors.New("no guild")

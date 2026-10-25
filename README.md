@@ -151,3 +151,6 @@ WebSocket transport (for WeChat / Douyin mini-games, which cannot open raw TCP):
 ## Policy values that are our choice, not protocol
 Role name <= 12 characters, 3 roles per account per server, placeholder name
 "玩家<rid>", `auto_register` creates unknown accounts on first login (dev only).
+
+Gold market (贝里市场: 23500 goods of a tab, 23501 buy, 23502 sell, 23516 prices, 23520 purchase counts; tests only, not yet on a device, no capture): 93 goods in four tabs with their level, price and weekly / daily limits from the client (`internal/game/data/market_gold.json`, `tools/extract_market_gold.py`). Buying pays coin and delivers the item; the limit counts in `shop_buys` under a negative key (limit type 1 per day, 2 per week, from the client's tips). Selling pays 0.9 of the price (the client's text) or the fixed price of the six sell-only items. Our rules: prices never move (the client says they follow trading and reset at 0:00; `margin` is always 1000 = no change) and the stock is unlimited. The silver market (stalls, 23504-23514) and the two sell-only items 10207/10208 (not in the item table) are not implemented.
+

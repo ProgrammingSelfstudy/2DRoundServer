@@ -118,6 +118,10 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 			if _, known := partnerTable[p.BID]; !known {
 				return reply(0, "英雄不存在")
 			}
+			before, err := resonanceSnapshot(st, role.RID)
+			if err != nil {
+				return err
+			}
 			var toLev, toBreak int
 			paid := false
 			for n := 0; n < tries && !paid; n++ {
@@ -154,6 +158,10 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 			np := *p
 			np.Lev, np.BreakLev = toLev, toBreak
 			if err := s.Send(11002, partnerMessage(np)); err != nil {
+				return err
+			}
+			// a level moved the crystal: the heroes in its slots follow (capture original-2026-10-25)
+			if err := pushResonanceShifts(s, st, role.RID, before, p.PartnerID); err != nil {
 				return err
 			}
 			return reply(1, "")

@@ -7,12 +7,14 @@ import (
 
 // Partner is one hero of a role.
 type Partner struct {
-	PartnerID, RID, BID int64
-	Lev, Star, BreakLev int
-	UseSkin             int64    // the skin worn (0 = none)
-	Locked              bool     // locked by the owner: not to be consumed
-	Equips              []Equip  // worn pieces, by slot
-	Talents             []Talent // learned talent skills, by slot
+	PartnerID, RID, BID  int64
+	Lev, Star, BreakLev  int
+	UseSkin              int64    // the skin worn (0 = none)
+	Locked               bool     // locked by the owner: not to be consumed
+	Equips               []Equip  // worn pieces, by slot
+	Talents              []Talent // learned talent skills, by slot
+	ResSlot              int64    // the resonance crystal slot it sits in (0 = none)
+	ShownLev, ShownBreak int      // level and break step it shows while it sits in a slot
 }
 
 // Equip is one worn piece of equipment.
@@ -55,7 +57,7 @@ func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
 		out[i].Equips = eq[out[i].PartnerID]
 		out[i].Talents = tl[out[i].PartnerID]
 	}
-	return out, nil
+	return out, s.applyResonance(rid, out)
 }
 
 // GrantStarterPartners gives the role the seeds once: it does nothing when the
@@ -108,7 +110,22 @@ func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	}
 	tl, err := s.talentsOf(`partner_id=?`, partnerID)
 	p.Talents = tl[partnerID]
-	return &p, err
+	if err != nil {
+		return &p, err
+	}
+	if slots, err := s.slotsOf(rid); err != nil || slots[partnerID] == 0 {
+		return &p, err
+	}
+	all, err := s.PartnersOf(rid) // a hero in a slot: the crystal level comes from all of them
+	if err != nil {
+		return &p, err
+	}
+	for _, q := range all {
+		if q.PartnerID == partnerID {
+			return &q, nil
+		}
+	}
+	return &p, nil
 }
 
 // UpgradePartner pays for a hero's new level / break step and stores it, in one

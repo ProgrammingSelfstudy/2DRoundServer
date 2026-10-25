@@ -77,10 +77,11 @@ func starterSeeds(sex int) []store.PartnerSeed {
 func partnerStats(p store.Partner) (hp, atk, def, speed int64) {
 	info := partnerTable[p.BID]
 	a := info.Attr
-	br := growth.Brach[brachKey(info, p.BreakLev)]
+	lev, brk := shownLevBreak(p)
+	br := growth.Brach[brachKey(info, brk)]
 	st := info.Stars[strconv.Itoa(p.Star)]
 	one := func(base, add, brMul, stMul int64, flat string) int64 {
-		v := base + add*int64(p.Lev-1)/1000
+		v := base + add*int64(lev-1)/1000
 		if brMul == 0 {
 			brMul = 1000
 		}
@@ -105,15 +106,16 @@ func partnerMessage(p store.Partner) proto.Message {
 	info := partnerTable[p.BID]
 	a := info.Attr
 	hp, atk, def, speed := partnerStats(p)
+	shownLev, shownBreak := shownLevBreak(p)
 	skills := []proto.Message{}
 	for _, sk := range info.Stars[strconv.Itoa(p.Star)].Skills {
 		skills = append(skills, proto.Message{"pos": sk[0], "skill_bid": sk[1]})
 	}
 	return proto.Message{
-		"partner_id": p.PartnerID, "bid": p.BID, "lev": p.Lev, "star": p.Star, "skills": skills,
-		"break_lev": p.BreakLev, "power": atk + def + hp/10 + speed,
+		"partner_id": p.PartnerID, "bid": p.BID, "lev": shownLev, "star": p.Star, "skills": skills,
+		"break_lev": shownBreak, "power": atk + def + hp/10 + speed,
 		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": 0,
-		"resonate_lev": 0, "resonate_break_lev": 0, "horcrux_status": 0, "horcrux_lev": 0,
+		"resonate_lev": b2i(p.ResSlot > 0), "resonate_break_lev": 0, "horcrux_status": 0, "horcrux_lev": 0,
 		"atk": atk, "def_p": def, "def_s": def, "hp": hp, "speed": speed,
 		"hit_rate": a["hit_rate"], "dodge_rate": a["dodge_rate"], "crit_rate": a["crit_rate"], "crit_ratio": a["crit_ratio"],
 		"hit_magic": a["hit_magic"], "dodge_magic": a["dodge_magic"], "def": def,
@@ -184,6 +186,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterTalent(r, st)
 	RegisterReset(r, st)
 	RegisterReturn(r, st)
+	RegisterResonance(r, st)
 	RegisterSkin(r, st)
 	RegisterSeerpalace(r, st)
 	RegisterVIPGifts(r, st)

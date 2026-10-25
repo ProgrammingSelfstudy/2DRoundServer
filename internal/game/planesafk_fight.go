@@ -88,85 +88,20 @@ func (p *pfSvc) fightTile(s *gateway.Session, role *store.Role, st *pfState, t *
 	if len(slots) == 0 {
 		return reply(0, "请选择出战英雄")
 	}
-	if formType == 0 {
-		formType = 1
-	}
-	var ownSlots, hiredSlots []store.FormationSlot
-	hired := map[int64]store.Partner{}
-	var fighters []pfSlot
-	for _, sl := range slots {
-		h := p.heroOf(st, sl.Flag, sl.ID)
-		if h == nil || h.HP <= 0 || len(fighters) == formMaxHeroes {
-			continue
-		}
-		fighters = append(fighters, sl)
-		fs := store.FormationSlot{Pos: sl.Pos, PartnerID: sl.ID}
-		if sl.Flag == 1 {
-			hiredSlots = append(hiredSlots, fs)
-			hired[sl.ID] = store.Partner{PartnerID: sl.ID, RID: role.RID, BID: h.BID, Lev: int(h.Lev), Star: int(h.Star)}
-		} else {
-			ownSlots = append(ownSlots, fs)
-		}
-	}
-	if len(fighters) == 0 {
-		return reply(0, "没有可以出战的英雄")
-	}
-	team, objects, err := p.fights.teamFor(role, formType, ownSlots)
+	pf, msg, err := planesFight(p.st, p.fights, role, st.Heroes, slots, formType, t.Power, e.Name, []proto.Message{{"param": t.Line}, {"param": t.Index}})
 	if err != nil {
 		return err
 	}
-	if len(hiredSlots) > 0 {
-		hu, ho := sideUnits(role.RID, role.SrvID, hiredSlots, formType, hired, true)
-		team, objects = append(team, hu...), append(objects, ho...)
+	if msg != "" {
+		return reply(0, msg)
 	}
-	hpOf := map[int64]*pfSlot{} // battle cell -> who stands there
-	for i := range fighters {
-		hpOf[battleCell(formType, fighters[i].Pos)] = &fighters[i]
-	}
-	for i := range team {
-		if sl := hpOf[team[i].pos]; sl != nil {
-			team[i].hp = max(1, team[i].maxHP*p.heroOf(st, sl.Flag, sl.ID).HP/100)
-		}
-	}
-	for _, o := range objects {
-		if o.Int("object_type") == 2 {
-			if sl := hpOf[o.Int("pos")]; sl != nil {
-				o["hp"] = max(1, o.Int("hp_max")*p.heroOf(st, sl.Flag, sl.ID).HP/100)
-			}
-		}
-	}
-	opp, _, err := p.enemyLineup(role, st, t)
-	if err != nil {
-		return err
-	}
-	oslots, oform, obyID, err := opp.fighters(p.st)
-	if err != nil {
-		return err
-	}
-	foes, foeObjects := sideUnits(opp.RID, opp.SrvID, oslots, oform, obyID, false)
-	if len(foes) == 0 {
-		return reply(0, "守卫已无法应战")
-	}
-	rounds, won, sim := playFightOpts(team, foes, newRng(), maxFightRounds, false)
-	left := map[int64]int64{} // battle cell -> hp per cent left
-	for _, u := range sim.units {
-		if u.ours {
-			left[u.pos] = max(0, u.hp) * 100 / max(1, u.maxHP)
-		}
-	}
-	intro := proto.Message{
-		"combat_type": combatPlanes, "formation": []proto.Message{{"group": 1, "formation_type": formType, "formation_lev": 1}, {"group": 2, "formation_type": oform, "formation_lev": 1}},
-		"objects": append(objects, foeObjects...), "is_auto": 0, "current_wave": 1, "total_wave": 1, "play_speed": 1,
-		"extra_args": []proto.Message{{"param": t.Line}, {"param": t.Index}}, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name,
-		"target_role_name": e.Name, "suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
-	}
-	st.FormType, st.Hallows, st.Form = formType, hallows, fighters
+	st.FormType, st.Hallows, st.Form = pf.formType, hallows, pf.fighters
 	if err := reply(1, ""); err != nil {
 		return err
 	}
-	line, index := t.Line, t.Index
-	return p.fights.begin(s, role, combatPlanes, intro, rounds, won, func(s *gateway.Session, won bool) error {
-		return p.settleFight(s, line, index, fighters, formType, left, won)
+	line, index, fighters, ft, left := t.Line, t.Index, pf.fighters, pf.formType, pf.left
+	return p.fights.begin(s, role, combatPlanes, pf.intro, pf.rounds, pf.won, func(s *gateway.Session, won bool) error {
+		return p.settleFight(s, line, index, fighters, ft, left, won)
 	})
 }
 

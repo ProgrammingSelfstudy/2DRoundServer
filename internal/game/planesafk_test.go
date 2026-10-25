@@ -88,7 +88,7 @@ func TestPlanesafkStepsSpringCrossAndMoves(t *testing.T) {
 	st := e.pfState(t, role)
 	st.Heroes[0].HP = 40
 	e.st.SaveState(role.RID, pfModule, st)
-	e.setTile(t, role, 2, 1, pfEvtID(1, 1, 2, 3)) // a spring
+	e.setTile(t, role, 2, 1, pfEvtID(1, 1, 2, 3))                                                   // a spring
 	c.send(28600, proto.Message{"line": 2, "index": 5, "action": 1, "ext_list": []proto.Message{}}) // too far
 	if r := c.waitFor(28600); r.Int("code") != 0 {
 		t.Fatalf("far tile: %v", r)

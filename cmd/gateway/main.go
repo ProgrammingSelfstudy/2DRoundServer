@@ -93,6 +93,7 @@ func main() {
 		game.RegisterShop(gw.Router, st)
 		game.RegisterMarket(gw.Router, st)
 		game.RegisterArena(gw.Router, st)
+		game.RegisterLadder(gw.Router, st)
 		game.RegisterStarTower(gw.Router, st)
 		game.RegisterAdventure(gw.Router, st)
 		game.RegisterPlanesafk(gw.Router, st)

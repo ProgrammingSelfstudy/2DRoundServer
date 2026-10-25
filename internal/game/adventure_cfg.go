@@ -108,6 +108,22 @@ type advBuffCfg struct {
 	Buffs [][]int64 `json:"buffs"`
 }
 
+type advMineRow struct {
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Star        int64     `json:"star"`
+	Pos         []int64   `json:"pos"`
+	BaseItems   [][]int64 `json:"base_items"`
+	HookItems   [][]int64 `json:"hook_items"`
+	RobotPower  int64     `json:"robot_power"`
+	RobotLev    [][]int64 `json:"robot_lev"`
+	RobotName   string    `json:"robot_name"`
+	MaxTime     int64     `json:"max_time"` // minutes
+	PrimaryLoss [][]int64 `json:"primary_loss"`
+	SeniorLoss  [][]int64 `json:"senior_loss"`
+	ResID       string    `json:"res_id"`
+}
+
 type advConf struct {
 	Events map[string]advEventCfg `json:"events"`
 	Units  map[string]struct {
@@ -148,8 +164,11 @@ type advConf struct {
 		} `json:"data_attenuation_reward"`
 	} `json:"mine"`
 
+	Mines map[string]advMineRow `json:"mines"`
+
 	events map[int64]advEventCfg
 	consts map[string]int64
+	mines  map[int64]advMineRow
 }
 
 var advCfg = func() *advConf {
@@ -161,6 +180,11 @@ var advCfg = func() *advConf {
 	for k, e := range c.Events {
 		id, _ := strconv.ParseInt(k, 10, 64)
 		c.events[id] = e
+	}
+	c.mines = map[int64]advMineRow{}
+	for k, m := range c.Mines {
+		id, _ := strconv.ParseInt(k, 10, 64)
+		c.mines[id] = m
 	}
 	c.consts = map[string]int64{}
 	for k, v := range c.Const {

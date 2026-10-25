@@ -275,3 +275,152 @@ func TestAdventureShopAndRoundReset(t *testing.T) {
 		t.Fatalf("buffs: %v", r)
 	}
 }
+
+func TestAdventureMineList(t *testing.T) {
+	e, c, role := advEnv(t)
+	c.send(20600, proto.Message{})
+	c.waitFor(20600)
+	c.send(20653, proto.Message{})
+	if r := c.waitFor(20653); len(r.Arr("floor_list")) != 0 {
+		t.Fatalf("floors before clearing 10: %v", r)
+	}
+	st := e.advState(t, role)
+	st.PassID = 20
+	e.st.SaveState(role.RID, advModule, st)
+	c.send(20653, proto.Message{})
+	if r := c.waitFor(20653); len(r.Arr("floor_list")) != 2 {
+		t.Fatalf("floors after clearing 20: %v", r)
+	}
+	c.send(20640, proto.Message{"floor": 10})
+	r := c.waitFor(20640)
+	if r.Int("floor") != 10 || r.Int("count") != 5 || r.Int("occupy_count") != 0 || len(r.Arr("list")) != 9 {
+		t.Fatalf("20640: %v", r)
+	}
+	for _, m := range r.Arr("list") {
+		if m.Int("rid") != 0 || m.Int("mine_id")/1000 != 101 || m.Str("name") == "" {
+			t.Fatalf("a mine: %v", m)
+		}
+	}
+	c.send(20641, proto.Message{"floor": 10, "room_id": 1})
+	if m := c.waitFor(20641); m.Int("mine_id") != 101011 || m.Int("plunder_count") != 3 || len(m.Arr("items")) != 1 || m.Int("power") != 68945 {
+		t.Fatalf("20641: %v", m)
+	}
+	c.send(20640, proto.Message{"floor": 15}) // there is no such floor
+	if r := c.waitFor(20640); len(r.Arr("list")) != 0 {
+		t.Fatalf("floor 15: %v", r)
+	}
+}
+
+func TestAdventureMineFightOccupyAndLeave(t *testing.T) {
+	e, c, role := advEnv(t)
+	hero := advForm(t, e, c, role)
+	c.send(20643, proto.Message{"floor": 10, "room_id": 1}) // floor 10 is not cleared yet
+	if r := c.waitFor(20643); r.Int("code") != 0 {
+		t.Fatalf("fought an unopened floor: %v", r)
+	}
+	st := e.advState(t, role)
+	st.PassID = 10
+	e.st.SaveState(role.RID, advModule, st)
+	c.send(20643, proto.Message{"floor": 10, "room_id": 1})
+	if r := c.waitFor(20643); r.Int("code") != 1 {
+		t.Fatalf("attack: %v", r)
+	}
+	if m := c.waitFor(20027); m.Int("combat_type") != combatMine {
+		t.Fatalf("intro: %v", m)
+	}
+	c.send(20062, proto.Message{})
+	c.waitFor(20062)
+	res := c.waitFor(20649)
+	if res.Int("floor") != 10 || res.Int("room_id") != 1 || res.Int("count") != 4 {
+		t.Fatalf("20649: %v", res)
+	}
+	if res.Int("result") != 1 {
+		t.Skip("the fight was lost; occupation not tested")
+	}
+	if len(res.Arr("award")) != 1 || res.Int("end_time") <= time.Now().Unix() {
+		t.Fatalf("a win pays and offers the mine: %v", res)
+	}
+	c.send(20646, proto.Message{"floor": 10, "room_id": 1, "pos_info": []proto.Message{{"pos": 1, "id": hero}}})
+	if r := c.waitFor(20646); r.Int("flag") != 1 {
+		t.Fatalf("occupy: %v", r)
+	}
+	c.send(20640, proto.Message{"floor": 10})
+	l := c.waitFor(20640)
+	if l.Int("occupy_count") != 1 || l.Arr("list")[0].Int("rid") != role.RID || l.Arr("list")[0].Int("status") != 2 {
+		t.Fatalf("held mine: %v", l)
+	}
+	c.send(20652, proto.Message{})
+	if m := c.waitFor(20652).Arr("mine_list"); len(m) != 1 || m[0].Int("mine_id") != 101011 {
+		t.Fatalf("my mines: %v", m)
+	}
+	c.send(20642, proto.Message{})
+	if d := c.waitFor(20642).Arr("defense"); len(d) != 1 || d[0].Int("id") != hero {
+		t.Fatalf("defense: %v", d)
+	}
+	c.send(20646, proto.Message{"floor": 10, "room_id": 3, "pos_info": []proto.Message{{"pos": 1, "id": hero}}}) // no win there
+	if r := c.waitFor(20646); r.Int("flag") != 0 {
+		t.Fatalf("occupied without winning: %v", r)
+	}
+	c.send(20643, proto.Message{"floor": 10, "room_id": 1}) // the own mine
+	if r := c.waitFor(20643); r.Int("code") != 0 {
+		t.Fatalf("attacked the own mine: %v", r)
+	}
+	c.send(20654, proto.Message{"floor": 10, "room_id": 1, "type": 1}) // 90000 beli, none here
+	if r := c.waitFor(20654); r.Int("code") != 0 {
+		t.Fatalf("hired without beli: %v", r)
+	}
+	e.grantAssets(c, role, map[int64]int64{1: 200000})
+	c.send(20654, proto.Message{"floor": 10, "room_id": 1, "type": 1})
+	if r := c.waitFor(20654); r.Int("code") != 1 {
+		t.Fatalf("hire: %v", r)
+	}
+	c.send(20651, proto.Message{"floor": 10, "room_id": 1})
+	if r := c.waitFor(20651); r.Int("code") != 1 {
+		t.Fatalf("give up: %v", r)
+	}
+	c.send(20640, proto.Message{"floor": 10})
+	if l := c.waitFor(20640); l.Int("occupy_count") != 0 || l.Arr("list")[0].Int("rid") != 0 {
+		t.Fatalf("after giving up: %v", l)
+	}
+}
+
+func TestAdventureMineBoxesAttacksAndHallows(t *testing.T) {
+	e, c, role := advEnv(t)
+	c.send(20647, proto.Message{})
+	if r := c.waitFor(20647); r.Int("had_combat_num") != 0 || r.Int("count") != 5 {
+		t.Fatalf("20647: %v", r)
+	}
+	c.send(20648, proto.Message{"num": 3}) // nothing fought yet
+	if r := c.waitFor(20648); r.Int("code") != 0 {
+		t.Fatalf("early box: %v", r)
+	}
+	c.send(20655, proto.Message{}) // no gems
+	if r := c.waitFor(20655); r.Int("code") != 0 {
+		t.Fatalf("buy without gems: %v", r)
+	}
+	e.grantAssets(c, role, map[int64]int64{3: 500})
+	c.send(20655, proto.Message{})
+	if r := c.waitFor(20655); r.Int("code") != 1 || r.Int("count") != 6 || r.Int("buy_count") != 1 {
+		t.Fatalf("buy: %v", r)
+	}
+	c.send(20659, proto.Message{})
+	if r := c.waitFor(20659); r.Int("code") != 1 {
+		t.Fatalf("red point: %v", r)
+	}
+	c.send(20657, proto.Message{})
+	if r := c.waitFor(20657); r.Int("code") != 0 {
+		t.Fatalf("log red point: %v", r)
+	}
+	c.send(20656, proto.Message{"rid": 12345, "srvid": "x"})
+	if r := c.waitFor(20656); r.Int("floor") != 0 || r.Int("room_id") != 0 {
+		t.Fatalf("strike back: %v", r)
+	}
+	c.send(20658, proto.Message{})
+	if r := c.waitFor(20658); len(r.Arr("list")) != 0 {
+		t.Fatalf("hallows: %v", r)
+	}
+	c.send(20660, proto.Message{"floor": 10, "room_id": 1})
+	if r := c.waitFor(20660); r.Int("code") != 1 {
+		t.Fatalf("20660: %v", r)
+	}
+}

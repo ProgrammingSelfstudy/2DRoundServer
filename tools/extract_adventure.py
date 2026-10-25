@@ -44,9 +44,14 @@ def monster_skills(head):
     return [sk[1] for sk in p["stars"][star].get("skills", []) if skills.get(str(sk[1]), {}).get("type") == "active_skill"]
 
 
+# mines: [id, name, star, pos, base_items, hook_items, robot_power, units, robot_power_repair, robot_lev, robot_name, max_time, primary_loss, senior_loss, res_id]
+mine_names = ["id", "name", "star", "pos", "base_items", "hook_items", "robot_power", "units", "robot_power_repair", "robot_lev", "robot_name",
+              "max_time", "primary_loss", "senior_loss", "res_id"]
+mines = {int(k): dict(zip(mine_names, v)) for k, v in dump(lua_dir, "adventure_mine_data.lua", [M + "data_mine_data_table"])[M + "data_mine_data_table"].items()}
+
 units, missing = {}, 0
-for e in events.values():
-    uid = e["unit_id"]
+wanted = [e["unit_id"] for e in events.values()] + [u[0] for mi in mines.values() for u in mi["units"]]
+for uid in wanted:
     if not uid or uid in units:
         continue
     g = groups.get(uid)
@@ -64,6 +69,6 @@ out = {"source": "restored client adventure_data.lua, adventure_mine_data.lua, u
        "events": {str(k): v for k, v in sorted(events.items())}, "units": {str(k): v for k, v in sorted(units.items())},
        "map": a["data_map"], "const": a["data_adventure_const"], "floors": a["data_floor_reward"], "battle_res": a["data_battle_res"],
        "skills": a["data_skill_data"], "answers": a["data_adventure_answer"], "answer_options": a["data_adventure_kind_answer"],
-       "npc": a["data_adventure_npc_data"], "round_rewards": a["data_round_reward_list"], "buffs": a["data_buff"], "mine": m}
+       "npc": a["data_adventure_npc_data"], "round_rewards": a["data_round_reward_list"], "buffs": a["data_buff"], "mine": m, "mines": {str(k): v for k, v in sorted(mines.items())}}
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-print(len(events), "events;", len(units), "unit groups;", missing, "without a group;", len(a["data_adventure_answer"]), "questions;", len(a["data_adventure_npc_data"]), "npc events")
+print(len(mines), "mines;", len(events), "events;", len(units), "unit groups;", missing, "without a group;", len(a["data_adventure_answer"]), "questions;", len(a["data_adventure_npc_data"]), "npc events")

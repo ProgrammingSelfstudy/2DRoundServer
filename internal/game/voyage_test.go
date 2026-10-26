@@ -1,6 +1,7 @@
 package game
 
 import (
+	"sort"
 	"testing"
 	"time"
 
@@ -12,8 +13,13 @@ func TestVoyageOrderLifecycle(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
 	c, role := e.enter("vy", "出海人")
 	var seeds []store.PartnerSeed
-	for bid, p := range partnerTable {
-		if p.Camp == 1 && len(seeds) == 0 || p.Camp == 2 && len(seeds) == 1 {
+	var bids []int64 // the map has no order, and the second hero must come after a camp 1 one
+	for bid := range partnerTable {
+		bids = append(bids, bid)
+	}
+	sort.Slice(bids, func(i, j int) bool { return bids[i] < bids[j] })
+	for _, bid := range bids {
+		if p := partnerTable[bid]; p.Camp == 1 && len(seeds) == 0 || p.Camp == 2 && len(seeds) == 1 {
 			seeds = append(seeds, store.PartnerSeed{BID: bid, Star: 5})
 		}
 	}

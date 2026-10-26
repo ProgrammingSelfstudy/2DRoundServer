@@ -592,7 +592,8 @@ func (g *GuildService) registerDonate(r *gateway.Router) {
 		if err != nil {
 			return err
 		}
-		return s.Send(13523, proto.Message{"donate_list": list, "boxes": boxes, "donate_exp": exp, "day_send_num": 0, "day_recv_num": 0})
+		sent, recv := g.redbagCounts(role.RID, s.Now())
+		return s.Send(13523, proto.Message{"donate_list": list, "boxes": boxes, "donate_exp": exp, "day_send_num": sent, "day_recv_num": recv})
 	}
 	r.Handle(13523, func(s *gateway.Session, _ proto.Message) error {
 		if s.Role() == nil {

@@ -647,6 +647,9 @@ func (g *GuildService) registerSecret(r *gateway.Router) {
 			return err
 		}
 		return fights.begin(s, role, combatGuildSecret, intro, rounds, damage >= fightHP, func(s *gateway.Session, _ bool) error {
+			if err := questEvent(s, g.Store, role.RID, evtGuildSecret, 1); err != nil {
+				return err
+			}
 			return g.secretStrike(s, gd, st, damage)
 		})
 	})

@@ -1,4 +1,4 @@
-# 服务端对客户端的覆盖（2026-10-26 全量重新统计，开学季之后）
+# 服务端对客户端的覆盖（2026-10-26 全量重新统计，开学季之后；之后做的回归活动 14 个请求没有重算进下表）
 
 口径：客户端 Lua 里所有 `SendProtocal(编号` 发出的请求协议（1110 个，分布在 97 个模块；比上一次多 8 个，是这次扫描范围略宽或脚本有增减，没有逐个核对），逐个看服务端是 **真实处理**、**只有空回复**（`empty_gen.go`，格式对但没内容）还是**什么都没有**。服务端主动推送的协议不在内。“真实处理”只表示有实现，不表示已和原服务器核对（核对情况见 `OPEN_QUESTIONS.md`）；其中回“未开放”的桩（`hero_stubs.go`、`role_extra.go`）也算真实处理。
 
@@ -45,7 +45,7 @@ hero(78)、adventure(35)、arenateam(32)、guild(28)、elfin(28)、arenamanypeop
 
 ## 一个真实处理都没有的模块（括号里是请求数）
 
-arenapeakchampion(18)、crossarena(17)、returnaction(16，其中 1 个空回复)、actionyearmonster(16)、crosschampion(16，其中 3 个空回复)、guildwar(11，其中 2 个空回复)、newfirstcharge(9，其中 2 个空回复)、godbattle(5)、primus(5，其中 2 个空回复)、barrage(4)、halidom(4，其中 1 个空回复)、guildmarketplace(4)、element(4，其中 1 个空回复)、notice(4)、mergeserver(3)、rolescene(3)、daycharge(2，其中 1 个空回复)、mainui(2，其中 1 个空回复)、exchange(2，其中 1 个空回复)、onecentgift(2，其中 1 个空回复)、guide(2)、scene(2，其中 1 个空回复)、story(2)、look(2)、recruithero(2，其中 1 个空回复)、rfmpersonalgift(1)、limittime(1)、verificationcode(1)、stronger(1)、crossshow(1)
+arenapeakchampion(18)、crossarena(17)、returnaction(16，其中 1 个空回复；已做 14 个，没重算)、actionyearmonster(16)、crosschampion(16，其中 3 个空回复)、guildwar(11，其中 2 个空回复)、newfirstcharge(9，其中 2 个空回复)、godbattle(5)、primus(5，其中 2 个空回复)、barrage(4)、halidom(4，其中 1 个空回复)、guildmarketplace(4)、element(4，其中 1 个空回复)、notice(4)、mergeserver(3)、rolescene(3)、daycharge(2，其中 1 个空回复)、mainui(2，其中 1 个空回复)、exchange(2，其中 1 个空回复)、onecentgift(2，其中 1 个空回复)、guide(2)、scene(2，其中 1 个空回复)、story(2)、look(2)、recruithero(2，其中 1 个空回复)、rfmpersonalgift(1)、limittime(1)、verificationcode(1)、stronger(1)、crossshow(1)
 
 ## 怎么重新统计
 

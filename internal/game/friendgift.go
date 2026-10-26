@@ -132,6 +132,7 @@ func (f *FriendService) gift(s *gateway.Session, req proto.Message) error {
 			}
 			return questEvent(s, f.Store, me.RID, evtFriendPresent, 1)
 		}
+		return questEvent(s, f.Store, me.RID, evtGetFriendPt, friendPointsEach)
 	}
 	return nil
 }
@@ -202,5 +203,5 @@ func (f *FriendService) giftBatch(s *gateway.Session, req proto.Message) error {
 		}
 		return questEvent(s, f.Store, me.RID, evtFriendPresent, int64(len(done)))
 	}
-	return nil
+	return questEvent(s, f.Store, me.RID, evtGetFriendPt, friendPointsEach*int64(len(done)))
 }

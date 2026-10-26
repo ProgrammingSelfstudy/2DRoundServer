@@ -269,7 +269,13 @@ func (f *FriendService) accept(s *gateway.Session, req proto.Message) error {
 	if err != nil {
 		return err
 	}
-	return reply(ok, msg)
+	if err := reply(ok, msg); err != nil {
+		return err
+	}
+	if ok {
+		return questEvent(s, f.Store, me.RID, evtAddFriend, 1)
+	}
+	return nil
 }
 
 func (f *FriendService) acceptAll(s *gateway.Session, req proto.Message) error {
@@ -288,7 +294,10 @@ func (f *FriendService) acceptAll(s *gateway.Session, req proto.Message) error {
 			done = append(done, proto.Message{"rid": e.Int("rid"), "srv_id": f.SrvID})
 		}
 	}
-	return s.Send(13334, proto.Message{"role_ids": done})
+	if err := s.Send(13334, proto.Message{"role_ids": done}); err != nil {
+		return err
+	}
+	return questEvent(s, f.Store, me.RID, evtAddFriend, int64(len(done)))
 }
 
 func (f *FriendService) refuseAll(s *gateway.Session, _ proto.Message) error {

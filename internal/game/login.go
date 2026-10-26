@@ -189,6 +189,7 @@ func (l *Login) enter(s *gateway.Session, req proto.Message, cmd uint16) error {
 	}
 	s.SetRole(role)
 	l.Store.TouchRoleLogin(role.RID)
+	ReturnEntered(l.Store, role, s.Now())
 	if l.Friends != nil {
 		l.Friends.Entered(role)
 	}

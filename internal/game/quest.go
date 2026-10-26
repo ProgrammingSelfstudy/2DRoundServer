@@ -39,16 +39,20 @@ var questTable = func() map[int64]questDef {
 // Only the events this server has are fed; the others (arena, guild, battles,
 // ...) stay at 0 until their systems exist.
 const (
-	evtLoaded        = "evt_cli_loaded"     // the daily login
-	evtRecruit       = "evt_recruit"        // one hero summon draw
-	evtFriendPresent = "evt_friend_present" // one friend gift sent
-	evtArena         = "evt_arena"          // one arena challenge
-	evtGuildDonate   = "evt_guild_donate"   // one guild donation
-	evtGuildBoss     = "evt_guild_boss"     // one guild boss challenge
-	evtEndless       = "evt_endless"        // one endless trial run started
-	evtVoyagePurple  = "evt_voyage_purple"  // one voyage order of purple quality or above taken
-	evtVoyageOrange  = "evt_voyage_orange"  // one voyage order of orange quality or above taken
-	evtStarTower     = "evt_star_tower"     // one challenge of the sea prison (star tower)
+	evtLoaded        = "evt_cli_loaded"               // the daily login
+	evtRecruit       = "evt_recruit"                  // one hero summon draw
+	evtFriendPresent = "evt_friend_present"           // one friend gift sent
+	evtArena         = "evt_arena"                    // one arena challenge
+	evtGuildDonate   = "evt_guild_donate"             // one guild donation
+	evtGuildBoss     = "evt_guild_boss"               // one guild boss challenge
+	evtEndless       = "evt_endless"                  // one endless trial run started
+	evtVoyagePurple  = "evt_voyage_purple"            // one voyage order of purple quality or above taken
+	evtVoyageOrange  = "evt_voyage_orange"            // one voyage order of orange quality or above taken
+	evtAddFriend     = "evt_add_friend"               // one friend added by accepting a request
+	evtVisitHome     = "evt_visit_home"               // one visit to the home of another role
+	evtGetFriendPt   = "evt_get_friend_point"         // friend points taken from the gifts of friends
+	evtGuildSecret   = "evt_guild_secret_area_combat" // one fight in the guild secret area
+	evtStarTower     = "evt_star_tower"               // one challenge of the sea prison (star tower)
 )
 
 // Task status in the quest list (TaskConst.task_status).
@@ -121,6 +125,9 @@ func questEvent(s *gateway.Session, st *store.Store, rid int64, label string, n 
 		return err
 	}
 	if err := newWarOrderEvent(s, st, s.Role(), label, n, true); err != nil {
+		return err
+	}
+	if err := returnEvent(s, st, s.Role(), label, n); err != nil {
 		return err
 	}
 	day := dayKey(s.Now())

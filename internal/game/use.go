@@ -89,6 +89,8 @@ func RegisterUse(r *gateway.Router, st *store.Store) {
 		switch {
 		case !known || !goesToBackpack(info.Type):
 			return reply(0, "物品不存在")
+		case id == retNum("red_item_id"):
+			return returnRedbagUse(s, st, role, n, reply)
 		case !isGift:
 			return reply(0, "该物品暂不能使用")
 		case n <= 0 || n > maxUseAtOnce:

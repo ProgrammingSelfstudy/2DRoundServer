@@ -568,6 +568,11 @@ func (h *homeSvc) visit(s *gateway.Session, req proto.Message) error {
 	if floor == 0 || !tst.floorOpen(floor) {
 		floor = tst.Main
 	}
+	if target.RID != me.RID {
+		if err := questEvent(s, h.st, me.RID, evtVisitHome, 1); err != nil {
+			return err
+		}
+	}
 	cur, _ := tst.refresh()
 	f := tst.Floors[floor-1]
 	status := int64(0)

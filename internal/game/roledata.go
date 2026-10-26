@@ -110,6 +110,9 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 	if err := warOrderEvent(s, l.Store, fresh, evtLoaded, 1, false); err != nil {
 		return err
 	}
+	if err := newWarOrderEvent(s, l.Store, fresh, evtLoaded, 1, false); err != nil {
+		return err
+	}
 	if err := pushDrama(s, l.Store, fresh.RID); err != nil {
 		return err
 	}

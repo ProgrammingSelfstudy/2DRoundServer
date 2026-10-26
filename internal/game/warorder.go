@@ -40,12 +40,17 @@ type warTask struct {
 	Award [][2]int64 `json:"award"`
 	Min   int64      `json:"min"`
 	Max   int64      `json:"max"`
-	Event string     `json:"-"` // the game event that counts it, "" when we have none
+	// the band of the role level the task is for (the new war order), 0 for no limit
+	MinLev int64  `json:"min_lev"`
+	MaxLev int64  `json:"max_lev"`
+	Event  string `json:"-"` // the game event that counts it, "" when we have none
 }
 
 type warLev struct {
 	Lev       int64      `json:"lev"`
 	Exp       int64      `json:"exp"` // the experience in all at which the level is reached
+	MinLev    int64      `json:"min_lev"`
+	MaxLev    int64      `json:"max_lev"`
 	Reward    [][2]int64 `json:"reward"`
 	RmbReward [][2]int64 `json:"rmb_reward"`
 }
@@ -125,6 +130,7 @@ type warState struct {
 	Exp     int64
 	Levs    []int64 // the level rewards taken
 	Opened  bool    // the client has asked, so the changes are pushed
+	Lev     int64   // the role level the cycle began with (the new war order picks its bands by it)
 }
 
 // warNow says where the calendar is in the war order: the period, the day of the month (1-30) and the end of the month; a

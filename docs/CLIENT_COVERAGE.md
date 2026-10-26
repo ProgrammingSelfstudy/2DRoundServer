@@ -1,4 +1,4 @@
-# 服务端对客户端的覆盖（2026-10-25 全量重新统计，多人竞技场、预知召唤之后；之后做的七日目标 4 个、战令 8 个请求没有重算进下表）
+# 服务端对客户端的覆盖（2026-10-25 全量重新统计，多人竞技场、预知召唤之后；之后做的七日目标 4 个、战令 8 个、段位赛令牌 4 个、海贼夺宝 7 个请求没有重算进下表）
 
 口径：客户端 Lua 里所有 `SendProtocal(编号` 发出的请求协议（1102 个，分布在 97 个模块），逐个看服务端是 **真实处理**、**只有空回复**（`empty_gen.go`，格式对但没内容）还是**什么都没有**。服务端主动推送的协议不在内。“真实处理”只表示有实现，不表示已和原服务器核对（核对情况见 `OPEN_QUESTIONS.md`）。
 
@@ -42,7 +42,7 @@ hero(78)、adventure(35)、arenateam(32)、elfin(28)、guild(28)、arenamanypeop
 
 ## 一个都没做的模块（括号里是请求数）
 
-action(88)、arenapeakchampion(18)、crossarena(17)、actionyearmonster(16)、returnaction(16)、crosschampion(16)、actiontermbegins(11)、guildwar(11)、animate_action(9)、newfirstcharge(9)、timesummon(7)、festivalaction(7)、neworderaction(7)、dial_action(6)、petard_action(6)、godbattle(5)、primus(5)、guildmarketplace(4)、notice(4)、barrage(4)、halidom(4)、element(4)、rolescene(3)、mergeserver(3)、look(2)、story(2)、guide(2)、onecentgift(2)、mainui(2)、exchange(2)、scene(2)、daycharge(2)、recruithero(2)、rfmpersonalgift(1)、verificationcode(1)、crossshow(1)、stronger(1)、limittime(1)
+action(88)、arenapeakchampion(18)、crossarena(17)、actionyearmonster(16)、returnaction(16)、crosschampion(16)、actiontermbegins(11)、guildwar(11)、animate_action(9)、newfirstcharge(9)、timesummon(7)、festivalaction(7)、dial_action(6)、petard_action(6)、godbattle(5)、primus(5)、guildmarketplace(4)、notice(4)、barrage(4)、halidom(4)、element(4)、rolescene(3)、mergeserver(3)、look(2)、story(2)、guide(2)、onecentgift(2)、mainui(2)、exchange(2)、scene(2)、daycharge(2)、recruithero(2)、rfmpersonalgift(1)、verificationcode(1)、crossshow(1)、stronger(1)、limittime(1)
 
 ## 怎么重新统计
 

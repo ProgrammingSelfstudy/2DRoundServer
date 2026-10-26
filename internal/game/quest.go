@@ -120,6 +120,9 @@ func questEvent(s *gateway.Session, st *store.Store, rid int64, label string, n 
 	if err := warOrderEvent(s, st, s.Role(), label, n, true); err != nil {
 		return err
 	}
+	if err := newWarOrderEvent(s, st, s.Role(), label, n, true); err != nil {
+		return err
+	}
 	day := dayKey(s.Now())
 	changed, err := questRecord(st, rid, day, label, n)
 	if err != nil || len(changed) == 0 {

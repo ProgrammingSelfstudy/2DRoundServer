@@ -190,6 +190,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterPartnerStar(r, st)
 	RegisterSummon(r, st)
 	RegisterEliteSummon(r, st)
+	RegisterHolidayElite(r, st)
 	RegisterPresage(r, st)
 	RegisterActivity(r, st)
 	RegisterSevenGoal(r, st)

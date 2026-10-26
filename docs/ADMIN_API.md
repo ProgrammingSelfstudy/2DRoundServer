@@ -47,6 +47,7 @@ demoting or disabling an admin, or changing their password, takes effect at once
 | `GET /api/reports?limit=` | read | what players reported (12770), newest first: `{id, rid, target_rid, target_srv_id, type, msg, created_at}`; the chat history the client attaches is not stored |
 | `GET /api/guilds?srv_id=&q=&limit=&offset=` | read | the guilds (all servers, or one) with `gid`, `srv_id`, `name`, `lev`, `members`, `leader`, `leader_rid`, `created_at`, biggest first; `q` matches the name; `{items, total}` |
 | `POST /api/guilds/{id}/disband` | write | dissolves a guild (members, applications and log go with it; the leader gets the leader's cool-down). Online members see it when they log in again; 404 for an unknown guild; audited as `guild.disband` |
+| `GET/POST /api/activities`, `PUT/DELETE /api/activities/{id}` | read / write | the schedule of the holiday activities (the client's action tabs, see "Activities" below); `GET` takes `srv_id` (that server's rows and the ones for every server), `limit`, `offset` and replies `{items, total}`; `POST`/`PUT` take `{srv_id, camp_id, bid, status, start_at, end_at, spec}` (`srv_id` empty = every server, `end_at` 0 = never ends, `status` 1 on / 0 off) and reply the row (201 / 200), 422 for a bad row or spec, 404 for an unknown id; audited as `activity.create` / `.update` / `.delete`. Nothing is pushed: the gateway notices the change within 15 seconds and tells the online roles to ask for the list again |
 | `GET/POST /api/notices`, `PUT/DELETE /api/notices/{id}` | read / write | shown in the game's mailbox ("公告" tab); create and update reply with the notice plus `pushed` (online roles told) or `push_error`; delete replies `{ok, pushed}` |
 | `GET /api/backups`, `POST /api/backups` | manage | list the database backups (newest first, with `keep`), or make one now and prune the old ones; `{ok, name, size, pruned}`; the directory is never taken from the request; 409 when backups are not configured; audited as `backup.create` |
 | `POST /api/broadcast` `{msg}` | write | scrolls `msg` (1 to 100 characters) across the top of every online player's screen (12761 on the NoticeTop channel; not kept in the chat history); `{ok, pushed}`; 422 for a bad message, 502 when the gateway cannot be reached; audited as `broadcast` |
@@ -55,6 +56,25 @@ demoting or disabling an admin, or changing their password, takes effect at once
 | `GET /api/audit?limit=&offset=` | manage | newest first |
 
 Paging: `limit` defaults to 50 and is capped at 200.
+
+### Activities
+
+A row is one activity open from `start_at` to `end_at` on a server. `camp_id` is the campaign number the client keeps (a
+positive number of your choice for activities made here) and `bid` the tab id; two open rows with one `bid` show only the
+older. `spec` is an object (unknown keys are refused):
+
+| key | meaning |
+|---|---|
+| `title` (required, at most 40 characters), `title2`, `ico`, `type_ico`, `top_banner`, `rule_str`, `time_str`, `bottom_alert`, `aim_title`, `reward_title`, `channel_ban` | the texts and pictures the tab shows (client resource names) |
+| `panel_type` (required, 1 to 100) | which panel draws the tab, the index in the client's `ActionPanelTypeView` (2 gift list, 3 accumulated charge, 4 accumulated cost, 16 common aim list, ...); the aims below fit the aim-list panels |
+| `sort_val` | the order of the tabs |
+| `cli_type`, `cli_type_name` | the main-screen icon the tab is grouped under (`MainuiConst.icon` id) and its name; 0 = none |
+| `daily` | counts and rewards start again every day |
+| `aims` (up to 60) | `{id, str, event, target, rewards}`: `id` positive and unique in the activity; `event` the event label it counts (empty: can be taken at once), `target` the count to reach, `rewards` 1 to 10 `[item_id, amount]` pairs of known items or currencies |
+
+The event labels are the ones the daily quests count (`questEvent`): `evt_cli_loaded` (the daily login), `evt_recruit`
+(one hero summon draw), `evt_friend_present` (one friend gift sent) and the fast-combat label of the campaign. A system
+that wants to feed more calls `questEvent` with a new label and the schedule can use it at once.
 
 ### Notices
 

@@ -136,6 +136,11 @@ func (s *Server) Handler() http.Handler {
 	route("PUT /api/notices/{id}", levWrite, s.updateNotice)
 	route("DELETE /api/notices/{id}", levWrite, s.deleteNotice)
 
+	route("GET /api/activities", levRead, s.listActivities)
+	route("POST /api/activities", levWrite, s.createActivity)
+	route("PUT /api/activities/{id}", levWrite, s.updateActivity)
+	route("DELETE /api/activities/{id}", levWrite, s.deleteActivity)
+
 	route("GET /api/mails", levRead, s.listMails)
 	route("POST /api/mails", levWrite, s.sendMail)
 

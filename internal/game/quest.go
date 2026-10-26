@@ -104,6 +104,9 @@ func questRecord(st *store.Store, rid, day int64, label string, n int64) ([]int6
 // questEvent counts an event and pushes the changed quests (10403) to the player.
 func questEvent(s *gateway.Session, st *store.Store, rid int64, label string, n int64) error {
 	lifeCount(st, rid, label, n)
+	if err := activityEvent(s, st, rid, label, n); err != nil {
+		return err
+	}
 	day := dayKey(s.Now())
 	changed, err := questRecord(st, rid, day, label, n)
 	if err != nil || len(changed) == 0 {

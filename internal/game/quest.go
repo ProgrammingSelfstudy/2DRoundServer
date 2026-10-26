@@ -107,6 +107,9 @@ func questEvent(s *gateway.Session, st *store.Store, rid int64, label string, n 
 	if err := activityEvent(s, st, rid, label, n); err != nil {
 		return err
 	}
+	if err := sevenGoalEvent(s, st, s.Role(), label, n, true); err != nil {
+		return err
+	}
 	day := dayKey(s.Now())
 	changed, err := questRecord(st, rid, day, label, n)
 	if err != nil || len(changed) == 0 {

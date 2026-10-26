@@ -1,6 +1,6 @@
 # 后端路线图（目标：完整联网游戏，2026-10-21）
 
-目标是把客户端的全部玩法接到服务端和后台，不只是单机内容。数字来自 `docs/CLIENT_COVERAGE.md`：客户端发出 1102 个请求协议。2026-10-25 组队竞技场做完后重新统计：服务端真实处理 630 个（57.2%），只有空回复 50 个，什么都没有 422 个；97 个模块里 32 个全做了、44 个一个都没做（372 个请求）。最大的缺口是 action 77、arenamanypeople 24、arenapeakchampion 18、crossarena 17、actionyearmonster 16、returnaction 15、homeworld 15、crosschampion 13、welfare 13。
+目标是把客户端的全部玩法接到服务端和后台，不只是单机内容。数字来自 `docs/CLIENT_COVERAGE.md`：客户端发出 1102 个请求协议。2026-10-25 全量重新统计（多人竞技场、预知召唤之后）：服务端真实处理 710 个（64.4%），只有空回复 44 个，什么都没有 348 个；97 个模块里 36 个全做了、40 个一个都没做（315 个请求）。最大的缺口是 action 77、arenapeakchampion 18、crossarena 17、actionyearmonster 16、returnaction 15、crosschampion 13、welfare 13、actiontermbegins 11。
 
 ## 进度（2026-10-25 更新）
 

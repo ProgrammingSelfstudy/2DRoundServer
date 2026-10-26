@@ -253,7 +253,7 @@ func (e *eliteSvc) infoMessage(role *store.Role, er *eliteRole, now time.Time) p
 	}
 	return proto.Message{"lev": er.Lev, "score": er.Score, "day_combat_count": e.left(er), "day_buy_count": er.Bought, "match_cd_time": 0, "rank": 0,
 		"is_king": 0, "promoted_info": e.promotedInfo(er), "state": state, "period": elitePeriod(now), "start_time": start, "end_time": end,
-		"state_time": stateEnd, "lev_reward": e.rewardList(er), "zone_id": 1, "day_max_buy_count": len(eliteCfg.Buy), "is_skip": 0, "rmb_status": 0}
+		"state_time": max(0, stateEnd-now.Unix()), "lev_reward": e.rewardList(er), "zone_id": 1, "day_max_buy_count": len(eliteCfg.Buy), "is_skip": 0, "rmb_status": 0}
 }
 
 func (e *eliteSvc) info(s *gateway.Session, _ proto.Message) error {
@@ -277,7 +277,7 @@ func (e *eliteSvc) openTime(s *gateway.Session, _ proto.Message) error {
 	if open {
 		state, until = 1, end
 	}
-	return s.Send(24905, proto.Message{"state": state, "end_time": until})
+	return s.Send(24905, proto.Message{"state": state, "end_time": max(0, until-s.Now().Unix())})
 }
 
 func (e *eliteSvc) pendingMessage(er *eliteRole, now time.Time) proto.Message {

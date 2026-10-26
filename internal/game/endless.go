@@ -239,7 +239,8 @@ func endSelect(now time.Time) (cur, next int64, nextTime int64) {
 		days = 0
 	}
 	slot := days / 3
-	return slot%4 + 1, (slot+1)%4 + 1, start.Add(time.Duration((slot+1)*3*24) * time.Hour).Unix()
+	// next_time is the seconds left: the client counts it down itself (a capture of the original server: 194424)
+	return slot%4 + 1, (slot+1)%4 + 1, start.Add(time.Duration((slot+1)*3*24)*time.Hour).Unix() - now.Unix()
 }
 
 func (e *endSvc) ranks(srv string) (*endRanks, error) {

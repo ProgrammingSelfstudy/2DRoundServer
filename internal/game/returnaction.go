@@ -432,7 +432,7 @@ func RegisterReturnAction(r *gateway.Router, st *store.Store) {
 	r.Handle(27902, func(s *gateway.Session, _ proto.Message) error {
 		return retWith(s, st, func(c *retCtx) error {
 			if !c.returning {
-				return s.Send(27902, proto.Message{"period": 1, "open_day": 0, "is_open": 0})
+				return s.Send(27902, proto.Message{"period": 0, "open_day": 0, "is_open": 0}) // as the original server answers one who did not come back
 			}
 			return s.Send(27902, proto.Message{"period": 1, "open_day": c.openDay, "is_open": 1})
 		})

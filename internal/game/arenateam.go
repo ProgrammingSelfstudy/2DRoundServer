@@ -695,7 +695,7 @@ func (a *atSvc) main(s *gateway.Session, _ proto.Message) error {
 func (a *atSvc) mainMessage(c *atCtx) proto.Message {
 	key, state, end := atSeason(c.now)
 	m := proto.Message{"tid": 0, "srv_id": c.role.SrvID, "team_name": "", "team_power": 0, "score": 0, "team_members": []proto.Message{},
-		"state": state, "end_time": end, "rank": 0, "count": 0, "do_count": 0, "add_time": 0, "is_sign": 0}
+		"state": state, "end_time": max(0, end-c.now.Unix()), "rank": 0, "count": 0, "do_count": 0, "add_time": 0, "is_sign": 0}
 	ar, _ := a.roleState(c.role.RID, key)
 	var do int64
 	if c.t != nil {

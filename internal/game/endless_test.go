@@ -45,7 +45,7 @@ func TestEndlessBaseAndGates(t *testing.T) {
 	e.st.SetRoleLevel(role.RID, 40)
 	c.send(23900, proto.Message{})
 	b := c.waitFor(23900)
-	if b.Int("type") != 0 || b.Int("select_type") < 1 || b.Int("select_type") > 4 || b.Int("current_round") != 1 || b.Int("max_round") != 0 || b.Int("next_time") <= time.Now().Unix() {
+	if b.Int("type") != 0 || b.Int("select_type") < 1 || b.Int("select_type") > 4 || b.Int("current_round") != 1 || b.Int("max_round") != 0 || b.Int("next_time") <= 0 || b.Int("next_time") > 3*86400 {
 		t.Fatalf("23900: %v", b)
 	}
 	c.send(23901, endTeam(1, 1)) // the new modes need round 200 and level 90

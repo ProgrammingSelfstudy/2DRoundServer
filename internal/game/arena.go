@@ -593,6 +593,9 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if err := st.SaveArenaPlayer(a); err != nil {
 			return err
 		}
+		if err := questEvent(s, st, role.RID, evtArena, 1); err != nil {
+			return err
+		}
 		intro := proto.Message{
 			"combat_type": combatArena, "formation": []proto.Message{{"group": 1, "formation_type": form.FormationType, "formation_lev": 1}, {"group": 2, "formation_type": oform, "formation_lev": 1}},
 			"objects": append(objects, foeObjects...), "is_auto": req.Int("is_auto"), "current_wave": 1, "total_wave": 1, "play_speed": 1,

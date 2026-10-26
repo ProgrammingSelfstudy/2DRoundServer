@@ -42,6 +42,10 @@ const (
 	evtLoaded        = "evt_cli_loaded"     // the daily login
 	evtRecruit       = "evt_recruit"        // one hero summon draw
 	evtFriendPresent = "evt_friend_present" // one friend gift sent
+	evtArena         = "evt_arena"          // one arena challenge
+	evtGuildDonate   = "evt_guild_donate"   // one guild donation
+	evtGuildBoss     = "evt_guild_boss"     // one guild boss challenge
+	evtStarTower     = "evt_star_tower"     // one challenge of the sea prison (star tower)
 )
 
 // Task status in the quest list (TaskConst.task_status).

@@ -22,7 +22,11 @@ func TestSevenGoalRules(t *testing.T) {
 		{"速战勇者：快速作战四次", questFastCombat, 4},
 		{"友谊之光：赠送好友友情点5次以上", evtFriendPresent, 5},
 		{"伙伴招募：高级召唤3次", evtRecruit, 3},
-		{"勇士战场：挑战5次竞技场", "", 5},
+		{"勇士战场：挑战5次竞技场", evtArena, 5},
+		{"公会使命：进行1次公会捐献", evtGuildDonate, 1},
+		{"公会使命：挑战公会boss3次", evtGuildBoss, 3},
+		{"爬塔勇者：挑战或扫荡海底监狱任意层3次", evtStarTower, 3},
+		{"冒险远航：接取一次紫色及以上远航订单", "", 1},
 	} {
 		if l, n := sevenGoalRule(c.desc); l != c.label || n != c.need {
 			t.Fatalf("%s: %s %d", c.desc, l, n)

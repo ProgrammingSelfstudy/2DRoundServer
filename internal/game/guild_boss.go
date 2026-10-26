@@ -534,6 +534,9 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 			"extra_args": []proto.Message{}, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name, "target_role_name": boss.Name,
 			"suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 		}
+		if err := questEvent(s, g.Store, role.RID, evtGuildBoss, 1); err != nil {
+			return err
+		}
 		if err := s.Send(21308, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}

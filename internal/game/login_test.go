@@ -106,6 +106,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterMonopoly(gw.Router, st)
 	RegisterEscort(gw.Router, st)
 	RegisterPracticeTower(gw.Router, st)
+	RegisterLimitExercise(gw.Router, st)
 	RegisterSmashegg(gw.Router, st)
 	RegisterVoyage(gw.Router, st)
 	RegisterLadder(gw.Router, st)

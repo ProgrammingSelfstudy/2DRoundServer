@@ -109,6 +109,7 @@ func main() {
 		game.RegisterMonopoly(gw.Router, st)
 		game.RegisterEscort(gw.Router, st)
 		game.RegisterPracticeTower(gw.Router, st)
+		game.RegisterLimitExercise(gw.Router, st)
 		game.RegisterSmashegg(gw.Router, st)
 		game.RegisterVoyage(gw.Router, st)
 		game.RegisterEncounter(gw.Router, st)

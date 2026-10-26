@@ -467,6 +467,9 @@ func (e *eliteSvc) settle(s *gateway.Session, opp arenaOpp, won bool, replayID, 
 		add = int64(eliteCfg.list("normal_win_base_exp_add")[0])
 		er.Wins++
 		er.Streak++
+		if err := elitePassWin(e.st, role.RID, now); err != nil {
+			return err
+		}
 	} else {
 		add = -int64(eliteCfg.list("normal_lose_base_exp_down")[0])
 		er.Loses++

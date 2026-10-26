@@ -88,6 +88,24 @@ type eliteLog struct {
 	ID, RID, Lev, Face, Rank, Ret, Time int64
 	SrvID, Name                         string
 	Power                               int64
+	Detail                              *eliteDetail // what the report of the fight (24931) shows
+}
+
+// eliteDetail is a fight as the report shows it: the replay, both sides' power, formation and heroes.
+type eliteDetail struct {
+	Replay, APower, AForm, BForm int64
+	AList, BList                 []arenaHero
+}
+
+// sideHeroes are the heroes the intro of a fight puts on a side (group 1 ours, 2 theirs); the spirit is not one.
+func sideHeroes(intro proto.Message, group int64) []arenaHero {
+	var out []arenaHero
+	for _, o := range intro.Arr("objects") {
+		if o.Int("group") == group && o.Int("object_type") != 5 {
+			out = append(out, arenaHero{Pos: o.Int("pos"), BID: o.Int("object_bid"), Lev: o.Int("lev"), Star: o.Int("star")})
+		}
+	}
+	return out
 }
 
 // eliteRole is what a role keeps in the match.
@@ -142,7 +160,10 @@ func RegisterElitematch(r *gateway.Router, db *store.Store) {
 	r.Handle(24920, e.formation)
 	r.Handle(24921, e.saveFormation)
 	r.Handle(24930, e.logs)
+	r.Handle(24931, e.report)
 	r.Handle(24940, e.personal)
+	r.Handle(24941, e.share)
+	r.Handle(24942, e.shared)
 	r.Handle(24945, e.manifesto)
 	r.Handle(24946, e.saveManifesto)
 }
@@ -417,13 +438,14 @@ func (e *eliteSvc) fight(s *gateway.Session, _ proto.Message) error {
 	replayID := recordReplay(e.st, combatElite, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType},
 		replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform}, intro, rounds, won, now.Unix())
 	return fights.begin(s, role, combatElite, intro, rounds, won, func(s *gateway.Session, won bool) error {
-		return e.settle(s, opp, won, replayID, face, power)
+		return e.settle(s, opp, won, replayID, face, power, &eliteDetail{Replay: replayID, APower: power, AForm: form.FormationType, BForm: oform,
+			AList: sideHeroes(intro, 1), BList: sideHeroes(intro, 2)})
 	})
 }
 
 // settle moves the score: a win adds the base of the match (30), a loss takes 15 off; the score reaching the need of the
 // level promotes to the next level, which starts at its initial score. The score never falls below the level's own.
-func (e *eliteSvc) settle(s *gateway.Session, opp arenaOpp, won bool, replayID, face, power int64) error {
+func (e *eliteSvc) settle(s *gateway.Session, opp arenaOpp, won bool, replayID, face, power int64, detail *eliteDetail) error {
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -460,7 +482,7 @@ func (e *eliteSvc) settle(s *gateway.Session, opp arenaOpp, won bool, replayID, 
 		er.Best = er.Lev
 	}
 	er.Next++
-	er.Logs = append([]eliteLog{{ID: er.Next, RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Rank: er.Lev, Ret: result, Time: now.Unix()}}, er.Logs...)
+	er.Logs = append([]eliteLog{{ID: er.Next, RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Rank: er.Lev, Ret: result, Time: now.Unix(), Detail: detail}}, er.Logs...)
 	er.Logs = er.Logs[:min(len(er.Logs), eliteLogKeep)]
 	if err := e.st.SaveState(role.RID, eliteModule, er); err != nil {
 		return err
@@ -700,6 +722,11 @@ func (e *eliteSvc) personal(s *gateway.Session, req proto.Message) error {
 	if role == nil {
 		return nil
 	}
+	return e.sendPersonal(s, 24940, role, req.Int("period"))
+}
+
+// sendPersonal sends the personal page of a role under the given command (24940 own, 24942 a shared one).
+func (e *eliteSvc) sendPersonal(s *gateway.Session, cmd uint16, role *store.Role, period int64) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	now := s.Now()
@@ -712,15 +739,66 @@ func (e *eliteSvc) personal(s *gateway.Session, req proto.Message) error {
 		face = store.DefaultFaceID
 	}
 	_, _, power, _ := lineupOf(e.st, role.RID)
-	period := req.Int("period")
 	if period == 0 {
 		period = elitePeriod(now)
 	}
-	return s.Send(24940, proto.Message{"best_mvp": 0, "my_score": er.Score, "my_elite_lev": er.Lev, "period": period, "max_lev": er.Best, "max_score": er.Score,
+	return s.Send(cmd, proto.Message{"best_mvp": 0, "my_score": er.Score, "my_elite_lev": er.Lev, "period": period, "max_lev": er.Best, "max_score": er.Score,
 		"combat_win_count1": er.Wins, "combat_all_count1": er.Wins + er.Loses, "combat_win_count2": 0, "combat_all_count2": 0, "max_dps": 0,
 		"winning_streak": er.Streak, "rid": role.RID, "srv_id": role.SrvID, "name": role.Name, "lev": role.Lev, "sex": role.Sex, "g_rid": 0, "g_srv_id": "",
 		"gname": "", "power": []proto.Message{{"order": 1, "power": power}}, "face": face, "score": er.Score, "elite_lev": er.Lev,
 		"avatar_id": eliteCfg.level(er.Lev).ID * 0, "face_update_time": 0, "face_file": "", "log_zone_id": 1, "log_rank": 0, "use_skin": 0})
+}
+
+// shared (24942): the personal page of a role somebody shared (id is its rid).
+func (e *eliteSvc) shared(s *gateway.Session, req proto.Message) error {
+	if s.Role() == nil {
+		return nil
+	}
+	target, err := e.st.RoleByID(req.Int("id"))
+	if err != nil || (req.Str("share_srv_id") != "" && target.SrvID != req.Str("share_srv_id")) {
+		return s.Send(24942, proto.Message{"rid": req.Int("id"), "srv_id": req.Str("share_srv_id"), "period": req.Int("period")})
+	}
+	return e.sendPersonal(s, 24942, target, req.Int("period"))
+}
+
+// share (24941): the page goes to a chat channel; the channels get no announcement (our simplification, as the replays).
+func (e *eliteSvc) share(s *gateway.Session, _ proto.Message) error {
+	if s.Role() == nil {
+		return nil
+	}
+	return s.Send(24941, proto.Message{"msg": "分享成功"})
+}
+
+// report (24931): the fight of one log entry, with its replay.
+func (e *eliteSvc) report(s *gateway.Session, req proto.Message) error {
+	role := s.Role()
+	if role == nil {
+		return nil
+	}
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	er, err := e.role(role.RID, s.Now())
+	if err != nil {
+		return err
+	}
+	infos := []proto.Message{}
+	for _, l := range er.Logs {
+		if l.ID != req.Int("id") || l.Detail == nil {
+			continue
+		}
+		d := l.Detail
+		plist := func(hs []arenaHero) []proto.Message {
+			out := []proto.Message{}
+			for _, h := range hs {
+				out = append(out, proto.Message{"pos": h.Pos, "bid": h.BID, "lev": h.Lev, "star": h.Star, "skin_id": 0, "ext": []proto.Message{}})
+			}
+			return out
+		}
+		infos = append(infos, proto.Message{"order": 1, "id": d.Replay, "round": 1, "ret": l.Ret, "time": l.Time, "rid": role.RID, "srv_id": role.SrvID,
+			"a_power": d.APower, "a_formation_type": d.AForm, "a_order": 1, "a_end_hp": 0, "b_rid": l.RID, "b_srv_id": l.SrvID, "b_power": l.Power,
+			"b_formation_type": d.BForm, "b_order": 1, "b_end_hp": 0, "a_plist": plist(d.AList), "b_plist": plist(d.BList), "hurt_statistics": []proto.Message{}})
+	}
+	return s.Send(24931, proto.Message{"type": req.Int("type"), "id": req.Int("id"), "arena_replay_infos": infos})
 }
 
 func (e *eliteSvc) manifesto(s *gateway.Session, _ proto.Message) error {

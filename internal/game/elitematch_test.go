@@ -70,6 +70,23 @@ func TestElitematchGateAndFight(t *testing.T) {
 	if p := c.waitFor(24940); p.Int("combat_all_count1") != 1 || p.Int("my_elite_lev") != res.Int("new_elite_lev") {
 		t.Fatalf("personal: %v", p)
 	}
+	logID := func() int64 {
+		c.send(24930, proto.Message{"type": 1})
+		return c.waitFor(24930).Arr("arena_elite_log")[0].Int("id")
+	}()
+	c.send(24931, proto.Message{"type": 1, "id": logID})
+	rep := c.waitFor(24931).Arr("arena_replay_infos")
+	if len(rep) != 1 || rep[0].Int("id") == 0 || len(rep[0].Arr("a_plist")) == 0 || len(rep[0].Arr("b_plist")) == 0 || rep[0].Int("ret") != res.Int("result") {
+		t.Fatalf("report: %v", rep)
+	}
+	c.send(24941, proto.Message{"channel": 1})
+	if r := c.waitFor(24941); r.Str("msg") == "" {
+		t.Fatalf("share: %v", r)
+	}
+	c.send(24942, proto.Message{"id": role.RID, "share_srv_id": role.SrvID, "period": 0})
+	if p := c.waitFor(24942); p.Int("rid") != role.RID || p.Int("combat_all_count1") != 1 {
+		t.Fatalf("shared page: %v", p)
+	}
 }
 
 func TestElitematchClosedBuyRewardAndForms(t *testing.T) {

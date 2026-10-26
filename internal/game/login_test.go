@@ -115,6 +115,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterLadder(gw.Router, st)
 	RegisterElitematch(gw.Router, st)
 	RegisterArenateam(gw.Router, st, gw.Hub)
+	RegisterPetard(gw.Router, st, gw.Hub)
 	RegisterArenamany(gw.Router, st, gw.Hub)
 	champ := RegisterArenaChampion(gw.Router, st, gw.Hub)
 	champ.now = func() time.Time { return time.Unix(0, clk.Load()) }

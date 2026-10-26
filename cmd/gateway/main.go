@@ -95,6 +95,7 @@ func main() {
 		game.RegisterArena(gw.Router, st)
 		game.RegisterLadder(gw.Router, st)
 		game.RegisterElitematch(gw.Router, st)
+		game.RegisterArenateam(gw.Router, st, gw.Hub)
 		game.RegisterStarTower(gw.Router, st)
 		game.RegisterAdventure(gw.Router, st)
 		game.RegisterPlanesafk(gw.Router, st)

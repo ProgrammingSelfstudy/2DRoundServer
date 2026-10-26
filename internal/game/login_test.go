@@ -109,6 +109,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterVoyage(gw.Router, st)
 	RegisterLadder(gw.Router, st)
 	RegisterElitematch(gw.Router, st)
+	RegisterArenateam(gw.Router, st, gw.Hub)
 	RegisterEncounter(gw.Router, st)
 	RegisterTrainingcamp(gw.Router, st)
 	RegisterVedio(gw.Router, st)

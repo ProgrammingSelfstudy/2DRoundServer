@@ -203,6 +203,17 @@ type FightService struct {
 
 	mu     sync.Mutex
 	active map[int64]*fightState
+	// passes are the fights of the frontier dungeons that were kept for the pass videos, by role, until the fight is settled
+	passes map[int64]passRecord
+}
+
+// takePass hands over (once) the pass video kept for the role's running campaign fight.
+func (f *FightService) takePass(rid int64) (passRecord, bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	rec, ok := f.passes[rid]
+	delete(f.passes, rid)
+	return rec, ok
 }
 
 // skillEffect is the effect id of a skill: 150101 -> 1501001, 200001 -> 2000001
@@ -858,11 +869,31 @@ func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama
 	if err != nil {
 		return err
 	}
+	var pass *passRecord
+	if won && d.DunID == d.MaxDunID { // the clear that takes the role past the dungeon
+		_, _, power, _ := lineupOf(f.Store, role.RID)
+		face := int64(role.FaceID)
+		if face == 0 {
+			face = store.DefaultFaceID
+		}
+		id := recordReplay(f.Store, combatDrama, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power},
+			replaySide{Name: dungeonUnits[d.DunID].Group}, intro, rounds, true, s.Now().Unix())
+		if id != 0 {
+			pass = &passRecord{Replay: id, Power: power, Time: int64(len(rounds)) * dramaPassSeconds}
+		}
+	}
 	f.mu.Lock()
 	if f.active == nil {
 		f.active = map[int64]*fightState{}
 	}
 	f.active[role.RID] = &fightState{rounds: rounds, won: won}
+	if f.passes == nil {
+		f.passes = map[int64]passRecord{}
+	}
+	delete(f.passes, role.RID)
+	if pass != nil {
+		f.passes[role.RID] = *pass
+	}
 	f.mu.Unlock()
 	for _, m := range []struct {
 		cmd  uint16

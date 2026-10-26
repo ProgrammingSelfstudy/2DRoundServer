@@ -167,3 +167,24 @@ func (s *Store) TakeDramaMilestone(rid, id int64, assets, items map[int64]int64)
 	}
 	return tx.Commit()
 }
+
+// DramaProgress is the furthest dungeon (max_dun_id) of every role of a server that has any, and how many roles the
+// server has.
+func (s *Store) DramaProgress(srvID string) (maxDuns []int64, roles int64, err error) {
+	if err = s.db.QueryRow(`SELECT COUNT(*) FROM roles WHERE srv_id=?`, srvID).Scan(&roles); err != nil {
+		return nil, 0, err
+	}
+	rows, err := s.db.Query(`SELECT d.max_dun_id FROM role_drama d JOIN roles r ON r.rid=d.rid WHERE r.srv_id=?`, srvID)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int64
+		if err = rows.Scan(&id); err != nil {
+			return nil, 0, err
+		}
+		maxDuns = append(maxDuns, id)
+	}
+	return maxDuns, roles, rows.Err()
+}

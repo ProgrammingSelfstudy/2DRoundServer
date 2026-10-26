@@ -190,6 +190,11 @@ func settleDrama(s *gateway.Session, st *store.Store) error {
 	if err := st.ClearDungeon(next, assets, items); err != nil {
 		return err
 	}
+	if rec, ok := fightServiceOf(st).takePass(role.RID); ok {
+		if err := dramaPassKeep(st, role, d.DunID, rec); err != nil {
+			return err
+		}
+	}
 	rewards := []proto.Message{}
 	for _, g := range reward {
 		rewards = append(rewards, proto.Message{"bid": g.ID, "is_bind": 1, "num": g.Amount, "id": 0})

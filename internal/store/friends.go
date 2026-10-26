@@ -140,10 +140,66 @@ func (s *Store) SearchRolesByName(srvID, q string, limit int) ([]Role, error) {
 }
 
 // RecommendFriends lists roles on a server who are neither rid itself, nor its
-// friends, nor already asked by it, the most recently active first.
+// friends, nor already asked by it, nor on a black list with it, the most recently active first.
 func (s *Store) RecommendFriends(srvID string, rid int64, limit int) ([]Role, error) {
 	return s.scanRoles(`SELECT `+qualifiedRoleCols+` FROM roles r WHERE r.srv_id=? AND r.status=1 AND r.rid<>?
 		AND NOT EXISTS (SELECT 1 FROM friends f WHERE f.rid=? AND f.friend_rid=r.rid)
 		AND NOT EXISTS (SELECT 1 FROM friend_requests q WHERE q.from_rid=? AND q.to_rid=r.rid)
-		ORDER BY r.last_login_at DESC, r.rid DESC LIMIT ?`, srvID, rid, rid, rid, limit)
+		AND NOT EXISTS (SELECT 1 FROM friend_blacklist b WHERE (b.rid=? AND b.black_rid=r.rid) OR (b.rid=r.rid AND b.black_rid=?))
+		ORDER BY r.last_login_at DESC, r.rid DESC LIMIT ?`, srvID, rid, rid, rid, rid, rid, limit)
+}
+
+// Blacklist lists the roles rid put on its black list, oldest first.
+func (s *Store) Blacklist(rid int64) ([]Role, error) {
+	return s.scanRoles(`SELECT `+qualifiedRoleCols+` FROM friend_blacklist b JOIN roles r ON r.rid=b.black_rid WHERE b.rid=? ORDER BY b.created_at, r.rid`, rid)
+}
+
+// IsBlacklisted says whether rid has other on its black list.
+func (s *Store) IsBlacklisted(rid, other int64) (bool, error) {
+	var n int
+	err := s.db.QueryRow(`SELECT COUNT(*) FROM friend_blacklist WHERE rid=? AND black_rid=?`, rid, other).Scan(&n)
+	return n > 0, err
+}
+
+// AddBlack puts other on rid's black list. The friendship (both ways) and the pending friend requests between
+// the two end with it; wasFriend says there was a friendship. ErrConflict: already listed; ErrFriendsFull: the
+// list holds max already.
+func (s *Store) AddBlack(rid, other int64, max int) (wasFriend bool, err error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback()
+	var n int
+	if err := tx.QueryRow(`SELECT COUNT(*) FROM friend_blacklist WHERE rid=?`, rid).Scan(&n); err != nil {
+		return false, err
+	}
+	if n >= max {
+		return false, ErrFriendsFull
+	}
+	if _, err := tx.Exec(`INSERT INTO friend_blacklist(rid,black_rid,created_at) VALUES(?,?,?)`, rid, other, s.unix()); err != nil {
+		if isUnique(err) {
+			return false, ErrConflict
+		}
+		return false, err
+	}
+	res, err := tx.Exec(`DELETE FROM friends WHERE (rid=? AND friend_rid=?) OR (rid=? AND friend_rid=?)`, rid, other, other, rid)
+	if err != nil {
+		return false, err
+	}
+	gone, _ := res.RowsAffected()
+	if _, err := tx.Exec(`DELETE FROM friend_requests WHERE (from_rid=? AND to_rid=?) OR (from_rid=? AND to_rid=?)`, rid, other, other, rid); err != nil {
+		return false, err
+	}
+	return gone > 0, tx.Commit()
+}
+
+// RemoveBlack takes other off rid's black list; false when it was not on it.
+func (s *Store) RemoveBlack(rid, other int64) (bool, error) {
+	res, err := s.db.Exec(`DELETE FROM friend_blacklist WHERE rid=? AND black_rid=?`, rid, other)
+	if err != nil {
+		return false, err
+	}
+	n, _ := res.RowsAffected()
+	return n > 0, nil
 }

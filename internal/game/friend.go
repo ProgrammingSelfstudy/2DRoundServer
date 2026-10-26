@@ -38,6 +38,7 @@ func (f *FriendService) Register(r *gateway.Router) {
 	r.Handle(13320, f.recommend)
 	r.Handle(13316, f.gift)
 	r.Handle(13317, f.giftBatch)
+	f.registerBlack(r)
 	f.registerProfile(r)
 	f.registerSpace(r)
 }
@@ -161,6 +162,12 @@ func (f *FriendService) ask(me *store.Role, rid int64, srvID string) (msg string
 	}
 	if is, err := f.Store.AreFriends(me.RID, t.RID); err != nil || is {
 		return "对方已经是你的好友", false, err
+	}
+	if blocked, err := f.Store.IsBlacklisted(me.RID, t.RID); err != nil || blocked {
+		return "对方在你的黑名单中", false, err
+	}
+	if blocked, err := f.Store.IsBlacklisted(t.RID, me.RID); err != nil || blocked {
+		return "对方拒绝了你的好友申请", false, err
 	}
 	for _, c := range []struct {
 		rid int64

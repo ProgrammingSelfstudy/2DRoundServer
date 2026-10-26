@@ -51,6 +51,10 @@ func (c *ChatService) Register(r *gateway.Router) {
 	r.Handle(12720, c.private)
 	r.Handle(12762, c.world)
 	r.Handle(12766, c.historyOf)
+	// 12764 (speech-to-text of a voice message) and 12768 (an @ notice) have no
+	// handler on the client, so they are taken without a reply.
+	r.Handle(12764, func(*gateway.Session, proto.Message) error { return nil })
+	r.Handle(12768, func(*gateway.Session, proto.Message) error { return nil })
 	// 12723: the client says it has read the offline messages. They were handed
 	// over (and deleted) when they were sent, so there is nothing left to do.
 	r.Handle(12723, func(*gateway.Session, proto.Message) error { return nil })

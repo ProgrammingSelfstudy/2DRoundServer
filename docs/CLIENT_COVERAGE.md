@@ -1,12 +1,12 @@
-# 服务端对客户端的覆盖（2026-10-25 重新统计，组队竞技场之后）
+# 服务端对客户端的覆盖（2026-10-25 重新统计，组队竞技场之后；好友黑名单、聊天 12764/12768 后手工改了总数：632 / 50 / 420）
 
 口径：客户端 Lua 里所有 `SendProtocal(编号` 发出的请求协议（1102 个，分布在 97 个模块），逐个看服务端是 **真实处理**、**只有空回复**（`empty_gen.go`，格式对但没内容）还是**什么都没有**。服务端主动推送的协议不在内。“真实处理”只表示有实现，不表示已和原服务器核对（核对情况见 `OPEN_QUESTIONS.md`）。
 
 | 请求协议 | 个数 | 占比 | 2026-10-25 早 | 2026-10-21 |
 |---|---|---|---|---|
-| 真实处理 | 626 | 56.8% | 259（23.5%） | 101（9.2%） |
+| 真实处理 | 632 | 57.3% | 259（23.5%） | 101（9.2%） |
 | 只有空回复 | 50 | 4.5% | 98（8.9%） | 115（10.4%） |
-| 什么都没有 | 426 | 38.7% | 745（67.6%） | 886（80.4%） |
+| 什么都没有 | 420 | 38.1% | 745（67.6%） | 886（80.4%） |
 
 97 个模块里：53 个至少有一个真实处理；32 个全做了（hero、adventure、arenateam、elfin、guild、planesafk、battle、ladder、emoguoshi、endless_trail、heaven、planes、heroexpedit、monopoly、mall、vip、escort、guildskill、vedio、mail、practisetower、smashegg、voyage、encounter、forgehouse、seerpalace、trainingcamp、newpartnersummon、stone_dungeon、onlinegift、activity、equipmake）；44 个一个都没做，合计 372 个请求（多数是各种跨服、家园、限时活动）。“全做了”包括回“未开放”的桩，不都是真功能（hero、mall、vip 里有一部分）。
 
@@ -33,7 +33,7 @@
 | planes | 14 | 14 | 0 | 0 |
 | heroexpedit | 13 | 13 | 0 | 0 |
 | monopoly | 13 | 13 | 0 | 0 |
-| friend | 17 | 12 | 0 | 5 |
+| friend | 17 | 16 | 0 | 1 |
 | mall | 12 | 12 | 0 | 0 |
 | vip | 12 | 12 | 0 | 0 |
 | arena | 25 | 11 | 1 | 13 |
@@ -58,7 +58,7 @@
 | seerpalace | 4 | 4 | 0 | 0 |
 | task | 7 | 4 | 1 | 2 |
 | trainingcamp | 4 | 4 | 0 | 0 |
-| chat | 9 | 3 | 0 | 6 |
+| chat | 9 | 5 | 0 | 4 |
 | newpartnersummon | 3 | 3 | 0 | 0 |
 | rank | 5 | 3 | 0 | 2 |
 | stone_dungeon | 3 | 3 | 0 | 0 |

@@ -53,6 +53,7 @@ const (
 	evtGetFriendPt   = "evt_get_friend_point"         // friend points taken from the gifts of friends
 	evtGuildSecret   = "evt_guild_secret_area_combat" // one fight in the guild secret area
 	evtStarTower     = "evt_star_tower"               // one challenge of the sea prison (star tower)
+	evtStoneFight    = "evt_dungeon_stone_fight"      // one won fight of the daily dungeon
 )
 
 // Task status in the quest list (TaskConst.task_status).
@@ -128,6 +129,9 @@ func questEvent(s *gateway.Session, st *store.Store, rid int64, label string, n 
 		return err
 	}
 	if err := returnEvent(s, st, s.Role(), label, n); err != nil {
+		return err
+	}
+	if err := luckyDogEvent(s, st, s.Role(), label, n); err != nil {
 		return err
 	}
 	day := dayKey(s.Now())

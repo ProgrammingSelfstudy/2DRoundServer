@@ -233,6 +233,9 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 				if err := give(s, role, gained); err != nil {
 					return err
 				}
+				if err := questEvent(s, st, role.RID, evtStoneFight, 1); err != nil {
+					return err
+				}
 			}
 			items := []proto.Message{}
 			for _, g := range gained {

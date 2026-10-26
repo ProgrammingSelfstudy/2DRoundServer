@@ -198,6 +198,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterReturnAction(r, st)
 	RegisterYearMonster(r, st)
 	RegisterDial(r, st)
+	RegisterLuckyDog(r, st)
 	RegisterDramaPass(r, st)
 	RegisterPresage(r, st)
 	RegisterActivity(r, st)

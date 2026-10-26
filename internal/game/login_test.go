@@ -40,6 +40,7 @@ type env struct {
 	notes   *NoticeService
 	online  *OnlineGiftService
 	invite  *InviteService
+	champ   *champSvc
 	clk     *atomic.Int64 // the gateway's clock, unix nanoseconds; it only moves with advance
 }
 
@@ -110,6 +111,8 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterLadder(gw.Router, st)
 	RegisterElitematch(gw.Router, st)
 	RegisterArenateam(gw.Router, st, gw.Hub)
+	champ := RegisterArenaChampion(gw.Router, st, gw.Hub)
+	champ.now = func() time.Time { return time.Unix(0, clk.Load()) }
 	RegisterEncounter(gw.Router, st)
 	RegisterTrainingcamp(gw.Router, st)
 	RegisterVedio(gw.Router, st)
@@ -133,7 +136,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	}
 	go gw.Serve(ln)
 	t.Cleanup(func() { gw.Close(); st.Close() })
-	return &env{t: t, st: st, gw: gw, addr: ln.Addr().String(), logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns}
+	return &env{t: t, st: st, gw: gw, addr: ln.Addr().String(), logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns, champ: champ}
 }
 
 func (e *env) account(name string) (*store.Account, string) {

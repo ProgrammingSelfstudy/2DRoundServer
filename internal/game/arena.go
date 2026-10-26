@@ -60,6 +60,8 @@ type arenaOpp struct {
 	Robot    bool
 	FormType int64
 	Lineup   []arenaHero
+	// Kind is the formation of a real role the fight uses (PartnerConst.Fun_Form); 0 is the campaign team.
+	Kind int64 `json:",omitempty"`
 }
 
 // arenaLogEntry is one line of the fight log as it is stored: Type 1 is a challenge by the role, 2 one against it;
@@ -106,7 +108,12 @@ func (o arenaOpp) heroMessages() []proto.Message {
 
 // arenaHeroes reads who stands where in a real role's campaign line-up.
 func arenaHeroes(st *store.Store, rid int64) (slots []store.FormationSlot, formType int64, byID map[int64]store.Partner, err error) {
-	form, err := formationOf(st, rid, formDrama)
+	return arenaHeroesKind(st, rid, formDrama)
+}
+
+// arenaHeroesKind is arenaHeroes for the saved formation of a kind; a kind never saved shows the campaign team.
+func arenaHeroesKind(st *store.Store, rid, kind int64) (slots []store.FormationSlot, formType int64, byID map[int64]store.Partner, err error) {
+	form, err := formationOf(st, rid, kind)
 	if err != nil {
 		return nil, 0, nil, err
 	}
@@ -126,7 +133,7 @@ func arenaHeroes(st *store.Store, rid int64) (slots []store.FormationSlot, formT
 // fighters turns an opponent into what a fight needs.
 func (o arenaOpp) fighters(st *store.Store) (slots []store.FormationSlot, formType int64, byID map[int64]store.Partner, err error) {
 	if !o.Robot {
-		return arenaHeroes(st, o.RID)
+		return arenaHeroesKind(st, o.RID, o.Kind)
 	}
 	byID = map[int64]store.Partner{}
 	for i, h := range o.Lineup {
@@ -139,7 +146,11 @@ func (o arenaOpp) fighters(st *store.Store) (slots []store.FormationSlot, formTy
 
 // lineupOf describes a real role's line-up for the lists.
 func lineupOf(st *store.Store, rid int64) ([]arenaHero, int64, int64, error) {
-	slots, formType, byID, err := arenaHeroes(st, rid)
+	return lineupOfKind(st, rid, formDrama)
+}
+
+func lineupOfKind(st *store.Store, rid, kind int64) ([]arenaHero, int64, int64, error) {
+	slots, formType, byID, err := arenaHeroesKind(st, rid, kind)
 	if err != nil {
 		return nil, 0, 0, err
 	}
@@ -157,7 +168,11 @@ func lineupOf(st *store.Store, rid int64) ([]arenaHero, int64, int64, error) {
 }
 
 func oppFromRole(st *store.Store, r *store.Role, score int64) (arenaOpp, bool, error) {
-	lineup, formType, power, err := lineupOf(st, r.RID)
+	return oppFromRoleKind(st, r, score, formDrama)
+}
+
+func oppFromRoleKind(st *store.Store, r *store.Role, score, kind int64) (arenaOpp, bool, error) {
+	lineup, formType, power, err := lineupOfKind(st, r.RID, kind)
 	if err != nil || len(lineup) == 0 {
 		return arenaOpp{}, false, err
 	}
@@ -165,7 +180,7 @@ func oppFromRole(st *store.Store, r *store.Role, score int64) (arenaOpp, bool, e
 	if face == 0 {
 		face = store.DefaultFaceID
 	}
-	return arenaOpp{RID: r.RID, SrvID: r.SrvID, Name: r.Name, Lev: int64(r.Lev), Sex: int64(r.Sex), Face: face, Power: power, Score: score, FormType: formType, Lineup: lineup}, true, nil
+	return arenaOpp{RID: r.RID, SrvID: r.SrvID, Name: r.Name, Lev: int64(r.Lev), Sex: int64(r.Sex), Face: face, Power: power, Score: score, FormType: formType, Lineup: lineup, Kind: kind}, true, nil
 }
 
 // newOpponents picks the three opponents of a role: real roles whose score is closest, and robots (a copy of

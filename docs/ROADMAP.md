@@ -1,6 +1,6 @@
 # 后端路线图（目标：完整联网游戏，2026-10-21）
 
-目标是把客户端的全部玩法接到服务端和后台，不只是单机内容。数字来自 `docs/CLIENT_COVERAGE.md`：客户端发出 1102 个请求协议。2026-10-26 全量重新统计（战令、节日精英召唤、推图录像、公会红包之后）：服务端真实处理 751 个（68.1%），只有空回复 34 个，什么都没有 317 个；97 个模块里 41 个全做了、36 个一个真实处理都没有（208 个请求）。最大的缺口是 action 74（限时活动的各面板）、arenapeakchampion 18、crossarena 17、actionyearmonster 16、returnaction 16、crosschampion 16、welfare 13、actiontermbegins 11、guildwar 11、market 10（银币交易行，刻意不做）。
+目标是把客户端的全部玩法接到服务端和后台，不只是单机内容。数字来自 `docs/CLIENT_COVERAGE.md`：客户端发出 1110 个请求协议。2026-10-26 全量重新统计（开学季之后）：服务端真实处理 799 个（72.0%），只有空回复 35 个，什么都没有 276 个；97 个模块里 45 个全做了、30 个一个真实处理都没有（162 个请求）。最大的缺口是 action 74（限时活动的各面板）、arenapeakchampion 18、crossarena 17、actionyearmonster 16、returnaction 15、crosschampion 13、welfare 13、market 10（银币交易行，刻意不做）、guildwar 9。
 
 ## 进度（2026-10-26 更新）
 

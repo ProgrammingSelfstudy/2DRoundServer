@@ -71,8 +71,8 @@ func ParseActivitySpec(raw string) (*ActivitySpec, error) {
 	switch {
 	case strings.TrimSpace(sp.Title) == "" || utf8.RuneCountInString(sp.Title) > 40:
 		return nil, errors.New("spec.title is required, at most 40 characters")
-	case sp.PanelType < 1 || sp.PanelType > 100:
-		return nil, errors.New("spec.panel_type must be 1 to 100")
+	case sp.PanelType < 1 || sp.PanelType > 145:
+		return nil, errors.New("spec.panel_type must be 1 to 145")
 	case len(sp.Aims) > maxAims:
 		return nil, fmt.Errorf("at most %d aims", maxAims)
 	}

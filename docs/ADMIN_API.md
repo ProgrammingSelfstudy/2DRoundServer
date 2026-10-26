@@ -66,7 +66,7 @@ older. `spec` is an object (unknown keys are refused):
 | key | meaning |
 |---|---|
 | `title` (required, at most 40 characters), `title2`, `ico`, `type_ico`, `top_banner`, `rule_str`, `time_str`, `bottom_alert`, `aim_title`, `reward_title`, `channel_ban` | the texts and pictures the tab shows (client resource names) |
-| `panel_type` (required, 1 to 100) | which panel draws the tab, the index in the client's `ActionPanelTypeView` (2 gift list, 3 accumulated charge, 4 accumulated cost, 16 common aim list, ...); the aims below fit the aim-list panels |
+| `panel_type` (required, 1 to 145) | which panel draws the tab, the index in the client's `ActionPanelTypeView` (2 gift list, 3 accumulated charge, 4 accumulated cost, 16 common aim list, ...); the aims below fit the aim-list panels |
 | `sort_val` | the order of the tabs |
 | `cli_type`, `cli_type_name` | the main-screen icon the tab is grouped under (`MainuiConst.icon` id) and its name; 0 = none |
 | `daily` | counts and rewards start again every day |

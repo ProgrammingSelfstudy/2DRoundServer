@@ -41,7 +41,10 @@ type env struct {
 	online  *OnlineGiftService
 	invite  *InviteService
 	champ   *champSvc
-	clk     *atomic.Int64 // the gateway's clock, unix nanoseconds; it only moves with advance
+	// plSync waits until the server has finished the planes request before (a handler replies first and saves after,
+	// so a test that reads the saved state right after a reply must let the session's next request pass first)
+	plSync func()
+	clk    *atomic.Int64 // the gateway's clock, unix nanoseconds; it only moves with advance
 }
 
 // advance moves the gateway's clock forward.

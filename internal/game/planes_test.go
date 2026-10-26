@@ -16,6 +16,10 @@ func plEnv(t *testing.T) (*env, *client, *store.Role) {
 	}
 	c.send(11000, proto.Message{})
 	c.waitFor(11000)
+	e.plSync = func() {
+		c.send(23112, proto.Message{}) // the bag: nothing else here asks for it
+		c.waitFor(23112)
+	}
 	c.send(23105, proto.Message{"id": 1})
 	if r := c.waitFor(23105); r.Int("flag") != 1 || r.Int("floor") != 1 {
 		t.Fatalf("23105: %v", r)
@@ -24,6 +28,9 @@ func plEnv(t *testing.T) (*env, *client, *store.Role) {
 }
 
 func (e *env) plState(t *testing.T, role *store.Role) *plState {
+	if e.plSync != nil {
+		e.plSync()
+	}
 	st := &plState{}
 	if ok, err := e.st.LoadState(role.RID, plModule, st); err != nil || !ok {
 		t.Fatalf("state: %v %v", ok, err)

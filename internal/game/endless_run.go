@@ -90,6 +90,9 @@ func (e *endSvc) start(s *gateway.Session, req proto.Message) error {
 		st.Form, st.FormType, st.Hallows = form, req.Int("formation_type"), req.Int("hallows_id")
 		st.Run.Opts = e.buffOptions()
 		st.Run.Choosing = true
+		if err := questEvent(s, e.st, role.RID, evtEndless, 1); err != nil {
+			return err
+		}
 		if err := s.Send(23901, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}

@@ -24,6 +24,12 @@ const (
 	voyageFinish   = 3
 )
 
+// the order qualities of the goals "purple and above" and "orange" (the scale of the item qualities: purple 3, orange 4).
+const (
+	voyagePurple = 3
+	voyageOrange = 4
+)
+
 type voyageConf struct {
 	Const  map[string]json.RawMessage `json:"const"`
 	Orders []struct {
@@ -283,6 +289,16 @@ func (v *voyageSvc) receive(s *gateway.Session, req proto.Message) error {
 		}
 		if err := sendBackpack(s, v.st); err != nil {
 			return err
+		}
+		if conf.Quality >= voyagePurple {
+			if err := questEvent(s, v.st, role.RID, evtVoyagePurple, 1); err != nil {
+				return err
+			}
+		}
+		if conf.Quality >= voyageOrange {
+			if err := questEvent(s, v.st, role.RID, evtVoyageOrange, 1); err != nil {
+				return err
+			}
 		}
 		if err := voyageReply(s, 23802, true, "接取成功", nil); err != nil {
 			return err

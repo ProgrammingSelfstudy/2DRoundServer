@@ -45,6 +45,9 @@ const (
 	evtArena         = "evt_arena"          // one arena challenge
 	evtGuildDonate   = "evt_guild_donate"   // one guild donation
 	evtGuildBoss     = "evt_guild_boss"     // one guild boss challenge
+	evtEndless       = "evt_endless"        // one endless trial run started
+	evtVoyagePurple  = "evt_voyage_purple"  // one voyage order of purple quality or above taken
+	evtVoyageOrange  = "evt_voyage_orange"  // one voyage order of orange quality or above taken
 	evtStarTower     = "evt_star_tower"     // one challenge of the sea prison (star tower)
 )
 

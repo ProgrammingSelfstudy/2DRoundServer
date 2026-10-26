@@ -103,7 +103,7 @@ var sevenGoalCfg = func() map[int64]*sevenPeriod {
 var sevenNumbers = map[rune]int64{'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10}
 
 // sevenGoalRule reads the event and the count of a goal from its text; the table has only the text. Goals about
-// systems that report no event yet (the voyage, forging, the endless trial...) get no event and stay open.
+// systems that report no event yet (forging, the daily dungeon, the lucky wheel...) get no event and stay open.
 func sevenGoalRule(desc string) (string, int64) {
 	label := ""
 	switch {
@@ -121,6 +121,12 @@ func sevenGoalRule(desc string) (string, int64) {
 		label = evtGuildBoss
 	case strings.Contains(desc, "海底监狱"):
 		label = evtStarTower
+	case strings.Contains(desc, "无尽试炼"):
+		label = evtEndless
+	case strings.Contains(desc, "橙色") && strings.Contains(desc, "远航"):
+		label = evtVoyageOrange
+	case strings.Contains(desc, "紫色") && strings.Contains(desc, "远航"):
+		label = evtVoyagePurple
 	case strings.Contains(desc, "召唤"):
 		label = evtRecruit
 	}

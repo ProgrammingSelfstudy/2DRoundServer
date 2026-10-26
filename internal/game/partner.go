@@ -193,6 +193,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 	RegisterPresage(r, st)
 	RegisterActivity(r, st)
 	RegisterSevenGoal(r, st)
+	RegisterWarOrder(r, st)
 	RegisterHeroLock(r, st)
 	RegisterTalent(r, st)
 	RegisterReset(r, st)

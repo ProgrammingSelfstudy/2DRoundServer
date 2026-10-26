@@ -17,7 +17,7 @@ func TestBackpackListsOnlyNormalItems(t *testing.T) {
 		t.Fatalf("empty backpack: %v", r)
 	}
 
-	// 10020 and 10033 are normal items, 40112 is equipment, 100201 a home item,
+	// 10020 and 10033 are normal items, 40112 is equipment, 100201 a home pet item (the sprite bag),
 	// 99999999 is not in the client's item table
 	m := e.sendMail(store.Mail{Subject: "items", Attachments: []store.Attachment{
 		{Kind: "item", ItemID: 10033, Num: 3}, {Kind: "item", ItemID: 10020, Num: 5}, {Kind: "item", ItemID: 40112, Num: 1},
@@ -30,6 +30,9 @@ func TestBackpackListsOnlyNormalItems(t *testing.T) {
 	if len(items) != 2 {
 		t.Fatalf("backpack: %v", bag)
 	}
+	if pets := c.recv(10503).Arr("item_list"); len(pets) != 1 || pets[0].Int("base_id") != 100201 {
+		t.Fatalf("pet bag: %v", pets)
+	}
 	if a, b := items[0], items[1]; a.Int("id") != 10020 || a.Int("base_id") != 10020 || a.Int("quantity") != 5 || a.Int("pos") != 1 ||
 		b.Int("id") != 10033 || b.Int("quantity") != 3 || b.Int("pos") != 2 {
 		t.Fatalf("items must be sorted by base id, one stack each: %v", items)
@@ -41,6 +44,7 @@ func TestBackpackListsOnlyNormalItems(t *testing.T) {
 	c.recv(10801)
 	c.recv(10302)
 	items = c.recv(10500).Arr("item_list")
+	c.recv(10503)
 	if len(items) != 2 || items[0].Int("quantity") != 7 {
 		t.Fatalf("stack must add up: %v", items)
 	}
@@ -51,11 +55,13 @@ func TestBackpackListsOnlyNormalItems(t *testing.T) {
 		t.Fatalf("10501: %v", r)
 	}
 	// the other bags answer with a capacity and nothing in them
-	for _, cmd := range []uint16{10502, 10503} {
-		c.send(cmd, proto.Message{})
-		if r := c.recv(cmd); r.Int("volume") != bagVolume || len(r.Arr("item_list")) != 0 {
-			t.Fatalf("%d: %v", cmd, r)
-		}
+	c.send(10502, proto.Message{})
+	if r := c.recv(10502); r.Int("volume") != bagVolume || len(r.Arr("item_list")) != 0 {
+		t.Fatalf("10502: %v", r)
+	}
+	c.send(10503, proto.Message{}) // only the pet item
+	if r := c.recv(10503); r.Int("volume") != bagVolume || len(r.Arr("item_list")) != 1 {
+		t.Fatalf("10503: %v", r)
 	}
 
 	// after a new login the same backpack comes back

@@ -17,6 +17,7 @@ const klbLabel = 41
 const (
 	worshipPerDay  = "worship_"       // counters key prefix: one worship of a role per day and kind
 	worshipGot     = "worship_got"    // how many times the role was worshipped
+	worshipHome    = 5                // WorshipType.home: the like of a home
 	redSeen        = "red_seen_"      // counters key prefix: red points the role has looked at
 	reportMsgMax   = 200              // characters of a report text (our policy)
 	redeemAttempts = 10               // wrong codes a role may type per day (our policy)
@@ -96,6 +97,13 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 			return err
 		} else if n > 0 {
 			return reply(0, "今天已经膜拜过了")
+		}
+		if kind == worshipHome { // a like of a home has its own limit and rewards (homeworld.go)
+			if msg, err := homeLike(st, s, role, target); err != nil {
+				return err
+			} else if msg != "" {
+				return reply(0, msg)
+			}
 		}
 		if _, err := st.AddCounter(role.RID, key, 1); err != nil {
 			return err

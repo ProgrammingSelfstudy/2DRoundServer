@@ -126,11 +126,12 @@ func backpackItems(ledger map[int64]int64) []proto.Message {
 	return out
 }
 
-// spriteBag lists the sprites, eggs and sprite items of the ledger (types 36-38) as the sprite bag (10503).
+// spriteBag lists the sprites, eggs and sprite items of the ledger (types 36-38) and the food, items and treasures of the
+// home pet (types 31-33, homepet.go) as the sprite bag (10503).
 func spriteBag(ledger map[int64]int64) []proto.Message {
 	ids := make([]int64, 0)
 	for id, n := range ledger {
-		if info, ok := itemTable[id]; ok && n > 0 && info.Type >= 36 && info.Type <= 38 {
+		if info, ok := itemTable[id]; ok && n > 0 && (info.Type >= 36 && info.Type <= 38 || info.Type >= 31 && info.Type <= 33) {
 			ids = append(ids, id)
 		}
 	}
@@ -157,12 +158,12 @@ func bagReply(s *gateway.Session, items []proto.Message) proto.Message {
 }
 
 // RegisterBag registers the bag commands: 10500 (backpack, from the item ledger)
-// 10502 (home bag: empty) and 10503 (the sprite bag; the equipment bag 10501 is in equipment.go).
+// 10502 (home bag: the furniture, homeworld.go) and 10503 (the sprite bag; the equipment bag 10501 is in equipment.go).
 func RegisterBag(r *gateway.Router, st *store.Store) {
 	r.Handle(10500, func(s *gateway.Session, _ proto.Message) error { return sendBackpack(s, st) })
 	r.Handle(10521, sellPreview(st))
 	r.Handle(10522, sell(st))
-	r.Handle(10502, func(s *gateway.Session, _ proto.Message) error { return s.Send(10502, bagReply(s, nil)) })
+	r.Handle(10502, func(s *gateway.Session, _ proto.Message) error { return sendHomeBag(s, st) })
 	r.Handle(10503, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {
@@ -197,7 +198,12 @@ func sendBackpack(s *gateway.Session, st *store.Store) error {
 	if err := s.Send(10501, bagReply(s, equipmentBag(ledger))); err != nil {
 		return err
 	}
-	// the sprite bag follows only when there is something in it; the sprite handlers always send it
+	// the sprite and home bags follow only when there is something in them; their handlers always send them
+	if furniture := homeBag(ledger); len(furniture) > 0 {
+		if err := s.Send(10502, bagReply(s, furniture)); err != nil {
+			return err
+		}
+	}
 	if sprites := spriteBag(ledger); len(sprites) > 0 {
 		return s.Send(10503, bagReply(s, sprites))
 	}

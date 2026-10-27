@@ -129,6 +129,8 @@ func main() {
 		game.RegisterExpTask(gw.Router, st)
 		game.RegisterChatShare(gw.Router, st)
 		game.RegisterTicket(gw.Router, st)
+		game.RegisterLook(gw.Router, st)
+		game.RegisterStory(gw.Router)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

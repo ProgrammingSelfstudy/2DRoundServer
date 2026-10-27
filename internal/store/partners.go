@@ -415,3 +415,13 @@ func (s *Store) ConsumePartners(rid int64, ids []int64, spendAssets, spendItems,
 	}
 	return tx.Commit()
 }
+
+// PartnerOwner returns the role a hero belongs to (partner ids are unique across roles), or ErrNotFound.
+func (s *Store) PartnerOwner(partnerID int64) (int64, error) {
+	var rid int64
+	err := s.db.QueryRow(`SELECT rid FROM partners WHERE partner_id=?`, partnerID).Scan(&rid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, ErrNotFound
+	}
+	return rid, err
+}

@@ -4,9 +4,9 @@
 
 | 请求协议 | 个数 | 占比 | 上一次（2026-10-26 午，开学季之后） | 2026-10-26 早 | 2026-10-25 晚 | 2026-10-25 早 | 2026-10-21 |
 |---|---|---|---|---|---|---|---|
-| 真实处理 | 862 | 77.7% | 799（72.0%） | 751（68.1%） | 710（64.4%） | 259（23.5%） | 101（9.2%） |
+| 真实处理 | 866 | 78.0% | 799（72.0%） | 751（68.1%） | 710（64.4%） | 259（23.5%） | 101（9.2%） |
 | 只有空回复 | 32 | 2.9% | 35（3.2%） | 34（3.1%） | 44（4.0%） | 98（8.9%） | 115（10.4%） |
-| 什么都没有 | 216 | 19.5% | 276（24.9%） | 317（28.8%） | 348（31.6%） | 745（67.6%） | 886（80.4%） |
+| 什么都没有 | 212 | 19.1% | 276（24.9%） | 317（28.8%） | 348（31.6%） | 745（67.6%） | 886（80.4%） |
 
 97 个模块里：49 个全做了；23 个做了一部分但还有缺；25 个一个真实处理都没有，合计 148 个请求（多数是限时活动、跨服玩法和充值）。
 
@@ -48,7 +48,7 @@ hero(78)、adventure(35)、arenateam(32)、guild(28)、elfin(28)、arenamanypeop
 
 ## 一个真实处理都没有的模块（括号里是请求数）
 
-arenapeakchampion(18)、crossarena(17)、crosschampion(16，其中 3 个空回复)、guildwar(11，其中 2 个空回复)、newfirstcharge(9，其中 2 个空回复)、godbattle(5)、primus(5，其中 2 个空回复)、element(4，其中 1 个空回复)、mergeserver(3)、rolescene(3)、daycharge(2，其中 1 个空回复)、mainui(2，其中 1 个空回复)、exchange(2，其中 1 个空回复)、onecentgift(2，其中 1 个空回复)、guide(2)、scene(2，其中 1 个空回复)、story(2)、look(2)、recruithero(2，其中 1 个空回复)、rfmpersonalgift(1)、limittime(1)、verificationcode(1)、stronger(1)、crossshow(1)
+arenapeakchampion(18)、crossarena(17)、crosschampion(16，其中 3 个空回复)、guildwar(11，其中 2 个空回复)、newfirstcharge(9，其中 2 个空回复)、godbattle(5)、primus(5，其中 2 个空回复)、element(4，其中 1 个空回复)、mergeserver(3)、rolescene(3)、daycharge(2，其中 1 个空回复)、mainui(2，其中 1 个空回复)、exchange(2，其中 1 个空回复)、onecentgift(2，其中 1 个空回复)、guide(2)、scene(2，其中 1 个空回复)、recruithero(2，其中 1 个空回复)、rfmpersonalgift(1)、limittime(1)、verificationcode(1)、stronger(1)、crossshow(1)
 
 ## 怎么重新统计
 

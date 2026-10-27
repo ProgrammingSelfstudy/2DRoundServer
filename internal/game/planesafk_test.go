@@ -25,10 +25,17 @@ func pfEnv(t *testing.T) (*env, *client, *store.Role) {
 
 func (e *env) pfState(t *testing.T, role *store.Role) *pfState {
 	st := &pfState{}
-	if ok, err := e.st.LoadState(role.RID, pfModule, st); err != nil || !ok {
-		t.Fatalf("state: %v %v", ok, err)
+	// the handler saves its state after it answered, so the first look may come early
+	for i := 0; ; i++ {
+		ok, err := e.st.LoadState(role.RID, pfModule, st)
+		if err == nil && ok {
+			return st
+		}
+		if err != nil || i == 50 {
+			t.Fatalf("state: %v %v", ok, err)
+		}
+		time.Sleep(20 * time.Millisecond)
 	}
-	return st
 }
 
 // setTile makes a tile of the board hold an event.

@@ -43,5 +43,9 @@ out["limit_gifts"] = [{"pos": i + 1, "id": r[0], "name": r[1], "kind": r[2], "co
 # the one yuan gift (16651/16652), period 1: its rewards are unlocked by the role's power (the other periods run on dates of 2021)
 od = dump(lua_dir, "holiday_dime_data.lua", ["Config.HolidayDimeData.data_award_list"])["Config.HolidayDimeData.data_award_list"][0]
 out["onecent"] = [{"id": r["id"], "power": r["power_limit"], "items": r["award"]} for r in sorted(od, key=lambda r: r["id"])]
+# the daily first top-up (21010/21011): the goal in diamonds paid in a day and the reward by the days since the server opened
+dc = dump(lua_dir, "charge_data.lua", ["Config.ChargeData.data_daily_reward", "Config.ChargeData.data_constant"])
+out["daily"] = {"goal": dc["Config.ChargeData.data_constant"]["day_charge_goal"]["val"],
+                "rewards": [{"min": r["min"], "max": r["max"], "items": r["reward"]} for r in sorted(dc["Config.ChargeData.data_daily_reward"], key=lambda r: r["id"])]}
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

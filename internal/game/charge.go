@@ -106,6 +106,9 @@ var chargeHooks = map[int64]ChargeHook{}
 // RegisterChargeHook makes a product payable and says how it is delivered.
 func RegisterChargeHook(id int64, h ChargeHook) { chargeHooks[id] = h }
 
+// chargePaidHooks run after any order was confirmed and delivered (the daily first top-up counts what was paid today).
+var chargePaidHooks []func(st *store.Store, role *store.Role, p ChargeProduct) error
+
 // chargeGuards say whether a product may be bought now (a gift limited by the cycle), asked when the order is opened.
 var chargeGuards = map[int64]func(st *store.Store, role *store.Role) error{}
 
@@ -213,6 +216,11 @@ func ConfirmChargeOrder(st *store.Store, no, operator, note string) (*store.PayO
 	o, err = st.ConfirmPayOrder(no, operator, note, p.VIPExp, assets, items)
 	if err != nil {
 		return nil, err
+	}
+	for _, h := range chargePaidHooks {
+		if err := h(st, role, p); err != nil {
+			return o, err
+		}
 	}
 	if rc, err = st.RoleCharge(o.RID); err == nil {
 		if lev := vipLevelFor(rc.VIPExp); lev > role.VIPLev {

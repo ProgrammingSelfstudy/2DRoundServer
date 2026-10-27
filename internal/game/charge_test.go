@@ -574,3 +574,53 @@ func TestOneCentGiftAndLoginInit(t *testing.T) {
 		t.Fatalf("diamonds %d -> %d", before[3], after[3])
 	}
 }
+
+func TestDayCharge(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	old := chargeClock
+	chargeClock = func() time.Time { return actNow }
+	t.Cleanup(func() { chargeClock = old })
+	c, role := e.enter("dc1", "日首充")
+	c.send(21010, proto.Message{})
+	if r := c.waitFor(21010); r.Int("status") != 0 || r.Int("num") != 0 {
+		t.Fatalf("21010: %v", r)
+	}
+	pay := func(id int64) {
+		o, err := CreateChargeOrder(e.st, role, id, actNow)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+			t.Fatal(err)
+		}
+	}
+	pay(3) // 6 yuan: 60 of 180
+	c.send(21010, proto.Message{})
+	if r := c.waitFor(21010); r.Int("status") != 0 || r.Int("num") != 60 {
+		t.Fatalf("after 6 yuan: %v", r)
+	}
+	c.send(21011, proto.Message{})
+	if r := c.waitFor(21011); r.Int("code") != 0 {
+		t.Fatalf("early take: %v", r)
+	}
+	pay(4) // 30 yuan more
+	c.send(21010, proto.Message{})
+	if r := c.waitFor(21010); r.Int("status") != 1 {
+		t.Fatalf("reached: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(21011, proto.Message{})
+	if r := c.waitFor(21011); r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+200 {
+		t.Fatalf("diamonds %d -> %d", before[3], after[3])
+	}
+	// the next day it starts again
+	e.setNow(actNow.Add(24 * time.Hour))
+	c.send(21010, proto.Message{})
+	if r := c.waitFor(21010); r.Int("status") != 0 || r.Int("num") != 0 {
+		t.Fatalf("next day: %v", r)
+	}
+}

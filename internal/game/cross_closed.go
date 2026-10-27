@@ -43,7 +43,6 @@ var closedReplies = map[uint16]proto.Message{
 	13601: {"flag": 0, "msg": "活动未开启", "period": 0, "charge": 0, "cur_day": 0, "num": 0, "end_time": 0, "welfare_list": []proto.Message{}, "grow_list": []proto.Message{}},
 	16630: {"code": 1, "items": []proto.Message{}}, // the download reward is told as taken: the icon goes
 	16653: {"is_buy": 0, "end_time": 0, "charge_id": 0, "award_list": []proto.Message{}},
-	20700: {"num": 0, "time": 0}, 20701: {"list": []proto.Message{}}, 20703: {"pos": 0, "list": []proto.Message{}}, 20706: {"is_show": 0},
 	23507: {"free_ids": []proto.Message{}, "cells": []proto.Message{}}, 23508: {"item_base_id": 0, "price": 0}, 23509: {"refresh_time": 0, "data": []proto.Message{}},
 	24810: {"quest_list": []proto.Message{}, "camp_id": 0}, 24813: {"quest_list": []proto.Message{}, "camp_id": 0},
 	24815: {"quest_list": []proto.Message{}, "camp_id": 0}, 24817: {"quest_list": []proto.Message{}, "camp_id": 0},
@@ -62,7 +61,7 @@ var closedRefusals = map[uint16]proto.Message{
 	11042: closedMsg("图鉴评论暂未开放"), 11043: closedMsg("图鉴评论暂未开放"), 11044: closedMsg("图鉴评论暂未开放"), 11047: closedMsg("图鉴暂未开放"),
 	11071: closedMsg("限时重生暂未开放"), 11072: closedMsg("限时重生暂未开放"), 11074: closedMsg("限时重生暂未开放"),
 	11331: closedMsg("占卜暂未开放"), 11332: closedMsg("占卜暂未开放"), 11333: closedMsg("暂时不能分享录像"), 13602: closedMsg("活动未开启"),
-	16654: closedMsg("活动未开启"), 16665: closedMsg("活动未开启"), 16695: closedMsg("活动未开启"), 20702: closedMsg("霸气修炼暂未开放"),
+	16654: closedMsg("活动未开启"), 16665: closedMsg("活动未开启"), 16695: closedMsg("活动未开启"),
 	21009: closedMsg("暂未开放"), 16631: closedMsg("没有可领取的下载奖励"), 10971: closedMsg("暂未开放"), 26809: closedMsg("暂未开放"),
 	23504: closedMsg("交易行暂未开放"), 23505: closedMsg("交易行暂未开放"), 23506: closedMsg("交易行暂未开放"), 23511: closedMsg("交易行暂未开放"),
 	23512: closedMsg("交易行暂未开放"), 23513: closedMsg("交易行暂未开放"), 23514: closedMsg("交易行暂未开放"),

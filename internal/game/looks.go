@@ -166,6 +166,11 @@ func withSettings(st *store.Store, rid int64, m proto.Message) (proto.Message, e
 		return m, err
 	}
 	m["signature"], m["is_show_vip"], m["auto_pk"] = cfg.Signature, cfg.ShowVIP, cfg.AutoPK
+	if rc, err := st.RoleCharge(rid); err == nil && rc.VIPExp > 0 { // the experience of what the role paid, when it is more than where the level starts
+		if cur, _ := m["vip_exp"].(int64); rc.VIPExp > cur {
+			m["vip_exp"] = rc.VIPExp
+		}
+	}
 	m["backdrop_id"], m["avatar_base_id"] = cfg.BackdropID, cfg.AvatarID
 	gd, mem, err := st.GuildOfRole(rid)
 	switch {

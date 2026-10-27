@@ -31,7 +31,7 @@ const (
 
 // RegisterRoleMisc registers the small role commands: 10303 klb, 10380 register / open time, 10905
 // world level, 10316 worship (10317 / 10319 how often the role was worshipped), 10395 age
-// check-in (always passed), 10345-10347 role models, 10945 redeem code, 10947 recharge (refused:
+// check-in (always passed), 10345-10347 role models, 10945 redeem code, 10947 recharge (moved to charge_proto.go; was refused:
 // there is no recharge), 10960 / 10961 real-name reward (shown as taken: no real-name system),
 // 10985 / 10986 red points seen, 12770 / 12771 reports.
 func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
@@ -284,12 +284,6 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		return reply(1, "兑换成功")
-	})
-	r.Handle(10947, func(s *gateway.Session, _ proto.Message) error {
-		if s.Role() == nil {
-			return nil
-		}
-		return s.Send(10947, proto.Message{"code": 0, "url": ""}) // there is no recharge
 	})
 	r.Handle(10960, func(s *gateway.Session, _ proto.Message) error {
 		if s.Role() == nil {

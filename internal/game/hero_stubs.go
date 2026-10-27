@@ -77,7 +77,6 @@ func registerHeroStubs(r *gateway.Router) {
 // state, not a missing feature.
 func registerNoPaymentStubs(r *gateway.Router) {
 	registerStubs(r, map[uint16]func(proto.Message) proto.Message{
-		16700: fixed(proto.Message{"list": []proto.Message{}}),
 		16707: fixed(proto.Message{"status": 0}),
 		16708: refuse("code", nil),
 		16712: fixed(proto.Message{"charge_sum": 0, "list": []proto.Message{}}),

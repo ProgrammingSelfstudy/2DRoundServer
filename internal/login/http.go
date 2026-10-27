@@ -36,6 +36,10 @@ func (s *Server) Handler() http.Handler {
 		// carry filler such as "////log" or "?&&&username=": match loosely.
 		p := r.URL.Path
 		switch {
+		case strings.HasPrefix(p, "/pay/"):
+			if !s.payRoute(w, r) {
+				http.NotFound(w, r)
+			}
 		case strings.Contains(p, "/update/config/"):
 			s.urlConfig(w, r)
 		case p == "/api/serverlist":

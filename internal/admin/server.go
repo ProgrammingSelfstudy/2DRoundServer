@@ -147,6 +147,14 @@ func (s *Server) Handler() http.Handler {
 	route("GET /api/mails", levRead, s.listMails)
 	route("POST /api/mails", levWrite, s.sendMail)
 
+	route("GET /api/pay/config", levRead, s.payConfig)
+	route("PUT /api/pay/config", levManage, s.setPayConfig)
+	route("GET /api/pay/products", levRead, s.payProducts)
+	route("GET /api/pay/orders", levRead, s.listPayOrders)
+	route("POST /api/pay/orders", levManage, s.createPayOrder)
+	route("POST /api/pay/orders/{no}/confirm", levManage, s.confirmPayOrder)
+	route("POST /api/pay/orders/{no}/cancel", levManage, s.cancelPayOrder)
+
 	route("GET /api/audit", levManage, s.listAudit)
 
 	mux.Handle("/", staticHandler()) // the web UI; /api/ paths that match nothing above are a JSON 404

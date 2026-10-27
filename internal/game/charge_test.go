@@ -218,3 +218,67 @@ func TestMonthCards(t *testing.T) {
 		t.Fatalf("after the run: %v", r)
 	}
 }
+
+func TestFirstChargeGifts(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("fc1", "首充人")
+	status := func() map[int64]int64 {
+		t.Helper()
+		c.send(21000, proto.Message{})
+		out := map[int64]int64{}
+		for _, g := range c.waitFor(21000).Arr("first_gift") {
+			out[g.Int("id")] = g.Int("status")
+		}
+		return out
+	}
+	if st := status(); len(st) != 6 || st[1] != 0 || st[4] != 0 {
+		t.Fatalf("before: %v", st)
+	}
+	c.send(21001, proto.Message{"id": 1})
+	if r := c.waitFor(21001); r.Int("code") != 0 {
+		t.Fatalf("take before paying: %v", r)
+	}
+	o, err := CreateChargeOrder(e.st, role, 3, actNow) // 6 yuan: 60 VIP experience, the first tier
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	if st := status(); st[1] != 1 || st[2] != 0 || st[4] != 0 {
+		t.Fatalf("paid 6: %v", st)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(21001, proto.Message{"id": 2}) // the second day's gift waits for its day
+	if r := c.waitFor(21001); r.Int("code") != 0 {
+		t.Fatalf("day 2 on day 1: %v", r)
+	}
+	c.send(21001, proto.Message{"id": 1})
+	if r := c.waitFor(21001); r.Int("code") != 1 {
+		t.Fatalf("take 1: %v", r)
+	}
+	if w := c.waitFor(21000); w.Arr("first_gift")[0].Int("status") != 2 {
+		t.Fatalf("after the take: %v", w)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3] {
+		t.Fatalf("the gift is items, diamonds %d -> %d", before[3], after[3])
+	}
+	c.send(21001, proto.Message{"id": 1})
+	if r := c.waitFor(21001); r.Int("code") != 0 {
+		t.Fatalf("twice: %v", r)
+	}
+	if st := status(); st[2] != 0 {
+		t.Fatalf("same day: %v", st)
+	}
+	e.setNow(actNow.Add(24 * time.Hour))
+	if st := status(); st[1] != 2 || st[2] != 1 || st[3] != 0 {
+		t.Fatalf("day 2: %v", st)
+	}
+	// a late take keeps the order: day 3 only after day 2, even when the days have passed
+	e.setNow(actNow.Add(5 * 24 * time.Hour))
+	c.send(21001, proto.Message{"id": 3})
+	if r := c.waitFor(21001); r.Int("code") != 0 {
+		t.Fatalf("day 3 before day 2: %v", r)
+	}
+}

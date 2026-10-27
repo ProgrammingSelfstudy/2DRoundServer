@@ -101,3 +101,53 @@ func TestChargeTiersAndOrders(t *testing.T) {
 		t.Fatalf("a sixth order: %v", err)
 	}
 }
+
+func TestAccumulatedTopUp(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("ca1", "累充人")
+	c.send(16712, proto.Message{})
+	r := c.waitFor(16712)
+	if r.Int("charge_sum") != 0 || len(r.Arr("list")) != 10 || r.Arr("list")[0].Int("id") != 10 || r.Arr("list")[0].Int("status") != 0 {
+		t.Fatalf("16712 before: %v", r)
+	}
+	o, err := CreateChargeOrder(e.st, role, 4, actNow) // 30 yuan: 300 experience
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	c.send(16712, proto.Message{})
+	r = c.waitFor(16712)
+	status := map[int64]int64{}
+	for _, x := range r.Arr("list") {
+		status[x.Int("id")] = x.Int("status")
+	}
+	if r.Int("charge_sum") != 300 || status[1] != 1 || status[2] != 0 {
+		t.Fatalf("16712 after: %v", r)
+	}
+	c.send(16713, proto.Message{"id": 2})
+	if r := c.waitFor(16713); r.Int("code") != 0 {
+		t.Fatalf("a reward not reached: %v", r)
+	}
+	coins, _ := e.st.RoleAssets(role.RID)
+	c.send(16713, proto.Message{"id": 1})
+	r = c.waitFor(16713)
+	if r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	after, _ := e.st.RoleAssets(role.RID)
+	if after[1] != coins[1]+1000 {
+		t.Fatalf("coins %d -> %d", coins[1], after[1])
+	}
+	for _, x := range r.Arr("list") {
+		if x.Int("id") == 1 && x.Int("status") != 2 {
+			t.Fatalf("not marked taken: %v", r)
+		}
+	}
+	c.send(16713, proto.Message{"id": 1})
+	if r := c.waitFor(16713); r.Int("code") != 0 {
+		t.Fatalf("twice: %v", r)
+	}
+}

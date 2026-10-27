@@ -34,11 +34,28 @@ type ChargeProduct struct {
 	Pic      int64      `json:"pic"`
 }
 
+// chargeAcc are the rewards of the accumulated top-up, by the sum of VIP experience paid in.
+var chargeAcc = func() []struct {
+	ID, Sum int64
+	Items   [][2]int64
+} {
+	var f struct {
+		Acc []struct {
+			ID, Sum int64
+			Items   [][2]int64
+		} `json:"acc"`
+	}
+	if err := json.Unmarshal(chargeJSON, &f); err != nil {
+		panic("game: bad charge.json")
+	}
+	return f.Acc
+}()
+
 var chargeTable = func() map[int64]ChargeProduct {
 	var f struct {
 		Products []ChargeProduct `json:"products"`
 	}
-	if err := json.Unmarshal(chargeJSON, &f); err != nil || len(f.Products) < 300 {
+	if err := json.Unmarshal(chargeJSON, &f); err != nil || len(f.Products) < 300 || len(chargeAcc) == 0 {
 		panic("game: bad charge.json")
 	}
 	m := make(map[int64]ChargeProduct, len(f.Products))

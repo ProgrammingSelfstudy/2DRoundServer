@@ -49,7 +49,18 @@ func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 	if err != nil {
 		return err
 	}
-	return s.Send(16700, proto.Message{"list": list})
+	if err := s.Send(16700, proto.Message{"list": list}); err != nil {
+		return err
+	}
+	rc, err := st.RoleCharge(rid)
+	if err != nil {
+		return err
+	}
+	d := &chargeAccState{}
+	if _, err := st.LoadState(rid, chargeAccModule, d); err != nil {
+		return err
+	}
+	return s.Send(16712, proto.Message{"charge_sum": accSum(rc), "list": chargeAccList(rc, d)})
 }
 
 // RegisterCharge registers the top-up side of the client: 16700 the tiers, 21016 whether a product can be bought and 10947 the

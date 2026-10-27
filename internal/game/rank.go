@@ -114,6 +114,8 @@ func ranking(st *store.Store, srvID string, typ int64) ([]rankEntry, error) {
 		}
 	case rankSweet:
 		return sweetRanking(st, srvID, roles)
+	case rankSandybeach:
+		return sandybeachRanking(st, srvID, roles)
 	default:
 		return nil, nil
 	}

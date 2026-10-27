@@ -137,6 +137,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterStory(gw.Router)
 	RegisterGuide(gw.Router)
 	RegisterWelfare(gw.Router, st)
+	RegisterLoginDay(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

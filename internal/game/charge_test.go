@@ -658,3 +658,44 @@ func TestTouchGold(t *testing.T) {
 		t.Fatalf("after the refresh: %v", r)
 	}
 }
+
+func TestActivityBox(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("ab1", "活跃人")
+	c.send(20300, proto.Message{})
+	if r := c.waitFor(20300); len(r.Arr("activity_box")) != 0 {
+		t.Fatalf("20300: %v", r)
+	}
+	c.send(20301, proto.Message{"activity": 25})
+	if r := c.waitFor(20301); r.Int("code") != 0 {
+		t.Fatalf("no points: %v", r)
+	}
+	if err := e.st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, map[int64]int64{9: 30}, map[int64]int64{}); err != nil {
+		t.Fatal(err)
+	}
+	c.send(20301, proto.Message{"activity": 50})
+	if r := c.waitFor(20301); r.Int("code") != 0 {
+		t.Fatalf("too few points: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(20301, proto.Message{"activity": 25})
+	if r := c.waitFor(20301); r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+20 || after[1] != before[1]+10000 {
+		t.Fatalf("box: %v -> %v", before, after)
+	}
+	c.send(20301, proto.Message{"activity": 25})
+	if r := c.waitFor(20301); r.Int("code") != 0 {
+		t.Fatalf("twice: %v", r)
+	}
+	e.setNow(actNow.Add(24 * time.Hour))
+	c.send(20300, proto.Message{})
+	if r := c.waitFor(20300); len(r.Arr("activity_box")) != 0 {
+		t.Fatalf("next day: %v", r)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[9] != 0 {
+		t.Fatalf("the points of the day before: %v", after)
+	}
+}

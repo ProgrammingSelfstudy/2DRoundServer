@@ -162,6 +162,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterTouchGold(gw.Router, st)
 	RegisterElement(gw.Router, st)
 	RegisterRankPartner(gw.Router, st)
+	RegisterActivityBox(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

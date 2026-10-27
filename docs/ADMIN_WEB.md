@@ -17,6 +17,7 @@ Log in with an admin account (the first start prints the bootstrap password once
 | 角色 | read; operator may ban and kick | search by name / account / id, filter by server, "详情" (online state, currencies, item ledger with names; operators can set the level and VIP, kick, and grant currencies and items straight into the role from it), ban, unban, "发邮件" shortcut |
 | 邮件 | read; operator may send | compose (direct or broadcast, currency and item attachments, expiry) and the list of sent mail with recipients and claims; items are picked by name or id from the client's item table (type in the box, choose from the list), and the sent list shows their names |
 | 公告 | read; operator may edit | create, edit, delete; online players see the change at once and the toast says how many were told |
+| 充值 | read; manage may edit | upload the WeChat / Alipay QR codes and the notice of the payment page; the orders players opened, with confirm / cancel (confirming delivers the product); orders by hand for players who paid outside the game |
 | 审计日志 | superadmin | who did what, when, from where |
 | 数据库备份 | manage | the backups on disk (name, size, time) and a button that makes one now (the old ones beyond `admin.backup_keep` are removed); restoring is a manual step, described on the page |
 | 管理员 | superadmin | create, change role, enable or disable, reset password |

@@ -13,6 +13,7 @@ hosts on its built-in white list, so the server's address is put on that list to
 It does this with a generated overlay for reconstructed-client/build.py:
   smali/org/local/LanRewrite.smali                         the rewriting function
   smali/org/cocos2dx/lib/Cocos2dxHttpURLConnection.smali  a copy that calls it first
+  smali/org/local/PayOpen.smali + smali/com/game/core/GameActivity.smali  the pay call opens the payment page in the browser
   lib/arm64-v8a/libcocos2dlua.so  the native library with BASE's host in its connection white list
 and a copy of the Lua overrides whose config.lua names BASE for the url_config download,
 which the native downloader does (not Java).
@@ -167,6 +168,81 @@ def patch_connection(src):
     return src[:j] + call + src[j:]
 
 
+# The client's pay call (sdkOnPay -> GameActivity.pay(json)) is an empty stub in the rebuilt client. The overlay makes it open the
+# phone's browser on BASE/pay/start?info=<json>, the server's payment page: it opens an order for the role and shows the QR
+# codes the operator set in the admin page (internal/login/pay.go).
+PAY_OPEN = """.class public Lorg/local/PayOpen;
+.super Ljava/lang/Object;
+
+.field private static final BASE:Ljava/lang/String; = "%s"
+
+.method public static open(Landroid/app/Activity;Ljava/lang/String;)V
+    .locals 5
+
+    if-eqz p0, :done
+
+    if-eqz p1, :done
+
+    :try_start
+    const-string v0, "UTF-8"
+
+    invoke-static {p1, v0}, Ljava/net/URLEncoder;->encode(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    new-instance v1, Ljava/lang/StringBuilder;
+
+    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
+
+    sget-object v2, Lorg/local/PayOpen;->BASE:Ljava/lang/String;
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    const-string v2, "/pay/start?info="
+
+    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1, v0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+
+    invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
+
+    move-result-object v1
+
+    invoke-static {v1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+
+    move-result-object v1
+
+    new-instance v2, Landroid/content/Intent;
+
+    const-string v3, "android.intent.action.VIEW"
+
+    invoke-direct {v2, v3, v1}, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
+
+    const/high16 v3, 0x10000000
+
+    invoke-virtual {v2, v3}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
+
+    invoke-virtual {p0, v2}, Landroid/app/Activity;->startActivity(Landroid/content/Intent;)V
+    :try_end
+    .catch Ljava/lang/Exception; {:try_start .. :try_end} :done
+
+    :done
+    return-void
+.end method
+"""
+
+
+def patch_pay(src):
+    """Make GameActivity.pay(String) call PayOpen.open(this, info)."""
+    marker = ".method public pay(Ljava/lang/String;)V"
+    i = src.index(marker)
+    j = src.index(".end method", i)
+    body = (marker + "\n    .locals 0\n    .param p1, \"info\"    # Ljava/lang/String;\n\n    .prologue\n"
+            "    invoke-static {p0, p1}, Lorg/local/PayOpen;->open(Landroid/app/Activity;Ljava/lang/String;)V\n\n    return-void\n")
+    assert src.count(marker) == 1 and "PayOpen" not in src
+    return src[:i] + body + src[j:]
+
+
 CONFIG_HASH = "99F709C18721A583"  # config.luac
 
 
@@ -241,6 +317,10 @@ def main():
     (overlay / "smali" / "org" / "local" / "LanRewrite.smali").write_text(lan_rewrite_smali(a.base), encoding="utf-8")
     (overlay / "smali" / "org" / "cocos2dx" / "lib" / "Cocos2dxHttpURLConnection.smali").write_text(
         patch_connection(smali.read_text(encoding="utf-8")), encoding="utf-8")
+    (overlay / "smali" / "org" / "local" / "PayOpen.smali").write_text(PAY_OPEN % a.base, encoding="utf-8")
+    game = root / "android" / "smali" / "com" / "game" / "core" / "GameActivity.smali"
+    (overlay / "smali" / "com" / "game" / "core").mkdir(parents=True)
+    (overlay / "smali" / "com" / "game" / "core" / "GameActivity.smali").write_text(patch_pay(game.read_text(encoding="utf-8")), encoding="utf-8")
     lan_native_library(a.client_root, a.base, overlay)
     print("overlay:", overlay)
     overrides = lan_lua_overrides(root, a.client_root, a.base, Path(tempfile.mkdtemp(prefix="lan-lua-")))

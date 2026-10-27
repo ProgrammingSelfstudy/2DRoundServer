@@ -104,6 +104,24 @@ to 1,000,000,000. The reply is `{mail, pushed, push_error?}`: the mail is stored
 first, then the gateway pushes it to online roles; if the gateway is down the mail
 is still stored and `push_error` says why.
 
+## Payments (top-up by QR code)
+
+There is no payment provider. The player taps a top-up in the game; the phone's browser opens the payment page of the login
+service (`/pay/order/<no>`), which shows the amount, the order number and the QR codes set here. The player pays; the
+operator checks the money arrived and confirms the order, which delivers the product (diamonds, VIP experience) and tells the
+role if it is online. Everything that moves money needs the `manage` role.
+
+- `GET /api/pay/config` (read) -> `{qr_wechat, qr_alipay, notice}`; the QR codes are data URLs. `PUT /api/pay/config` (manage)
+  `{key, value}` with key `qr_wechat`, `qr_alipay` (a png, jpeg or webp data URL of up to 600 KiB) or `notice` (300 characters);
+  an empty value removes it.
+- `GET /api/pay/products` (read) the products that can be paid for now. `GET /api/pay/orders?status=0|1|2&limit=` (read): 0
+  waiting, 1 paid, 2 cancelled; each row has `product` and `role`.
+- `POST /api/pay/orders/{no}/confirm` (manage) `{note}` -> `{ok, order, refreshed?, push_error?}`; 409 when the order is not
+  waiting any more (a second confirm cannot deliver twice). `POST /api/pay/orders/{no}/cancel` (manage) `{note}`.
+- `POST /api/pay/orders` (manage) `{rid, charge_id, confirm?, note?}` makes an order by hand (the player paid outside the
+  game); with `confirm` it is delivered at once. 422 for a product nothing delivers yet, 409 when the role already has five
+  orders waiting.
+
 ## Status codes
 
 400 malformed JSON, unknown field, trailing data, bad id · 401 no or bad token, wrong

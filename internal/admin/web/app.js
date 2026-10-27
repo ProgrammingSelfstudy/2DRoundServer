@@ -9,6 +9,7 @@ const PAGES = {
   accounts: { title: "账号", need: "read", load: () => import("/pages/accounts.js") },
   roles: { title: "角色", need: "read", load: () => import("/pages/roles.js") },
   mail: { title: "邮件", need: "read", load: () => import("/pages/mail.js") },
+  pay: { title: "充值", need: "read", load: () => import("/pages/pay.js") },
   notices: { title: "公告", need: "read", load: () => import("/pages/notices.js") },
   audit: { title: "审计日志", need: "manage", load: () => import("/pages/audit.js") },
   backups: { title: "数据库备份", need: "manage", load: () => import("/pages/backups.js") },

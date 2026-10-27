@@ -25,6 +25,14 @@ func TestLoginDay(t *testing.T) {
 	if s := statuses(); s[1] != loginDayOpen || s[2] != loginDayLocked {
 		t.Fatalf("day 1 only: %v", s)
 	}
+	c.send(10922, proto.Message{})
+	if l := c.waitFor(10922).Arr("act_list"); len(l) != 1 || l[0].Int("id") != loginDayIcon || l[0].Int("status") != 1 {
+		t.Fatalf("10922: %v", l)
+	}
+	c.send(10925, proto.Message{"id": loginDayIcon})
+	if r := c.waitFor(10925); r.Int("id") != loginDayIcon || r.Int("status") != 1 {
+		t.Fatalf("10925: %v", r)
+	}
 	c.send(21101, proto.Message{"day": 2})
 	if r := c.waitFor(21101); r.Int("code") != 0 {
 		t.Fatalf("day 2 too early: %v", r)

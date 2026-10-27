@@ -27,6 +27,10 @@ var loginDays = func() [][][2]int64 {
 
 const loginDayModule = "loginday"
 
+// loginDayIcon is the id of the eight-day login in the client's function table; its icon
+// (open_type 2) shows only when the server lists it in the activity status (10922).
+const loginDayIcon = 508
+
 // Day states the client understands (action_eight_login_window.lua): 1 not reached, 2 reached and
 // not taken, 3 taken.
 const (
@@ -57,8 +61,22 @@ func loginDayReached(role *store.Role, now time.Time) int64 {
 	return max(1, min(days, int64(len(loginDays))))
 }
 
-// RegisterLoginDay registers the eight-day login gifts: 21100 (the state of each day) and 21101 (take
-// a reached day's reward).
+// loginDayIconStatus is what 10922 / 10924 / 10925 tell about the icon: open (1) while a day is left to take
+// or to wait for, gone (0) when all eight were taken.
+func loginDayIconStatus(st *store.Store, rid int64) (int, error) {
+	state := &loginDayState{}
+	if _, err := st.LoadState(rid, loginDayModule, state); err != nil {
+		return 0, err
+	}
+	if len(state.Taken) >= len(loginDays) {
+		return 0, nil
+	}
+	return 1, nil
+}
+
+// RegisterLoginDay registers the icon status (10922 the list, 10924 the same on request, 10925 one
+// icon by id; the ids this server has no activity for are told as not open) and the eight-day login gifts:
+// 21100 (the state of each day) and 21101 (take a reached day's reward).
 func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 	list := func(role *store.Role, state *loginDayState, now time.Time) []proto.Message {
 		reached := loginDayReached(role, now)
@@ -75,6 +93,33 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		}
 		return out
 	}
+	icons := func(cmd uint16) gateway.Handler {
+		return func(s *gateway.Session, _ proto.Message) error {
+			role := s.Role()
+			if role == nil {
+				return s.Send(cmd, proto.Message{"act_list": []proto.Message{}})
+			}
+			status, err := loginDayIconStatus(st, role.RID)
+			if err != nil {
+				return err
+			}
+			return s.Send(cmd, proto.Message{"act_list": []proto.Message{{"id": loginDayIcon, "status": status,
+				"int_args": []proto.Message{}, "ext_args": []proto.Message{}}}})
+		}
+	}
+	r.Handle(10922, icons(10922))
+	r.Handle(10924, icons(10924))
+	r.Handle(10925, func(s *gateway.Session, req proto.Message) error {
+		role := s.Role()
+		if role == nil || req.Int("id") != loginDayIcon {
+			return s.Send(10925, proto.Message{"id": req.Int("id"), "status": 0, "int_args": []proto.Message{}, "ext_args": []proto.Message{}})
+		}
+		status, err := loginDayIconStatus(st, role.RID)
+		if err != nil {
+			return err
+		}
+		return s.Send(10925, proto.Message{"id": loginDayIcon, "status": status, "int_args": []proto.Message{}, "ext_args": []proto.Message{}})
+	})
 	r.Handle(21100, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

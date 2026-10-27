@@ -126,6 +126,7 @@ func main() {
 		game.RegisterDramaExtras(gw.Router, st)
 		game.RegisterDramaMilestones(gw.Router, st)
 		game.RegisterRank(gw.Router, st)
+		game.RegisterExpTask(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

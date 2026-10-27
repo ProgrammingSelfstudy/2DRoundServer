@@ -130,6 +130,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterDramaExtras(gw.Router, st)
 	RegisterDramaMilestones(gw.Router, st)
 	RegisterRank(gw.Router, st)
+	RegisterExpTask(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

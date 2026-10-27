@@ -14,6 +14,7 @@ const (
 	rankTower = 3 // star tower: val1 is the highest floor
 	rankArena = 5 // arena: val1 is the score
 	rankPower = 6 // power: val1 is the power
+	// rankSweet (49) is the personal score of the sweet activity, sweet.go
 )
 
 const rankMaxLen = 100
@@ -111,6 +112,8 @@ func ranking(st *store.Store, srvID string, typ int64) ([]rankEntry, error) {
 				out = append(out, rankEntry{r, row.val})
 			}
 		}
+	case rankSweet:
+		return sweetRanking(st, srvID, roles)
 	default:
 		return nil, nil
 	}

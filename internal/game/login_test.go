@@ -140,6 +140,8 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterLoginDay(gw.Router, st)
 	RegisterHolidayConvert(gw.Router, st)
 	RegisterCrossArena(gw.Router, st)
+	RegisterSweet(gw.Router, st)
+	RegisterSkinLottery(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

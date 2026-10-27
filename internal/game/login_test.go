@@ -132,6 +132,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterRank(gw.Router, st)
 	RegisterExpTask(gw.Router, st)
 	RegisterChatShare(gw.Router, st)
+	RegisterTicket(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

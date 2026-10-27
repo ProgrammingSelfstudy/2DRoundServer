@@ -35,7 +35,22 @@ var closedReplies = map[uint16]proto.Message{
 	// merge-server voting
 	10990: {"flag": 0, "cmd": 0, "img": ""},
 	10991: {"status": 0, "is_vote": 0, "flag": 0, "last_time": 0},
-	24950: {},
+	24950: {}, 10342: {},
+	// plays of the client whose rules are not in the client package (see OPEN_QUESTIONS): the window opens empty or closed
+	11041: {"like": 0, "like_num": 0, "partner_comments": []proto.Message{}},
+	11070: {"partner_bid": 0, "partner_score": []proto.Message{}, "stronger_partner_score": []proto.Message{}},
+	11330: {"quality": 0, "luck": 0, "end_count": 0, "ref_count": 0, "day_gold_count": 0, "flag": 0},
+	13601: {"flag": 0, "msg": "活动未开启", "period": 0, "charge": 0, "cur_day": 0, "num": 0, "end_time": 0, "welfare_list": []proto.Message{}, "grow_list": []proto.Message{}},
+	16630: {"code": 1, "items": []proto.Message{}}, // the download reward is told as taken: the icon goes
+	16653: {"is_buy": 0, "end_time": 0, "charge_id": 0, "award_list": []proto.Message{}},
+	20700: {"num": 0, "time": 0}, 20701: {"list": []proto.Message{}}, 20703: {"pos": 0, "list": []proto.Message{}}, 20706: {"is_show": 0},
+	23507: {"free_ids": []proto.Message{}, "cells": []proto.Message{}}, 23508: {"item_base_id": 0, "price": 0}, 23509: {"refresh_time": 0, "data": []proto.Message{}},
+	24810: {"quest_list": []proto.Message{}, "camp_id": 0}, 24813: {"quest_list": []proto.Message{}, "camp_id": 0},
+	24815: {"quest_list": []proto.Message{}, "camp_id": 0}, 24817: {"quest_list": []proto.Message{}, "camp_id": 0},
+	25500: {"period": 0, "day_time": 0, "week_time": 0, "month_time": 0, "list": []proto.Message{}},
+	26521: {"camp_id": 0, "free_time": 0, "times": 0, "start_time": 0, "end_time": 0, "item_id": 0, "item_num": 0, "must_count": 0, "reward_list": []proto.Message{}, "award_list": []proto.Message{}},
+	28000: {"gifts": []proto.Message{}}, 28100: {"start_time": 0, "end_time": 0, "rsidue_gold": 0}, 28900: {"gift_list": []proto.Message{}},
+	10989: {"id": 0, "start_unixtime": 0}, 16666: {},
 }
 
 // closedRefusals are the requests that ask for something the closed play could give: they are told why not.
@@ -43,7 +58,17 @@ var closedRefusals = map[uint16]proto.Message{
 	27704: closedMsg("巅峰冠军赛未开启"), 26204: closedMsg("跨服冠军赛未开启"),
 	21401: closedMsg("战场未开启"), 21403: {"code": 0}, 21421: closedMsg("战场未开启"), 21427: closedMsg("战场未开启"),
 	10992: closedMsg("没有进行中的合服投票"), 10993: closedMsg("没有进行中的合服投票"),
-	20204: closedMsg("暂不能查看"), 23203: {"code": 0, "msg": "暂未开放", "is_share": 0, "is_day_share": 0}, 23304: closedMsg("暂未开放"),
+	20204: closedMsg("暂不能查看"),
+	11042: closedMsg("图鉴评论暂未开放"), 11043: closedMsg("图鉴评论暂未开放"), 11044: closedMsg("图鉴评论暂未开放"), 11047: closedMsg("图鉴暂未开放"),
+	11071: closedMsg("限时重生暂未开放"), 11072: closedMsg("限时重生暂未开放"), 11074: closedMsg("限时重生暂未开放"),
+	11331: closedMsg("占卜暂未开放"), 11332: closedMsg("占卜暂未开放"), 11333: closedMsg("暂时不能分享录像"), 13602: closedMsg("活动未开启"),
+	16654: closedMsg("活动未开启"), 16665: closedMsg("活动未开启"), 16695: closedMsg("活动未开启"), 20702: closedMsg("霸气修炼暂未开放"),
+	21009: closedMsg("暂未开放"), 16631: closedMsg("没有可领取的下载奖励"), 10971: closedMsg("暂未开放"), 26809: closedMsg("暂未开放"),
+	23504: closedMsg("交易行暂未开放"), 23505: closedMsg("交易行暂未开放"), 23506: closedMsg("交易行暂未开放"), 23511: closedMsg("交易行暂未开放"),
+	23512: closedMsg("交易行暂未开放"), 23513: closedMsg("交易行暂未开放"), 23514: closedMsg("交易行暂未开放"),
+	24812: closedMsg("活动未开启"), 24814: closedMsg("活动未开启"), 24816: closedMsg("活动未开启"), 24818: closedMsg("活动未开启"),
+	26522: closedMsg("活动未开启"), 26523: closedMsg("活动未开启"), 26530: closedMsg("暂未开放"), 27916: closedMsg("活动未开启"),
+	28101: closedMsg("活动未开启"), 28102: closedMsg("活动未开启"), 28103: closedMsg("活动未开启"), 23203: {"code": 0, "msg": "暂未开放", "is_share": 0, "is_day_share": 0}, 23304: closedMsg("暂未开放"),
 }
 
 type peakFormations struct {

@@ -193,6 +193,22 @@ func RegisterArenaChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub)
 		}
 		return rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
+	r.Handle(20250, func(s *gateway.Session, _ proto.Message) error { // the client asks at login; the tick would tell it in a few seconds
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		c.mu.Lock()
+		stt, _, err := c.load(role.SrvID, c.now())
+		if err != nil {
+			c.mu.Unlock()
+			return err
+		}
+		base := c.baseInfo(stt, c.now(), 0)
+		c.mu.Unlock()
+		c.pushBase(s, base, champSnapshot(base))
+		return nil
+	})
 	r.Handle(20251, c.roleInfo)
 	r.Handle(20252, c.myMatch)
 	r.Handle(20253, c.guessMatch)

@@ -511,3 +511,24 @@ func TestLimitGifts(t *testing.T) {
 		t.Fatalf("after buying: %v", r)
 	}
 }
+
+func TestLimitGiftOnLevelUp(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("lg2", "升级人")
+	o, err := CreateChargeOrder(e.st, role, 3, actNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.SetRoleLevel(role.RID, 50); err != nil { // the level went up since the session began
+		t.Fatal(err)
+	}
+	c.send(21001, proto.Message{"id": 1}) // any answer that pushes the resources notices the new level
+	c.waitFor(21001)
+	if push := c.waitFor(21211); push.Int("id") != 10 {
+		t.Fatalf("21211: %v", push)
+	}
+}

@@ -159,7 +159,10 @@ func sendAssets(s *gateway.Session, st *store.Store, rid int64) error {
 		if err := s.Send(10344, proto.Message{"old_lev": old, "lev": fresh.Lev}); err != nil {
 			return err
 		}
-		return pushLevelFeats(s, st, rid, fresh.Lev)
+		if err := pushLevelFeats(s, st, rid, fresh.Lev); err != nil {
+			return err
+		}
+		return offerLimitGifts(s, st, rid, int64(fresh.Lev), 0, s.Now()) // a level that opens a limited gift
 	}
 	return nil
 }

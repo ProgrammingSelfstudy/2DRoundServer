@@ -155,15 +155,20 @@ func CheckLimitGifts(s *gateway.Session, st *store.Store, now time.Time) error {
 	for _, p := range ps {
 		star = max(star, int64(p.Star))
 	}
+	return offerLimitGifts(s, st, role.RID, int64(fresh.Lev), star, now)
+}
+
+// offerLimitGifts offers the gifts that a level and a best hero star reach, and tells the client.
+func offerLimitGifts(s *gateway.Session, st *store.Store, rid, lev, star int64, now time.Time) error {
 	d := &limitGiftState{}
-	if _, err := st.LoadState(role.RID, limitGiftModule, d); err != nil {
+	if _, err := st.LoadState(rid, limitGiftModule, d); err != nil {
 		return err
 	}
-	ids := d.trigger(int64(fresh.Lev), star, now.Unix())
+	ids := d.trigger(lev, star, now.Unix())
 	if len(ids) == 0 {
 		return nil
 	}
-	if err := st.SaveState(role.RID, limitGiftModule, d); err != nil {
+	if err := st.SaveState(rid, limitGiftModule, d); err != nil {
 		return err
 	}
 	for _, id := range ids {

@@ -126,6 +126,40 @@ func rankRow(e rankEntry, srvID string, idx int) proto.Message {
 		"face_update_time": 0, "face_file": ""}
 }
 
+// guildRanking lists the guilds of a server by power, the sum of the powers of their members'
+// five strongest heroes each (our policy; the client does not say), ties by level then id.
+func guildRanking(st *store.Store, srvID string) ([]store.GuildRow, map[int64]int64, error) {
+	guilds, _, err := st.GuildsOf(srvID, "", 1, rankMaxLen*10)
+	if err != nil {
+		return nil, nil, err
+	}
+	heroes, err := st.PartnersOfServer(srvID)
+	if err != nil {
+		return nil, nil, err
+	}
+	power := map[int64]int64{}
+	for _, g := range guilds {
+		members, err := st.MembersOf(g.GID)
+		if err != nil {
+			return nil, nil, err
+		}
+		for _, m := range members {
+			power[g.GID] += rolePower(heroes[m.RID])
+		}
+	}
+	sort.SliceStable(guilds, func(i, j int) bool {
+		a, b := guilds[i], guilds[j]
+		if power[a.GID] != power[b.GID] {
+			return power[a.GID] > power[b.GID]
+		}
+		return a.Lev > b.Lev
+	})
+	if len(guilds) > rankMaxLen {
+		guilds = guilds[:rankMaxLen]
+	}
+	return guilds, power, nil
+}
+
 // RegisterRank registers the rankings: 12900 (a list), 12901 (when it was last
 // refreshed) and 12902 (the first place of each ranking). Only the campaign, star tower, arena and
 // power rankings of the role's own server are filled; any other type is an empty list.
@@ -156,6 +190,50 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		return s.Send(12900, proto.Message{"is_cluster": 0, "type": typ, "start": start, "num": len(rows), "len": len(list),
 			"time": s.Now().Unix(), "my_idx": myIdx, "lev": role.Lev, "face_id": role.FaceID, "avatar_bid": 0, "name": role.Name,
 			"my_val1": myVal, "my_val2": 0, "my_val3": 0, "rank_list": rows})
+	})
+	r.Handle(12903, func(s *gateway.Session, req proto.Message) error {
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		list, power, err := guildRanking(st, role.SrvID)
+		if err != nil {
+			return err
+		}
+		var mine *store.Guild
+		if gd, _, err := st.GuildOfRole(role.RID); err != nil {
+			return err
+		} else {
+			mine = gd
+		}
+		start, num := req.Int("start"), req.Int("num")
+		if start < 1 {
+			start = 1
+		}
+		out := proto.Message{"start": start, "len": len(list), "time": s.Now().Unix(), "my_idx": 0,
+			"gname": "", "leader_name": "", "glev": 0, "power": 0}
+		rows := []proto.Message{}
+		for i, x := range list {
+			if mine != nil && x.GID == mine.GID {
+				out["my_idx"], out["gname"], out["leader_name"], out["glev"], out["power"] = i+1, x.Name, x.LeaderName, x.Lev, power[x.GID]
+			}
+			if int64(i+1) < start || int64(len(rows)) >= num {
+				continue
+			}
+			leader, err := st.RoleByID(x.LeaderRID)
+			if err != nil {
+				return err
+			}
+			row := proto.Message{"name": x.Name, "lev": x.Lev, "members_num": x.Members, "members_max": guildCapacity(x.Lev),
+				"leader_name": x.LeaderName, "power": power[x.GID], "idx": i + 1, "leader_rid": x.LeaderRID, "leader_srvid": x.SrvID,
+				"leader_face": 0, "leader_lev": 0, "leader_avatar_bid": 0, "leader_look_id": 0, "leader_face_update_time": 0, "leader_face_file": ""}
+			if leader != nil {
+				row["leader_face"], row["leader_lev"] = leader.FaceID, leader.Lev
+			}
+			rows = append(rows, row)
+		}
+		out["num"], out["rank_list"] = len(rows), rows
+		return s.Send(12903, out)
 	})
 	r.Handle(12901, func(s *gateway.Session, req proto.Message) error {
 		return s.Send(12901, proto.Message{"is_cluster": 0, "type": req.Int("type"), "time": s.Now().Unix()})

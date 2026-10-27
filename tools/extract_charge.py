@@ -11,16 +11,17 @@ from luadump import dump
 
 lua_dir, out_json = sys.argv[1:3]
 K = "Config.ChargeData."
-m = dump(lua_dir, "charge_data.lua", [K + "data_charge_data", K + "data_charge_reward_data", K + "data_first_charge_data"])
+m = dump(lua_dir, "charge_data.lua", [K + "data_charge_data", K + "data_charge_reward_data", K + "data_first_charge_data", K + "data_new_first_charge_data", K + "data_first_charge_lwt_data", K + "data_new_first_charge_data3"])
 d = m[K + "data_charge_data"]
 rows = list(d.values()) if isinstance(d, dict) else d
 out = {"source": "restored client charge_data.lua",
        "products": [{"id": r["id"], "name": r["name"], "val": r["val"], "gold": r["gold"], "add": r["add"], "first_add": r["first_add"], "items": r["items"],
                      "vip_exp": r["vip_exp"], "type": r["type"], "sort": r["sort"], "pic": r["pic"]} for r in sorted(rows, key=lambda r: r["id"])]}
 out["acc"] = [{"id": r["id"], "sum": r["charge_sum"], "items": r["item_list"]} for r in sorted(m[K + "data_charge_reward_data"], key=lambda r: r["id"])]
-# the first top-up gifts (21000/21001): fid 1 and 2 are the two tiers, each with three days (id 1~3 and 4~6)
-fd = m[K + "data_first_charge_data"]
-out["first"] = [{"id": r["id"], "fid": r["fid"], "day": r["day"], "need_exp": r["need_exp"], "items": r["item_list"]}
+# the first top-up gifts (21000/21001 first, 21012~21014 first_new, 21030/21031 first_lwt, 21032/21033 first_3): fid 1 and 2 are the two tiers, each with three days (id 1~3 and 4~6)
+for key, table in [("first", "data_first_charge_data"), ("first_new", "data_new_first_charge_data"), ("first_lwt", "data_first_charge_lwt_data"), ("first_3", "data_new_first_charge_data3")]:
+    fd = m[K + table]
+    out[key] = [{"id": r["id"], "fid": r["fid"], "day": r["day"], "need_exp": r["need_exp"], "items": r["item_list"]}
                 for r in sorted(fd.values() if isinstance(fd, dict) else fd, key=lambda r: r["id"])]
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

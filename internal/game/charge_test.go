@@ -282,3 +282,60 @@ func TestFirstChargeGifts(t *testing.T) {
 		t.Fatalf("day 3 before day 2: %v", r)
 	}
 }
+
+func TestFirstChargeWindows(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("fc2", "首充二")
+	c.send(21012, proto.Message{})
+	if r := c.waitFor(21012); r.Int("choosen_status") != 0 || len(r.Arr("first_gift")) != 6 {
+		t.Fatalf("21012 before: %v", r)
+	}
+	c.send(21014, proto.Message{"id": 1})
+	if r := c.waitFor(21014); r.Int("code") != 0 {
+		t.Fatalf("choose before paying: %v", r)
+	}
+	o, err := CreateChargeOrder(e.st, role, 3, actNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	c.send(21012, proto.Message{})
+	if r := c.waitFor(21012); r.Int("choosen_status") != 1 || r.Arr("first_gift")[0].Int("status") != 1 {
+		t.Fatalf("21012 paid: %v", r)
+	}
+	c.send(21014, proto.Message{"id": 2})
+	if r := c.waitFor(21014); r.Int("code") != 1 {
+		t.Fatalf("choose: %v", r)
+	}
+	c.waitFor(11001)
+	if r := c.waitFor(21012); r.Int("choosen_status") != 2 || r.Int("has_choosen_id") != 2 {
+		t.Fatalf("after the choice: %v", r)
+	}
+	ps, _ := e.st.PartnersOf(role.RID)
+	found := false
+	for _, p := range ps {
+		found = found || p.BID == 30506
+	}
+	if !found {
+		t.Fatalf("the hero was not given: %v", ps)
+	}
+	c.send(21014, proto.Message{"id": 1})
+	if r := c.waitFor(21014); r.Int("code") != 0 {
+		t.Fatalf("a second choice: %v", r)
+	}
+	c.send(21013, proto.Message{"id": 1})
+	if r := c.waitFor(21013); r.Int("code") != 1 {
+		t.Fatalf("21013: %v", r)
+	}
+	c.send(21030, proto.Message{})
+	if r := c.waitFor(21030); r.Arr("first_gift")[0].Int("status") != 1 {
+		t.Fatalf("21030: %v", r)
+	}
+	c.send(21032, proto.Message{}) // 10000 experience asked: 6 yuan is not enough
+	if r := c.waitFor(21032); r.Arr("first_gift")[0].Int("status") != 0 {
+		t.Fatalf("21032: %v", r)
+	}
+}

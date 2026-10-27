@@ -98,3 +98,62 @@ func (s *Store) SavePartnerChange(rid, partnerID int64) (*Partner, error) {
 	}
 	return s.PartnerByID(rid, newID)
 }
+
+// ConvertPartner turns a hero into another base id and deletes the consumed heroes, in one
+// transaction: like a saved swap the result is a new hero with a new partner id (level, star,
+// break step, worn equipment and formation places stay), the consumed heroes' equipment goes back to
+// the bag, the cost is taken and the gains are paid. ErrConflict, changing nothing, when a hero
+// is not the role's, or the role cannot pay.
+func (s *Store) ConvertPartner(rid, partnerID, newBID int64, consumed []int64, spendA, spendI, gainA, gainI map[int64]int64) (*Partner, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	for _, id := range consumed {
+		if id == partnerID {
+			return nil, ErrConflict
+		}
+		if err := releaseEquipsTx(tx, rid, id); err != nil {
+			return nil, err
+		}
+		res, err := tx.Exec(`DELETE FROM partners WHERE partner_id=? AND rid=?`, id, rid)
+		if err != nil {
+			return nil, err
+		}
+		if n, _ := res.RowsAffected(); n == 0 {
+			return nil, ErrConflict
+		}
+	}
+	res, err := tx.Exec(`INSERT INTO partners(rid,bid,lev,star,break_lev,created_at)
+		SELECT rid,?,lev,star,break_lev,created_at FROM partners WHERE partner_id=? AND rid=?`, newBID, partnerID, rid)
+	if err != nil {
+		return nil, err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, ErrConflict
+	}
+	newID, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	if _, err := tx.Exec(`UPDATE hero_equips SET partner_id=? WHERE partner_id=?`, newID, partnerID); err != nil {
+		return nil, err
+	}
+	if _, err := tx.Exec(`UPDATE formation_slots SET partner_id=? WHERE rid=? AND partner_id=?`, newID, rid, partnerID); err != nil {
+		return nil, err
+	}
+	if _, err := tx.Exec(`DELETE FROM partners WHERE partner_id=? AND rid=?`, partnerID, rid); err != nil {
+		return nil, err
+	}
+	if err := spendTx(tx, rid, spendA, spendI); err != nil {
+		return nil, err
+	}
+	if err := creditTx(tx, rid, gainA, gainI); err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return s.PartnerByID(rid, newID)
+}

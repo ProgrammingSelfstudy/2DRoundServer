@@ -538,13 +538,13 @@ func TestUnknownCommandsAndBadSignatureAreSurvivable(t *testing.T) {
 	_, tok := e.account("u1")
 	c := e.dial(true)
 	// a command with a send schema but no handler, then a mismatching 1197
-	c.send(23304, proto.Message{}) // title composing: not implemented yet
+	c.send(10200, proto.Message{}) // a scene command: not implemented
 	c.send(1164, loginArgs("u1", tok), true)
 	if r := c.recv(1164); r.Int("code") != 1 {
 		t.Fatalf("login after unknown command / bad signature: %v", r)
 	}
 	logs := e.logs.String()
-	if !strings.Contains(logs, "cmd 23304: no handler") || !strings.Contains(logs, "cmd 1164: 1197 signature mismatch") {
+	if !strings.Contains(logs, "cmd 10200: no handler") || !strings.Contains(logs, "cmd 1164: 1197 signature mismatch") {
 		t.Fatalf("expected both events to be logged:\n%s", logs)
 	}
 }

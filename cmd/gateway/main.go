@@ -135,6 +135,7 @@ func main() {
 		game.RegisterWelfare(gw.Router, st)
 		game.RegisterLoginDay(gw.Router, st)
 		game.RegisterHolidayConvert(gw.Router, st)
+		game.RegisterCrossArena(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

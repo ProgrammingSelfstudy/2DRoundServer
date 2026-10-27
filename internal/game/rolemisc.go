@@ -14,6 +14,11 @@ import (
 // klbLabel is the asset label of "klb" (10303); the ledger holds it like any currency.
 const klbLabel = 41
 
+// worshipKey is the counter of one worship of a role by a role on a day, per kind.
+func worshipKey(day, kind, rid int64) string {
+	return worshipPerDay + strconv.FormatInt(day, 10) + "_" + strconv.FormatInt(kind, 10) + "_" + strconv.FormatInt(rid, 10)
+}
+
 const (
 	worshipPerDay  = "worship_"       // counters key prefix: one worship of a role per day and kind
 	worshipGot     = "worship_got"    // how many times the role was worshipped
@@ -92,7 +97,7 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		key := worshipPerDay + strconv.FormatInt(dayKey(s.Now()), 10) + "_" + strconv.FormatInt(kind, 10) + "_" + strconv.FormatInt(rid, 10)
+		key := worshipKey(dayKey(s.Now()), kind, rid)
 		if n, err := st.Counter(role.RID, key); err != nil {
 			return err
 		} else if n > 0 {
@@ -110,6 +115,18 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 		}
 		if _, err := st.AddCounter(rid, worshipGot, 1); err != nil {
 			return err
+		}
+		if kind == worshipCrossArena { // the honour list of the cross-server arena pays for it
+			ga, gi := map[int64]int64{}, map[int64]int64{}
+			like := caCfg.pair("like_reward")
+			splitGains([]sellGain{{like[0], like[1]}}, 1, ga, gi)
+			if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
+				return err
+			}
+			if err := reply(1, "膜拜成功"); err != nil {
+				return err
+			}
+			return sendAssets(s, st, role.RID)
 		}
 		return reply(1, "膜拜成功")
 	})

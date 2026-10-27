@@ -151,3 +151,70 @@ func TestAccumulatedTopUp(t *testing.T) {
 		t.Fatalf("twice: %v", r)
 	}
 }
+
+func TestMonthCards(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("mc1", "月卡人")
+	c.send(16705, proto.Message{})
+	r := c.waitFor(16705)
+	if r.Int("card2_is_reward") != 0 || r.Int("card2_acc") != 0 || r.Int("card1_is_reward") != 0 {
+		t.Fatalf("before: %v", r)
+	}
+	c.send(16706, proto.Message{"card_type": 2})
+	if r := c.waitFor(16706); r.Int("code") != 0 {
+		t.Fatalf("take without a card: %v", r)
+	}
+	pay := func(id int64) {
+		t.Helper()
+		o, err := CreateChargeOrder(e.st, role, id, actNow)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+			t.Fatal(err)
+		}
+	}
+	pay(3) // 6 yuan
+	c.send(16705, proto.Message{})
+	if r := c.waitFor(16705); r.Int("card2_acc") != 6 || r.Int("card2_is_reward") != 0 {
+		t.Fatalf("6 yuan: %v", r)
+	}
+	pay(4) // 30 yuan more: 36, the card of 30 is on
+	c.send(16705, proto.Message{})
+	r = c.waitFor(16705)
+	if r.Int("card2_is_reward") != 1 || r.Int("card1_is_reward") != 0 || r.Int("card2_end_time") != dayStart(actNow).Unix()+30*86400 {
+		t.Fatalf("the card is on: %v", r)
+	}
+	c.send(16707, proto.Message{})
+	if r := c.waitFor(16707); r.Int("status") != 1 {
+		t.Fatalf("16707: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(16706, proto.Message{"card_type": 2})
+	if r := c.waitFor(16706); r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	if w := c.waitFor(16705); w.Int("card2_is_reward") != 2 || w.Int("card2_days") != 1 {
+		t.Fatalf("after the take: %v", w)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+120 {
+		t.Fatalf("diamonds %d -> %d", before[3], after[3])
+	}
+	c.send(16706, proto.Message{"card_type": 2})
+	if r := c.waitFor(16706); r.Int("code") != 0 {
+		t.Fatalf("twice a day: %v", r)
+	}
+	// the next day again; after 30 days the run is over and the paid sum counts from the activation
+	e.setNow(actNow.Add(24 * time.Hour))
+	c.send(16708, proto.Message{})
+	if r := c.waitFor(16708); r.Int("code") != 1 {
+		t.Fatalf("16708 the next day: %v", r)
+	}
+	c.waitFor(16705)
+	e.setNow(actNow.Add(31 * 24 * time.Hour))
+	c.send(16705, proto.Message{})
+	if r := c.waitFor(16705); r.Int("card2_is_reward") != 0 || r.Int("card2_acc") != 0 {
+		t.Fatalf("after the run: %v", r)
+	}
+}

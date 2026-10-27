@@ -8,20 +8,13 @@ import (
 
 // RegisterWelfare registers the welfare window's paid and account parts as the state of a
 // player who bought and bound nothing, since there is no payment, phone or wechat here:
-// 16705 / 16706 the two month cards (none bought, taking is refused), 21002 the recharge
+// (16705 / 16706 the month cards are monthcard.go) 21002 the recharge
 // count (0), 21007 the week / month gift panel (when it renews and how old the role is; the
 // gifts are bought), 21008 the daily award (not open), 24703 the red dots (none), 10987 the
 // subscription red dot (none), 16633 / 16634 / 16635 / 16636 the wechat and phone binding
 // (told as done, so the window does not nag; a new binding is refused) and 24600-24604 the
 // survey (not open). The sign-in (14100, 14101) is checkin.go.
 func RegisterWelfare(r *gateway.Router, st *store.Store) {
-	r.Handle(16705, func(s *gateway.Session, _ proto.Message) error {
-		return s.Send(16705, proto.Message{"card1_is_reward": 0, "card1_end_time": 0, "card1_days": 0, "card1_acc": 0,
-			"card2_is_reward": 0, "card2_end_time": 0, "card2_days": 0, "card2_acc": 0})
-	})
-	r.Handle(16706, func(s *gateway.Session, req proto.Message) error {
-		return s.Send(16706, proto.Message{"code": 0, "msg": "还没有购买月卡", "card_type": req.Int("card_type")})
-	})
 	r.Handle(21002, func(s *gateway.Session, _ proto.Message) error { return s.Send(21002, proto.Message{"count": 0}) })
 	r.Handle(21007, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()

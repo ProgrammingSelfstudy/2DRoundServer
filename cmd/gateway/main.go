@@ -147,6 +147,7 @@ func main() {
 		game.RegisterRankReward(gw.Router, st)
 		game.RegisterCharge(gw.Router, st, cfg.LoginHTTP.PublicBase)
 		game.RegisterChargeAcc(gw.Router, st)
+		game.RegisterMonthCard(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

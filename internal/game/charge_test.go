@@ -617,6 +617,7 @@ func TestDayCharge(t *testing.T) {
 	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+200 {
 		t.Fatalf("diamonds %d -> %d", before[3], after[3])
 	}
+	c.waitFor(21010) // the push after the take
 	// the next day it starts again
 	e.setNow(actNow.Add(24 * time.Hour))
 	c.send(21010, proto.Message{})

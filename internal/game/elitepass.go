@@ -42,17 +42,31 @@ var elitePassCfg = func() map[int64][]elitePassLev {
 }()
 
 type elitePassState struct {
-	Month int64 // the YYYYMM of the wins; a new month starts from nothing
+	Month int64 // the 30-day period of the wins (elitePassNow); a new period starts from nothing
 	Wins  int64
 	Levs  []int64 // the level rewards taken
 }
 
-// elitePassNow is the period (odd months 1, even months 2: our rule, the client table only numbers them), the day of the
-// month and the end of the month.
-func elitePassNow(now time.Time) (period, day, end, month int64) {
-	t := now.In(dayZone)
-	period = 2 - int64(t.Month())%2
-	return period, int64(t.Day()), time.Date(t.Year(), t.Month()+1, 1, 0, 0, 0, 0, dayZone).Unix(), int64(t.Year()*100 + int(t.Month()))
+// elitePassStart is the first day of the period the original server showed on 2026-10-26 (capture original-2026-10-26:
+// period 2, cur_day 16, end 2026-11-10 00:00); a period is 30 days and the two tables of the client take turns.
+var elitePassStart = time.Date(2026, time.October, 11, 0, 0, 0, 0, dayZone)
+
+const elitePassDays = 30
+
+// elitePassNow is the period (the tables alternate 2, 1, 2, ...), the day of the period (the first is 1) and its end. The
+// last value numbers the 30-day periods from the captured one, so a new period starts from nothing.
+func elitePassNow(now time.Time) (period, day, end, cycle int64) {
+	days := (now.Unix() - elitePassStart.Unix()) / 86400
+	if now.Before(elitePassStart) && (now.Unix()-elitePassStart.Unix())%86400 != 0 {
+		days-- // floor, not truncate toward zero
+	}
+	cycle = days / elitePassDays
+	if days%elitePassDays < 0 {
+		cycle--
+	}
+	day = days - cycle*elitePassDays + 1
+	end = elitePassStart.AddDate(0, 0, int(cycle+1)*elitePassDays).Unix()
+	return 2 - ((cycle%2)+2)%2, day, end, cycle
 }
 
 func loadElitePass(st *store.Store, rid int64, now time.Time) (*elitePassState, error) {
@@ -60,8 +74,8 @@ func loadElitePass(st *store.Store, rid int64, now time.Time) (*elitePassState, 
 	if _, err := st.LoadState(rid, elitePassModule, state); err != nil {
 		return nil, err
 	}
-	if _, _, _, month := elitePassNow(now); state.Month != month {
-		*state = elitePassState{Month: month}
+	if _, _, _, cycle := elitePassNow(now); state.Month != cycle {
+		*state = elitePassState{Month: cycle}
 	}
 	return state, nil
 }

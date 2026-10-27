@@ -155,6 +155,9 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		if err := sendAssets(s, st, role.RID); err != nil {
 			return err
 		}
-		return sendBackpack(s, st)
+		if err := sendBackpack(s, st); err != nil {
+			return err
+		}
+		return CheckLimitGifts(s, st, s.Now()) // a star that opens a limited gift
 	})
 }

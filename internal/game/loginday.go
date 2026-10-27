@@ -99,6 +99,11 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 			if role == nil {
 				return s.Send(cmd, proto.Message{"act_list": []proto.Message{}})
 			}
+			if cmd == 10922 { // asked once at login: the moment to offer the limited gifts the role reached
+				if err := CheckLimitGifts(s, st, s.Now()); err != nil {
+					return err
+				}
+			}
 			status, err := loginDayIconStatus(st, role.RID)
 			if err != nil {
 				return err

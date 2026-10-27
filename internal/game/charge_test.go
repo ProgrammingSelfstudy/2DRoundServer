@@ -462,3 +462,52 @@ func TestMonthFund(t *testing.T) {
 		t.Fatalf("buying again: %v", err)
 	}
 }
+
+func TestLimitGifts(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	old := chargeClock
+	chargeClock = func() time.Time { return actNow }
+	t.Cleanup(func() { chargeClock = old })
+	c, role := e.enter("lg1", "限时人")
+	c.send(21210, proto.Message{})
+	if r := c.waitFor(21210); len(r.Arr("gifts")) != 0 {
+		t.Fatalf("nothing is reached: %v", r)
+	}
+	if _, err := CreateChargeOrder(e.st, role, 211, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("a gift that is not offered: %v", err)
+	}
+	if err := e.st.SetRoleLevel(role.RID, 60); err != nil {
+		t.Fatal(err)
+	}
+	c.send(21210, proto.Message{})
+	if push := c.waitFor(21211); push.Int("id") != 10 { // level 60: the 48 gift, not 18 too
+		t.Fatalf("21211: %v", push)
+	}
+	r := c.waitFor(21210)
+	g := r.Arr("gifts")
+	if len(g) != 1 || g[0].Int("id") != 10 || g[0].Int("end_time") != actNow.Unix()+7200 {
+		t.Fatalf("21210: %v", r)
+	}
+	if _, err := CreateChargeOrder(e.st, role, 211, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("the passed 18 gift: %v", err)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	o, err := CreateChargeOrder(e.st, role, 212, actNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+680 || after[1] != before[1]+1000000 {
+		t.Fatalf("the gift: %v -> %v", before, after)
+	}
+	if _, err := CreateChargeOrder(e.st, role, 212, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("a second time: %v", err)
+	}
+	c.send(21210, proto.Message{})
+	if r := c.waitFor(21210); len(r.Arr("gifts")) != 0 {
+		t.Fatalf("after buying: %v", r)
+	}
+}

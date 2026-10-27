@@ -37,5 +37,8 @@ out["month_fund"] = {
     "funds": [{"id": r["id"], "charge_id": r["charge_id"], "name": r["name"]} for r in sorted(mf["Config.MonthFundData.data_fund_data"].values(), key=lambda r: r["id"])],
     "award": mf["Config.MonthFundData.data_fund_award"],
 }
+# the limited gifts (21210/21211): the client finds one by its place in the table, which is its id
+sg = dump(lua_dir, "star_gift_data.lua", ["Config.StarGiftData.data_limit_gift_table"])["Config.StarGiftData.data_limit_gift_table"]
+out["limit_gifts"] = [{"pos": i + 1, "id": r[0], "name": r[1], "kind": r[2], "cond": r[3], "items": r[4], "charge_id": r[5], "secs": r[6]} for i, r in enumerate(sg)]
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

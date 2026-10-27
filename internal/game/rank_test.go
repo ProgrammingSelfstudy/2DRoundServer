@@ -120,3 +120,17 @@ func TestRankingSnapshot(t *testing.T) {
 	}
 	_ = a
 }
+
+func TestRankPartner(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	c, role := e.enter("rp1", "最强英雄")
+	if ok, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: 10501, Star: 5}, {BID: 10503, Star: 5}}); err != nil || !ok {
+		t.Fatalf("heroes: %v %v", ok, err)
+	}
+	c.send(12904, proto.Message{"start": 0, "num": 100})
+	r := c.waitFor(12904)
+	rows := r.Arr("rank_list")
+	if len(rows) != 1 || rows[0].Int("rid") != role.RID || rows[0].Int("power") <= 0 || rows[0].Int("pbid") == 0 || r.Int("my_idx") != 1 {
+		t.Fatalf("12904: %v", r)
+	}
+}

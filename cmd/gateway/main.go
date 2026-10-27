@@ -157,6 +157,7 @@ func main() {
 		game.RegisterDayCharge(gw.Router, st)
 		game.RegisterTouchGold(gw.Router, st)
 		game.RegisterElement(gw.Router, st)
+		game.RegisterRankPartner(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

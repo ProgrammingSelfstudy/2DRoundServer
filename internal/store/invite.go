@@ -137,3 +137,15 @@ func (s *Store) ClaimInvite(rid, taskID, allowed int64, assets, items map[int64]
 	}
 	return tx.Commit()
 }
+
+// InviterOf is the role whose code the invitee entered; ErrNotFound when none was.
+func (s *Store) InviterOf(invitee int64) (*Role, error) {
+	var rid int64
+	switch err := s.db.QueryRow(`SELECT inviter_rid FROM invite_binds WHERE invitee_rid=?`, invitee).Scan(&rid); {
+	case err == sql.ErrNoRows:
+		return nil, ErrNotFound
+	case err != nil:
+		return nil, err
+	}
+	return s.RoleByID(rid)
+}

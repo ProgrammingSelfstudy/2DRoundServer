@@ -243,3 +243,41 @@ func TestInviteTableIsComplete(t *testing.T) {
 		}
 	}
 }
+
+func TestInviteReturnWindowAndInviter(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	ca, a := e.enter("a", "甲")
+	cb, b := e.enter("b", "乙")
+	cb.send(19807, proto.Message{})
+	if r := cb.recv(19807); r.Int("code") != 0 {
+		t.Fatalf("19807 before: %v", r)
+	}
+	bindCode(cb, myCode(ca))
+	ca.recv(19803)
+	cb.send(19807, proto.Message{})
+	if r := cb.recv(19807); r.Int("code") != 1 || r.Int("rid") != a.RID || r.Str("name") != "甲" {
+		t.Fatalf("19807: %v", r)
+	}
+	e.invite.Metrics = func(rid int64) (int64, int64) {
+		if rid == b.RID {
+			return 120000, 0
+		}
+		return 0, 0
+	}
+	ca.send(19811, proto.Message{})
+	r := ca.recv(19811)
+	l := r.Arr("list")
+	if len(l) != 7 || l[0].Int("num") != 1 || l[1].Int("num") != 1 || l[2].Int("num") != 0 {
+		t.Fatalf("19811: %v", r)
+	}
+	ca.send(19812, proto.Message{"id": 1})
+	if r := ca.recv(19812); r.Int("code") != 1 || r.Int("had") != 1 {
+		t.Fatalf("19812: %v", r)
+	}
+	ca.recv(10302)
+	ca.recv(10500)
+	ca.send(19812, proto.Message{"id": 9}) // a step of the VIP kind is not in this window
+	if r := ca.recv(19812); r.Int("code") != 0 {
+		t.Fatalf("19812 out of the window: %v", r)
+	}
+}

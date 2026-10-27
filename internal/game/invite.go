@@ -41,6 +41,18 @@ const maxInvitees = 20
 // them, cannot be reached until there are.
 type InviteMetrics func(rid int64) (power, vip int64)
 
+// InviteMetricsOf gives the invite rewards the power (of the best five heroes, as the lists show it) and VIP level of a role.
+func InviteMetricsOf(st *store.Store) InviteMetrics {
+	return func(rid int64) (int64, int64) {
+		r, err := st.RoleByID(rid)
+		if err != nil || r == nil {
+			return 0, 0
+		}
+		heroes, _ := st.PartnersOf(rid)
+		return rolePower(heroes), int64(r.VIPLev)
+	}
+}
+
 // InviteService implements invite codes: a role's own code (19800), entering
 // someone else's (19801), the list of invited roles (19802, pushed on a new
 // one as 19803), and the reward steps (19804 progress, 19805 claim). The return
@@ -58,7 +70,57 @@ func (v *InviteService) Register(r *gateway.Router) {
 	r.Handle(19801, v.bind)
 	r.Handle(19802, v.invitees)
 	r.Handle(19804, v.progress)
-	r.Handle(19805, v.claim)
+	r.Handle(19805, func(s *gateway.Session, req proto.Message) error { return v.claimAs(s, req, 19805) })
+	// the return window lists the seven "power" steps (the first seven of the table, which are the same rewards) and takes them the same way
+	r.Handle(19811, v.returnList)
+	r.Handle(19812, func(s *gateway.Session, req proto.Message) error {
+		if id := req.Int("id"); id < 1 || id > returnSteps {
+			return s.Send(19812, proto.Message{"code": 0, "msg": "奖励不存在", "id": id, "num": 0, "had": 0})
+		}
+		return v.claimAs(s, req, 19812)
+	})
+	r.Handle(19807, v.inviter)
+}
+
+// returnSteps is how many steps the return window has (data_return_list: the first seven steps).
+const returnSteps = 7
+
+// inviter (19807) tells the role who invited it, to offer that role as a chat friend; code 0 when nobody did.
+func (v *InviteService) inviter(s *gateway.Session, _ proto.Message) error {
+	me := s.Role()
+	if me == nil {
+		return nil
+	}
+	r, err := v.Store.InviterOf(me.RID)
+	switch {
+	case errors.Is(err, store.ErrNotFound):
+		return s.Send(19807, proto.Message{"code": 0, "rid": 0, "srv_id": "", "name": "", "lev": 0, "vip": 0, "online": 0, "power": 0, "face_id": 0, "avatar_bid": 0, "face_update_time": 0, "face_file": ""})
+	case err != nil:
+		return err
+	}
+	m := v.entry(r)
+	m["code"], m["avatar_bid"], m["face_update_time"], m["face_file"] = 1, 0, 0, ""
+	return s.Send(19807, m)
+}
+
+func (v *InviteService) returnList(s *gateway.Session, _ proto.Message) error {
+	me := s.Role()
+	if me == nil {
+		return nil
+	}
+	rs, err := v.Store.Invitees(me.RID)
+	if err != nil {
+		return err
+	}
+	had, err := v.Store.InviteClaims(me.RID)
+	if err != nil {
+		return err
+	}
+	list := []proto.Message{}
+	for _, t := range inviteTasks[:returnSteps] {
+		list = append(list, proto.Message{"id": t.ID, "num": claimable(v.reached(rs, t), t.Max), "had": had[t.ID]})
+	}
+	return s.Send(19811, proto.Message{"list": list})
 }
 
 func (v *InviteService) metrics(rid int64) (int64, int64) {
@@ -194,7 +256,7 @@ func (v *InviteService) progress(s *gateway.Session, _ proto.Message) error {
 	return s.Send(19804, proto.Message{"list": list})
 }
 
-func (v *InviteService) claim(s *gateway.Session, req proto.Message) error {
+func (v *InviteService) claimAs(s *gateway.Session, req proto.Message, cmd uint16) error {
 	me := s.Role()
 	if me == nil {
 		return nil
@@ -207,7 +269,7 @@ func (v *InviteService) claim(s *gateway.Session, req proto.Message) error {
 		}
 	}
 	reply := func(ok bool, msg string, num, had int64) error {
-		return s.Send(19805, proto.Message{"code": b2i(ok), "msg": msg, "id": id, "num": num, "had": had})
+		return s.Send(cmd, proto.Message{"code": b2i(ok), "msg": msg, "id": id, "num": num, "had": had})
 	}
 	if task == nil {
 		return reply(false, "奖励不存在", 0, 0)

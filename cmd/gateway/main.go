@@ -98,6 +98,7 @@ func main() {
 		game.RegisterArenateam(gw.Router, st, gw.Hub)
 		game.RegisterArenamany(gw.Router, st, gw.Hub)
 		game.RegisterBarrage(gw.Router)
+		game.RegisterGuildMarket(gw.Router, st, gw.Hub)
 		game.RegisterPetard(gw.Router, st, gw.Hub)
 		go game.WatchActivities(st, gw.Hub, 15*time.Second, time.Now, make(chan struct{}))
 		go game.RegisterArenaChampion(gw.Router, st, gw.Hub).Run(make(chan struct{}))

@@ -161,6 +161,7 @@ func main() {
 		game.RegisterActivityBox(gw.Router, st)
 		game.RegisterRecruitHero(gw.Router, st)
 		game.RegisterMergeGoal(gw.Router, st)
+		game.RegisterGuildWar(gw.Router, st, gw.Hub)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

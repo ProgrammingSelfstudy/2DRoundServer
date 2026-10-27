@@ -60,7 +60,20 @@ func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 	if _, err := st.LoadState(rid, chargeAccModule, d); err != nil {
 		return err
 	}
-	return s.Send(16712, proto.Message{"charge_sum": accSum(rc), "list": chargeAccList(rc, d)})
+	if err := s.Send(16712, proto.Message{"charge_sum": accSum(rc), "list": chargeAccList(rc, d)}); err != nil {
+		return err
+	}
+	// a fund that was just bought
+	fd := &monthFundState{}
+	if _, err := st.LoadState(rid, monthFundModule, fd); err != nil {
+		return err
+	}
+	for i := range monthFunds {
+		if err := s.Send(24701, monthFundMessage(fd, i, dayNo(s.Now()))); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // RegisterCharge registers the top-up side of the client: 16700 the tiers, 21016 whether a product can be bought and 10947 the

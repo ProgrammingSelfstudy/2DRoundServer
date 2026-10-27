@@ -150,6 +150,7 @@ func main() {
 		game.RegisterMonthCard(gw.Router, st)
 		game.RegisterFirstCharge(gw.Router, st)
 		game.RegisterCycleGifts(gw.Router, st)
+		game.RegisterMonthFund(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

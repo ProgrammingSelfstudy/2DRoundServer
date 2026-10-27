@@ -144,6 +144,9 @@ var (
 	ErrTooManyOpen = errors.New("too many orders wait for payment")
 )
 
+// errNotPayable makes a reason that is a kind of ErrNotPayable.
+func errNotPayable(why string) error { return fmt.Errorf("%w: %s", ErrNotPayable, why) }
+
 // maxOpenOrders is how many unpaid orders a role may hold at once.
 const maxOpenOrders = 5
 

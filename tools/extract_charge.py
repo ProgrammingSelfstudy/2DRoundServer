@@ -31,5 +31,11 @@ out["cycle"] = {
     "reward": [{"charge_id": r["charge_id"], "min": r["min"], "max": r["max"], "reg_min": r["reg_min"], "reg_max": r["reg_max"], "sort": r["sort_id"], "items": r["reward"]}
                for k, rows in sorted(mm["Config.MiscData.data_cycle_gift_reward"].items(), key=lambda kv: int(kv[0])) for r in rows],
 }
+# the month funds (24700~24702): the two funds with the charge they are bought by, and the 30 days of rewards of each reward group
+mf = dump(lua_dir, "month_fund_data.lua", ["Config.MonthFundData.data_fund_data", "Config.MonthFundData.data_fund_award"])
+out["month_fund"] = {
+    "funds": [{"id": r["id"], "charge_id": r["charge_id"], "name": r["name"]} for r in sorted(mf["Config.MonthFundData.data_fund_data"].values(), key=lambda r: r["id"])],
+    "award": mf["Config.MonthFundData.data_fund_award"],
+}
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

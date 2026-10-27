@@ -395,3 +395,70 @@ func TestCycleGifts(t *testing.T) {
 		t.Fatalf("next week: %v", err)
 	}
 }
+
+func TestMonthFund(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	old := chargeClock
+	chargeClock = func() time.Time { return actNow }
+	t.Cleanup(func() { chargeClock = old })
+	c, role := e.enter("mf1", "基金人")
+	c.send(24700, proto.Message{})
+	r := c.waitFor(24700)
+	if ids := r.Arr("ids"); len(ids) != 2 || ids[0].Int("id") != 101 || ids[0].Int("status") != 0 {
+		t.Fatalf("24700: %v", r)
+	}
+	c.send(24702, proto.Message{"id": 101})
+	if r := c.waitFor(24702); r.Int("code") != 0 {
+		t.Fatalf("take before buying: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	o, err := CreateChargeOrder(e.st, role, 102, actNow) // the 128 yuan fund
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+1280 {
+		t.Fatalf("the diamonds of the price: %d -> %d", before[3], after[3])
+	}
+	if _, err := CreateChargeOrder(e.st, role, 102, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("buying a running fund: %v", err)
+	}
+	c.send(24701, proto.Message{"id": 101})
+	r = c.waitFor(24701)
+	if r.Int("status") != 1 || r.Int("current_day") != 1 || r.Int("group_id") != 1 || r.Int("endtime") != dayStart(actNow).Unix()+30*86400 {
+		t.Fatalf("24701: %v", r)
+	}
+	mid, _ := e.st.RoleAssets(role.RID)
+	c.send(24702, proto.Message{"id": 101})
+	if r := c.waitFor(24702); r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	if r := c.waitFor(24701); r.Int("status") != 2 {
+		t.Fatalf("after the take: %v", r)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != mid[3]+400 { // day 1 of group 1 is 400 diamonds
+		t.Fatalf("day 1: %d -> %d", mid[3], after[3])
+	}
+	c.send(24702, proto.Message{"id": 101})
+	if r := c.waitFor(24702); r.Int("code") != 0 {
+		t.Fatalf("twice a day: %v", r)
+	}
+	e.setNow(actNow.Add(24 * time.Hour))
+	c.send(24701, proto.Message{"id": 101})
+	if r := c.waitFor(24701); r.Int("status") != 1 || r.Int("current_day") != 2 {
+		t.Fatalf("day 2: %v", r)
+	}
+	// after the 30 days it is over and can be bought again
+	e.setNow(actNow.Add(30 * 24 * time.Hour))
+	chargeClock = func() time.Time { return actNow.Add(30 * 24 * time.Hour) }
+	c.send(24701, proto.Message{"id": 101})
+	if r := c.waitFor(24701); r.Int("status") != 0 {
+		t.Fatalf("after 30 days: %v", r)
+	}
+	if _, err := CreateChargeOrder(e.st, role, 102, actNow); err != nil {
+		t.Fatalf("buying again: %v", err)
+	}
+}

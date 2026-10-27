@@ -113,7 +113,7 @@ func cycleRewardFor(chargeID int64, createdAt, now int64) ([][2]int64, bool) {
 }
 
 // ErrCycleLimit is the answer when a gift was bought as often as a cycle allows; it is a kind of ErrNotPayable.
-var ErrCycleLimit = fmt.Errorf("%w: bought as often as this cycle allows", ErrNotPayable)
+var ErrCycleLimit = errNotPayable("bought as often as this cycle allows")
 
 func init() {
 	for _, c := range cycleInfos {

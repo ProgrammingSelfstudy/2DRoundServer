@@ -699,3 +699,32 @@ func TestActivityBox(t *testing.T) {
 		t.Fatalf("the points of the day before: %v", after)
 	}
 }
+
+func TestRecruitHero(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("rh1", "新人")
+	c.send(25100, proto.Message{})
+	r := c.waitFor(25100)
+	q := r.Arr("quests")
+	if r.Int("state") != 0 || len(q) != 3 || q[0].Int("status") != 0 || q[1].Int("status") != 0 || r.Int("end_time") != dayStart(time.Unix(role.CreatedAt, 0)).AddDate(0, 0, 3).Unix() {
+		t.Fatalf("25100: %v", r)
+	}
+	c.send(25101, proto.Message{"id": 2})
+	if r := c.waitFor(25101); r.Int("code") != 0 {
+		t.Fatalf("early: %v", r)
+	}
+	e.setNow(time.Unix(role.CreatedAt, 0).Add(24 * time.Hour)) // the second day
+	c.send(25100, proto.Message{})
+	if r := c.waitFor(25100); r.Arr("quests")[1].Int("status") != 1 {
+		t.Fatalf("day 2: %v", r)
+	}
+	c.send(25101, proto.Message{"id": 2})
+	if r := c.waitFor(25101); r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	c.send(25101, proto.Message{"id": 0})
+	if r := c.waitFor(25101); r.Int("code") != 0 {
+		t.Fatalf("the final prize too early: %v", r)
+	}
+}

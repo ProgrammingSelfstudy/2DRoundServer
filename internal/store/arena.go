@@ -1,5 +1,10 @@
 package store
 
+import (
+	"database/sql"
+	"errors"
+)
+
 // ArenaPlayer is a role's standing in the arena.
 type ArenaPlayer struct {
 	RID, Score, Season, Battles, Day, FreeUsed, Bought, ContWin, RefTime, LogSeen int64
@@ -195,4 +200,13 @@ func (s *Store) ArenaLogs(rid int64) ([]ArenaLog, error) {
 		out = append(out, l)
 	}
 	return out, rows.Err()
+}
+
+// ArenaScoreOf reads a role's arena score without creating the standing; ok is false for a role that never entered.
+func (s *Store) ArenaScoreOf(rid int64) (score, battles int64, ok bool, err error) {
+	err = s.db.QueryRow(`SELECT score,battles FROM arena_players WHERE rid=?`, rid).Scan(&score, &battles)
+	if errors.Is(err, sql.ErrNoRows) {
+		return 0, 0, false, nil
+	}
+	return score, battles, err == nil, err
 }

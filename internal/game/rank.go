@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"sort"
 	"sync"
 
@@ -15,6 +16,10 @@ const (
 	rankTower = 3 // star tower: val1 is the highest floor
 	rankArena = 5 // arena: val1 is the score
 	rankPower = 6 // power: val1 is the power
+	// the views of the seven-day ranking (days_rank_data rank_type)
+	rankPartner  = 14 // the power of the strongest single hero
+	rankTreasure = 28 // lucky treasure draws
+	rankEndless  = 29 // endless trial: the highest round of any mode
 	// rankSweet (49) is the personal score of the sweet activity, sweet.go
 )
 
@@ -160,6 +165,22 @@ func ranking(st *store.Store, srvID string, typ int64) ([]rankEntry, error) {
 				out = append(out, rankEntry{r, row.val})
 			}
 		}
+	case rankPartner, rankTreasure, rankEndless:
+		vals, err := daysRankValues(st, srvID, typ, roles)
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range roles {
+			if v := vals[r.RID]; v > 0 {
+				out = append(out, rankEntry{r, v})
+			}
+		}
+		sort.SliceStable(out, func(i, j int) bool {
+			if out[i].val != out[j].val {
+				return out[i].val > out[j].val
+			}
+			return out[i].role.RID < out[j].role.RID
+		})
 	case rankSweet:
 		return sweetRanking(st, srvID, roles)
 	case rankSandybeach:
@@ -227,11 +248,9 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		myIdx, myVal := int64(0), int64(0)
-		for i, e := range list {
-			if e.role.RID == role.RID {
-				myIdx, myVal = int64(i+1), e.val
-			}
+		myIdx, myVal, err := rankSelf(st, role.RID, typ, list)
+		if err != nil {
+			return err
 		}
 		if start < 1 {
 			start = 1
@@ -318,4 +337,83 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		}
 		return s.Send(12902, proto.Message{"is_cluster": 0, "rank_list": out})
 	})
+}
+
+// rankLive is a role's value in a ranking right now (not from a snapshot) and whether it counts at all.
+func rankLive(st *store.Store, rid, typ int64) (int64, bool, error) {
+	switch typ {
+	case rankDrama:
+		d, err := st.Drama(rid)
+		if err != nil {
+			if errors.Is(err, store.ErrNotFound) {
+				return dramaChain.First, true, nil
+			}
+			return 0, false, err
+		}
+		if d.MaxDunID == 0 {
+			return dramaChain.First, true, nil
+		}
+		return d.MaxDunID, true, nil
+	case rankTower:
+		t, err := st.StarTowerOf(rid)
+		return t.MaxTower, t.MaxTower > 0, err
+	case rankArena:
+		score, _, ok, err := st.ArenaScoreOf(rid)
+		return score, ok, err
+	case rankPower:
+		heroes, err := st.PartnersOf(rid)
+		return rolePower(heroes), true, err
+	case rankPartner, rankTreasure, rankEndless:
+		v, err := daysRankLive(st, rid, typ)
+		return v, v > 0, err
+	}
+	return 0, false, nil
+}
+
+// rankBefore says whether value a is ahead of value b in a ranking (the campaign ranks by its place in the chain).
+func rankBefore(typ, a, b int64) bool {
+	if typ == rankDrama {
+		return dungeonIndex[a] > dungeonIndex[b]
+	}
+	return a > b
+}
+
+// rankSelf is the place and value of a role in a ranking: its value is read now and set against the snapshot's list,
+// so a fight shows at once. A role that was in the snapshot with the same value keeps its place; one that changed goes
+// behind those with an equal value (it arrived later). 0 when it is not within the list's length.
+func rankSelf(st *store.Store, rid, typ int64, list []rankEntry) (idx, val int64, err error) {
+	switch typ {
+	case rankDrama, rankTower, rankArena, rankPower, rankPartner, rankTreasure, rankEndless:
+	default: // a list that is not built from the roles' own state (the activities' scores): the list is the truth
+		for i, e := range list {
+			if e.role.RID == rid {
+				return int64(i + 1), e.val, nil
+			}
+		}
+		return 0, 0, nil
+	}
+	val, ok, err := rankLive(st, rid, typ)
+	if err != nil || !ok {
+		return 0, 0, err
+	}
+	ahead, same := int64(0), int64(0)
+	for i, e := range list {
+		if e.role.RID == rid {
+			if e.val == val {
+				return int64(i + 1), val, nil
+			}
+			continue
+		}
+		switch {
+		case rankBefore(typ, e.val, val):
+			ahead++
+		case e.val == val:
+			same++
+		}
+	}
+	idx = ahead + same + 1
+	if idx > rankMaxLen {
+		idx = 0
+	}
+	return idx, val, nil
 }

@@ -2,6 +2,7 @@ package game
 
 import (
 	"sort"
+	"sync"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -17,7 +18,54 @@ const (
 	// rankSweet (49) is the personal score of the sweet activity, sweet.go
 )
 
-const rankMaxLen = 100
+const (
+	rankMaxLen   = 100
+	rankSnapshot = 300 // seconds a list is served from its snapshot before it is built again
+)
+
+type rankKey struct {
+	st  *store.Store
+	srv string
+	typ int64
+}
+
+type rankSnap struct {
+	at   int64
+	list []rankEntry
+}
+
+var (
+	rankMu    sync.Mutex
+	rankSnaps = map[rankKey]*rankSnap{}
+)
+
+// rankingAt is the list of a type from its snapshot: built again when it is older than rankSnapshot seconds (the first
+// request after that pays for it; no timer), so a busy server does not scan every hero for each request. A settlement
+// that pays by rank (a season, the end of an event) calls ranking directly and so pays by the final standing.
+func rankingAt(st *store.Store, srvID string, typ int64, now int64) ([]rankEntry, error) {
+	rankMu.Lock()
+	defer rankMu.Unlock()
+	k := rankKey{st, srvID, typ}
+	if sn := rankSnaps[k]; sn != nil && now >= sn.at && now-sn.at < rankSnapshot {
+		return sn.list, nil
+	}
+	list, err := ranking(st, srvID, typ)
+	if err != nil {
+		return nil, err
+	}
+	rankSnaps[k] = &rankSnap{at: now, list: list}
+	return list, nil
+}
+
+// rankingTime is when the snapshot of a list was built, 0 for none.
+func rankingTime(st *store.Store, srvID string, typ int64) int64 {
+	rankMu.Lock()
+	defer rankMu.Unlock()
+	if sn := rankSnaps[rankKey{st, srvID, typ}]; sn != nil {
+		return sn.at
+	}
+	return 0
+}
 
 type rankEntry struct {
 	role store.RankRole
@@ -175,7 +223,7 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		typ, start, num := req.Int("type"), req.Int("start"), req.Int("num")
-		list, err := ranking(st, role.SrvID, typ)
+		list, err := rankingAt(st, role.SrvID, typ, s.Now().Unix())
 		if err != nil {
 			return err
 		}
@@ -193,7 +241,7 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 			rows = append(rows, rankRow(list[i], role.SrvID, i+1))
 		}
 		return s.Send(12900, proto.Message{"is_cluster": 0, "type": typ, "start": start, "num": len(rows), "len": len(list),
-			"time": s.Now().Unix(), "my_idx": myIdx, "lev": role.Lev, "face_id": role.FaceID, "avatar_bid": 0, "name": role.Name,
+			"time": rankingTime(st, role.SrvID, typ), "my_idx": myIdx, "lev": role.Lev, "face_id": role.FaceID, "avatar_bid": 0, "name": role.Name,
 			"my_val1": myVal, "my_val2": 0, "my_val3": 0, "rank_list": rows})
 	})
 	r.Handle(12903, func(s *gateway.Session, req proto.Message) error {
@@ -241,7 +289,14 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		return s.Send(12903, out)
 	})
 	r.Handle(12901, func(s *gateway.Session, req proto.Message) error {
-		return s.Send(12901, proto.Message{"is_cluster": 0, "type": req.Int("type"), "time": s.Now().Unix()})
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		if _, err := rankingAt(st, role.SrvID, req.Int("type"), s.Now().Unix()); err != nil {
+			return err
+		}
+		return s.Send(12901, proto.Message{"is_cluster": 0, "type": req.Int("type"), "time": rankingTime(st, role.SrvID, req.Int("type"))})
 	})
 	r.Handle(12902, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
@@ -250,7 +305,7 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		}
 		out := []proto.Message{}
 		for _, typ := range []int64{rankDrama, rankTower, rankArena, rankPower} {
-			list, err := ranking(st, role.SrvID, typ)
+			list, err := rankingAt(st, role.SrvID, typ, s.Now().Unix())
 			if err != nil {
 				return err
 			}

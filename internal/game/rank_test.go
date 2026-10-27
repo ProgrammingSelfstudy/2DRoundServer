@@ -91,3 +91,32 @@ func TestGuildRanking(t *testing.T) {
 		t.Fatalf("window: %v", w)
 	}
 }
+
+func TestRankingSnapshot(t *testing.T) {
+	e := newEnv(t, time.Hour)
+	e.setNow(actNow)
+	ca, a := e.enter("sa", "甲")
+	_, b := e.enter("sb", "乙")
+	ask := func() proto.Message {
+		ca.send(12900, proto.Message{"type": rankDrama, "start": 1, "num": 100})
+		return ca.recv(12900)
+	}
+	first := ask()
+	built := first.Int("time")
+	if built != actNow.Unix() {
+		t.Fatalf("snapshot time %d", built)
+	}
+	atDungeon(t, e, b.RID, 10050, false)
+	// inside the five minutes the list is the snapshot
+	e.setNow(actNow.Add(4 * time.Minute))
+	if r := ask(); r.Int("time") != built || r.Arr("rank_list")[0].Int("rid") == b.RID {
+		t.Fatalf("a snapshot was rebuilt too early: %v", r)
+	}
+	// after them the first request builds it again
+	e.setNow(actNow.Add(5 * time.Minute))
+	r := ask()
+	if r.Int("time") != actNow.Add(5*time.Minute).Unix() || r.Arr("rank_list")[0].Int("rid") != b.RID {
+		t.Fatalf("a snapshot was not rebuilt: %v", r)
+	}
+	_ = a
+}

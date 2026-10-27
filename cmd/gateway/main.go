@@ -155,6 +155,7 @@ func main() {
 		game.RegisterLoginInit(gw.Router, st)
 		game.RegisterOneCentGift(gw.Router, st)
 		game.RegisterDayCharge(gw.Router, st)
+		game.RegisterTouchGold(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

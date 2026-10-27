@@ -159,6 +159,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterLoginInit(gw.Router, st)
 	RegisterOneCentGift(gw.Router, st)
 	RegisterDayCharge(gw.Router, st)
+	RegisterTouchGold(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

@@ -625,3 +625,36 @@ func TestDayCharge(t *testing.T) {
 		t.Fatalf("next day: %v", r)
 	}
 }
+
+func TestTouchGold(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(dayStart(actNow).Add(10 * time.Hour)) // after the 9:00 refresh
+	c, role := e.enter("tg1", "点金手")
+	c.send(23606, proto.Message{})
+	r := c.waitFor(23606)
+	l := r.Arr("list")
+	if len(l) != 3 || l[0].Int("price") != 0 || l[1].Int("price") != 20 || l[0].Int("num") != 0 || r.Int("ref_time") != dayStart(actNow).Add(19*time.Hour).Unix() {
+		t.Fatalf("23606: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(23607, proto.Message{"id": 1})
+	if r := c.waitFor(23607); r.Int("code") != 1 {
+		t.Fatalf("free touch: %v", r)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[1] < before[1]+10000 {
+		t.Fatalf("coins %d -> %d", before[1], after[1])
+	}
+	c.send(23607, proto.Message{"id": 1})
+	if r := c.waitFor(23607); r.Int("code") != 0 {
+		t.Fatalf("twice: %v", r)
+	}
+	c.send(23607, proto.Message{"id": 3}) // 50 diamonds that the role does not have
+	if r := c.waitFor(23607); r.Int("code") != 0 {
+		t.Fatalf("no diamonds: %v", r)
+	}
+	e.setNow(dayStart(actNow).Add(19*time.Hour + time.Minute))
+	c.send(23606, proto.Message{})
+	if r := c.waitFor(23606); r.Arr("list")[0].Int("num") != 0 {
+		t.Fatalf("after the refresh: %v", r)
+	}
+}

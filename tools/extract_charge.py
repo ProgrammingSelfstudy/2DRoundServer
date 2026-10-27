@@ -23,5 +23,13 @@ for key, table in [("first", "data_first_charge_data"), ("first_new", "data_new_
     fd = m[K + table]
     out[key] = [{"id": r["id"], "fid": r["fid"], "day": r["day"], "need_exp": r["need_exp"], "items": r["item_list"]}
                 for r in sorted(fd.values() if isinstance(fd, dict) else fd, key=lambda r: r["id"])]
+# the weekly (gift_type 1) and monthly (2) gifts of the welfare window: what can be bought how often, and what each pays by the role's age
+mm = dump(lua_dir, "misc_data.lua", ["Config.MiscData.data_cycle_gift_info", "Config.MiscData.data_cycle_gift_reward"])
+out["cycle"] = {
+    "info": [{"type": i + 1, "charge_id": r["charge_id"], "limit": r["limit_count"], "sort": r["sort_id"]}
+             for i, grp in enumerate(mm["Config.MiscData.data_cycle_gift_info"]) for r in sorted(grp.values(), key=lambda r: r["charge_id"])],
+    "reward": [{"charge_id": r["charge_id"], "min": r["min"], "max": r["max"], "reg_min": r["reg_min"], "reg_max": r["reg_max"], "sort": r["sort_id"], "items": r["reward"]}
+               for k, rows in sorted(mm["Config.MiscData.data_cycle_gift_reward"].items(), key=lambda kv: int(kv[0])) for r in rows],
+}
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

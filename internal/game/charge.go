@@ -106,6 +106,14 @@ var chargeHooks = map[int64]ChargeHook{}
 // RegisterChargeHook makes a product payable and says how it is delivered.
 func RegisterChargeHook(id int64, h ChargeHook) { chargeHooks[id] = h }
 
+// chargeGuards say whether a product may be bought now (a gift limited by the cycle), asked when the order is opened.
+var chargeGuards = map[int64]func(st *store.Store, role *store.Role) error{}
+
+// RegisterChargeGuard adds a check to opening an order for a product; the error should be an ErrNotPayable.
+func RegisterChargeGuard(id int64, g func(st *store.Store, role *store.Role) error) {
+	chargeGuards[id] = g
+}
+
 // chargeGain is what a product pays out in diamonds and items; first says that the role never bought it before.
 func chargeGain(p ChargeProduct, first bool) (assets, items map[int64]int64) {
 	assets, items = map[int64]int64{}, map[int64]int64{}
@@ -152,6 +160,11 @@ func CreateChargeOrder(st *store.Store, role *store.Role, chargeID int64, now ti
 	}
 	if !ChargeDeliverable(p) {
 		return nil, ErrNotPayable
+	}
+	if g, ok := chargeGuards[chargeID]; ok {
+		if err := g(st, role); err != nil {
+			return nil, err
+		}
 	}
 	if n, err := st.PendingPayOrders(role.RID); err != nil {
 		return nil, err

@@ -339,3 +339,59 @@ func TestFirstChargeWindows(t *testing.T) {
 		t.Fatalf("21032: %v", r)
 	}
 }
+
+func TestCycleGifts(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	old := chargeClock
+	chargeClock = func() time.Time { return actNow }
+	t.Cleanup(func() { chargeClock = old })
+	c, role := e.enter("cg1", "礼包人")
+	c.send(21007, proto.Message{"type": 1})
+	r := c.waitFor(21007)
+	if len(r.Arr("first_gift")) != 5 || r.Arr("first_gift")[0].Int("id") != 401 || r.Arr("first_gift")[0].Int("count") != 0 || r.Int("ref_time") != leWeekEnd(actNow) {
+		t.Fatalf("21007 weekly: %v", r)
+	}
+	c.send(21007, proto.Message{"type": 2})
+	if r := c.waitFor(21007); len(r.Arr("first_gift")) != 7 {
+		t.Fatalf("21007 monthly: %v", r)
+	}
+	c.send(21016, proto.Message{"charge_id": 401})
+	if r := c.waitFor(21016); r.Int("status") != 1 {
+		t.Fatalf("21016: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	buy := func() error {
+		o, err := CreateChargeOrder(e.st, role, 401, actNow)
+		if err != nil {
+			return err
+		}
+		_, err = ConfirmChargeOrder(e.st, o.OrderNo, "t", "")
+		return err
+	}
+	if err := buy(); err != nil {
+		t.Fatal(err)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+300 {
+		t.Fatalf("diamonds %d -> %d", before[3], after[3])
+	}
+	c.send(21007, proto.Message{"type": 1})
+	if r := c.waitFor(21007); r.Arr("first_gift")[0].Int("count") != 1 {
+		t.Fatalf("after one: %v", r)
+	}
+	for i := 1; i < 10; i++ {
+		if err := buy(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, err := CreateChargeOrder(e.st, role, 401, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("the 11th: %v", err)
+	}
+	// the next week it is open again
+	next := actNow.Add(7 * 24 * time.Hour)
+	chargeClock = func() time.Time { return next }
+	e.setNow(next)
+	if err := buy(); err != nil {
+		t.Fatalf("next week: %v", err)
+	}
+}

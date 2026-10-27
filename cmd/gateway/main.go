@@ -144,6 +144,7 @@ func main() {
 		game.RegisterStoneShop(gw.Router, st)
 		game.RegisterTreasure(gw.Router, st)
 		game.RegisterDaysRank(gw.Router, st)
+		game.RegisterRankReward(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

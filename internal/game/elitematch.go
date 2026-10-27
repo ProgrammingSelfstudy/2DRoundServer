@@ -41,11 +41,16 @@ type eliteConf struct {
 		Cost [][2]int64 `json:"cost"`
 		Vip  int64      `json:"vip"`
 	} `json:"buy"`
+	RankReward []struct {
+		Min, Max, Limit int64
+		Award           [][2]int64
+	} `json:"rank_reward"`
+	Reset map[string]int64 `json:"reset"` // the rank a new season starts from, by the rank the old one ended on
 }
 
 var eliteCfg = func() *eliteConf {
 	c := &eliteConf{}
-	if err := json.Unmarshal(elitematchJSON, c); err != nil || len(c.Level) == 0 || len(c.Buy) == 0 {
+	if err := json.Unmarshal(elitematchJSON, c); err != nil || len(c.Level) == 0 || len(c.Buy) == 0 || len(c.RankReward) == 0 || len(c.Reset) != len(c.Level) {
 		panic("game: bad elitematch.json")
 	}
 	return c
@@ -238,6 +243,13 @@ func (e *eliteSvc) period(srv string, now time.Time) int64 {
 }
 
 func (e *eliteSvc) role(rid int64, now time.Time) (*eliteRole, error) {
+	srv := ""
+	if r, err := e.st.RoleByID(rid); err == nil {
+		srv = r.SrvID
+	}
+	if err := e.settleSeasons(srv, now); err != nil {
+		return nil, err
+	}
 	er := &eliteRole{}
 	if _, err := e.st.LoadState(rid, eliteModule, er); err != nil {
 		return nil, err
@@ -245,10 +257,6 @@ func (e *eliteSvc) role(rid int64, now time.Time) (*eliteRole, error) {
 	if er.Lev == 0 {
 		er.Lev = 1
 		er.Score = eliteCfg.level(1).InitExp
-	}
-	srv := ""
-	if r, err := e.st.RoleByID(rid); err == nil {
-		srv = r.SrvID
 	}
 	if day := eliteDayNo(now, eliteOpenAt(e.st, srv, now)); er.Day != day {
 		er.Day, er.Used, er.Bought = day, 0, 0

@@ -211,3 +211,80 @@ func phaseNow(e *env) int64 {
 	_, phase, _, _, _ := eliteSeason(now, at)
 	return phase
 }
+
+func TestEliteSeasonSettlement(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	openAt := time.Date(2026, 10, 1, 15, 21, 4, 0, dayZone)
+	if err := e.st.UpsertServer(store.Server{SrvID: "symlf_1", Name: "s1", Platform: "symlf", ZoneID: 1, Host: "127.0.0.1", Port: 8800, Status: 1, GroupID: 1, OpenTime: openAt.Unix()}); err != nil {
+		t.Fatal(err)
+	}
+	e.setNow(openAt.Add(36 * time.Hour))
+	ca, a := e.enter("ss_a", "甲")
+	_, b := e.enter("ss_b", "乙")
+	_, low := e.enter("ss_c", "丙")
+	put := func(rid, lev, score int64) {
+		t.Helper()
+		if err := e.st.SaveState(rid, eliteModule, &eliteRole{Lev: lev, Score: score}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	put(a.RID, 20, 5000)
+	put(b.RID, 22, 6000)
+	put(low.RID, 5, 100)            // under the rank the rewards ask
+	ca.send(24900, proto.Message{}) // the first look: nothing to pay, only noted
+	ca.waitFor(24900)
+	count := func(role *store.Role, subject string) int {
+		ms, err := e.st.MailsForRole(role)
+		if err != nil {
+			t.Fatal(err)
+		}
+		n := 0
+		for _, m := range ms {
+			if m.Subject == subject {
+				n++
+			}
+		}
+		return n
+	}
+	if count(b, "超凡段位赛上半赛季结算奖励") != 0 {
+		t.Fatal("paid before the half season ended")
+	}
+	// the end of the first half (9 days): paid by rank, ranks stay
+	e.setNow(openAt.Add(9*24*time.Hour + time.Hour))
+	ca.send(24900, proto.Message{})
+	ca.waitFor(24900)
+	for _, r := range []*store.Role{a, b} {
+		if n := count(r, "超凡段位赛上半赛季结算奖励"); n != 1 {
+			t.Fatalf("%s: %d mails for the first half", r.Name, n)
+		}
+	}
+	if n := count(low, "超凡段位赛上半赛季结算奖励"); n != 0 {
+		t.Fatalf("a low rank was paid: %d", n)
+	}
+	er := &eliteRole{}
+	if _, err := e.st.LoadState(b.RID, eliteModule, er); err != nil || er.Lev != 22 {
+		t.Fatalf("a rank moved after a first half: %v %+v", err, er)
+	}
+	// asking again pays nothing twice
+	ca.send(24900, proto.Message{})
+	ca.waitFor(24900)
+	if n := count(b, "超凡段位赛上半赛季结算奖励"); n != 1 {
+		t.Fatalf("paid twice: %d", n)
+	}
+	// the end of the season (21 days): the second half is paid and the ranks go back
+	e.setNow(openAt.Add(21*24*time.Hour + time.Hour))
+	ca.send(24900, proto.Message{})
+	r := ca.waitFor(24900)
+	if count(b, "超凡段位赛下半赛季结算奖励") != 1 || count(a, "超凡段位赛下半赛季结算奖励") != 1 {
+		t.Fatal("the second half was not paid")
+	}
+	if r.Int("period") != 2 || r.Int("lev") != 12 { // 超凡王者 III (20) -> 钻石大师 II (12)
+		t.Fatalf("24900 of the new season: %v", r)
+	}
+	if _, err := e.st.LoadState(b.RID, eliteModule, er); err != nil || er.Lev != 13 || er.Score != eliteCfg.level(13).InitExp {
+		t.Fatalf("b after the reset: %v %+v", err, er)
+	}
+	if _, err := e.st.LoadState(low.RID, eliteModule, er); err != nil || er.Lev != 1 {
+		t.Fatalf("low after the reset: %v %+v", err, er)
+	}
+}

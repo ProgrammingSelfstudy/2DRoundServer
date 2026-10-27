@@ -10,7 +10,7 @@ from luadump import dump
 
 lua_dir, out_json = sys.argv[1:3]
 S = "Config.ArenaEliteData."
-names = ("data_elite_const", "data_elite_level", "data_elite_buy")
+names = ("data_elite_const", "data_elite_level", "data_elite_buy", "data_elite_rank_reward", "data_explain2")
 m = dump(lua_dir, "arena_elite_data.lua", [S + n for n in names])
 m = {k[len(S):]: v for k, v in m.items()}
 
@@ -28,5 +28,16 @@ out = {
               for r in rows(m["data_elite_level"])],
     "buy": [{"cost": r["cost"], "vip": r["need_vip"]} for r in rows(m["data_elite_buy"])],
 }
+# the places paid at the end of a half season, and the rank a new season starts from (the text of the rank list window)
+out["rank_reward"] = sorted(({"min": r["min_rank"], "max": r["max_rank"], "limit": r["rank_award_limit"], "award": r["award"]} for r in m["data_elite_rank_reward"].values()), key=lambda r: r["min"])
+import re
+ids = {r["name"].replace(" ", ""): r["id"] for r in rows(m["data_elite_level"])}
+reset = {}
+for line in rows(m["data_explain2"])[1]["desc"].split("\n"):
+    if "→" in line:
+        a, b = [x.replace(" ", "") for x in line.split("→")]
+        reset[str(ids[a])] = ids[b]
+assert len(reset) == 22, reset
+out["reset"] = reset
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print({k: len(v) for k, v in out.items() if k != "source"})

@@ -532,3 +532,45 @@ func TestLimitGiftOnLevelUp(t *testing.T) {
 		t.Fatalf("21211: %v", push)
 	}
 }
+
+func TestOneCentGiftAndLoginInit(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("oc1", "一分钱")
+	c.send(21021, proto.Message{})
+	if r := c.waitFor(21021); r.Int("flag") != 1 {
+		t.Fatalf("21021: %v", r)
+	}
+	c.send(16651, proto.Message{})
+	r := c.waitFor(16651)
+	if r.Int("is_buy") != 0 || len(r.Arr("list")) != 4 || r.Arr("list")[0].Int("finish") != 0 {
+		t.Fatalf("16651: %v", r)
+	}
+	c.send(16652, proto.Message{"id": 1})
+	if r := c.waitFor(16652); r.Int("code") != 0 {
+		t.Fatalf("before buying: %v", r)
+	}
+	o, err := CreateChargeOrder(e.st, role, 301, actNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := CreateChargeOrder(e.st, role, 301, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("twice: %v", err)
+	}
+	c.send(16651, proto.Message{})
+	r = c.waitFor(16651)
+	if r.Int("is_buy") != 1 || r.Arr("list")[0].Int("finish") != 1 || r.Arr("list")[3].Int("finish") != 0 {
+		t.Fatalf("bought: %v", r)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(16652, proto.Message{"id": 1})
+	if r := c.waitFor(16652); r.Int("code") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+200 {
+		t.Fatalf("diamonds %d -> %d", before[3], after[3])
+	}
+}

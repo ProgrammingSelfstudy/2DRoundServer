@@ -40,5 +40,8 @@ out["month_fund"] = {
 # the limited gifts (21210/21211): the client finds one by its place in the table, which is its id
 sg = dump(lua_dir, "star_gift_data.lua", ["Config.StarGiftData.data_limit_gift_table"])["Config.StarGiftData.data_limit_gift_table"]
 out["limit_gifts"] = [{"pos": i + 1, "id": r[0], "name": r[1], "kind": r[2], "cond": r[3], "items": r[4], "charge_id": r[5], "secs": r[6]} for i, r in enumerate(sg)]
+# the one yuan gift (16651/16652), period 1: its rewards are unlocked by the role's power (the other periods run on dates of 2021)
+od = dump(lua_dir, "holiday_dime_data.lua", ["Config.HolidayDimeData.data_award_list"])["Config.HolidayDimeData.data_award_list"][0]
+out["onecent"] = [{"id": r["id"], "power": r["power_limit"], "items": r["award"]} for r in sorted(od, key=lambda r: r["id"])]
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

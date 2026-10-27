@@ -44,3 +44,20 @@ func TestLookAndStory(t *testing.T) {
 	ca.send(11100, proto.Message{"drama_bid": 1, "step_id": 2})
 	ca.waitFor(11100)
 }
+
+func TestGuideAndSceneAcks(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, _ := e.enter("a", "甲")
+	c.send(11121, proto.Message{"id": 7, "n": 3})
+	if r := c.waitFor(11121); r.Int("id") != 7 || r.Int("n") != 3 {
+		t.Fatalf("11121: %v", r)
+	}
+	c.send(11122, proto.Message{"id": 7, "is_skip": 1})
+	c.waitFor(11122)
+	c.send(10956, proto.Message{"key": 1, "val": 2})
+	c.waitFor(10956)
+	c.send(20063, proto.Message{})
+	if r := c.waitFor(20063); len(r.Arr("type_list")) != 0 {
+		t.Fatalf("20063: %v", r)
+	}
+}

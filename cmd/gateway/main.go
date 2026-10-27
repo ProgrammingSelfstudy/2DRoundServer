@@ -131,6 +131,7 @@ func main() {
 		game.RegisterTicket(gw.Router, st)
 		game.RegisterLook(gw.Router, st)
 		game.RegisterStory(gw.Router)
+		game.RegisterGuide(gw.Router)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

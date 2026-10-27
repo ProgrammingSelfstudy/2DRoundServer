@@ -276,3 +276,17 @@ func RegisterLevGift(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// openByBID is the open activity of a server with an activity number (bid) the client knows.
+func openByBID(st *store.Store, srv string, bid int64, now time.Time) (actEntry, bool) {
+	es, err := openActivities(st, srv, now)
+	if err != nil {
+		return actEntry{}, false
+	}
+	for _, e := range es {
+		if e.Row.BID == bid {
+			return e, true
+		}
+	}
+	return actEntry{}, false
+}

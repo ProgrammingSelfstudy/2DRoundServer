@@ -141,6 +141,7 @@ func main() {
 		game.RegisterSandybeach(gw.Router, st)
 		game.RegisterWhiteDay(gw.Router, st)
 		game.RegisterLevGift(gw.Router, st)
+		game.RegisterStoneShop(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

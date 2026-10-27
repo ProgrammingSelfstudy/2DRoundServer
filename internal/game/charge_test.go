@@ -728,3 +728,39 @@ func TestRecruitHero(t *testing.T) {
 		t.Fatalf("the final prize too early: %v", r)
 	}
 }
+
+func TestMergeGoal(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, a := e.enter("mg1", "合服人")
+	start := dayStart(actNow).Unix()
+	e.addActivity(t, store.Activity{SrvID: a.SrvID, CampID: mergeGoalCamp, BID: 9993039, Status: 1, StartAt: start, EndAt: start + 7*86400, Spec: actSpecJSON(t, false)})
+	e.setNow(time.Unix(start, 0).Add(12 * time.Hour)) // half of the first day: 48 intervals of 160
+	c.send(27300, proto.Message{})
+	r := c.waitFor(27300)
+	if r.Int("score") != 48*160 || r.Int("max_score") != 100000 || r.Int("lev") != 1 || r.Int("end_time") != start+7*86400 {
+		t.Fatalf("27300: %v", r)
+	}
+	c.send(27301, proto.Message{"reward_list": []proto.Message{{"id": 1}}})
+	if r := c.waitFor(27301); r.Int("flag") != 0 { // 7680 of 100000 is below the 160 per thousand of the first box
+		t.Fatalf("early: %v", r)
+	}
+	e.setNow(time.Unix(start, 0).Add(24 * time.Hour)) // a whole day: 96 * 160 = 15360, past 160 per thousand (16000)? not yet
+	e.setNow(time.Unix(start, 0).Add(36 * time.Hour))
+	c.send(27300, proto.Message{})
+	if r := c.waitFor(27300); r.Int("lev") != 2 {
+		t.Fatalf("a day and a half: %v", r)
+	}
+	before, _ := e.st.RoleItems(a.RID)
+	c.send(27301, proto.Message{"reward_list": []proto.Message{{"id": 1}, {"id": 2}}})
+	if r := c.waitFor(27301); r.Int("flag") != 1 {
+		t.Fatalf("take: %v", r)
+	}
+	if after, _ := e.st.RoleItems(a.RID); after[10403] != before[10403]+3 || after[37002] != before[37002] {
+		t.Fatalf("only the first box: %v -> %v", before, after)
+	}
+	c.send(27301, proto.Message{"reward_list": []proto.Message{{"id": 1}}})
+	if r := c.waitFor(27301); r.Int("flag") != 0 {
+		t.Fatalf("twice: %v", r)
+	}
+}

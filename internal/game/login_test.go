@@ -164,6 +164,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterRankPartner(gw.Router, st)
 	RegisterActivityBox(gw.Router, st)
 	RegisterRecruitHero(gw.Router, st)
+	RegisterMergeGoal(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

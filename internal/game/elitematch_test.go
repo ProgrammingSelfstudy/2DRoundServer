@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"2droundserver/internal/proto"
+	"2droundserver/internal/store"
 )
 
 func TestElitematchGateAndFight(t *testing.T) {
@@ -12,7 +13,7 @@ func TestElitematchGateAndFight(t *testing.T) {
 	e.setNow(time.Date(2026, 10, 21, 12, 0, 0, 0, dayZone))
 	c, role := e.enter("em0", "段位客")
 	c.send(24900, proto.Message{})
-	if r := c.waitFor(24900); r.Int("lev") != 1 || r.Int("day_combat_count") != 3 || r.Int("state") != 1 {
+	if r := c.waitFor(24900); r.Int("lev") != 1 || r.Int("day_combat_count") != 3 || r.Int("state") != phaseNow(e) {
 		t.Fatalf("info of a low level role: %v", r)
 	}
 	c.send(24902, proto.Message{"type": 1})
@@ -148,4 +149,65 @@ func TestElitematchClosedBuyRewardAndForms(t *testing.T) {
 	if r := c.waitFor(24945).Arr("manifesto"); r[1].Int("manifesto_id") != 9 {
 		t.Fatalf("saved manifesto: %v", r)
 	}
+}
+
+func TestEliteSeasons(t *testing.T) {
+	// the original server (capture 2026-10-26) opened at 07:21:04 UTC; period 12 started 11 seasons after, on 2026-10-08
+	open := int64(1791444064 - 11*21*86400)
+	at := func(unix int64) time.Time { return time.Unix(unix, 0) }
+	// the capture was taken with 194425 seconds to the end of the season, in its last three days
+	now := at(1793258464 - 194425)
+	p, phase, start, end, phaseEnd := eliteSeason(now, open)
+	if p != 12 || phase != 3 || start != 1791444064 || end != 1793258464 || phaseEnd != end {
+		t.Fatalf("capture: %d %d %d %d %d", p, phase, start, end, phaseEnd)
+	}
+	if p, phase, _, _, pe := eliteSeason(at(1791444064+86400), open); p != 12 || phase != 1 || pe != 1791444064+9*86400 {
+		t.Fatalf("first half: %d %d %d", p, phase, pe)
+	}
+	if p, phase, _, _, pe := eliteSeason(at(1791444064+10*86400), open); p != 12 || phase != 2 || pe != 1791444064+18*86400 {
+		t.Fatalf("second half: %d %d %d", p, phase, pe)
+	}
+	if p, phase, start, _, _ := eliteSeason(at(1793258464), open); p != 13 || phase != 1 || start != 1793258464 {
+		t.Fatalf("the next season: %d %d %d", p, phase, start)
+	}
+	if p, _, _, _, _ := eliteSeason(at(open), open); p != 1 {
+		t.Fatalf("the first season: %d", p)
+	}
+	// the day's window of the capture: 19825 seconds to its end, 30 minutes before the clock time of the opening
+	if o, _, end := eliteOpen(now, open); !o || end-now.Unix() != 19825 {
+		t.Fatalf("the day's window: open %v, %d seconds left", o, end-now.Unix())
+	}
+}
+
+func TestEliteSeasonOfAServer(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	openAt := time.Date(2026, 10, 1, 15, 21, 4, 0, dayZone)
+	if err := e.st.UpsertServer(store.Server{SrvID: "symlf_1", Name: "s1", Platform: "symlf", ZoneID: 1, Host: "127.0.0.1", Port: 8800, Status: 1, GroupID: 1, OpenTime: openAt.Unix()}); err != nil {
+		t.Fatal(err)
+	}
+	e.setNow(openAt.Add(25 * 24 * time.Hour))
+	c, _ := e.enter("es1", "赛季客")
+	c.send(24900, proto.Message{})
+	r := c.waitFor(24900)
+	// day 26: the second season, its fifth day
+	if r.Int("period") != 2 || r.Int("state") != 1 || r.Int("start_time") != openAt.Unix()+21*86400 || r.Int("end_time") != openAt.Unix()+42*86400 || r.Int("zone_id") != 1 {
+		t.Fatalf("24900: %v", r)
+	}
+	if r.Int("state_time") != openAt.Unix()+30*86400-e.clk.Load()/1e9 {
+		t.Fatalf("state_time: %v", r)
+	}
+}
+
+func phaseNow(e *env) int64 {
+	srv, _ := e.st.Server("symlf_1")
+	at := srv.OpenTime
+	if at == 0 {
+		at = srv.CreatedAt
+	}
+	now := time.Unix(0, e.clk.Load())
+	if at > now.Unix() {
+		at = dayStart(now).Unix()
+	}
+	_, phase, _, _, _ := eliteSeason(now, at)
+	return phase
 }

@@ -22,7 +22,6 @@ const (
 	eliteModule  = "elitematch"
 	combatElite  = 23 // BattleConst.Fight_Type.EliteMatchWar
 	eliteLogKeep = 30
-	eliteCycle   = 21 // days of a season: 9 + 9 regular, 3 king
 )
 
 type eliteLevel struct {
@@ -168,16 +167,75 @@ func RegisterElitematch(r *gateway.Router, db *store.Store) {
 	r.Handle(24946, e.saveManifesto)
 }
 
-// eliteOpen says whether the match runs at a moment: every day from 00:01 for 84600 seconds.
-func eliteOpen(now time.Time) (open bool, start, end int64) {
+// The original server counted its days and seasons from the moment it opened (capture 2026-10-26: the day's window ended
+// at 14:51:04 China time, 30 minutes before the clock time of its opening, 15:21:04, and period 12 started 11 seasons
+// of 21 days after it): a day begins at the clock time of the server's opening, the match is open from 00:01 to 23:30
+// of that day, a season is 21 days: 9 of the first half (state 1), 9 of the second (state 2), 3 of the king match
+// (state 3). A server without an opening time (or one in the future) counts from the midnight of China time.
+func eliteOpenAt(st *store.Store, srv string, now time.Time) int64 {
+	sv, err := st.Server(srv)
+	if err != nil {
+		return dayStart(now).Unix()
+	}
+	at := sv.OpenTime
+	if at == 0 {
+		at = sv.CreatedAt
+	}
+	if at <= 0 || at > now.Unix() {
+		return dayStart(now).Unix()
+	}
+	return at
+}
+
+func floorDiv(a, b int64) int64 {
+	q := a / b
+	if a%b != 0 && (a < 0) != (b < 0) {
+		q--
+	}
+	return q
+}
+
+// eliteDayNo is the number of the server's day (the first is 1).
+func eliteDayNo(now time.Time, openAt int64) int64 { return floorDiv(now.Unix()-openAt, 86400) + 1 }
+
+// eliteOpen says whether the match runs at a moment: from 00:01 to 23:30 of the server's day.
+func eliteOpen(now time.Time, openAt int64) (open bool, start, end int64) {
+	day := openAt + (eliteDayNo(now, openAt)-1)*86400
 	hms := eliteCfg.list("open_time")
-	t := dayStart(now.In(dayZone))
-	start = t.Unix() + int64(hms[0])*3600 + int64(hms[1])*60 + int64(hms[2])
-	end = start + eliteCfg.num("open_times")
+	start = day + int64(hms[0])*3600 + int64(hms[1])*60 + int64(hms[2])
+	cl := eliteCfg.list("close_time")
+	end = day + int64(cl[0])*3600 + int64(cl[1])*60 + int64(cl[2])
 	return now.Unix() >= start && now.Unix() < end, start, end
 }
 
-func elitePeriod(now time.Time) int64 { return now.Unix()/86400/eliteCycle - 900 }
+const (
+	eliteSeasonDays = 21
+	eliteZone       = 1 // the zone of the match: we have one (the original showed 2 on its server 90, nothing says how zones are cut)
+)
+
+// eliteSeason is the season a moment is in: its period (the first is 1), its phase (1 first half, 2 second half, 3 king
+// match), the start and the end of the season and the end of the phase.
+func eliteSeason(now time.Time, openAt int64) (period, phase, start, end, phaseEnd int64) {
+	const length = eliteSeasonDays * 86400
+	n := floorDiv(now.Unix()-openAt, length)
+	start = openAt + n*length
+	end = start + length
+	first, second := eliteCfg.num("first_routine")*86400, eliteCfg.num("second_routine")*86400
+	switch at := now.Unix() - start; {
+	case at < first:
+		phase, phaseEnd = 1, start+first
+	case at < first+second:
+		phase, phaseEnd = 2, start+first+second
+	default:
+		phase, phaseEnd = 3, end
+	}
+	return n + 1, phase, start, end, phaseEnd
+}
+
+func (e *eliteSvc) period(srv string, now time.Time) int64 {
+	p, _, _, _, _ := eliteSeason(now, eliteOpenAt(e.st, srv, now))
+	return p
+}
 
 func (e *eliteSvc) role(rid int64, now time.Time) (*eliteRole, error) {
 	er := &eliteRole{}
@@ -188,7 +246,11 @@ func (e *eliteSvc) role(rid int64, now time.Time) (*eliteRole, error) {
 		er.Lev = 1
 		er.Score = eliteCfg.level(1).InitExp
 	}
-	if day := dayKey(now); er.Day != day {
+	srv := ""
+	if r, err := e.st.RoleByID(rid); err == nil {
+		srv = r.SrvID
+	}
+	if day := eliteDayNo(now, eliteOpenAt(e.st, srv, now)); er.Day != day {
 		er.Day, er.Used, er.Bought = day, 0, 0
 	}
 	return er, nil
@@ -203,7 +265,7 @@ func (e *eliteSvc) gate(role *store.Role, now time.Time) string {
 	if int64(role.Lev) < eliteMinLev {
 		return "角色等级达到" + itoa64(eliteMinLev) + "级后开启"
 	}
-	if open, _, _ := eliteOpen(now); !open {
+	if open, _, _ := eliteOpen(now, eliteOpenAt(e.st, role.SrvID, now)); !open {
 		return "精英段位赛未开启"
 	}
 	return ""
@@ -239,21 +301,10 @@ func (e *eliteSvc) promotedInfo(er *eliteRole) []proto.Message {
 }
 
 func (e *eliteSvc) infoMessage(role *store.Role, er *eliteRole, now time.Time) proto.Message {
-	open, start, end := eliteOpen(now)
-	state := int64(0)
-	if open {
-		state = 1
-	}
-	stateEnd := end
-	if !open {
-		stateEnd = start
-		if now.Unix() >= end {
-			stateEnd = start + 86400
-		}
-	}
+	period, phase, start, end, phaseEnd := eliteSeason(now, eliteOpenAt(e.st, role.SrvID, now))
 	return proto.Message{"lev": er.Lev, "score": er.Score, "day_combat_count": e.left(er), "day_buy_count": er.Bought, "match_cd_time": 0, "rank": 0,
-		"is_king": 0, "promoted_info": e.promotedInfo(er), "state": state, "period": elitePeriod(now), "start_time": start, "end_time": end,
-		"state_time": max(0, stateEnd-now.Unix()), "lev_reward": e.rewardList(er), "zone_id": 1, "day_max_buy_count": len(eliteCfg.Buy), "is_skip": 0, "rmb_status": 0}
+		"is_king": 0, "promoted_info": e.promotedInfo(er), "state": phase, "period": period, "start_time": start, "end_time": end,
+		"state_time": max(0, phaseEnd-now.Unix()), "lev_reward": e.rewardList(er), "zone_id": eliteZone, "day_max_buy_count": len(eliteCfg.Buy), "is_skip": 0, "rmb_status": 0}
 }
 
 func (e *eliteSvc) info(s *gateway.Session, _ proto.Message) error {
@@ -271,8 +322,11 @@ func (e *eliteSvc) info(s *gateway.Session, _ proto.Message) error {
 }
 
 func (e *eliteSvc) openTime(s *gateway.Session, _ proto.Message) error {
-	_, start, end := eliteOpen(s.Now())
-	open, _, _ := eliteOpen(s.Now())
+	at := int64(0)
+	if role := s.Role(); role != nil {
+		at = eliteOpenAt(e.st, role.SrvID, s.Now())
+	}
+	open, start, end := eliteOpen(s.Now(), at)
 	state, until := int64(0), start
 	if open {
 		state, until = 1, end
@@ -567,7 +621,10 @@ func (e *eliteSvc) buy(s *gateway.Session, _ proto.Message) error {
 }
 
 func (e *eliteSvc) zones(s *gateway.Session, _ proto.Message) error {
-	return s.Send(24910, proto.Message{"zone_info": []proto.Message{{"period": elitePeriod(s.Now()), "max_zone_id": 1}}})
+	if s.Role() == nil {
+		return nil
+	}
+	return s.Send(24910, proto.Message{"zone_info": []proto.Message{{"period": e.period(s.Role().SrvID, s.Now()), "max_zone_id": eliteZone}}})
 }
 
 func (e *eliteSvc) history(s *gateway.Session, req proto.Message) error {
@@ -582,7 +639,7 @@ func (e *eliteSvc) history(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	return s.Send(24911, proto.Message{"rank": 0, "elite_lev": er.Lev, "score": er.Score, "period": req.Int("period"), "arena_elite_rank": []proto.Message{},
-		"zone_id": req.Int("zone_id"), "max_zone_id": 1})
+		"zone_id": req.Int("zone_id"), "max_zone_id": eliteZone})
 }
 
 func (e *eliteSvc) reward(s *gateway.Session, req proto.Message) error {
@@ -743,13 +800,13 @@ func (e *eliteSvc) sendPersonal(s *gateway.Session, cmd uint16, role *store.Role
 	}
 	_, _, power, _ := lineupOf(e.st, role.RID)
 	if period == 0 {
-		period = elitePeriod(now)
+		period = e.period(role.SrvID, now)
 	}
 	return s.Send(cmd, proto.Message{"best_mvp": 0, "my_score": er.Score, "my_elite_lev": er.Lev, "period": period, "max_lev": er.Best, "max_score": er.Score,
 		"combat_win_count1": er.Wins, "combat_all_count1": er.Wins + er.Loses, "combat_win_count2": 0, "combat_all_count2": 0, "max_dps": 0,
 		"winning_streak": er.Streak, "rid": role.RID, "srv_id": role.SrvID, "name": role.Name, "lev": role.Lev, "sex": role.Sex, "g_rid": 0, "g_srv_id": "",
 		"gname": "", "power": []proto.Message{{"order": 1, "power": power}}, "face": face, "score": er.Score, "elite_lev": er.Lev,
-		"avatar_id": eliteCfg.level(er.Lev).ID * 0, "face_update_time": 0, "face_file": "", "log_zone_id": 1, "log_rank": 0, "use_skin": 0})
+		"avatar_id": eliteCfg.level(er.Lev).ID * 0, "face_update_time": 0, "face_file": "", "log_zone_id": eliteZone, "log_rank": 0, "use_skin": 0})
 }
 
 // shared (24942): the personal page of a role somebody shared (id is its rid).

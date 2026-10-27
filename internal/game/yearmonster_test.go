@@ -28,6 +28,9 @@ func (e *env) ymTile(t *testing.T, c *client, role *store.Role, evt int64) int64
 	t.Helper()
 	c.send(28201, proto.Message{})
 	m := c.waitFor(28201)
+	// the handler saves its state after it answered; a request that saves nothing comes back only when it is done
+	c.send(10400, proto.Message{})
+	c.waitFor(10400)
 	for _, tl := range m.Arr("tile_list") {
 		if tl.Int("evtid") == evt {
 			d := &ymRole{}

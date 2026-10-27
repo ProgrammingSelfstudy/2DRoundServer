@@ -166,6 +166,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterRecruitHero(gw.Router, st)
 	RegisterMergeGoal(gw.Router, st)
 	RegisterGuildWar(gw.Router, st, gw.Hub)
+	RegisterCrossClosed(gw.Router, st)
 	RegisterEquipment(gw.Router, st)
 	RegisterFormation(gw.Router, st)
 	RegisterFeat(gw.Router, st)

@@ -764,3 +764,31 @@ func TestMergeGoal(t *testing.T) {
 		t.Fatalf("twice: %v", r)
 	}
 }
+
+func TestCrossClosed(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	c, _ := e.enter("cc1", "跨服人")
+	c.send(27700, proto.Message{})
+	if r := c.waitFor(27700); r.Int("step_status") != 0 || r.Int("zone_id") != 0 {
+		t.Fatalf("27700: %v", r)
+	}
+	c.send(27704, proto.Message{"bet_type": 1, "bet_val": 100})
+	if r := c.waitFor(27704); r.Int("code") != 0 || r.Str("msg") == "" {
+		t.Fatalf("27704: %v", r)
+	}
+	c.send(26200, proto.Message{})
+	if r := c.waitFor(26200); r.Int("is_open") != 0 {
+		t.Fatalf("26200: %v", r)
+	}
+	form := []proto.Message{{"order": 1, "formation_type": 1, "pos_info": []proto.Message{{"pos": 1, "id": 7}}, "hallows_id": 0}}
+	c.send(27725, proto.Message{"formations": form})
+	if r := c.waitFor(27725); r.Int("code") != 1 {
+		t.Fatalf("27725: %v", r)
+	}
+	c.send(27726, proto.Message{})
+	r := c.waitFor(27726)
+	f := r.Arr("formations")
+	if len(f) != 1 || f[0].Int("order") != 1 || f[0].Arr("pos_info")[0].Int("id") != 7 {
+		t.Fatalf("27726: %v", r)
+	}
+}

@@ -162,6 +162,7 @@ func main() {
 		game.RegisterRecruitHero(gw.Router, st)
 		game.RegisterMergeGoal(gw.Router, st)
 		game.RegisterGuildWar(gw.Router, st, gw.Hub)
+		game.RegisterCrossClosed(gw.Router, st)
 		game.RegisterEquipment(gw.Router, st)
 		game.RegisterFormation(gw.Router, st)
 		game.RegisterFeat(gw.Router, st)

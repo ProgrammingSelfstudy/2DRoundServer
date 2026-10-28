@@ -103,6 +103,28 @@ func expTaskTime(st *store.Store, rid, id int64) (int64, error) {
 // taken ones with the time they were taken), 25811 pushes changes (nothing is pushed here) and
 // 25812 takes a finished one's reward.
 func RegisterExpTask(r *gateway.Router, st *store.Store) {
+	// the original pushes the open trials with the city (the taken ones only come with 25810)
+	r.OnEnter(func(s *gateway.Session, _ proto.Message) error {
+		role := s.Role()
+		if role == nil || role.Lev < expTaskOpenLev {
+			return nil
+		}
+		vals, err := expTaskValues(st, role.RID)
+		if err != nil {
+			return err
+		}
+		done, err := st.FeatsClaimed(role.RID)
+		if err != nil {
+			return err
+		}
+		feats := []proto.Message{}
+		for _, id := range expTaskIDs(int(role.Lev)) {
+			if !done[id] {
+				feats = append(feats, expTaskMessage(id, vals))
+			}
+		}
+		return s.Send(25811, proto.Message{"feat_list": feats})
+	})
 	r.Handle(25810, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

@@ -29,10 +29,11 @@ const (
 )
 
 type Login struct {
-	Store *store.Store
-	SrvID string
-	Hub   *gateway.Hub
-	Log   *log.Logger
+	router *gateway.Router // set by Register: its OnEnter pushes follow 10304
+	Store  *store.Store
+	SrvID  string
+	Hub    *gateway.Hub
+	Log    *log.Logger
 	// MaxRoles is how many roles one account may create per server (policy).
 	MaxRoles int
 	// Friends, when set, is told when a role enters the game.
@@ -46,6 +47,7 @@ type Login struct {
 }
 
 func (l *Login) Register(r *gateway.Router) {
+	l.router = r
 	r.Handle(1164, l.roleList)
 	r.Handle(10191, l.createRole)
 	r.Handle(10192, func(s *gateway.Session, m proto.Message) error { return l.enter(s, m, 10192) })

@@ -493,6 +493,12 @@ func ymRedPoints(c *ymCtx) int64 {
 // minutes). Not made: the barriers and the puzzle events, the exchange windows of the table are in the past and the client shows them
 // as over whatever the server says.
 func RegisterYearMonster(r *gateway.Router, st *store.Store) {
+	r.OnEnter(func(s *gateway.Session, _ proto.Message) error {
+		if role := s.Role(); role != nil {
+			return ymSendAssets(s, st, role.RID)
+		}
+		return nil
+	})
 	fights := fightServiceOf(st)
 	sendTiles := func(s *gateway.Session, tiles ...ymTile) error {
 		if len(tiles) == 0 {

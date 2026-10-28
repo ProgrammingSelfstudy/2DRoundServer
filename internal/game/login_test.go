@@ -254,11 +254,14 @@ func (c *client) send(cmd uint16, msg proto.Message, badSign ...bool) {
 	c.c.Write(c.frames(cmd, msg, badSign...))
 }
 
+// enterPush are the pushes of pushEnterState, which come with every entry into the game.
+var enterPush = map[uint16]bool{10995: true, 10996: true, 21002: true, 21322: true, 24500: true, 10403: true, 25811: true, 13330: true, 10350: true, 16606: true, 20282: true}
+
 func (c *client) recv(cmd uint16) proto.Message {
 	c.t.Helper()
 	c.c.SetReadDeadline(time.Now().Add(3 * time.Second))
 	fr, err := proto.ReadFrame(c.br)
-	for err == nil && (fr.Command == 10403 || fr.Command == 10344 || fr.Command == 16401 || fr.Command == 10501) && fr.Command != cmd {
+	for err == nil && (fr.Command == 10403 || fr.Command == 10344 || fr.Command == 16401 || fr.Command == 10501 || enterPush[fr.Command]) && fr.Command != cmd {
 		fr, err = proto.ReadFrame(c.br) // daily quest progress (10403), level-up (10344), achievement (16401) and equipment bag (10501, sent with every 10500) pushes are only read by tests that ask for them
 	}
 	if err != nil {
@@ -931,12 +934,16 @@ func enterCityAndSeeName(c *client) (asked bool) {
 	c.recv(10302)
 	c.recv(13000)
 	c.recv(10304)
-	c.c.SetReadDeadline(time.Now().Add(400 * time.Millisecond))
-	fr, err := proto.ReadFrame(c.br)
-	if err != nil {
-		return false // nothing more: not asked
+	for {
+		c.c.SetReadDeadline(time.Now().Add(400 * time.Millisecond))
+		fr, err := proto.ReadFrame(c.br)
+		if err != nil {
+			return false // nothing more: not asked
+		}
+		if !enterPush[fr.Command] {
+			return fr.Command == 10342
+		}
 	}
-	return fr.Command == 10342
 }
 
 // With the switch on, a brand-new role (never named, no starter hero) is asked to name
@@ -977,5 +984,32 @@ func TestNewRoleFlowAsksOnlyBrandNewRoles(t *testing.T) {
 	}
 	if enterCityAndSeeName(c) {
 		t.Fatal("a role that was already named was asked again")
+	}
+}
+
+// The pushes the original makes as the main city comes up (capture original-2026-10-27) all arrive
+// after 10304, and nothing else is needed to get them.
+func TestEnterPushes(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, _ := e.enter("pushes", "推送")
+	c.send(10300, proto.Message{})
+	got := map[uint16]bool{}
+	after := false
+	for {
+		c.c.SetReadDeadline(time.Now().Add(400 * time.Millisecond))
+		fr, err := proto.ReadFrame(c.br)
+		if err != nil {
+			break
+		}
+		if fr.Command == 10304 {
+			after = true
+		} else if after {
+			got[fr.Command] = true
+		}
+	}
+	for _, cmd := range []uint16{10995, 10996, 21002, 21322, 24500, 10403, 13330, 10350} {
+		if !got[cmd] {
+			t.Errorf("%d was not pushed after 10304", cmd)
+		}
 	}
 }

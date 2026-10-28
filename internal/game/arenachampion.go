@@ -212,6 +212,25 @@ func RegisterArenaChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub)
 	c.awards = champCfg.Awards
 	c.entrants = db.ArenaTop
 	c.register(r)
+	// the original sends the last match's best three with the city (20282); a server that has had no match has none
+	r.OnEnter(func(s *gateway.Session, _ proto.Message) error {
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		now := c.now()
+		c.mu.Lock()
+		stt, _, err := c.load(role.SrvID, now)
+		var top proto.Message
+		if err == nil && len(stt.Last) > 0 {
+			top = c.topMessage(stt, now)
+		}
+		c.mu.Unlock()
+		if err != nil || top == nil {
+			return err
+		}
+		return s.Send(c.id(20282), top)
+	})
 	return c
 }
 

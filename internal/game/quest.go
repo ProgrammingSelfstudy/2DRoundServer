@@ -154,22 +154,26 @@ func questEvent(s *gateway.Session, st *store.Store, rid int64, label string, n 
 // (take a finished quest's reward). Progress comes
 // from questEvent / questRecord calls in the systems that have the events.
 func RegisterQuest(r *gateway.Router, st *store.Store) {
-	r.Handle(10400, func(s *gateway.Session, _ proto.Message) error {
-		role := s.Role()
-		if role == nil {
-			return nil
+	sendAll := func(cmd uint16) gateway.Handler {
+		return func(s *gateway.Session, _ proto.Message) error {
+			role := s.Role()
+			if role == nil {
+				return nil
+			}
+			day := dayKey(s.Now())
+			rows, err := st.QuestRows(role.RID, day)
+			if err != nil {
+				return err
+			}
+			list := []proto.Message{}
+			for _, id := range sortedQuestIDs() {
+				list = append(list, questMessage(id, questTable[id], rows[id], day))
+			}
+			return s.Send(cmd, proto.Message{"quest_list": list})
 		}
-		day := dayKey(s.Now())
-		rows, err := st.QuestRows(role.RID, day)
-		if err != nil {
-			return err
-		}
-		list := []proto.Message{}
-		for _, id := range sortedQuestIDs() {
-			list = append(list, questMessage(id, questTable[id], rows[id], day))
-		}
-		return s.Send(10400, proto.Message{"quest_list": list})
-	})
+	}
+	r.Handle(10400, sendAll(10400))
+	r.OnEnter(sendAll(10403)) // the original pushes the whole list as progress when the city comes up
 	claim := func(cmd uint16) gateway.Handler {
 		return func(s *gateway.Session, req proto.Message) error {
 			role := s.Role()

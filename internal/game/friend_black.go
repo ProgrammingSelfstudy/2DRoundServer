@@ -17,6 +17,7 @@ const maxBlack = 50
 // cannot send a friend request to the one who listed them. The chat is not filtered. Our rules, not captured.
 func (f *FriendService) registerBlack(r *gateway.Router) {
 	r.Handle(13330, f.blackList)
+	r.OnEnter(f.blackList)
 	r.Handle(13332, f.blackAdd)
 	r.Handle(13333, f.blackRemove)
 	r.Handle(13315, func(s *gateway.Session, _ proto.Message) error {

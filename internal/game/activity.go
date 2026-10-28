@@ -281,6 +281,19 @@ func RegisterActivity(r *gateway.Router, st *store.Store) {
 	r.Handle(16604, a.claim)
 	r.Handle(16620, a.batch)
 	r.Handle(16687, a.redOne)
+	// the original tells the role how many aims of each open activity can be taken as the city comes up
+	r.OnEnter(func(s *gateway.Session, _ proto.Message) error {
+		es, state, err := a.open(s)
+		if err != nil || s.Role() == nil {
+			return err
+		}
+		for _, e := range es {
+			if err := s.Send(16606, proto.Message{"bid": e.Row.BID, "can_get_num": state.prog(e, s.Now()).ready(e)}); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (a *actSvc) open(s *gateway.Session) ([]actEntry, *actState, error) {

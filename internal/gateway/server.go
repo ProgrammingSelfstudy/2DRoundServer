@@ -19,11 +19,28 @@ import (
 
 type Handler func(s *Session, req proto.Message) error
 
-type Router struct{ handlers map[uint16]Handler }
+type Router struct {
+	handlers map[uint16]Handler
+	enter    []Handler
+}
 
 func NewRouter() *Router { return &Router{handlers: map[uint16]Handler{}} }
 
 func (r *Router) Handle(cmd uint16, h Handler) { r.handlers[cmd] = h }
+
+// OnEnter registers a push the original makes when a role comes into the game: RunEnter calls it
+// (with no request) once the main city is up.
+func (r *Router) OnEnter(h Handler) { r.enter = append(r.enter, h) }
+
+// RunEnter calls the OnEnter pushes in the order they were registered.
+func (r *Router) RunEnter(s *Session) error {
+	for _, h := range r.enter {
+		if err := h(s, nil); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // Has reports whether a handler is registered for cmd.
 func (r *Router) Has(cmd uint16) bool { return r.handlers[cmd] != nil }

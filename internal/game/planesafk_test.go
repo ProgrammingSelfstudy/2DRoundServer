@@ -155,6 +155,10 @@ func TestPlanesafkFightRelicAndBoss(t *testing.T) {
 	fight := proto.Message{"line": 2, "index": 2, "action": 1, "ext_list": []proto.Message{
 		{"type": pfExtFormation, "val1": 1, "val2": 0}, {"type": pfExtOwnHero, "val1": 1, "val2": hero}}}
 	c.send(28600, fight)
+	// the line's other tiles are hidden before the fight starts, in a 28606 of their own
+	if h := c.waitFor(28606); len(h.Arr("tile_list")) == 0 || h.Arr("tile_list")[0].Int("is_hide") != 1 || h.Int("line") != 1 {
+		t.Fatalf("hide at the start: %v", h)
+	}
 	if r := c.waitFor(28600); r.Int("code") != 1 {
 		t.Fatalf("fight: %v", r)
 	}

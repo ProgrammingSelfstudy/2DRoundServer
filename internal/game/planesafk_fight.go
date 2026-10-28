@@ -97,6 +97,19 @@ func (p *pfSvc) fightTile(s *gateway.Session, role *store.Role, st *pfState, t *
 		return reply(0, msg)
 	}
 	st.FormType, st.Hallows, st.Form = pf.formType, hallows, pf.fighters
+	// choosing a tile hides the line's other tiles before the fight starts: 28606 lists just those (capture original-2026-10-27)
+	st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
+	hidden := []proto.Message{}
+	for _, m := range st.tileList() {
+		if m.Int("line") == t.Line && m.Int("index") != t.Index {
+			hidden = append(hidden, m)
+		}
+	}
+	if len(hidden) > 0 {
+		if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": hidden}); err != nil {
+			return err
+		}
+	}
 	if err := reply(1, ""); err != nil {
 		return err
 	}

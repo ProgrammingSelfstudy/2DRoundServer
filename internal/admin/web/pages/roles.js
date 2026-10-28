@@ -115,6 +115,43 @@ export async function render(root, ctx) {
           h("p", {}, hero, " 星级 ", star, " 数量 ", num, " ", giveHero), heroErr);
       } catch (e) { toast(e.message, "err"); }
     }
+    // skins and cosmetics (avatar frames, titles, heads, backdrops, bubbles), for good or for some days
+    let lookBox = null;
+    if (ctx.can("write")) {
+      try {
+        const meta = await get("/api/meta");
+        const skin = select((meta.skins || []).map((x) => [x.id, `${x.name}（${x.id}，英雄 ${x.bid}）`]), meta.skins && meta.skins[0] && meta.skins[0].id);
+        const skinDays = h("input", { type: "number", min: 0, max: 3650, value: 0, class: "inline-num" });
+        const kinds = { face: "头像", backdrop: "背景", avatar: "头像框", bubble: "气泡", title: "称号" };
+        const kind = select(Object.entries(kinds), "avatar");
+        const choices = (meta.looks || []);
+        const look = h("select", {});
+        const baseID = h("input", { type: "number", min: 1, class: "inline-num", placeholder: "编号" });
+        const lookDays = h("input", { type: "number", min: 0, max: 3650, value: 0, class: "inline-num" });
+        const fillLooks = () => {
+          const own = choices.filter((c) => c.kind === kind.value);
+          look.replaceChildren(...own.map((c) => h("option", { value: c.id, text: `${c.name}（${c.id}）` })));
+          look.hidden = own.length === 0;
+          baseID.hidden = own.length > 0;
+        };
+        kind.addEventListener("change", fillLooks);
+        fillLooks();
+        const lookErr = h("p", { class: "form-error", role: "alert" });
+        const giveSkin = h("button", { class: "btn primary", type: "button", text: "发放皮肤", onclick: async () => {
+          lookErr.textContent = "";
+          try { const res = await post(`/api/roles/${d.role.rid}/skins`, { skin_id: Number(skin.value), days: Number(skinDays.value) || 0 }); toast(res.push_error ? "已发放（网关未通知：" + res.push_error + "）" : "已发放"); } catch (e) { lookErr.textContent = e.message; }
+        } });
+        const giveLook = h("button", { class: "btn primary", type: "button", text: "发放外观", onclick: async () => {
+          lookErr.textContent = "";
+          const id = Number(look.hidden ? baseID.value : look.value);
+          if (!Number.isInteger(id) || id < 1) { lookErr.textContent = "请选择或填写编号"; return; }
+          try { await post(`/api/roles/${d.role.rid}/looks`, { kind: kind.value, base_id: id, days: Number(lookDays.value) || 0 }); toast("已发放（玩家打开对应界面时看到）"); } catch (e) { lookErr.textContent = e.message; }
+        } });
+        lookBox = h("div", {}, h("h4", { text: "发放皮肤和外观" }),
+          h("p", { class: "hint", text: "天数 0 = 永久。皮肤会实时通知在线玩家；外观要玩家重新打开面板才看到。" }),
+          h("p", {}, skin, " 天数 ", skinDays, " ", giveSkin), h("p", {}, kind, " ", look, baseID, " 天数 ", lookDays, " ", giveLook), lookErr);
+      } catch (e) { toast(e.message, "err"); }
+    }
     const shown = modal({
       title: `角色「${d.role.name}」（${d.role.rid}）`, wide: true, actions,
       body: h("div", {},
@@ -123,6 +160,7 @@ export async function render(root, ctx) {
         vipRow,
         grantBox,
         heroBox,
+        lookBox,
         h("h4", { text: "资源" }),
         table(["资源", "名称", "数量"], d.assets.map((a) => h("tr", {}, h("td", { text: a.label }), h("td", { text: a.name || "—" }), h("td", { text: a.val })))),
         h("h4", { text: "物品" }),

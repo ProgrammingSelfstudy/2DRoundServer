@@ -15,6 +15,7 @@ type HolyPiece struct {
 	Main    []HolyAttr // the fixed attributes (attack, hp, speed)
 	Rand    []HolyAttr // the random ones, Pos 1..n
 	Washes  int64      // 洗练次数
+	Wash    []HolyAttr // the random attributes of a wash that is not saved yet (Pos 1..n, shown with Pos+100)
 	Partner int64      // the hero wearing it (0 = in the bag)
 	Slot    int64      // 1~4 when worn
 }

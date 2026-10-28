@@ -73,10 +73,11 @@ func TestHolyEqm(t *testing.T) {
 	if atk1 <= atk0 {
 		t.Fatalf("attack %d -> %d", atk0, atk1)
 	}
-	// wash the first attribute: costs the base's price, counts a wash
+	// wash with nothing locked (the capture's request has an empty pos): costs the base's price, counts a wash, and the
+	// new attributes wait next to the old ones (position + 100) until 11090 saves them
 	before, _ := e.st.RoleItems(role.RID)
-	c.send(11094, proto.Message{"partner_id": hero, "holy_eqm_id": p.Int("id"), "pos": []proto.Message{{"pos": 1}}})
-	if r := c.until(11094); r.Int("result") != 1 {
+	c.send(11094, proto.Message{"partner_id": hero, "holy_eqm_id": p.Int("id"), "pos": []proto.Message{}})
+	if r := c.until(11094); r.Int("result") != 1 || r.Str("msg") != "洗练成功" {
 		t.Fatalf("wash: %v", r)
 	}
 	after, _ := e.st.RoleItems(role.RID)
@@ -84,12 +85,21 @@ func TestHolyEqm(t *testing.T) {
 		t.Fatalf("price: %v -> %v", before, after)
 	}
 	d, _ := e.st.HolyOf(role.RID)
-	if i := holyFind(d, p.Int("id")); d.Pieces[i].Washes != 1 || len(d.Pieces[i].Rand) != 2 || d.Pieces[i].Rand[0].ID == d.Pieces[i].Rand[1].ID {
+	i := holyFind(d, p.Int("id"))
+	old := append([]store.HolyAttr(nil), d.Pieces[i].Rand...)
+	if d.Pieces[i].Washes != 1 || len(old) != 2 || len(d.Pieces[i].Wash) != 2 {
 		t.Fatalf("washed: %+v", d.Pieces[i])
 	}
+	if l := holyRandMsgs(d.Pieces[i]); len(l) != 4 || l[0].Int("pos") != 1 || l[2].Int("pos") != 101 || l[3].Int("pos") != 102 {
+		t.Fatalf("shown: %v", l)
+	}
 	c.send(11090, proto.Message{"partner_id": hero, "holy_eqm_id": p.Int("id"), "type": 1})
-	if r := c.until(11090); r.Int("result") != 1 {
+	if r := c.until(11090); r.Int("result") != 1 || r.Str("msg") != "" {
 		t.Fatalf("save: %v", r)
+	}
+	d, _ = e.st.HolyOf(role.RID)
+	if i = holyFind(d, p.Int("id")); len(d.Pieces[i].Wash) != 0 || len(d.Pieces[i].Rand) != 2 {
+		t.Fatalf("saved: %+v", d.Pieces[i])
 	}
 	// a plan keeps the worn piece
 	c.send(25221, proto.Message{"id": 1, "partner_id": hero, "name": "方案甲", "holy_eqm": []proto.Message{{"partner_id": hero, "item_id": p.Int("id")}}})

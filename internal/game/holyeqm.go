@@ -214,9 +214,19 @@ func holyAttrMsgs(l []store.HolyAttr, withPos bool) []proto.Message {
 // holyMessage is one piece as 10501 and 11092 show it.
 func holyMessage(x store.HolyPiece) proto.Message {
 	return proto.Message{"id": x.ID, "base_id": x.Base, "bind": 0, "quantity": 1, "expire_type": 0, "expire_time": 0,
-		"main_attr": holyAttrMsgs(x.Main, false), "holy_eqm_attr": holyAttrMsgs(x.Rand, true), "enchant": 0, "attr": []proto.Message{},
+		"main_attr": holyAttrMsgs(x.Main, false), "holy_eqm_attr": holyRandMsgs(x), "enchant": 0, "attr": []proto.Message{},
 		"extra_attr": []proto.Message{}, "score": holyTable.Bases[x.Base].Score, "all_score": 0, "gemstones": []proto.Message{},
-		"extra": []proto.Message{{"extra_k": holyWashKey, "extra_v": x.Washes}}}
+		"extra": []proto.Message{{"extra_k": 11, "extra_v": 0}, {"extra_k": holyWashKey, "extra_v": x.Washes}}}
+}
+
+// holyRandMsgs are the random attributes of a piece; a wash that is not saved yet is listed after them with the position
+// plus 100 (capture original-2026-10-27, 14-gear-holy).
+func holyRandMsgs(x store.HolyPiece) []proto.Message {
+	out := holyAttrMsgs(x.Rand, true)
+	for _, a := range x.Wash {
+		out = append(out, proto.Message{"attr_id": a.ID, "attr_val": a.Val, "pos": a.Pos + 100})
+	}
+	return out
 }
 
 // holyBag lists the pieces in the bag for 10501; firstPos continues the numbering of the equipment before them.
@@ -403,17 +413,25 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 		}
 		x := d.Pieces[i]
 		b := holyTable.Bases[x.Base]
-		pick := map[int64]bool{}
+		// `pos` lists the attributes that are locked (the window's 锁定属性 boxes; the capture's wash with none locked sent an empty
+		// list); the others are washed. The price of a lock (lock_pay_diamon) is not charged.
+		locked := map[int64]bool{}
 		for _, p := range req.Arr("pos") {
-			pick[p.Int("pos")] = true
+			locked[p.Int("pos")] = true
 		}
-		if len(pick) == 0 {
-			return no("请选择要洗练的属性")
-		}
-		for p := range pick {
+		for p := range locked {
 			if p < 1 || int(p) > len(x.Rand) {
 				return no("属性不存在")
 			}
+		}
+		pick := map[int64]bool{}
+		for _, a := range x.Rand {
+			if !locked[a.Pos] {
+				pick[a.Pos] = true
+			}
+		}
+		if len(pick) == 0 {
+			return no("没有可洗练的属性")
 		}
 		spendA, spendI := splitCost(b.Price, 1)
 		if err := st.Exchange(role.RID, spendA, spendI, nil, nil); err != nil {
@@ -435,26 +453,46 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 				taken[rolled[j].ID] = true
 			}
 		}
-		d.Pieces[i].Rand = rolled
+		d.Pieces[i].Wash = rolled // the piece keeps its attributes until 11090 saves the wash
 		d.Pieces[i].Washes++
 		if err := st.SaveHoly(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11094, "result", 1, "洗练成功", nil); err != nil {
-			return err
-		}
+		// the answer comes last, after the assets and the piece with both the old and the new attributes
 		if err := sendAssets(s, st, role.RID); err != nil {
 			return err
 		}
-		return push(s, role.RID, d.Pieces[i].Partner)
+		if err := push(s, role.RID, d.Pieces[i].Partner); err != nil {
+			return err
+		}
+		return reply(s, 11094, "result", 1, "洗练成功", nil)
 	})
 
-	// 11090 saves the washed attributes. They are already in the piece (see OPEN_QUESTIONS), so there is nothing to keep.
-	r.Handle(11090, func(s *gateway.Session, _ proto.Message) error {
-		if s.Role() == nil {
+	// 11090 keeps (type 1) or drops (type 0, not captured) the attributes of the last wash.
+	r.Handle(11090, func(s *gateway.Session, req proto.Message) error {
+		role := s.Role()
+		if role == nil {
 			return nil
 		}
-		return reply(s, 11090, "result", 1, "保存成功", nil)
+		d, err := load(role.RID)
+		if err != nil {
+			return err
+		}
+		i := holyFind(d, req.Int("holy_eqm_id"))
+		if i < 0 || len(d.Pieces[i].Wash) == 0 {
+			return reply(s, 11090, "result", 0, "没有可保存的洗练", nil)
+		}
+		if req.Int("type") == 1 {
+			d.Pieces[i].Rand = d.Pieces[i].Wash
+		}
+		d.Pieces[i].Wash = nil
+		if err := st.SaveHoly(role.RID, d); err != nil {
+			return err
+		}
+		if err := push(s, role.RID, d.Pieces[i].Partner); err != nil {
+			return err
+		}
+		return reply(s, 11090, "result", 1, "", nil)
 	})
 
 	sellGains := func(d *store.HolyDoc, ids []proto.Message) (spend, gain map[int64]int64, gone map[int64]bool, msg string) {

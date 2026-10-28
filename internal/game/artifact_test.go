@@ -58,15 +58,15 @@ func TestArtifact(t *testing.T) {
 		}
 	}
 	p := tier2[0]
-	if p.Int("id")/artSerial != 10452 || len(p.Arr("extra_attr")) != 1 || len(p.Arr("extra")) != 1 || p.Arr("extra")[0].Int("extra_k") != 1 {
+	if p.Int("id")/artSerial != 10452 || len(p.Arr("attr")) != 1 || len(p.Arr("extra_attr")) != 0 || len(p.Arr("extra")) != 2 || p.Arr("extra")[0].Int("extra_k") != 11 || p.Arr("extra")[1].Int("extra_k") != 1 {
 		t.Fatalf("piece: %v", p)
 	}
 	// wear it: the hero's list shows it, the bag loses one
 	c.send(11030, proto.Message{"partner_id": hero, "pos_id": 1, "artifact_id": p.Int("id"), "type": 1})
-	if r := c.until(11030); r.Int("result") != 1 {
+	hv := c.until(11031) // the original answers last (capture original-2026-10-27)
+	if r := c.until(11030); r.Int("result") != 1 || r.Str("msg") != "" {
 		t.Fatalf("wear: %v", r)
 	}
-	hv := c.until(11031)
 	if len(hv.Arr("artifacts")) != 1 || hv.Arr("artifacts")[0].Int("artifact_pos") != 1 || hv.Arr("artifacts")[0].Int("id") != p.Int("id") {
 		t.Fatalf("hero view: %v", hv)
 	}
@@ -75,8 +75,8 @@ func TestArtifact(t *testing.T) {
 	}
 	hs, _ = e.st.PartnersOf(role.RID)
 	_, atk1, _, _ := partnerStats(hs[0])
-	flat := p.Arr("extra_attr")[0]
-	if flat.Int("attr_id") == 101 && atk1 != atk0+flat.Int("attr_val") {
+	flat := p.Arr("attr")[0] // the wire has thousandths: 43000 is a defense of 43
+	if flat.Int("attr_id") == 101 && atk1 != atk0+flat.Int("attr_val")/1000 {
 		t.Fatalf("attack %d -> %d with %v", atk0, atk1, flat)
 	}
 	// the same piece cannot be worn twice; a second one takes the position and the first goes back
@@ -100,12 +100,19 @@ func TestArtifact(t *testing.T) {
 	}
 	// recast: new skills wait in extra_k 3, saving them makes them the piece's
 	c.send(11033, proto.Message{"partner_id": 0, "artifact_id": p.Int("id"), "skills": []proto.Message{}, "luck_item": 0})
+	cnt := c.until(11048) // the counters come before the answer; the limits are the original's
+	if l := cnt.Arr("artifact_ref_count"); len(l) != 4 || l[0].Int("limit") != 25 || l[1].Int("limit") != 15 || l[3].Int("limit") != 15 {
+		t.Fatalf("counters: %v", cnt)
+	}
 	if r := c.until(11033); r.Int("result") != 1 {
 		t.Fatalf("recast: %v", r)
 	}
 	var pend int64
 	for _, it := range artBag(t, c) {
 		if it.Int("id") == p.Int("id") {
+			if len(it.Arr("extra_attr")) != len(it.Arr("attr")) { // the new base attribute waits in extra_attr
+				t.Fatalf("pending attribute: %v", it)
+			}
 			for _, x := range it.Arr("extra") {
 				if x.Int("extra_k") == 3 {
 					pend = x.Int("extra_v")
@@ -117,12 +124,12 @@ func TestArtifact(t *testing.T) {
 		t.Fatal("no pending skill")
 	}
 	c.send(11034, proto.Message{"partner_id": 0, "artifact_id": p.Int("id"), "type": 0})
-	if r := c.until(11034); r.Int("result") != 1 {
+	if r := c.until(11034); r.Int("result") != 1 || r.Str("msg") != "" {
 		t.Fatalf("save: %v", r)
 	}
 	for _, it := range artBag(t, c) {
 		if it.Int("id") == p.Int("id") {
-			if len(it.Arr("extra")) != 1 || it.Arr("extra")[0].Int("extra_k") != 1 || it.Arr("extra")[0].Int("extra_v") != pend {
+			if len(it.Arr("extra")) != 2 || it.Arr("extra")[1].Int("extra_k") != 1 || it.Arr("extra")[1].Int("extra_v") != pend || len(it.Arr("extra_attr")) != 0 {
 				t.Fatalf("saved: %v", it)
 			}
 		}
@@ -130,7 +137,11 @@ func TestArtifact(t *testing.T) {
 	// decompose one: 300 of 10450 come back (data_artifact_resolve), the piece is gone
 	before, _ := e.st.RoleItems(role.RID)
 	c.send(11035, proto.Message{"artifact_id": []proto.Message{{"id": tier2[2].Int("id")}}})
-	if r := c.until(11035); r.Int("result") != 1 {
+	gain := c.until(12742) // "you got" comes before the answer, which has an empty msg
+	if l := gain.Arr("asset_list"); len(l) != 1 || l[0].Int("bid") != 10450 || l[0].Str("num") != "300" {
+		t.Fatalf("gain: %v", gain)
+	}
+	if r := c.until(11035); r.Int("result") != 1 || r.Str("msg") != "" {
 		t.Fatalf("decompose: %v", r)
 	}
 	after, _ := e.st.RoleItems(role.RID)

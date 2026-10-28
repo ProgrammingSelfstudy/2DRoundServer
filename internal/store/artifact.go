@@ -9,14 +9,15 @@ type ArtAttr struct{ ID, Val int64 }
 // ArtPiece is one artifact of a role. The item ledger only counts the pieces that sit in the bag (a worn piece is taken
 // out of it, like equipment); the piece itself, with its attributes and skills, lives here.
 type ArtPiece struct {
-	ID      int64     // base*10000 + serial, what the client calls artifact_id
-	Base    int64     // 10451~10457
-	Star    int64     // the client's enchant
-	Attr    []ArtAttr // random attributes (extra_attr)
-	Skills  []int64   // skills, by position (extra_k 1, 2, 8)
-	Pending []int64   // skills of a recast that is not saved yet (extra_k 3, 4, 9)
-	Partner int64     // the hero wearing it (0 = in the bag)
-	Pos     int64     // 1 or 2 when worn
+	ID       int64     // base*10000 + serial, what the client calls artifact_id
+	Base     int64     // 10451~10457
+	Star     int64     // the client's enchant
+	Attr     []ArtAttr // random attributes (attr)
+	Skills   []int64   // skills, by position (extra_k 1, 2, 8)
+	Pending  []int64   // skills of a recast that is not saved yet (extra_k 3, 4, 9)
+	PendAttr []ArtAttr // attributes of a recast that is not saved yet (extra_attr)
+	Partner  int64     // the hero wearing it (0 = in the bag)
+	Pos      int64     // 1 or 2 when worn
 }
 
 // ArtifactDoc is the whole module state.

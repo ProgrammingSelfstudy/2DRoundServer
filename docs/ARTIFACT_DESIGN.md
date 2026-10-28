@@ -4,7 +4,7 @@
 
 ## 客户端怎么用
 - 战技是物品表里 type 10（`ARTIFACTCHIPS`）的物品，基础编号 10451~10457（七个品阶），在 10500 背包里**一件一条**，带 `extra`（技能）、`extra_attr`、`attr`、`enchant`（星级）。强化训练 = 10450，重铸石 10430（紫）/10431（橙），幸运宝珠 10470。
-- `extra`：`extra_k` 1、2、8 是当前技能，3、4、9 是重铸后待保存的新技能（`extra_v` 是技能编号）。`extra_attr` 是随机属性（`attr_id`/`attr_val`），`attr` 是星级加成。
+- `extra`：`extra_k` 1、2、8 是当前技能，3、4、9 是重铸后待保存的新技能（`extra_v` 是技能编号）。`attr` 是属性（`attr_id`/`attr_val`，线上 ×1000），`extra_attr` 只在重铸待保存时有新属性（2026-10-27 抓包更正，原先读客户端代码时写反了）。
 - 每个英雄 2 个位置（`artifact_pos` 1、2）。11030：`type` 1 穿到 `pos_id`，0 卸下；11031 回英雄的属性加战技列表（`artifacts` 的字段同背包）；11012 的 `artifacts` 也要带。
 - 11035 分解（按 `data_artifact_resolve` 给强化训练）、11036 合成（`data_artifact_compound[目标][材料数]` 有成功率 `rate`、失败 `award`、熔炼值 `add_num`；熔炼值满 1000 在 11038 换 `change_gift` 的 10454 一个，11037 回当前熔炼值）、11033 重铸（消耗 `ref_expend`，锁定的技能 `skills` 保留，`luck_item` 幸运宝珠）、11034 保存或放弃重铸、11032 升星（`expends` 是材料战技）。11048 回各类型的重铸计数 `current`/`limit`（保底：同类重铸到次数必出稀有技能）。
 - 各品阶的属性数 `attr_num`、技能数 `skill_num` 和技能等级组合在 `data_artifact_data` 的 `skill_desc`（文字），技能池按等级在 `data_artifact_skill[1..4]`，属性数值在 `data_artifact_attr`。

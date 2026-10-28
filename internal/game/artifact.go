@@ -22,8 +22,7 @@ const (
 	artSerial         = 10000        // piece id = base*artSerial + serial
 	artTrain          = 10450        // 强化训练, what pieces are decomposed into and recast with
 	artCoin           = 1
-	artPositions      = 2  // artifact_pos 1, 2 on a hero
-	artPity           = 10 // recasts of one tier before a rare skill is sure (the client says "指定次数", not which; ours)
+	artPositions      = 2 // artifact_pos 1, 2 on a hero
 )
 
 // the client's attribute ids (Config.AttrData.data_key_to_id) of the keys artifacts roll
@@ -155,34 +154,40 @@ func rareSkill(lvl int) int64 {
 // client has only the ceiling; the range is ours), and the skills.
 func newArtPiece(d *store.ArtifactDoc, base int64) store.ArtPiece {
 	d.Next[base]++
-	a := store.ArtPiece{ID: base*artSerial + d.Next[base], Base: base}
+	a := store.ArtPiece{ID: base*artSerial + d.Next[base], Base: base, Attr: rollArtAttrs(base)}
+	if combos := artSkillCombos[base]; len(combos) > 0 {
+		a.Skills = rollSkills(combos[rand.Intn(len(combos))], nil, false)
+	}
+	return a
+}
+
+// rollArtAttrs rolls the attributes of a tier: the first is one of the four flat ones, the rest are percent ones.
+func rollArtAttrs(base int64) []store.ArtAttr {
+	var out []store.ArtAttr
 	tier := artTable.Tiers[base]
 	ceil := artTable.Attr[base]
 	roll := func(key string) store.ArtAttr {
-		v := ceil[key] * int64(60+rand.Intn(41)) / 100
-		return store.ArtAttr{ID: artAttrIDs[key], Val: max(v, 1)}
+		// every attribute in the capture (original-2026-10-27, 14 of them over six tiers) is exactly the table's value
+		return store.ArtAttr{ID: artAttrIDs[key], Val: max(ceil[key], 1)}
 	}
 	for i := 0; i < tier.AttrNum; i++ {
 		if i == 0 {
-			a.Attr = append(a.Attr, roll(artFlatKeys[rand.Intn(len(artFlatKeys))]))
+			out = append(out, roll(artFlatKeys[rand.Intn(len(artFlatKeys))]))
 			continue
 		}
 		have := map[int64]bool{}
-		for _, x := range a.Attr {
+		for _, x := range out {
 			have[x.ID] = true
 		}
 		for {
 			k := artPerKeys[rand.Intn(len(artPerKeys))]
 			if !have[artAttrIDs[k]] {
-				a.Attr = append(a.Attr, roll(k))
+				out = append(out, roll(k))
 				break
 			}
 		}
 	}
-	if combos := artSkillCombos[base]; len(combos) > 0 {
-		a.Skills = rollSkills(combos[rand.Intn(len(combos))], nil, false)
-	}
-	return a
+	return out
 }
 
 // syncArtifacts makes the pieces in the bag match the item ledger, which every other module (mail, shop, gift boxes, selling)
@@ -224,7 +229,7 @@ func artFind(d *store.ArtifactDoc, id int64) int {
 }
 
 func artExtra(a store.ArtPiece) []proto.Message {
-	out := []proto.Message{}
+	out := []proto.Message{{"extra_k": 11, "extra_v": 0}} // every piece of the original has this first
 	for i, sk := range a.Skills {
 		out = append(out, proto.Message{"extra_k": artSkillSlot[i][0], "extra_v": sk})
 	}
@@ -234,10 +239,10 @@ func artExtra(a store.ArtPiece) []proto.Message {
 	return out
 }
 
-func artAttrs(a store.ArtPiece) []proto.Message {
+func artAttrList(list []store.ArtAttr) []proto.Message {
 	out := []proto.Message{}
-	for _, x := range a.Attr {
-		out = append(out, proto.Message{"attr_id": x.ID, "attr_val": x.Val})
+	for _, x := range list {
+		out = append(out, proto.Message{"attr_id": x.ID, "attr_val": x.Val * 1000}) // the wire has thousandths
 	}
 	return out
 }
@@ -247,7 +252,7 @@ func artifactsOf(p store.Partner) []proto.Message {
 	out := []proto.Message{}
 	for _, a := range p.Artifacts {
 		out = append(out, proto.Message{"artifact_pos": a.Pos, "id": a.ID, "base_id": a.Base, "enchant": a.Star,
-			"attr": []proto.Message{}, "extra_attr": artAttrs(a), "extra": artExtra(a)})
+			"attr": artAttrList(a.Attr), "extra_attr": artAttrList(a.PendAttr), "extra": artExtra(a)})
 	}
 	return out
 }
@@ -264,8 +269,8 @@ func artifactBag(d *store.ArtifactDoc, firstPos int) []proto.Message {
 	out := []proto.Message{}
 	for i, a := range ps {
 		out = append(out, proto.Message{"id": a.ID, "base_id": a.Base, "bind": 0, "quantity": 1, "pos": firstPos + i,
-			"expire_type": 0, "expire_time": 0, "main_attr": []proto.Message{}, "enchant": a.Star, "attr": []proto.Message{},
-			"extra_attr": artAttrs(a), "score": 0, "all_score": 0, "extra": artExtra(a), "gemstones": []proto.Message{},
+			"expire_type": 0, "expire_time": 0, "main_attr": []proto.Message{}, "enchant": a.Star, "attr": artAttrList(a.Attr),
+			"extra_attr": artAttrList(a.PendAttr), "score": 0, "all_score": 0, "extra": artExtra(a), "gemstones": []proto.Message{},
 			"holy_eqm_attr": []proto.Message{}})
 	}
 	return out
@@ -294,7 +299,8 @@ func artifactBonus(arts []store.ArtPiece, hp, atk, def, speed int64) (int64, int
 			}
 		}
 	}
-	return hp * (100 + per["hp_max_per"]) / 100, atk * (100 + per["atk_per"]) / 100, def * (100 + per["def_per"]) / 100, speed
+	// the percent values are in tenths of a percent (the window shows 50 as 5%)
+	return hp * (1000 + per["hp_max_per"]) / 1000, atk * (1000 + per["atk_per"]) / 1000, def * (1000 + per["def_per"]) / 1000, speed
 }
 
 func artItems(pairs [][]int64, times int64) map[int64]int64 {
@@ -303,6 +309,24 @@ func artItems(pairs [][]int64, times int64) map[int64]int64 {
 		m[p[0]] += p[1] * times
 	}
 	return m
+}
+
+// artPity is the recasts of one tier before a rare skill is sure: the counters 11048 sends have the limit 25 for the first
+// tier and 15 for the other three (capture original-2026-10-27, 14-gear-skill; what the counter does at the limit is still ours).
+func artPity(base int64) int64 {
+	if base == 10454 {
+		return 25
+	}
+	return 15
+}
+
+// sendRecastCounters sends 11048: the recast counters of the four tiers that have one.
+func sendRecastCounters(s *gateway.Session, d *store.ArtifactDoc) error {
+	list := []proto.Message{}
+	for typ, base := range []int64{10454, 10455, 10456, 10457} { // the client's counter types 1~4
+		list = append(list, proto.Message{"type": typ + 1, "current": d.Recasts[base], "limit": artPity(base)})
+	}
+	return s.Send(11048, proto.Message{"artifact_ref_count": list})
 }
 
 // splitCost puts the currency part of a cost list (item id 1 and the other currencies) in assets and the rest in items.
@@ -440,17 +464,14 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
-		msg := "穿戴成功"
-		if req.Int("type") == 0 {
-			msg = "卸下成功"
-		}
-		if err := reply(s, 11030, 1, msg, proto.Message{"partner_id": pid}); err != nil {
+		// the original answers last and with an empty msg (capture original-2026-10-27, 14-gear-skill)
+		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
 		if err := sendHero(s, role.RID, pid); err != nil {
 			return err
 		}
-		return sendBackpack(s, st)
+		return reply(s, 11030, 1, "", proto.Message{"partner_id": pid})
 	})
 
 	r.Handle(11033, func(s *gateway.Session, req proto.Message) error {
@@ -506,7 +527,7 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		}
 		levels = levels[:len(a.Skills)]
 		tierPity := a.Base >= 10454
-		guaranteed := tierPity && d.Recasts[a.Base]+1 >= artPity
+		guaranteed := tierPity && d.Recasts[a.Base]+1 >= artPity(a.Base)
 		rare := guaranteed || luck == 1
 		if err := st.Exchange(role.RID, spendA, spendI, nil, nil); err != nil {
 			if errors.Is(err, store.ErrConflict) {
@@ -515,6 +536,7 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		d.Pieces[i].Pending = rollSkills(levels, keep, rare)
+		d.Pieces[i].PendAttr = rollArtAttrs(a.Base) // the base attribute is rolled again too (the window says 随机属性)
 		if tierPity {
 			d.Recasts[a.Base]++
 			if guaranteed {
@@ -524,13 +546,17 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11033, 1, "重铸成功", proto.Message{"luck_item": luck}); err != nil {
-			return err
-		}
+		// the answer comes last, after the assets, the counters and the piece
 		if err := sendAssets(s, st, role.RID); err != nil {
 			return err
 		}
-		return pushPiece(s, role.RID, d.Pieces[i])
+		if err := sendRecastCounters(s, d); err != nil {
+			return err
+		}
+		if err := pushPiece(s, role.RID, d.Pieces[i]); err != nil {
+			return err
+		}
+		return reply(s, 11033, 1, "重铸成功", proto.Message{"luck_item": luck})
 	})
 
 	r.Handle(11034, func(s *gateway.Session, req proto.Message) error {
@@ -547,13 +573,16 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 			return reply(s, 11034, 0, "没有可保存的重铸", nil)
 		}
 		d.Pieces[i].Skills, d.Pieces[i].Pending = d.Pieces[i].Pending, nil
+		if len(d.Pieces[i].PendAttr) > 0 {
+			d.Pieces[i].Attr, d.Pieces[i].PendAttr = d.Pieces[i].PendAttr, nil
+		}
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11034, 1, "保存成功", nil); err != nil {
+		if err := pushPiece(s, role.RID, d.Pieces[i]); err != nil {
 			return err
 		}
-		return pushPiece(s, role.RID, d.Pieces[i])
+		return reply(s, 11034, 1, "", nil)
 	})
 
 	r.Handle(11035, func(s *gateway.Session, req proto.Message) error {
@@ -601,10 +630,13 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11035, 1, "分解成功", nil); err != nil {
+		if err := refresh(s, role.RID); err != nil {
 			return err
 		}
-		return refresh(s, role.RID)
+		if err := sendAssetGain(s, gain); err != nil {
+			return err
+		}
+		return reply(s, 11035, 1, "", nil)
 	})
 
 	r.Handle(11036, func(s *gateway.Session, req proto.Message) error {
@@ -668,13 +700,18 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11036, 1, msg, proto.Message{"flag": flag}); err != nil {
+		if err := refresh(s, role.RID); err != nil {
 			return err
 		}
-		if err := s.Send(11037, proto.Message{"lucky": d.Lucky}); err != nil {
+		if err := sendAssetGain(s, gain); err != nil {
 			return err
 		}
-		return refresh(s, role.RID)
+		if !win { // a success sent no 11037 (capture original-2026-10-27); what a failure sent is not known
+			if err := s.Send(11037, proto.Message{"lucky": d.Lucky}); err != nil {
+				return err
+			}
+		}
+		return reply(s, 11036, 1, msg, proto.Message{"flag": flag})
 	})
 
 	r.Handle(11037, func(s *gateway.Session, _ proto.Message) error {
@@ -727,11 +764,7 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		list := []proto.Message{}
-		for typ, base := range []int64{10454, 10455, 10456, 10457} { // the client's counter types 1~4
-			list = append(list, proto.Message{"type": typ + 1, "current": d.Recasts[base], "limit": artPity})
-		}
-		return s.Send(11048, proto.Message{"artifact_ref_count": list})
+		return sendRecastCounters(s, d)
 	})
 
 	r.Handle(11032, func(s *gateway.Session, _ proto.Message) error {

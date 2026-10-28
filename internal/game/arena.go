@@ -26,7 +26,7 @@ const (
 	arenaTicket      = 10103
 	arenaTicketGems  = 20 // ticket_price
 	arenaLoseRatio   = 600
-	arenaWinCoin     = 30000 // ours: the drops 20002 / 20003 are on the server only
+	arenaWinCoin     = 20000 // capture original-2026-10-27: a first win gave 20000 gold, the next 15 arena prestige (bid 8): the drops are random, here always the gold
 	arenaOpponents   = 3
 	arenaTopList     = 50
 	arenaRobotBase   = 4000000000 // robot rids start here, above any real role
@@ -79,11 +79,15 @@ func arenaSeason(now time.Time) (key, start, end int64) {
 	return dayKey(monday), start, start + 7*86400 - 1
 }
 
-// arenaGain is the score a win is worth: more against a stronger opponent.
-func arenaGain(mine, theirs int64) int64 {
-	g := 20 + (theirs-mine)/10
-	return min(max(g, 5), 60)
+// arenaGain is the score a win is worth: 20 against the 1000 of a new standing, a little more against
+// a higher one, whatever the winner's own score is (capture original-2026-10-27: 20 against five 1000s, 22
+// against 1107, at 1085, 1105 and 1125). Two points only: the slope is a fit.
+func arenaGain(_, theirs int64) int64 {
+	return min(max(20+(theirs-arenaInitScore)/50, 5), 60)
 }
+
+// arenaLoss is what the loser of a lost challenge pays: 15 for the win worth 20 (same capture, `lose_score`).
+func arenaLoss(gain int64) int64 { return gain * 3 / 4 }
 
 // arenaTouch brings a standing up to date: the day's counters and the season's.
 func arenaTouch(a *store.ArenaPlayer, now time.Time) {
@@ -637,7 +641,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	if won {
 		result = 1
 		gain = arenaGain(a.Score, opp.Score)
-		lose = gain
+		lose = arenaLoss(gain)
 		a.Score += gain
 		a.ContWin++
 	} else {
@@ -694,7 +698,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 		return err
 	}
 	if err := s.Send(20210, proto.Message{"result": result, "score": a.Score, "get_score": gain, "items": []proto.Message{{"bid": 1, "num": coin}},
-		"tar_name": opp.Name, "tar_lev": opp.Lev, "tar_face": opp.Face, "face_update_time": 0, "face_file": "", "tar_score": opp.Score - lose, "lose_score": lose,
+		"tar_name": opp.Name, "tar_lev": opp.Lev, "tar_face": opp.Face, "face_update_time": 0, "face_file": "", "tar_score": opp.Score - lose, "lose_score": -lose,
 		"target_role_name": opp.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": replayID,
 		"partner_bid": bid, "partner_hurt": hurt, "partner_total_hurt": total}); err != nil {
 		return err

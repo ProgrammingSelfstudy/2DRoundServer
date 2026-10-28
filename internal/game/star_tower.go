@@ -241,9 +241,22 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		return s.Send(11323, proto.Message{"result": 1, "max_tower": t.MaxTower, "tower": floor.Lev, "timer": 0, "count": towerCount(t, s.Now()),
+		if err := s.Send(11323, proto.Message{"result": 1, "max_tower": t.MaxTower, "tower": floor.Lev, "timer": 0, "count": towerCount(t, s.Now()),
 			"first_award": awardMessages(firstGains), "award": awardMessages(gains), "target_role_name": floor.Name,
-			"hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": 0, "is_skip": b2i(skip)})
+			"hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": 0, "is_skip": b2i(skip)}); err != nil || skip {
+			return err
+		}
+		// the original follows every won floor with the milestones that changed: none, or "can be taken" (1)
+		// for the one this floor reaches (capture original-2026-10-27, floors 29 to 31 and the 30th)
+		changed := []proto.Message{}
+		if first {
+			for _, m := range towerCfg.Milestones {
+				if m.Tower == floor.Lev {
+					changed = append(changed, proto.Message{"id": m.ID, "status": 1})
+				}
+			}
+		}
+		return s.Send(11329, proto.Message{"award_list": changed})
 	}
 	r.Handle(11322, func(s *gateway.Session, req proto.Message) error {
 		role, t, ok, err := open(s)
@@ -404,10 +417,11 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 			if err := sendBackpack(s, st); err != nil {
 				return err
 			}
-			if err := s.Send(11328, proto.Message{"result": 1, "msg": "领取成功"}); err != nil {
+			// the original sends the changed state (11329) first, then the answer with an empty msg
+			if err := s.Send(11329, proto.Message{"award_list": []proto.Message{{"id": m.ID, "status": 2}}}); err != nil {
 				return err
 			}
-			return s.Send(11329, proto.Message{"award_list": []proto.Message{{"id": m.ID, "status": 2}}})
+			return s.Send(11328, proto.Message{"result": 1, "msg": ""})
 		}
 		return refuse("奖励不存在")
 	})

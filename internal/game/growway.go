@@ -58,7 +58,7 @@ func growHas(st *store.Store, rid, id int64) (bool, error) {
 // [start, start+num).
 func growPage(d *growDoc, start, num int64) []proto.Message {
 	list := append([]growEntry(nil), d.Entries...)
-	sort.Slice(list, func(i, j int) bool { return list[i].Order < list[j].Order })
+	sort.Slice(list, func(i, j int) bool { return list[i].Order > list[j].Order }) // newest first, like the original (capture original-2026-10-27)
 	out := []proto.Message{}
 	for _, e := range list {
 		if start == 0 {

@@ -175,7 +175,7 @@ func TestArenaRealOpponentLosesScore(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if won && theirs.Score != 1000-res.Int("lose_score") || !won && theirs.Score != 1000 {
+	if won && theirs.Score != 1000+res.Int("lose_score") || !won && theirs.Score != 1000 {
 		t.Fatalf("their score %d after %v", theirs.Score, res)
 	}
 	b.send(20222, proto.Message{})

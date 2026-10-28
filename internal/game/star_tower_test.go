@@ -106,11 +106,12 @@ func TestStarTowerSweepBuyMilestoneAndRank(t *testing.T) {
 		t.Fatalf("floor 20 not reached: %v", r)
 	}
 	c.send(11328, proto.Message{"id": 1})
-	if r := c.waitFor(11328); r.Int("result") != 1 {
-		t.Fatalf("milestone: %v", r)
-	}
+	// the original sends the changed state first, then the answer (capture original-2026-10-27)
 	if u := c.waitFor(11329); len(u.Arr("award_list")) != 1 || u.Arr("award_list")[0].Int("status") != 2 {
 		t.Fatalf("milestone push: %v", u)
+	}
+	if r := c.waitFor(11328); r.Int("result") != 1 || r.Str("msg") != "" {
+		t.Fatalf("milestone: %v", r)
 	}
 	c.send(11328, proto.Message{"id": 1})
 	if r := c.waitFor(11328); r.Int("result") != 0 {

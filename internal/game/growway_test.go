@@ -41,11 +41,11 @@ func TestGrowWay(t *testing.T) {
 		return out
 	}
 	a.send(25830, proto.Message{"start": 0, "num": 2})
-	if got := orders(a.waitFor(25830), "progress"); len(got) != 2 || got[0] != 4 || got[1] != 5 {
+	if got := orders(a.waitFor(25830), "progress"); len(got) != 2 || got[0] != 5 || got[1] != 4 { // newest first (capture original-2026-10-27)
 		t.Fatalf("newest two: %v", got)
 	}
 	a.send(25830, proto.Message{"start": 2, "num": 2})
-	if got := orders(a.waitFor(25830), "progress"); len(got) != 2 || got[0] != 2 || got[1] != 3 {
+	if got := orders(a.waitFor(25830), "progress"); len(got) != 2 || got[0] != 3 || got[1] != 2 {
 		t.Fatalf("from 2: %v", got)
 	}
 	// another role reads it by id
@@ -85,6 +85,15 @@ func TestGrowEvents(t *testing.T) {
 		}
 		return false
 	}
+	// hasAny: one of the n variants of an event (the original picks one at random)
+	hasAny := func(rid, base int64, n int) bool {
+		for i := 0; i < n; i++ {
+			if has(rid, base+int64(i)) {
+				return true
+			}
+		}
+		return false
+	}
 	// the first friend
 	if err := e.st.RequestFriend(ra.RID, rb.RID); err != nil {
 		t.Fatal(err)
@@ -93,20 +102,20 @@ func TestGrowEvents(t *testing.T) {
 		t.Fatal(err)
 	}
 	growFriend(e.st, ra.RID, rb.Name, 1)
-	if !has(ra.RID, 103001) {
+	if !hasAny(ra.RID, 103001, 4) {
 		t.Fatalf("first friend: %v", ids(ra.RID))
 	}
 	// a guild
 	growGuild(e.st, rb.RID, "海贼团", ra.RID, false, 2)
 	growGuild(e.st, ra.RID, "海贼团", ra.RID, true, 2)
-	if !has(rb.RID, 109001) || !has(ra.RID, 110001) {
+	if !hasAny(rb.RID, 109001, 4) || !hasAny(ra.RID, 110001, 4) {
 		t.Fatalf("guild: %v %v", ids(rb.RID), ids(ra.RID))
 	}
 	// worshipped: 1st, then nothing until the 10th
 	growWorshipped(e.st, ra.RID, "乙乙", 1, 3)
 	growWorshipped(e.st, ra.RID, "乙乙", 2, 3)
 	growWorshipped(e.st, ra.RID, "乙乙", 100, 3)
-	if !has(ra.RID, 107001) || !has(ra.RID, 107003) {
+	if !hasAny(ra.RID, 107001, 3) || !has(ra.RID, 107003) {
 		t.Fatalf("worship: %v", ids(ra.RID))
 	}
 	// stars: the first 6-star hero once, the 5th 10-star hero
@@ -119,11 +128,11 @@ func TestGrowEvents(t *testing.T) {
 	growStar(e.st, rb.RID, "火拳", 10, 6)
 	n6 := 0
 	for _, id := range ids(rb.RID) {
-		if id == 102001 {
+		if id >= 102001 && id <= 102004 {
 			n6++
 		}
 	}
-	if n6 != 1 || !has(rb.RID, 121101) {
+	if n6 != 1 || !hasAny(rb.RID, 121101, 2) {
 		t.Fatalf("stars: %v", ids(rb.RID))
 	}
 	growChampion(e.st, rb.RID, 1, 7)

@@ -65,7 +65,7 @@ var guildSecretCfg = func() *gsecretConf {
 
 // The vitality a guild earns (our rule; the client only says that opening a crusade costs it).
 const (
-	vitalityDonate = 20
+	vitalityDonate = 0 // capture original-2026-10-27: 13518 `vitality` was 1185 before and after a donation
 	vitalityBoss   = 10
 	vitalitySecret = 5
 )

@@ -113,9 +113,11 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 		if _, err := st.AddCounter(role.RID, key, 1); err != nil {
 			return err
 		}
-		if _, err := st.AddCounter(rid, worshipGot, 1); err != nil {
+		total, err := st.AddCounter(rid, worshipGot, 1)
+		if err != nil {
 			return err
 		}
+		growWorshipped(st, rid, role.Name, total, s.Now().Unix())
 		if kind == worshipCrossArena { // the honour list of the cross-server arena pays for it
 			ga, gi := map[int64]int64{}, map[int64]int64{}
 			like := caCfg.pair("like_reward")

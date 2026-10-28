@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"log"
+	"time"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -244,6 +245,9 @@ func (f *FriendService) befriend(me *store.Role, rid int64) (string, bool, error
 	}
 	f.push(me.RID, 13310, f.friendEntry(other, nil))
 	f.push(other.RID, 13310, f.friendEntry(me, nil))
+	now := time.Now().Unix()
+	growFriend(f.Store, me.RID, other.Name, now)
+	growFriend(f.Store, other.RID, me.Name, now)
 	return "已添加好友", true, nil
 }
 

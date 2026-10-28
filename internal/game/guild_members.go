@@ -549,6 +549,7 @@ func (g *GuildService) answerApply(s *gateway.Session, kind int, rid int64, repl
 		return err
 	}
 	g.pushLog(gd.GID, guildLogGeneral, rid, applicant.Name, "加入了公会", now)
+	growGuild(g.Store, rid, gd.Name, gd.LeaderRID, false, now)
 	if err := reply(true, "已同意申请"); err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"2droundserver/internal/proto"
+	"2droundserver/internal/store"
 )
 
 func TestGrowWay(t *testing.T) {
@@ -59,4 +60,76 @@ func TestGrowWay(t *testing.T) {
 		t.Fatalf("own: %v", r)
 	}
 	_ = rb
+}
+
+func TestGrowEvents(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	_, ra := e.enter("ua", "甲甲")
+	_, rb := e.enter("ub", "乙乙")
+	ids := func(rid int64) []int64 {
+		d := &growDoc{}
+		if _, err := e.st.LoadState(rid, growModule, d); err != nil {
+			t.Fatal(err)
+		}
+		var out []int64
+		for _, g := range d.Entries {
+			out = append(out, g.ID)
+		}
+		return out
+	}
+	has := func(rid, id int64) bool {
+		for _, x := range ids(rid) {
+			if x == id {
+				return true
+			}
+		}
+		return false
+	}
+	// the first friend
+	if err := e.st.RequestFriend(ra.RID, rb.RID); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.AcceptFriendRequest(ra.RID, rb.RID, 100); err != nil {
+		t.Fatal(err)
+	}
+	growFriend(e.st, ra.RID, rb.Name, 1)
+	if !has(ra.RID, 103001) {
+		t.Fatalf("first friend: %v", ids(ra.RID))
+	}
+	// a guild
+	growGuild(e.st, rb.RID, "海贼团", ra.RID, false, 2)
+	growGuild(e.st, ra.RID, "海贼团", ra.RID, true, 2)
+	if !has(rb.RID, 109001) || !has(ra.RID, 110001) {
+		t.Fatalf("guild: %v %v", ids(rb.RID), ids(ra.RID))
+	}
+	// worshipped: 1st, then nothing until the 10th
+	growWorshipped(e.st, ra.RID, "乙乙", 1, 3)
+	growWorshipped(e.st, ra.RID, "乙乙", 2, 3)
+	growWorshipped(e.st, ra.RID, "乙乙", 100, 3)
+	if !has(ra.RID, 107001) || !has(ra.RID, 107003) {
+		t.Fatalf("worship: %v", ids(ra.RID))
+	}
+	// stars: the first 6-star hero once, the 5th 10-star hero
+	if _, err := e.st.GrantStarterPartners(rb.RID, []store.PartnerSeed{{BID: 10502, Star: 6}, {BID: 10502, Star: 10}, {BID: 10502, Star: 10},
+		{BID: 10502, Star: 10}, {BID: 10502, Star: 10}, {BID: 10502, Star: 10}}); err != nil {
+		t.Fatal(err)
+	}
+	growStar(e.st, rb.RID, "火拳", 6, 4)
+	growStar(e.st, rb.RID, "火拳", 6, 5)
+	growStar(e.st, rb.RID, "火拳", 10, 6)
+	n6 := 0
+	for _, id := range ids(rb.RID) {
+		if id == 102001 {
+			n6++
+		}
+	}
+	if n6 != 1 || !has(rb.RID, 121101) {
+		t.Fatalf("stars: %v", ids(rb.RID))
+	}
+	growChampion(e.st, rb.RID, 1, 7)
+	growChampion(e.st, rb.RID, 20, 7)
+	growChampion(e.st, rb.RID, 90, 7)
+	if !has(rb.RID, 118201) || !has(rb.RID, 118001) {
+		t.Fatalf("champion: %v", ids(rb.RID))
+	}
 }

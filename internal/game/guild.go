@@ -420,6 +420,7 @@ func (g *GuildService) registerBasics(r *gateway.Router) {
 			return err
 		}
 		g.pushLog(gid, guildLogGeneral, fresh.RID, fresh.Name, "创建了公会", now)
+		growGuild(g.Store, fresh.RID, name, fresh.RID, true, now)
 		if err := sendAssets(s, g.Store, fresh.RID); err != nil {
 			return err
 		}
@@ -522,6 +523,7 @@ func (g *GuildService) registerBasics(r *gateway.Router) {
 				return err
 			}
 			g.pushLog(gid, guildLogGeneral, fresh.RID, fresh.Name, "加入了公会", now)
+			growGuild(g.Store, fresh.RID, gd.Name, gd.LeaderRID, false, now)
 			if err := reply(true, "加入公会成功", false); err != nil {
 				return err
 			}

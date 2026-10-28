@@ -158,6 +158,7 @@ func (l *Login) createRole(s *gateway.Session, req proto.Message) error {
 	if err != nil {
 		return err
 	}
+	growCreated(l.Store, role.RID, s.Now().Unix())
 	return s.Send(10191, proto.Message{
 		"code": codeOK, "msg": "", "rid": role.RID, "srv_id": role.SrvID, "name": role.Name, "reg_time": role.CreatedAt,
 	})

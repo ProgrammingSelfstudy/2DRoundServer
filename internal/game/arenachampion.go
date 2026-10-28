@@ -923,6 +923,9 @@ func (c *champSvc) finish(srv string, stt *champState) error {
 				return err
 			}
 		}
+		if !c.cross {
+			growChampion(c.st, e.RID, e.Rank, time.Now().Unix())
+		}
 		role := &champRole{}
 		if _, err := c.st.LoadState(e.RID, c.module, role); err != nil {
 			return err

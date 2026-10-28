@@ -464,6 +464,11 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
+		if req.Int("type") != 0 {
+			if hp, err := st.PartnerByID(role.RID, pid); err == nil {
+				growArtifact(st, role.RID, partnerTable[hp.BID].Name, a.Base, s.Now().Unix())
+			}
+		}
 		// the original answers last and with an empty msg (capture original-2026-10-27, 14-gear-skill)
 		if err := sendBackpack(s, st); err != nil {
 			return err

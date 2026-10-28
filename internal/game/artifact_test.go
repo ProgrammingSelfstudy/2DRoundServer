@@ -207,3 +207,45 @@ func TestSyncArtifacts(t *testing.T) {
 		t.Fatalf("shrunk: %+v", d.Pieces)
 	}
 }
+
+// Wearing the first super skill book writes a line in the growth way (capture original-2026-10-27: 125001 with the hero's name);
+// a mid-tier book writes none, and a second super one is not written again.
+func TestArtifactGrowthLine(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u2", "乙")
+	if _, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: 10401, Star: 6}}); err != nil {
+		t.Fatal(err)
+	}
+	hs, _ := e.st.PartnersOf(role.RID)
+	hero := hs[0].PartnerID
+	e.give(c, role, map[int64]int64{10452: 1, 10454: 2})
+	bag := artBag(t, c)
+	wear := func(it proto.Message, pos int) {
+		t.Helper()
+		c.send(11030, proto.Message{"partner_id": hero, "pos_id": pos, "artifact_id": it.Int("id"), "type": 1})
+		if r := c.until(11030); r.Int("result") != 1 {
+			t.Fatalf("wear: %v", r)
+		}
+	}
+	var mid, super []proto.Message
+	for _, it := range bag {
+		if it.Int("base_id") == 10454 {
+			super = append(super, it)
+		} else if it.Int("base_id") == 10452 {
+			mid = append(mid, it)
+		}
+	}
+	wear(mid[0], 1)
+	if had, _ := growHasAny(e.st, role.RID, 125001, 2); had {
+		t.Fatal("a mid-tier book wrote a line")
+	}
+	wear(super[0], 1)
+	if had, _ := growHasAny(e.st, role.RID, 125001, 2); !had {
+		t.Fatal("the super book wrote no line")
+	}
+	wear(super[1], 2)
+	c.send(25830, proto.Message{"num": 10, "start": 0})
+	if r := c.until(25830); len(r.Arr("progress")) != 1 || r.Arr("progress")[0].Int("id")/10 != 12500 || r.Arr("progress")[0].Arr("arge")[0].Str("val") == "" {
+		t.Fatalf("growth way: %v", r)
+	}
+}

@@ -69,6 +69,20 @@ func growWorshipped(st *store.Store, rid int64, by string, total, now int64) {
 	}
 }
 
+// growArtifact: a hero got a super (10454) or legend (10455) skill book. The capture (original-2026-10-27) has a line for
+// the first super one worn and none for a mid-tier one; whether later ones get a line too is not known, so it is the first only.
+func growArtifact(st *store.Store, rid int64, name string, base, now int64) {
+	id, n := int64(125001), 2
+	if base == 10455 {
+		id, n = 126001, 3
+	} else if base != 10454 {
+		return
+	}
+	if had, err := growHasAny(st, rid, id, n); err == nil && !had {
+		_ = RecordGrowth(st, rid, growPick(id, n), now, name)
+	}
+}
+
 // growStar: a hero reached a star. The first hero of a star and the 5th, 10th and 15th hero at 10, 11 and 12 stars get a line.
 func growStar(st *store.Store, rid int64, name string, star int, now int64) {
 	ps, err := st.PartnersOf(rid)

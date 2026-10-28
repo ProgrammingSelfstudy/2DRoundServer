@@ -19,6 +19,9 @@ var elitePassJSON []byte
 
 const elitePassModule = "elitepass"
 
+// elitePassAdvanceCharge is the charge product of the advance card of the pass.
+const elitePassAdvanceCharge = 909
+
 type elitePassLev struct {
 	Lev       int64      `json:"lev"`
 	Wins      int64      `json:"wins"`
@@ -45,6 +48,9 @@ type elitePassState struct {
 	Month int64 // the 30-day period of the wins (elitePassNow); a new period starts from nothing
 	Wins  int64
 	Levs  []int64 // the level rewards taken
+	// the advance card (product 909) of the period was paid, and the levels whose advance reward was taken
+	Premium bool
+	RmbLevs []int64
 }
 
 // elitePassStart is the first day of the period the original server showed on 2026-10-26 (capture original-2026-10-26:
@@ -104,6 +110,25 @@ func elitePassWin(st *store.Store, rid int64, now time.Time) error {
 // level has a free reward. The paid track (the advance card) needs payments, which we have none of. The period of a month
 // and the window are our rules.
 func RegisterElitePass(r *gateway.Router, st *store.Store) {
+	// the advance card (product 909), once a period; it is the period the confirmation falls in
+	RegisterChargeGuard(elitePassAdvanceCharge, func(st *store.Store, role *store.Role) error {
+		state, err := loadElitePass(st, role.RID, time.Now())
+		switch {
+		case err != nil:
+			return err
+		case state.Premium:
+			return errNotPayable("本期已激活进阶卡")
+		}
+		return nil
+	})
+	RegisterChargeHook(elitePassAdvanceCharge, func(st *store.Store, role *store.Role, _ ChargeProduct, _ int64) (map[int64]int64, map[int64]int64, error) {
+		state, err := loadElitePass(st, role.RID, time.Now())
+		if err != nil {
+			return nil, nil, err
+		}
+		state.Premium = true
+		return nil, nil, st.SaveState(role.RID, elitePassModule, state)
+	})
 	r.Handle(24952, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {
@@ -116,13 +141,17 @@ func RegisterElitePass(r *gateway.Router, st *store.Store) {
 		period, day, end, _ := elitePassNow(s.Now())
 		levs := elitePassCfg[period]
 		list := []proto.Message{}
-		ids := append([]int64(nil), state.Levs...)
+		seen := map[int64]bool{}
+		ids := append(append([]int64(nil), state.Levs...), state.RmbLevs...)
 		sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 		for _, id := range ids {
-			list = append(list, proto.Message{"id": id, "award_status": 1, "rmb_award_status": 0})
+			if !seen[id] {
+				seen[id] = true
+				list = append(list, proto.Message{"id": id, "award_status": b2i(has(state.Levs, id)), "rmb_award_status": b2i(has(state.RmbLevs, id))})
+			}
 		}
 		return s.Send(24952, proto.Message{"period": period, "cur_day": day, "end_time": end, "lev": state.reached(levs),
-			"rmb_status": 0, "win_count": state.Wins, "list": list})
+			"rmb_status": b2i(state.Premium), "win_count": state.Wins, "list": list})
 	})
 	r.Handle(24953, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -139,7 +168,7 @@ func RegisterElitePass(r *gateway.Router, st *store.Store) {
 		reached := state.reached(levs)
 		var rows []elitePassLev
 		for _, l := range levs {
-			if l.Lev <= reached && !has(state.Levs, l.Lev) && (req.Int("id") == 0 || req.Int("id") == l.Lev) {
+			if l.Lev <= reached && (!has(state.Levs, l.Lev) || (state.Premium && !has(state.RmbLevs, l.Lev))) && (req.Int("id") == 0 || req.Int("id") == l.Lev) {
 				rows = append(rows, l)
 			}
 		}
@@ -153,13 +182,22 @@ func RegisterElitePass(r *gateway.Router, st *store.Store) {
 			return refuse("没有可领取的奖励")
 		}
 		ga, gi := map[int64]int64{}, map[int64]int64{}
-		for _, l := range rows {
-			for _, a := range l.Reward {
+		add := func(rows [][2]int64) {
+			for _, a := range rows {
 				if ItemKnown(a[0]) {
 					splitGains([]sellGain{{a[0], a[1]}}, 1, ga, gi)
 				}
 			}
-			state.Levs = append(state.Levs, l.Lev)
+		}
+		for _, l := range rows {
+			if !has(state.Levs, l.Lev) {
+				add(l.Reward)
+				state.Levs = append(state.Levs, l.Lev)
+			}
+			if state.Premium && !has(state.RmbLevs, l.Lev) {
+				add(l.RmbReward)
+				state.RmbLevs = append(state.RmbLevs, l.Lev)
+			}
 		}
 		if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
 			return err

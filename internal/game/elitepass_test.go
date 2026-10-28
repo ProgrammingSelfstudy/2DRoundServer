@@ -49,3 +49,46 @@ func TestElitePass(t *testing.T) {
 		t.Fatalf("the next month: %v", r)
 	}
 }
+
+func TestElitePassAdvanceCard(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	c, role := e.enter("ep2", "进阶令牌人")
+	now := time.Date(2026, time.October, 15, 12, 0, 0, 0, dayZone)
+	e.setNow(now)
+	for i := 0; i < 5; i++ {
+		if err := elitePassWin(e.st, role.RID, now); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c.send(24953, proto.Message{"id": 0}) // the free track first, without the card
+	c.waitFor(24953)
+	c.send(24952, proto.Message{})
+	r := c.waitFor(24952)
+	if r.Int("rmb_status") != 0 || r.Arr("list")[0].Int("rmb_award_status") != 0 {
+		t.Fatalf("without the card: %v", r)
+	}
+	state, err := loadElitePass(e.st, role.RID, now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state.Premium = true // what the delivery of product 909 sets
+	if err := e.st.SaveState(role.RID, elitePassModule, state); err != nil {
+		t.Fatal(err)
+	}
+	c.send(24953, proto.Message{"id": 0})
+	if r := c.waitFor(24953); r.Int("flag") != 1 {
+		t.Fatalf("the advance rewards: %v", r)
+	}
+	c.send(24952, proto.Message{})
+	r = c.waitFor(24952)
+	if r.Int("rmb_status") != 1 || r.Arr("list")[0].Int("rmb_award_status") != 1 || r.Arr("list")[0].Int("award_status") != 1 {
+		t.Fatalf("both tracks: %v", r)
+	}
+	c.send(24953, proto.Message{"id": 0})
+	if r := c.waitFor(24953); r.Int("flag") != 0 {
+		t.Fatalf("taken twice: %v", r)
+	}
+	if chargeHooks[elitePassAdvanceCharge] == nil || chargeGuards[elitePassAdvanceCharge] == nil {
+		t.Fatal("product 909 is not wired")
+	}
+}

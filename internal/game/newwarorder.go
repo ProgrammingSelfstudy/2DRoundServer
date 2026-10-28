@@ -3,7 +3,6 @@ package game
 import (
 	_ "embed"
 	"encoding/json"
-	"sort"
 	"strconv"
 	"time"
 
@@ -75,6 +74,9 @@ func (s *warState) visible(t *warTask, day int64) bool {
 	return t.onList(day) && inBand(s.Lev, t.MinLev, t.MaxLev)
 }
 
+// newWarAdvanceCharge is the charge product of the advance card of the new war order.
+const newWarAdvanceCharge = 911
+
 func loadNewWar(st *store.Store, role *store.Role, now time.Time) (*warState, *warPeriod, int64, int64, error) {
 	period, day, end, cycle := newWarNow(role, now)
 	state := &warState{}
@@ -104,6 +106,27 @@ func (s *warState) newReached(p *warPeriod) int64 {
 // role was created, runs cycles of 30 days that go round three periods, has day and week tasks only, and the tasks and
 // rewards are in bands of the role level (the level the cycle began with). The paid track needs payments, which we have none of.
 func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
+	// the advance card (product 911), once a cycle; it is the cycle the confirmation falls in
+	RegisterChargeGuard(newWarAdvanceCharge, func(st *store.Store, role *store.Role) error {
+		state, p, _, _, err := loadNewWar(st, role, time.Now())
+		switch {
+		case err != nil:
+			return err
+		case p == nil:
+			return errNotPayable("海贼夺宝未开启")
+		case state.Premium:
+			return errNotPayable("本期已激活进阶卡")
+		}
+		return nil
+	})
+	RegisterChargeHook(newWarAdvanceCharge, func(st *store.Store, role *store.Role, _ ChargeProduct, _ int64) (map[int64]int64, map[int64]int64, error) {
+		state, _, _, _, err := loadNewWar(st, role, time.Now())
+		if err != nil {
+			return nil, nil, err
+		}
+		state.Premium = true
+		return nil, nil, st.SaveState(role.RID, newWarOrderModule, state)
+	})
 	r.Handle(28700, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {
@@ -121,7 +144,7 @@ func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 			}
 		}
 		reply := proto.Message{"period": period, "cur_day": day, "end_time": end, "lev": int64(0), "exp": state.Exp, "period_lev": state.Lev,
-			"day_lev": state.Lev, "week_lev": state.Lev, "rmb_status": 0, "list": []proto.Message{}}
+			"day_lev": state.Lev, "week_lev": state.Lev, "rmb_status": b2i(state.Premium), "list": []proto.Message{}}
 		if p != nil {
 			reply["lev"] = state.newReached(p)
 			list := []proto.Message{}
@@ -187,12 +210,7 @@ func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 		return s.Send(28705, proto.Message{"lev": state.newReached(p), "exp": state.Exp})
 	})
 	levList := func(s *gateway.Session, state *warState, p *warPeriod) error {
-		taken := []proto.Message{}
-		ids := append([]int64(nil), state.Levs...)
-		sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-		for _, id := range ids {
-			taken = append(taken, proto.Message{"id": id, "status": 1, "rmb_status": 0})
-		}
+		taken := state.takenLevels()
 		lev := int64(0)
 		if p != nil {
 			lev = state.newReached(p)
@@ -226,7 +244,7 @@ func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 		reached := state.newReached(p)
 		var rows []warLev
 		for _, l := range state.levs(p) {
-			if l.Lev <= reached && !has(state.Levs, l.Lev) && (req.Int("id") == 0 || req.Int("id") == l.Lev) {
+			if l.Lev <= reached && state.open(l) && (req.Int("id") == 0 || req.Int("id") == l.Lev) {
 				rows = append(rows, l)
 			}
 		}
@@ -241,12 +259,7 @@ func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 		}
 		ga, gi := map[int64]int64{}, map[int64]int64{}
 		for _, l := range rows {
-			for _, a := range l.Reward {
-				if ItemKnown(a[0]) {
-					splitGains([]sellGain{{a[0], a[1]}}, 1, ga, gi)
-				}
-			}
-			state.Levs = append(state.Levs, l.Lev)
+			state.takeLevel(l, ga, gi)
 		}
 		if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
 			return err
@@ -266,10 +279,15 @@ func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 		return levList(s, state, p)
 	})
 	r.Handle(28706, func(s *gateway.Session, _ proto.Message) error {
-		if s.Role() == nil {
+		role := s.Role()
+		if role == nil {
 			return nil
 		}
-		return s.Send(28706, proto.Message{"rmb_status": 0, "list": []proto.Message{}})
+		state, _, _, _, err := loadNewWar(st, role, s.Now())
+		if err != nil {
+			return err
+		}
+		return s.Send(28706, proto.Message{"rmb_status": b2i(state.Premium), "list": []proto.Message{}})
 	})
 	r.Handle(28707, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()

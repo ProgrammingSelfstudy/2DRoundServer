@@ -119,3 +119,85 @@ func TestWarOrderFlow(t *testing.T) {
 		t.Fatalf("november: %v", r)
 	}
 }
+
+func TestWarOrderAdvanceCard(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	c, role := e.enter("wo2", "进阶人")
+	now := time.Date(2026, time.October, 3, 12, 0, 0, 0, dayZone)
+	e.setNow(now)
+	c.send(10300, proto.Message{})
+	c.send(25300, proto.Message{})
+	if r := c.waitFor(25300); r.Int("rmb_status") != 0 {
+		t.Fatalf("card before paying: %v", r)
+	}
+	// two levels bought, the free rewards taken
+	e.grantAssets(c, role, map[int64]int64{3: 2000})
+	c.send(25307, proto.Message{"id": 2})
+	c.waitFor(25307)
+	c.waitFor(25305)
+	c.send(25308, proto.Message{})
+	if r := c.waitFor(25308); r.Int("flag") != 0 {
+		t.Fatalf("extra rewards without the card: %v", r)
+	}
+	c.send(25304, proto.Message{"id": 0})
+	c.waitFor(25304)
+	if r := c.waitFor(25303); len(r.Arr("reward_list")) != 2 || r.Arr("reward_list")[0].Int("rmb_status") != 0 {
+		t.Fatalf("free track: %v", r)
+	}
+	// the product is delivered: the card is on for the month, and cannot be bought twice
+	hook := chargeHooks[warAdvanceCharge]
+	if hook == nil {
+		t.Fatal("no hook for the advance card")
+	}
+	if _, _, err := hook(e.st, role, ChargeProduct{}, 1); err != nil {
+		t.Fatal(err)
+	}
+	if st, _, _, _, _ := loadWar(e.st, role, time.Now()); !st.Premium {
+		t.Fatal("not marked")
+	}
+	if err := chargeGuards[warAdvanceCharge](e.st, role); err == nil {
+		t.Fatal("bought twice")
+	}
+	// the card is the real clock's month; the rewards below are of the test's month (October), so move the flag there
+	st, _, _, _, _ := loadWar(e.st, role, now)
+	st.Premium = true
+	if err := e.st.SaveState(role.RID, warOrderModule, st); err != nil {
+		t.Fatal(err)
+	}
+	c.send(25308, proto.Message{})
+	if r := c.waitFor(25308); r.Int("flag") != 1 {
+		t.Fatalf("extra rewards: %v", r)
+	}
+	r := c.waitFor(25303)
+	if len(r.Arr("reward_list")) != 2 || r.Arr("reward_list")[0].Int("rmb_status") != 1 || r.Arr("reward_list")[0].Int("status") != 1 {
+		t.Fatalf("both tracks: %v", r)
+	}
+	c.send(25308, proto.Message{})
+	if r := c.waitFor(25308); r.Int("flag") != 0 {
+		t.Fatalf("taken twice: %v", r)
+	}
+}
+
+func TestWarStateTakeLevel(t *testing.T) {
+	l := warLev{Lev: 1, Reward: [][2]int64{{3, 10}}, RmbReward: [][2]int64{{3, 100}}}
+	s := &warState{}
+	ga, gi := map[int64]int64{}, map[int64]int64{}
+	if !s.open(l) {
+		t.Fatal("a fresh level is open")
+	}
+	s.takeLevel(l, ga, gi)
+	if ga[3] != 10 || s.open(l) {
+		t.Fatalf("free track only: %v", ga)
+	}
+	s.Premium = true // the card comes after the free reward was taken: the advance one is still open
+	if !s.open(l) {
+		t.Fatal("the advance reward is open")
+	}
+	s.takeLevel(l, ga, gi)
+	if ga[3] != 110 || s.open(l) {
+		t.Fatalf("advance track: %v", ga)
+	}
+	if got := s.takenLevels(); len(got) != 1 || got[0].Int("status") != 1 || got[0].Int("rmb_status") != 1 {
+		t.Fatalf("taken: %v", got)
+	}
+}

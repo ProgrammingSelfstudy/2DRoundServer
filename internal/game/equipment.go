@@ -89,7 +89,12 @@ func RegisterEquipment(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		return s.Send(10501, bagReply(s, equipmentBag(ledger)))
+		holy, err := loadHoly(st, rid)
+		if err != nil {
+			return err
+		}
+		eqm := equipmentBag(ledger)
+		return s.Send(10501, bagReply(s, append(eqm, holyBag(holy, len(eqm)+1)...)))
 	}
 	r.Handle(10501, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()

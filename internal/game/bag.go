@@ -201,7 +201,13 @@ func sendBackpack(s *gateway.Session, st *store.Store) error {
 	if err := s.Send(10500, bagReply(s, items)); err != nil {
 		return err
 	}
-	if err := s.Send(10501, bagReply(s, equipmentBag(ledger))); err != nil {
+	holy, err := loadHoly(st, role.RID)
+	if err != nil {
+		return err
+	}
+	eqm := equipmentBag(ledger)
+	eqm = append(eqm, holyBag(holy, len(eqm)+1)...)
+	if err := s.Send(10501, bagReply(s, eqm)); err != nil {
 		return err
 	}
 	// the sprite and home bags follow only when there is something in them; their handlers always send them

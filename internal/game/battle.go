@@ -14,7 +14,6 @@ const combatDrama = 3
 // RegisterBattle registers the battle commands that have a defined meaning.
 func RegisterBattle(r *gateway.Router, st *store.Store) {
 	r.Handle(20060, func(s *gateway.Session, req proto.Message) error { return combatType(s, st, req) })
-	r.Handle(11092, partnerHolyEquipment)
 	// 10397: the client says whether it is watching a replay; there is no reply.
 	r.Handle(10397, func(*gateway.Session, proto.Message) error { return nil })
 	// 21322: is the double-reward period on (code 1)? Never, here.
@@ -23,6 +22,7 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 	})
 	registerBattleLeftovers(r, st)
 	RegisterArtifact(r, st)
+	RegisterHolyEqm(r, st)
 	registerHeroStubs(r)
 	registerNoPaymentStubs(r)
 }
@@ -64,16 +64,6 @@ func registerBattleLeftovers(r *gateway.Router, st *store.Store) {
 	for _, cmd := range []uint16{20016, 10958} {
 		r.Handle(cmd, func(*gateway.Session, proto.Message) error { return nil })
 	}
-}
-
-// partnerHolyEquipment answers 11092 (the holy equipment worn by heroes): every
-// asked hero is echoed with an empty holy_eqm list; the feature is not implemented.
-func partnerHolyEquipment(s *gateway.Session, req proto.Message) error {
-	out := []proto.Message{}
-	for _, p := range req.Arr("partner_ids") {
-		out = append(out, proto.Message{"partner_id": p.Int("partner_id"), "holy_eqm": []proto.Message{}})
-	}
-	return s.Send(11092, proto.Message{"partner_ids": out})
 }
 
 // combatType answers 20060. The client sends it with the fight type it wants to

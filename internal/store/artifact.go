@@ -47,17 +47,26 @@ func (s *Store) SaveArtifacts(rid int64, d *ArtifactDoc) error {
 	return s.SaveState(rid, ArtifactModule, d)
 }
 
-// attachArtifacts puts the worn artifacts on the heroes of one role.
+// attachArtifacts puts the worn artifacts and holy equipment on the heroes of one role.
 func (s *Store) attachArtifacts(rid int64, ps []Partner) error {
 	d, err := s.ArtifactsOf(rid)
 	if err != nil {
 		return err
 	}
+	h, err := s.HolyOf(rid)
+	if err != nil {
+		return err
+	}
 	for i := range ps {
-		ps[i].Artifacts = nil
+		ps[i].Artifacts, ps[i].Holy = nil, nil
 		for _, a := range d.Pieces {
 			if a.Partner == ps[i].PartnerID && a.Pos > 0 {
 				ps[i].Artifacts = append(ps[i].Artifacts, a)
+			}
+		}
+		for _, x := range h.Pieces {
+			if x.Partner == ps[i].PartnerID && x.Slot > 0 {
+				ps[i].Holy = append(ps[i].Holy, x)
 			}
 		}
 	}

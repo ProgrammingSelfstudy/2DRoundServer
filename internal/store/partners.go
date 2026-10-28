@@ -9,13 +9,14 @@ import (
 type Partner struct {
 	PartnerID, RID, BID  int64
 	Lev, Star, BreakLev  int
-	UseSkin              int64      // the skin worn (0 = none)
-	Locked               bool       // locked by the owner: not to be consumed
-	Equips               []Equip    // worn pieces, by slot
-	Talents              []Talent   // learned talent skills, by slot
-	ResSlot              int64      // the resonance crystal slot it sits in (0 = none)
-	ShownLev, ShownBreak int        // level and break step it shows while it sits in a slot
-	Artifacts            []ArtPiece // worn artifacts (战技), by position
+	UseSkin              int64       // the skin worn (0 = none)
+	Locked               bool        // locked by the owner: not to be consumed
+	Equips               []Equip     // worn pieces, by slot
+	Talents              []Talent    // learned talent skills, by slot
+	ResSlot              int64       // the resonance crystal slot it sits in (0 = none)
+	ShownLev, ShownBreak int         // level and break step it shows while it sits in a slot
+	Artifacts            []ArtPiece  // worn artifacts (战技), by position
+	Holy                 []HolyPiece // worn holy equipment (神装), by slot
 }
 
 // Equip is one worn piece of equipment.
@@ -121,7 +122,7 @@ func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	if err := s.attachArtifacts(rid, one); err != nil {
 		return &p, err
 	}
-	p.Artifacts = one[0].Artifacts
+	p.Artifacts, p.Holy = one[0].Artifacts, one[0].Holy
 	if slots, err := s.slotsOf(rid); err != nil || slots[partnerID] == 0 {
 		return &p, err
 	}

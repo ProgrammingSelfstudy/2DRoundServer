@@ -98,6 +98,7 @@ func partnerStats(p store.Partner) (hp, atk, def, speed int64) {
 		hp, atk, def, speed = hp+eq.Attr["hp_max"], atk+eq.Attr["atk"], def+eq.Attr["def"], speed+eq.Attr["speed"]
 	}
 	hp, atk, def, speed = artifactBonus(p.Artifacts, hp, atk, def, speed) // worn artifacts
+	hp, atk, def, speed = holyBonus(p.Holy, hp, atk, def, speed)          // worn holy equipment
 	return
 }
 
@@ -129,7 +130,7 @@ func partnerMessage(p store.Partner) proto.Message {
 		"hit_rate": a["hit_rate"], "dodge_rate": a["dodge_rate"], "crit_rate": a["crit_rate"], "crit_ratio": a["crit_ratio"],
 		"hit_magic": a["hit_magic"], "dodge_magic": a["dodge_magic"], "def": def,
 		"atk2": 0, "hp2": 0, "def2": 0, "speed2": 0,
-		"eqms": eqmsOf(p), "artifacts": artifactsOf(p), "dower_skill": talentMessages(p.Talents),
+		"eqms": eqmsOf(p), "artifacts": artifactsOf(p), "holy_eqm": holyHeroMessages(p), "dower_skill": talentMessages(p.Talents),
 	}
 }
 

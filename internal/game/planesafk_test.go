@@ -171,14 +171,29 @@ func TestPlanesafkFightRelicAndBoss(t *testing.T) {
 	if len(res.Arr("award_list")) == 0 {
 		t.Fatalf("a win pays: %v", res)
 	}
+	// the tile became the relic event and the role stayed put (capture original-2026-10-27); asking the tile shows the options
+	upd := c.waitFor(28606)
+	if upd.Int("line") != 1 {
+		t.Fatalf("the role moved: %v", upd)
+	}
+	for _, tile := range upd.Arr("tile_list") {
+		if tile.Int("line") == 2 && tile.Int("index") == 2 && tile.Int("evt_id") < 3021 {
+			t.Fatalf("the tile is no relic: %v", tile)
+		}
+	}
+	c.send(28600, proto.Message{"line": 2, "index": 2, "action": 0})
 	opts := c.waitFor(28614)
 	if len(opts.Arr("ext_list")) != 3 || opts.Int("line") != 2 {
 		t.Fatalf("relic options: %v", opts)
 	}
-	c.waitFor(28606)
+	c.waitFor(28600)
 	pick := opts.Arr("ext_list")[1].Int("val1")
 	c.send(28600, proto.Message{"line": 2, "index": 2, "action": 1, "ext_list": []proto.Message{{"type": pfExtBuff, "val1": pick, "val2": 0}}})
-	if r := c.waitFor(28600); r.Int("code") != 1 {
+	moved := c.waitFor(28606) // the role steps onto the tile before the answer, whose msg is empty
+	if moved.Int("line") != 2 || moved.Int("index") != 2 {
+		t.Fatalf("not moved: %v", moved)
+	}
+	if r := c.waitFor(28600); r.Int("code") != 1 || r.Str("msg") != "" {
 		t.Fatalf("choose relic: %v", r)
 	}
 	c.send(28620, proto.Message{})

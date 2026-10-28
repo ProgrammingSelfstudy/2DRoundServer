@@ -269,23 +269,22 @@ func (p *pfSvc) act(s *gateway.Session, req proto.Message) error {
 		if st.Floor == 0 || t == nil {
 			return reply(0, "该格子不存在")
 		}
-		here := line == st.Line && index == st.Index
-		pending := len(st.BuffOpts) > 0 && here
+		pending := len(st.BuffOpts) > 0 && t.Evt >= 3021 && t.Evt <= 3023 // a won fight left a relic on this tile
 		reachable := line == st.Line+1 && (index == st.Index+1 || index == st.Index-1 || line == pfBossLine)
-		if !reachable && !pending {
+		if !reachable {
 			return reply(0, "无法到达该格子")
 		}
 		if c, ok := st.Chosen[strconv.FormatInt(line, 10)]; ok && c != index {
 			return reply(0, "已经选择了本层的其他格子")
 		}
-		if st.Done[tileKey(line, index)] && !pending {
+		if st.Done[tileKey(line, index)] {
 			return reply(0, "该格子已经完成")
 		}
-		e := pfCfg.events[t.Evt]
 		ext := extOf3(req)
-		if pending { // the relic of a won fight is chosen on the tile just fought
+		if pending {
 			return p.chooseBuff(s, role, st, t, action, ext, reply)
 		}
+		e := pfCfg.events[t.Evt]
 		switch e.Type {
 		case pfEvtMonster, pfEvtGuard:
 			return p.fightTile(s, role, st, t, e, action, req, reply)

@@ -177,18 +177,19 @@ func (p *pfSvc) settleFight(s *gateway.Session, line, index int64, fighters []pf
 		if !won {
 			return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
 		}
-		st.Line, st.Index = t.Line, t.Index
-		st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
-		st.Done[tileKey(t.Line, t.Index)] = true
 		_ = reply
+		st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
+		// a won fight with a relic turns the tile into the relic event and the role stays where it is; the options come when the
+		// tile is asked (28600 action 0) and the role steps onto it when one is chosen (capture original-2026-10-27, 20-planes-afk)
 		if q, ok := map[int64]int64{3021: 1, 3022: 2, 3023: 3}[e.Exchange]; ok {
 			if opts := p.relicOptions(st, q); len(opts) > 0 {
 				st.BuffOpts = opts
-				if err := p.pushBuffOptions(s, st, t); err != nil {
-					return err
-				}
+				t.Evt = e.Exchange
+				return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
 			}
 		}
+		st.Line, st.Index = t.Line, t.Index
+		st.Done[tileKey(t.Line, t.Index)] = true
 		return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
 	})
 }
@@ -239,7 +240,13 @@ func (p *pfSvc) chooseBuff(s *gateway.Session, role *store.Role, st *pfState, t 
 		if b == pick {
 			st.Buffs = append(st.Buffs, b)
 			st.BuffOpts = nil
-			return reply(1, "获得遗物")
+			// the role steps onto the tile, which is empty now; 28606 comes before the answer, whose msg is empty
+			st.Line, st.Index = t.Line, t.Index
+			st.Done[tileKey(t.Line, t.Index)] = true
+			if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()}); err != nil {
+				return err
+			}
+			return reply(1, "")
 		}
 	}
 	return reply(0, "请选择遗物")

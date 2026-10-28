@@ -308,10 +308,10 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 		wrap           func(cur int64, list []proto.Message) proto.Message // the list command's answer
 		activateAnswer uint16
 	}
-	entry := func(kind string, l store.Look) proto.Message {
+	entry := func(kind string, l store.Look, levs map[int64]int64) proto.Message {
 		m := proto.Message{"base_id": l.ID, "expire_time": l.EndTime}
 		if kind == store.LookTitle {
-			m["lev"] = 0
+			m["lev"] = levs[l.ID] // raised by composing (23304)
 		}
 		return m
 	}
@@ -325,9 +325,15 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return nil, err
 		}
+		var levs map[int64]int64
+		if kind == store.LookTitle {
+			if levs, err = titleLevels(st, s.Role().RID); err != nil {
+				return nil, err
+			}
+		}
 		out := []proto.Message{}
 		for _, l := range owned {
-			out = append(out, entry(kind, l))
+			out = append(out, entry(kind, l, levs))
 		}
 		return out, nil
 	}

@@ -67,7 +67,7 @@ var closedRefusals = map[uint16]proto.Message{
 	23512: closedMsg("交易行暂未开放"), 23513: closedMsg("交易行暂未开放"), 23514: closedMsg("交易行暂未开放"),
 	24812: closedMsg("活动未开启"), 24814: closedMsg("活动未开启"), 24816: closedMsg("活动未开启"), 24818: closedMsg("活动未开启"),
 	26522: closedMsg("活动未开启"), 26523: closedMsg("活动未开启"), 26530: closedMsg("暂未开放"), 27916: closedMsg("活动未开启"),
-	28101: closedMsg("活动未开启"), 28102: closedMsg("活动未开启"), 28103: closedMsg("活动未开启"), 23203: {"code": 0, "msg": "暂未开放", "is_share": 0, "is_day_share": 0}, 23304: closedMsg("暂未开放"),
+	28101: closedMsg("活动未开启"), 28102: closedMsg("活动未开启"), 28103: closedMsg("活动未开启"), 23203: {"code": 0, "msg": "暂未开放", "is_share": 0, "is_day_share": 0},
 }
 
 type peakFormations struct {

@@ -125,7 +125,7 @@ func partnerMessage(p store.Partner) proto.Message {
 	return proto.Message{
 		"partner_id": p.PartnerID, "bid": p.BID, "lev": shownLev, "star": p.Star, "skills": skills,
 		"break_lev": shownBreak, "power": heroPower(atk, hp, def, speed),
-		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": 0,
+		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": p.EndTime,
 		"resonate_lev": b2i(p.ResSlot > 0), "resonate_break_lev": 0, "horcrux_status": p.Horcrux.Status, "horcrux_lev": p.Horcrux.Lev,
 		"atk": atk, "def_p": def, "def_s": def, "hp": hp, "speed": speed,
 		"hit_rate": a["hit_rate"], "dodge_rate": a["dodge_rate"], "crit_rate": a["crit_rate"], "crit_ratio": a["crit_ratio"],
@@ -173,6 +173,9 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 				return nil
 			}
 			if _, err := st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+				return err
+			}
+			if err := expireEmpowered(st, role.RID, s.Now()); err != nil { // an empowered hero whose day is over is gone
 				return err
 			}
 			msgs, err := messages(role.RID, nil)

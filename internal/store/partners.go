@@ -18,6 +18,7 @@ type Partner struct {
 	Artifacts            []ArtPiece   // worn artifacts (战技), by position
 	Holy                 []HolyPiece  // worn holy equipment (神装), by slot
 	Horcrux              HorcruxState // the hero's horcrux (魂器)
+	EndTime              int64        // when an empowered hero ends (0 = it stays)
 }
 
 // Equip is one worn piece of equipment.
@@ -123,7 +124,7 @@ func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	if err := s.attachArtifacts(rid, one); err != nil {
 		return &p, err
 	}
-	p.Artifacts, p.Holy, p.Horcrux = one[0].Artifacts, one[0].Holy, one[0].Horcrux
+	p.Artifacts, p.Holy, p.Horcrux, p.EndTime = one[0].Artifacts, one[0].Holy, one[0].Horcrux, one[0].EndTime
 	if slots, err := s.slotsOf(rid); err != nil || slots[partnerID] == 0 {
 		return &p, err
 	}

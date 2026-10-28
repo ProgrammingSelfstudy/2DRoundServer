@@ -39,7 +39,7 @@ func fixed(m proto.Message) func(proto.Message) proto.Message {
 
 // registerHeroStubs covers what the hero module still lacks: artifacts that are not in artifact.go (11039, 11040, 11060),
 // the soul weapon (11401, no table in the client), resonance empowerment
-// (26401, 26420-26432), the fuse red point (11055 / 11056) and 11018.
+// (26401, 26430-26432), the fuse red point (11055 / 11056) and 11018.
 func registerHeroStubs(r *gateway.Router) {
 	registerStubs(r, map[uint16]func(proto.Message) proto.Message{
 		11018: fixed(proto.Message{}),
@@ -50,12 +50,6 @@ func registerHeroStubs(r *gateway.Router) {
 		11087: refuse("code", proto.Message{"list": []proto.Message{}}),
 		11401: fixed(proto.Message{}),
 		26401: refuse("result", nil),
-		26420: fixed(proto.Message{"star": 0, "num": 0}),
-		26421: refuse("result", nil),
-		26422: fixed(proto.Message{"skills": []proto.Message{}}),
-		26423: func(req proto.Message) proto.Message {
-			return proto.Message{"partner_id": req.Int("partner_id"), "power": 0}
-		},
 		26430: refuse("result", nil), 26431: refuse("result", proto.Message{"power": 0}), 26432: refuse("result", nil),
 	})
 }

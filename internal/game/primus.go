@@ -284,6 +284,7 @@ func (g *primusSvc) settle(s *gateway.Session, pos, evo int64, won bool, target 
 		}
 		seat.RID, seat.Name, seat.Lev, seat.Face, seat.Power, seat.FormType, seat.Lineup = role.RID, role.Name, int64(role.Lev), int64(role.FaceID), power, formType, lineup
 		seat.Num += evo
+		_ = RecordGrowth(g.st, role.RID, 124001, s.Now().Unix(), primusCfg.Seats[pos-1].Name) // "challenged the overlord seat"
 	} else {
 		d.CoolUntil = s.Now().Unix() + primusCfg.Const["lose_challange_cd"]
 	}

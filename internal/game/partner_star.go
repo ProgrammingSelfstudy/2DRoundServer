@@ -149,6 +149,21 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		}
 		np := *p
 		np.Star++
+		name := partnerTable[p.BID].Name
+		for _, ev := range []struct {
+			star int
+			id   int64
+		}{{7, 115002}, {10, 121001}} { // 115002 the first 7-star hero, 121001 a hero raised to 10 stars
+			if np.Star != ev.star {
+				continue
+			}
+			if ev.id == 115002 {
+				if had, err := growHas(st, role.RID, ev.id); err != nil || had {
+					continue
+				}
+			}
+			_ = RecordGrowth(st, role.RID, ev.id, s.Now().Unix(), name)
+		}
 		if err := s.Send(11001, proto.Message{"partners": []proto.Message{partnerMessage(np)}}); err != nil {
 			return err
 		}

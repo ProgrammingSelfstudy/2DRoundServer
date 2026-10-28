@@ -3,6 +3,7 @@ package game
 import (
 	_ "embed"
 	"encoding/json"
+	"strconv"
 	"unicode"
 	"unicode/utf8"
 
@@ -117,6 +118,9 @@ func (f *FriendService) registerSpace(r *gateway.Router) {
 		msg := "已取消关注"
 		if now {
 			msg = "关注成功"
+			if fans, err := f.Store.FansOf(t.RID); err == nil { // the target's growth way: 120403 "X followed you in the space, your Nth fan"
+				_ = RecordGrowth(f.Store, t.RID, 120403, s.Now().Unix(), me.Name, strconv.FormatInt(fans, 10))
+			}
 		}
 		return s.Send(25801, proto.Message{"code": 1, "msg": msg, "flag": b2i(now)})
 	})

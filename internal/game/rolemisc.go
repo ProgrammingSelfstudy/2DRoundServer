@@ -35,7 +35,7 @@ const (
 // there is no recharge), 10960 / 10961 real-name reward (shown as taken: no real-name system),
 // 10985 / 10986 red points seen, 12770 / 12771 reports.
 func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
-	registerRoleExtra(r)
+	registerRoleExtra(r, st)
 	r.Handle(10303, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

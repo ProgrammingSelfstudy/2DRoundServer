@@ -117,6 +117,7 @@ func partnerMessage(p store.Partner) proto.Message {
 	info := partnerTable[p.BID]
 	a := info.Attr
 	hp, atk, def, speed := partnerStats(p)
+	ex := extraStats(p)
 	shownLev, shownBreak := shownLevBreak(p)
 	skills := []proto.Message{}
 	for _, sk := range info.Stars[strconv.Itoa(p.Star)].Skills {
@@ -128,8 +129,8 @@ func partnerMessage(p store.Partner) proto.Message {
 		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": p.EndTime,
 		"resonate_lev": b2i(p.ResSlot > 0), "resonate_break_lev": 0, "horcrux_status": p.Horcrux.Status, "horcrux_lev": p.Horcrux.Lev,
 		"atk": atk, "def_p": def, "def_s": def, "hp": hp, "speed": speed,
-		"hit_rate": a["hit_rate"], "dodge_rate": a["dodge_rate"], "crit_rate": a["crit_rate"], "crit_ratio": a["crit_ratio"],
-		"hit_magic": a["hit_magic"], "dodge_magic": a["dodge_magic"], "def": def,
+		"hit_rate": a["hit_rate"] + ex["hit_rate"], "dodge_rate": a["dodge_rate"] + ex["dodge_rate"], "crit_rate": a["crit_rate"] + ex["crit_rate"],
+		"crit_ratio": a["crit_ratio"] + ex["crit_ratio"], "hit_magic": a["hit_magic"] + ex["hit_magic"], "dodge_magic": a["dodge_magic"] + ex["dodge_magic"], "def": def,
 		"atk2": 0, "hp2": 0, "def2": 0, "speed2": 0,
 		"eqms": eqmsOf(p), "artifacts": artifactsOf(p), "holy_eqm": holyHeroMessages(p), "dower_skill": talentMessages(p.Talents),
 	}

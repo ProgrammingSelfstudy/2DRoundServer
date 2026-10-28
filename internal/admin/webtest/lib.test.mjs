@@ -3,7 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   can, itemIdOf, fmtBytes, fmtTime, toUnix, toLocalInput, parseIDs, buildMailPayload, buildGrantPayload, grantSummary, buildHeroGrantPayload, heroGrantSummary, buildServerPayload, buildNoticePayload,
-  pageInfo, queryString, parseHash, truncate, lockText, roleLabel, LIMITS, zhError, GATEWAY_DOWN, pushSummary,
+  aimsToText, parseAims, buildActivityPayload, pageInfo, queryString, parseHash, truncate, lockText, roleLabel, LIMITS, zhError, GATEWAY_DOWN, pushSummary,
 } from "../web/lib.js";
 
 test("can() follows the three levels and refuses unknown roles", () => {
@@ -202,4 +202,27 @@ test("buildHeroGrantPayload checks hero, star and count", () => {
   assert.ok(buildHeroGrantPayload([{ bid: "10401", star: "4", num: "1.5" }], heroes).error, "not whole");
   assert.equal(heroGrantSummary({ granted: [{}, {}], refreshed: true }).kind, "ok");
   assert.equal(heroGrantSummary({ granted: [{}], push_error: "x" }).kind, "warn");
+});
+
+test("activity aims are written one to a line and read back", () => {
+  const aims = [{ id: 1, str: "每日登录", event: "evt_cli_loaded", target: 1, rewards: [[3, 100], [10403, 2]] }];
+  assert.equal(aimsToText(aims), "1 | 每日登录 | evt_cli_loaded | 1 | 3:100,10403:2");
+  assert.deepEqual(parseAims(aimsToText(aims)).aims, aims);
+  assert.match(parseAims("1 | a | b").error, /5 段/);
+  assert.match(parseAims("1 | a | | 1 | 3-100").error, /物品编号:数量/);
+  assert.match(parseAims("1 | a | | 1 | 3:1\n1 | b | | 1 | 3:1").error, /重复/);
+  assert.match(parseAims("1 | a | | 1 | ").error, /1 到 10/);
+});
+
+test("the activity form is checked like the API and keeps the spec keys it does not edit", () => {
+  const f = { srvID: "", campID: "9001", bid: "9001", title: "每日福利", panelType: "16", startAt: "2026-10-18T10:00", endAt: "", aims: "1 | 登录 | evt_cli_loaded | 1 | 3:100", status: true, daily: true };
+  const r = buildActivityPayload(f, { ico: "x" });
+  assert.equal(r.error, undefined);
+  assert.deepEqual(r.payload.spec, { ico: "x", title: "每日福利", panel_type: 16, daily: true, aims: [{ id: 1, str: "登录", event: "evt_cli_loaded", target: 1, rewards: [[3, 100]] }] });
+  assert.equal(r.payload.end_at, 0);
+  assert.equal(r.payload.status, 1);
+  assert.match(buildActivityPayload({ ...f, panelType: "200" }).error, /145/);
+  assert.match(buildActivityPayload({ ...f, title: "" }).error, /标题/);
+  assert.match(buildActivityPayload({ ...f, endAt: "2026-10-17T10:00" }).error, /晚于/);
+  assert.match(buildActivityPayload({ ...f, campID: "0" }).error, /活动编号/);
 });

@@ -279,3 +279,62 @@ export function pushSummary(res, done = "已保存") {
   const n = res && res.pushed;
   return { kind: "ok", text: n == null ? done : `${done}，已通知 ${n} 个在线角色` };
 }
+
+// ---- the activity schedule ----
+
+// aimsToText writes the aims of an activity one to a line: "id | text | event | target | item:amount,item:amount".
+export function aimsToText(aims) {
+  return (aims || []).map((a) => [a.id, a.str || "", a.event || "", a.target || 0, (a.rewards || []).map((r) => r[0] + ":" + r[1]).join(",")].join(" | ")).join("\n");
+}
+
+// parseAims reads that text back; {aims} or {error}.
+export function parseAims(text) {
+  const aims = [];
+  const lines = String(text || "").split("\n").map((l) => l.trim()).filter(Boolean);
+  for (let i = 0; i < lines.length; i++) {
+    const p = lines[i].split("|").map((x) => x.trim());
+    if (p.length < 5) return { error: `第 ${i + 1} 行要有 5 段：编号 | 说明 | 事件 | 目标 | 奖励` };
+    const id = Number(p[0]), target = Number(p[3]);
+    if (!Number.isInteger(id) || id < 1) return { error: `第 ${i + 1} 行的编号要是正整数` };
+    if (aims.some((a) => a.id === id)) return { error: `第 ${i + 1} 行的编号 ${id} 重复了` };
+    if (!Number.isInteger(target) || target < 0) return { error: `第 ${i + 1} 行的目标要是不小于 0 的整数` };
+    const rewards = [];
+    for (const r of p[4].split(",").map((x) => x.trim()).filter(Boolean)) {
+      const m = /^(\d+):(\d+)$/.exec(r);
+      if (!m) return { error: `第 ${i + 1} 行的奖励 “${r}” 要写成 物品编号:数量` };
+      rewards.push([Number(m[1]), Number(m[2])]);
+    }
+    if (rewards.length < 1 || rewards.length > 10) return { error: `第 ${i + 1} 行要有 1 到 10 个奖励` };
+    aims.push({ id, str: p[1], event: p[2], target, rewards });
+  }
+  return { aims };
+}
+
+// buildActivityPayload checks the activity form like the API does and returns {payload} or {error}. keep holds the keys of the
+// spec the form does not edit (they are sent back as they were).
+export function buildActivityPayload(f, keep = {}) {
+  const num = (s) => (String(s).trim() === "" ? NaN : Number(s));
+  const camp = num(f.campID), bid = num(f.bid), panel = num(f.panelType);
+  if (!Number.isInteger(camp) || camp < 1) return { error: "活动编号要是正整数" };
+  if (!Number.isInteger(bid) || bid < 1) return { error: "页签编号要是正整数" };
+  const title = String(f.title || "").trim();
+  if (!title || [...title].length > 40) return { error: "标题必填，最多 40 个字" };
+  if (!Number.isInteger(panel) || panel < 1 || panel > 145) return { error: "面板类型要在 1 到 145 之间" };
+  const start = toUnix(f.startAt), end = f.endAt ? toUnix(f.endAt) : 0;
+  if (!start) return { error: "开始时间必填" };
+  if (end && end <= start) return { error: "结束时间要晚于开始时间" };
+  const a = parseAims(f.aims);
+  if (a.error) return a;
+  if (a.aims.length > 60) return { error: "目标最多 60 个" };
+  const spec = { ...keep, title, panel_type: panel };
+  for (const k of ["title2", "rule_str", "time_str", "aim_title", "cli_type_name"]) {
+    const v = String(f[k] || "").trim();
+    if (v) spec[k] = v; else delete spec[k];
+  }
+  const sort = num(f.sortVal), cli = num(f.cliType);
+  if (Number.isInteger(sort) && sort !== 0) spec.sort_val = sort; else delete spec.sort_val;
+  if (Number.isInteger(cli) && cli !== 0) spec.cli_type = cli; else delete spec.cli_type;
+  if (f.daily) spec.daily = true; else delete spec.daily;
+  if (a.aims.length) spec.aims = a.aims; else delete spec.aims;
+  return { payload: { srv_id: f.srvID || "", camp_id: camp, bid, status: f.status ? 1 : 0, start_at: start, end_at: end, spec } };
+}

@@ -16,6 +16,11 @@ Log in with an admin account (the first start prints the bootstrap password once
 | 账号 | read; operator may ban | search, ban with a reason, unban |
 | 角色 | read; operator may ban and kick | search by name / account / id, filter by server, "详情" (online state, currencies, item ledger with names; operators can set the level and VIP, kick, and grant currencies and items straight into the role from it), ban, unban, "发邮件" shortcut |
 | 邮件 | read; operator may send | compose (direct or broadcast, currency and item attachments, expiry) and the list of sent mail with recipients and claims; items are picked by name or id from the client's item table (type in the box, choose from the list), and the sent list shows their names |
+| 活动 | read; operator may edit | the schedule of the holiday activities (`/api/activities`): list by server with a state badge (关闭 / 未开始 / 进行中 / 已结束), create, edit, copy and delete; the form has the camp and tab numbers, title, panel type, order, the main-screen icon, texts, times and the aims (one per line: `id | text | event | target | item:amount,...`); spec keys the form does not show are kept when a row is edited |
+| 客服工单 | read; operator may reply | the newest 100 tickets with their questions and answers, a filter for the unanswered ones and a reply box |
+| 兑换码 | read; operator may edit | the redeem codes with uses and expiry; create one with rewards (picked like mail attachments), a total limit and days; delete |
+| 举报 | read | what players reported in chat, newest first |
+| 公会 | read; operator may disband | the guilds by server and name, disband |
 | 公告 | read; operator may edit | create, edit, delete; online players see the change at once and the toast says how many were told |
 | 充值 | read; manage may edit | upload the WeChat / Alipay QR codes and the notice of the payment page; the orders players opened, with confirm / cancel (confirming delivers the product); orders by hand for players who paid outside the game |
 | 审计日志 | superadmin | who did what, when, from where |

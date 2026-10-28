@@ -22,12 +22,8 @@ var closedReplies = map[uint16]proto.Message{
 	27709: {"list": []proto.Message{}}, 27710: {"pos_list": []proto.Message{}}, 27711: {}, 27712: {}, 27713: {"arena_peak_rank": []proto.Message{}},
 	27714: {"rank": 0, "worship": 0, "power": 0, "score": 0, "rank_list": []proto.Message{}}, 27715: {"time": 0, "rank_list": []proto.Message{}}, 27716: {},
 	27720: {"zone_info": []proto.Message{}}, 27730: {"point_info": []proto.Message{}}, 27731: {},
-	// cross champion (26200~26216)
-	26200: {"start_time": 0, "end_time": 0, "step": 0, "step_status": 0, "step_status_time": 0, "round": 0, "round_status": 0, "round_status_time": 0, "flag": 0, "srv_id": "", "is_open": 0},
-	26201: {"rank": 0, "best_rank": 0, "can_bet": 0, "group": 0},
-	26202: {}, 26203: {}, 26205: {"list": []proto.Message{}}, 26206: {}, 26208: {"list": []proto.Message{}}, 26209: {"list": []proto.Message{}},
-	26210: {"pos_list": []proto.Message{}}, 26211: {}, 26212: {}, 26213: {"rank_list": []proto.Message{}},
-	26214: {"rank": 0, "worship": 0, "power": 0, "rank_list": []proto.Message{}, "score": 0}, 26215: {"time": 0, "rank_list": []proto.Message{}}, 26216: {},
+	// cross champion: 26200~26215 are answered by RegisterCrossChampion (arenachampion.go); only the empty 26216 stays
+	26216: {},
 	// god battle
 	21410: {"type": 0, "role_list": []proto.Message{}},
 	// cross show, the list of the servers that take part
@@ -54,7 +50,7 @@ var closedReplies = map[uint16]proto.Message{
 
 // closedRefusals are the requests that ask for something the closed play could give: they are told why not.
 var closedRefusals = map[uint16]proto.Message{
-	27704: closedMsg("巅峰冠军赛未开启"), 26204: closedMsg("跨服冠军赛未开启"),
+	27704: closedMsg("巅峰冠军赛未开启"),
 	21401: closedMsg("战场未开启"), 21403: {"code": 0}, 21421: closedMsg("战场未开启"), 21427: closedMsg("战场未开启"),
 	10992: closedMsg("没有进行中的合服投票"), 10993: closedMsg("没有进行中的合服投票"),
 	20204: closedMsg("暂不能查看"),

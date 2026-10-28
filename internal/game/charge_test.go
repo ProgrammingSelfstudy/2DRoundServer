@@ -776,8 +776,8 @@ func TestCrossClosed(t *testing.T) {
 	if r := c.waitFor(27704); r.Int("code") != 0 || r.Str("msg") == "" {
 		t.Fatalf("27704: %v", r)
 	}
-	c.send(26200, proto.Message{})
-	if r := c.waitFor(26200); r.Int("is_open") != 0 {
+	c.send(26200, proto.Message{}) // the cross champion is on Sundays (arenachampion.go); this is a Monday-less test clock
+	if r := c.waitFor(26200); r.Int("is_open") != 0 || r.Int("step") != 0 {
 		t.Fatalf("26200: %v", r)
 	}
 	form := []proto.Message{{"order": 1, "formation_type": 1, "pos_info": []proto.Message{{"pos": 1, "id": 7}}, "hallows_id": 0}}

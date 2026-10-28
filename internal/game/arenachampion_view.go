@@ -20,7 +20,7 @@ type champPhase struct {
 
 func (c *champSvc) phaseOf(stt *champState, now time.Time) champPhase {
 	p := champPhase{round: -1}
-	last, _ := champEventAt(now)
+	last, _ := c.eventAt(now)
 	ev := stt.Ev
 	if ev == nil || ev.Skip || last == 0 || ev.T0 != last {
 		return p
@@ -48,11 +48,19 @@ func (c *champSvc) phaseOf(stt *champState, now time.Time) champPhase {
 
 // baseInfo is 20250.
 func (c *champSvc) baseInfo(stt *champState, now time.Time, flag int64) proto.Message {
+	m := c.baseInfoOf(stt, now, flag)
+	if c.cross { // the cross window: srv_id of the zone (one server: none) and whether a match is on or announced
+		m["srv_id"], m["is_open"] = "", b2i(m.Int("step") != 0)
+	}
+	return m
+}
+
+func (c *champSvc) baseInfoOf(stt *champState, now time.Time, flag int64) proto.Message {
 	p := c.phaseOf(stt, now)
 	t := now.Unix()
 	m := proto.Message{"start_time": 0, "end_time": 0, "step": 0, "step_status": 0, "step_status_time": 0, "round": 0, "round_status": 0, "round_status_time": 0, "flag": flag}
 	if p.ev == nil {
-		if _, next := champEventAt(now); next != 0 && dayStart(time.Unix(next, 0).In(dayZone)).Unix() == dayStart(now.In(dayZone)).Unix() {
+		if _, next := c.eventAt(now); next != 0 && dayStart(time.Unix(next, 0).In(dayZone)).Unix() == dayStart(now.In(dayZone)).Unix() {
 			m["start_time"], m["end_time"] = dayStart(time.Unix(next, 0).In(dayZone)).Unix(), champEndShown(next)
 			m["step"], m["step_status_time"] = champStepScore, next
 		}
@@ -123,7 +131,7 @@ func (c *champSvc) ranks(ev *champEvent) []int64 {
 
 func (c *champSvc) best(rid int64, ev *champEvent, idx int) int64 {
 	r := &champRole{}
-	_, _ = c.st.LoadState(rid, champModule, r)
+	_, _ = c.st.LoadState(rid, c.module, r)
 	if ev != nil && ev.Done && idx >= 0 && ev.Entries[idx].Rank > 0 && (r.Best == 0 || ev.Entries[idx].Rank < r.Best) {
 		return ev.Entries[idx].Rank
 	}
@@ -255,7 +263,7 @@ func (c *champSvc) view(s *gateway.Session, fn func(role *store.Role, stt *champ
 }
 
 func (c *champSvc) save(srv string, stt *champState) error {
-	return c.st.SaveGlobal(srv, champModule, stt)
+	return c.st.SaveGlobal(srv, c.module, stt)
 }
 
 func (c *champSvc) roleInfo(s *gateway.Session, _ proto.Message) error {
@@ -275,13 +283,13 @@ func (c *champSvc) roleInfo(s *gateway.Session, _ proto.Message) error {
 				return err
 			}
 		}
-		if err := s.Send(20251, msg); err != nil {
+		if err := s.Send(c.id(20251), msg); err != nil {
 			return err
 		}
 		base := c.baseInfo(stt, now, 0)
 		if key := champSnapshot(base); c.pushed[role.RID] != key {
 			c.pushed[role.RID] = key
-			return s.Send(20250, base)
+			return s.Send(c.id(20250), base)
 		}
 		return nil
 	})
@@ -293,18 +301,18 @@ func (c *champSvc) myMatch(s *gateway.Session, _ proto.Message) error {
 		if p.ev != nil {
 			if me := c.indexOf(p.ev, role.RID); me >= 0 {
 				if r, j, ok := c.myMatchIndex(p.ev, me, p.round); ok {
-					return s.Send(20252, c.matchMsg(p.ev, r, j, now.Unix(), me))
+					return s.Send(c.id(20252), c.matchMsg(p.ev, r, j, now.Unix(), me))
 				}
 			}
 		}
-		return s.Send(20252, empty)
+		return s.Send(c.id(20252), empty)
 	})
 }
 
 func (c *champSvc) guessMatch(s *gateway.Session, _ proto.Message) error {
 	return c.view(s, func(role *store.Role, stt *champState, p champPhase, now time.Time) error {
 		if p.ev == nil || p.round < 0 {
-			return s.Send(20253, proto.Message{"step": 0, "round": 0, "group": 0, "ret": 0, "replay_id": 0})
+			return s.Send(c.id(20253), proto.Message{"step": 0, "round": 0, "group": 0, "ret": 0, "replay_id": 0})
 		}
 		ev, r := p.ev, p.round
 		j := ev.Guess[r]
@@ -317,14 +325,14 @@ func (c *champSvc) guessMatch(s *gateway.Session, _ proto.Message) error {
 				msg["bet_type"], msg["bet_val"] = b.Side, b.Amount
 			}
 		}
-		return s.Send(20253, msg)
+		return s.Send(c.id(20253), msg)
 	})
 }
 
 func (c *champSvc) bet(s *gateway.Session, req proto.Message) error {
 	return c.view(s, func(role *store.Role, stt *champState, p champPhase, now time.Time) error {
 		refuse := func(msg string) error {
-			return s.Send(20254, proto.Message{"code": 0, "msg": msg, "can_bet": 0, "bet_type": 0, "bet_val": 0})
+			return s.Send(c.id(20254), proto.Message{"code": 0, "msg": msg, "can_bet": 0, "bet_type": 0, "bet_val": 0})
 		}
 		ev := p.ev
 		if ev == nil || p.over || p.round < 0 || p.status != 2 {
@@ -355,11 +363,11 @@ func (c *champSvc) bet(s *gateway.Session, req proto.Message) error {
 		if err := c.save(role.SrvID, stt); err != nil {
 			return err
 		}
-		if err := s.Send(20254, proto.Message{"code": 1, "msg": "竞猜成功", "can_bet": ch.Have, "bet_type": side, "bet_val": amount}); err != nil {
+		if err := s.Send(c.id(20254), proto.Message{"code": 1, "msg": "竞猜成功", "can_bet": ch.Have, "bet_type": side, "bet_val": amount}); err != nil {
 			return err
 		}
 		pa, pb = ev.pools(p.round, j)
-		return s.Send(20257, proto.Message{"a_bet": pa, "b_bet": pb, "a_bet_ratio": champOdds(pa, pb), "b_bet_ratio": champOdds(pb, pa)})
+		return s.Send(c.id(20257), proto.Message{"a_bet": pa, "b_bet": pb, "a_bet_ratio": champOdds(pa, pb), "b_bet_ratio": champOdds(pb, pa)})
 	})
 }
 
@@ -373,7 +381,7 @@ func (c *champSvc) myBets(s *gateway.Session, _ proto.Message) error {
 				list = append(list, m)
 			}
 		}
-		return s.Send(20255, proto.Message{"list": list})
+		return s.Send(c.id(20255), proto.Message{"list": list})
 	})
 }
 
@@ -390,7 +398,7 @@ func (c *champSvc) result(s *gateway.Session, _ proto.Message) error {
 			return err
 		}
 		e := ev.Entries[idx]
-		return s.Send(20256, proto.Message{"rank": e.Rank, "cnum": e.Fights, "win": e.Wins})
+		return s.Send(c.id(20256), proto.Message{"rank": e.Rank, "cnum": e.Fights, "win": e.Wins})
 	})
 }
 
@@ -415,7 +423,7 @@ func (c *champSvc) myLog(s *gateway.Session, _ proto.Message) error {
 				}
 			}
 		}
-		return s.Send(20258, proto.Message{"list": list})
+		return s.Send(c.id(20258), proto.Message{"list": list})
 	})
 }
 
@@ -473,7 +481,7 @@ func (c *champSvc) group32(s *gateway.Session, _ proto.Message) error {
 				list = append(list, proto.Message{"group": g + 1, "pos_list": slots})
 			}
 		}
-		return s.Send(20260, proto.Message{"list": list})
+		return s.Send(c.id(20260), proto.Message{"list": list})
 	})
 }
 
@@ -497,7 +505,7 @@ func (c *champSvc) top4(s *gateway.Session, _ proto.Message) error {
 				slots = append(slots, c.slotMsg(ev, idx, int64(sl), ret, replay))
 			}
 		}
-		return s.Send(20261, proto.Message{"pos_list": slots})
+		return s.Send(c.id(20261), proto.Message{"pos_list": slots})
 	})
 }
 
@@ -508,7 +516,7 @@ func (c *champSvc) guessAt(s *gateway.Session, _ proto.Message) error {
 			m := p.ev.Rounds[p.round][p.ev.Guess[p.round]]
 			msg["group"], msg["pos"] = m.Group, m.Pos
 		}
-		return s.Send(20262, msg)
+		return s.Send(c.id(20262), msg)
 	})
 }
 
@@ -518,12 +526,12 @@ func (c *champSvc) matchAt(s *gateway.Session, req proto.Message) error {
 			for r := champScoreRnds; r <= p.round; r++ {
 				for j, m := range ev.Rounds[r] {
 					if m.Group == req.Int("group") && m.Pos == req.Int("pos") {
-						return s.Send(20263, c.matchMsg(ev, r, j, now.Unix(), -1))
+						return s.Send(c.id(20263), c.matchMsg(ev, r, j, now.Unix(), -1))
 					}
 				}
 			}
 		}
-		return s.Send(20263, proto.Message{"step": 0, "round": 0, "group": 0, "ret": 0, "replay_id": 0})
+		return s.Send(c.id(20263), proto.Message{"step": 0, "round": 0, "group": 0, "ret": 0, "replay_id": 0})
 	})
 }
 
@@ -542,7 +550,7 @@ func (c *champSvc) statues(s *gateway.Session, _ proto.Message) error {
 			list = append(list, proto.Message{"rid": t.RID, "srv_id": t.SrvID, "name": t.Name, "lev": t.Lev, "rank": t.Rank, "sex": t.Sex,
 				"lookid": defaultLookID(int(t.Face)), "worship": w, "worship_status": st})
 		}
-		return s.Send(20280, proto.Message{"rank_list": list})
+		return s.Send(c.id(20280), proto.Message{"rank_list": list})
 	})
 }
 
@@ -577,10 +585,10 @@ func (c *champSvc) ranking(s *gateway.Session, _ proto.Message) error {
 			}
 			msg["rank_list"] = list
 			if me := c.indexOf(ev, role.RID); me >= 0 {
-				msg["rank"], msg["power"] = ranks[me], ev.Entries[me].Power
+				msg["rank"], msg["power"], msg["score"] = ranks[me], ev.Entries[me].Power, ev.Entries[me].total()
 				msg["worship"], _ = c.worshipOf(role.RID, role.RID, now)
 			}
 		}
-		return s.Send(20281, msg)
+		return s.Send(c.id(20281), msg)
 	})
 }

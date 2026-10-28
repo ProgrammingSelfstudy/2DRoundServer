@@ -317,3 +317,49 @@ func TestChampionTickPushesWhenItMovesOn(t *testing.T) {
 		t.Fatalf("the three best are shown when it ends: %v", top)
 	}
 }
+
+func TestCrossChampion(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	// the 25th of October 2026 is a Sunday: the cross match starts at 12:00
+	sunday := champAt(25, 12, 0, 0)
+	e.setNow(sunday.Add(10 * time.Second))
+	c, role := e.champRole("cc1", "跨服客")
+	board := &caBoard{Roles: map[int64]*caRole{role.RID: {RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: 120, Score: 1500, Fought: true, Season: 1}}}
+	if err := e.st.SaveGlobal(role.SrvID, caModule, board); err != nil {
+		t.Fatal(err)
+	}
+	c.send(26200, proto.Message{})
+	b := c.waitFor(26200)
+	if b.Int("step") != champStepScore || b.Int("is_open") != 1 || b.Int("start_time") != dayStart(sunday).Unix() {
+		t.Fatalf("base: %v", b)
+	}
+	// the entrants are the cross arena's best, robots after them, up to 128; the local match is not touched
+	c.send(26214, proto.Message{})
+	r := c.waitFor(26214)
+	list := r.Arr("rank_list")
+	if len(list) != champSize || r.Int("rank") == 0 {
+		t.Fatalf("ranking of %d: rank %d", len(list), r.Int("rank"))
+	}
+	var me bool
+	for _, e := range list {
+		if e.Int("rid") == role.RID {
+			me = true
+		}
+	}
+	if !me {
+		t.Fatal("the cross arena's best is not in the match")
+	}
+	c.send(26201, proto.Message{})
+	if r := c.waitFor(26201); r.Int("rank") == 0 {
+		t.Fatalf("own standing: %v", r)
+	}
+	if ev := (&champState{}); true {
+		if ok, _ := e.st.LoadGlobal(role.SrvID, "crosschamp", ev); !ok || ev.Ev == nil || len(ev.Ev.Entries) != champSize {
+			t.Fatalf("state: %v %+v", ok, ev.Ev)
+		}
+		local := &champState{}
+		if ok, _ := e.st.LoadGlobal(role.SrvID, champModule, local); ok && local.Ev != nil {
+			t.Fatal("the local match was started by the cross one")
+		}
+	}
+}

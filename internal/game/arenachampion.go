@@ -180,11 +180,97 @@ type champSvc struct {
 	now    func() time.Time
 	pushed map[int64]string  // 20250 state last sent to a role
 	cast   map[string]string // 20250 state last broadcast, by server
+
+	// what tells the champion matches apart: the cross one (26200~26215) is the same match with its own commands, state, days, prizes
+	// and entrants (the best of the cross-server arena instead of the server's arena)
+	module    string
+	cmds      map[uint16]uint16 // the 202xx command -> the one this match answers on (missing = the same)
+	days      []time.Weekday
+	startHour int
+	startMin  int
+	awards    []struct {
+		Min, Max int64
+		Items    [][2]int64
+	}
+	entrants func(srv string, n int) ([]store.ArenaRow, error)
+	cross    bool
+}
+
+// id is the command this match uses for the canonical (local champion) one.
+func (c *champSvc) id(cmd uint16) uint16 {
+	if v, ok := c.cmds[cmd]; ok {
+		return v
+	}
+	return cmd
 }
 
 // RegisterArenaChampion registers the champion match: 20250 is only pushed (when the state changes), 20251-20263 and
 // 20280-20281 are the windows. Run keeps the clients told while the match goes on.
 func RegisterArenaChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub) *champSvc {
+	c := newChampSvc(db, hub)
+	c.module, c.days, c.startHour, c.startMin = champModule, []time.Weekday{time.Wednesday, time.Saturday}, champStartHour, champStartMin
+	c.awards = champCfg.Awards
+	c.entrants = db.ArenaTop
+	c.register(r)
+	return c
+}
+
+// crossChampDays / crossChampStart: the cross champion match is on Sunday at 12:00, the hour the client's `time_score_start` names (the
+// cross arena of crossarena.go closes on Saturday 23:00, so its list is final).
+var crossChampDays = []time.Weekday{time.Sunday}
+
+const crossChampStart = 12
+
+//go:embed data/crosschampion.json
+var crossChampJSON []byte
+
+var crossChampAwards = func() []struct {
+	Min, Max int64
+	Items    [][2]int64
+} {
+	var f struct {
+		Awards []struct {
+			Min, Max int64
+			Items    [][2]int64
+		} `json:"awards"`
+	}
+	if err := json.Unmarshal(crossChampJSON, &f); err != nil || len(f.Awards) != 12 {
+		panic("game: bad crosschampion.json")
+	}
+	return f.Awards
+}()
+
+// crossChampCmds maps the commands of the champion match to the cross ones.
+var crossChampCmds = map[uint16]uint16{20250: 26200, 20251: 26201, 20252: 26202, 20253: 26203, 20254: 26204, 20255: 26205, 20256: 26206,
+	20257: 26207, 20258: 26208, 20260: 26209, 20261: 26210, 20262: 26211, 20263: 26212, 20280: 26213, 20281: 26214, 20282: 26215}
+
+// RegisterCrossChampion registers the cross champion match (26200~26215). With one server the cross-server arena is the server's own
+// (crossarena.go), so the match is the champion match again: the best of that arena (115 and over, robots filling up to 128), the same
+// rounds, on Sunday at 12:00, with the prizes of the cross match. The client's 256 and 64 are not kept: the bracket is the local
+// one (128, four groups of eight, four), which the cross windows draw the same way.
+func RegisterCrossChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub) *champSvc {
+	c := newChampSvc(db, hub)
+	c.module, c.days, c.startHour, c.startMin = "crosschamp", crossChampDays, crossChampStart, 0
+	c.awards, c.cmds, c.cross = crossChampAwards, crossChampCmds, true
+	c.entrants = func(srv string, n int) ([]store.ArenaRow, error) {
+		b := &caBoard{}
+		if _, err := db.LoadGlobal(srv, caModule, b); err != nil {
+			return nil, err
+		}
+		var rows []store.ArenaRow
+		for _, cr := range b.ranked() {
+			if len(rows) == n {
+				break
+			}
+			rows = append(rows, store.ArenaRow{RID: cr.RID, Score: cr.Score})
+		}
+		return rows, nil
+	}
+	c.register(r)
+	return c
+}
+
+func newChampSvc(db *store.Store, hub *gateway.Hub) *champSvc {
 	c := &champSvc{st: db, hub: hub, pushed: map[int64]string{}, cast: map[string]string{}, now: time.Now}
 	fights := fightServiceOf(db)
 	c.rng = func() *rand.Rand {
@@ -193,7 +279,11 @@ func RegisterArenaChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub)
 		}
 		return rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
-	r.Handle(20250, func(s *gateway.Session, _ proto.Message) error { // the client asks at login; the tick would tell it in a few seconds
+	return c
+}
+
+func (c *champSvc) register(r *gateway.Router) {
+	r.Handle(c.id(20250), func(s *gateway.Session, _ proto.Message) error { // the client asks at login; the tick would tell it in a few seconds
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -209,20 +299,13 @@ func RegisterArenaChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub)
 		c.pushBase(s, base, champSnapshot(base))
 		return nil
 	})
-	r.Handle(20251, c.roleInfo)
-	r.Handle(20252, c.myMatch)
-	r.Handle(20253, c.guessMatch)
-	r.Handle(20254, c.bet)
-	r.Handle(20255, c.myBets)
-	r.Handle(20256, c.result)
-	r.Handle(20258, c.myLog)
-	r.Handle(20260, c.group32)
-	r.Handle(20261, c.top4)
-	r.Handle(20262, c.guessAt)
-	r.Handle(20263, c.matchAt)
-	r.Handle(20280, c.statues)
-	r.Handle(20281, c.ranking)
-	return c
+	for _, h := range []struct {
+		cmd uint16
+		fn  gateway.Handler
+	}{{20251, c.roleInfo}, {20252, c.myMatch}, {20253, c.guessMatch}, {20254, c.bet}, {20255, c.myBets}, {20256, c.result},
+		{20258, c.myLog}, {20260, c.group32}, {20261, c.top4}, {20262, c.guessAt}, {20263, c.matchAt}, {20280, c.statues}, {20281, c.ranking}} {
+		r.Handle(c.id(h.cmd), h.fn)
+	}
 }
 
 // Run looks at the clock every few seconds and tells the online roles when the match moves on, until stop is closed.
@@ -291,7 +374,7 @@ func (c *champSvc) tick() {
 				}
 			}
 			if top != nil {
-				_ = s.Send(20282, top)
+				_ = s.Send(c.id(20282), top)
 			}
 		}
 	}
@@ -303,7 +386,7 @@ func (c *champSvc) pushBase(s *gateway.Session, base proto.Message, key string) 
 		c.pushed[role.RID] = key
 		c.mu.Unlock()
 	}
-	_ = s.Send(20250, base)
+	_ = s.Send(c.id(20250), base)
 }
 
 func champSnapshot(base proto.Message) string {
@@ -312,15 +395,15 @@ func champSnapshot(base proto.Message) string {
 
 // ---- the calendar
 
-// champEventAt gives the start of the last event that began at or before now (0 if none lately) and of the next one.
-func champEventAt(now time.Time) (last, next int64) {
+// eventAt gives the start of the last event that began at or before now (0 if none lately) and of the next one.
+func (c *champSvc) eventAt(now time.Time) (last, next int64) {
 	today := dayStart(now.In(dayZone))
 	for d := -9; d <= 9; d++ {
 		day := today.AddDate(0, 0, d)
-		if w := day.Weekday(); w != time.Wednesday && w != time.Saturday {
+		if !c.onDay(day.Weekday()) {
 			continue
 		}
-		t0 := day.Add(time.Duration(champStartHour)*time.Hour + time.Duration(champStartMin)*time.Minute).Unix()
+		t0 := day.Add(time.Duration(c.startHour)*time.Hour + time.Duration(c.startMin)*time.Minute).Unix()
 		if t0 <= now.Unix() {
 			last = t0
 		} else if next == 0 {
@@ -328,6 +411,15 @@ func champEventAt(now time.Time) (last, next int64) {
 		}
 	}
 	return last, next
+}
+
+func (c *champSvc) onDay(w time.Weekday) bool {
+	for _, d := range c.days {
+		if d == w {
+			return true
+		}
+	}
+	return false
 }
 
 func champLength() int64 { return champOffsets[champRounds] }
@@ -343,11 +435,11 @@ func champEndShown(t0 int64) int64 {
 // load reads the state of a server and brings it up to date. finished is true when the event ended on this call.
 func (c *champSvc) load(srv string, now time.Time) (*champState, bool, error) {
 	stt := &champState{}
-	if _, err := c.st.LoadGlobal(srv, champModule, stt); err != nil {
+	if _, err := c.st.LoadGlobal(srv, c.module, stt); err != nil {
 		return nil, false, err
 	}
 	dirty, finished := false, false
-	last, _ := champEventAt(now)
+	last, _ := c.eventAt(now)
 	if last != 0 && now.Unix() <= last+champLength()+champGrace && (stt.Ev == nil || stt.Ev.T0 != last) {
 		if stt.Ev != nil && !stt.Ev.Done && !stt.Ev.Skip {
 			if _, err := c.advance(srv, stt, time.Unix(1<<40, 0)); err != nil {
@@ -370,7 +462,7 @@ func (c *champSvc) load(srv string, now time.Time) (*champState, bool, error) {
 		finished = !was && ev.Done
 	}
 	if dirty {
-		if err := c.st.SaveGlobal(srv, champModule, stt); err != nil {
+		if err := c.st.SaveGlobal(srv, c.module, stt); err != nil {
 			return nil, false, err
 		}
 	}
@@ -380,7 +472,7 @@ func (c *champSvc) load(srv string, now time.Time) (*champState, bool, error) {
 // newEvent picks the 128: the best of the arena, then robots copying them.
 func (c *champSvc) newEvent(srv string, t0 int64) (*champEvent, error) {
 	ev := &champEvent{Key: dayKey(time.Unix(t0, 0)), T0: t0, Bets: map[int64][]champBet{}, Chips: map[int64]*champChips{}, Seen: map[int64]bool{}}
-	rows, err := c.st.ArenaTop(srv, champSize)
+	rows, err := c.entrants(srv, champSize)
 	if err != nil {
 		return nil, err
 	}
@@ -815,7 +907,7 @@ func (c *champSvc) finish(srv string, stt *champState) error {
 			continue
 		}
 		var items [][2]int64
-		for _, a := range champCfg.Awards {
+		for _, a := range c.awards {
 			if e.Rank >= a.Min && e.Rank <= a.Max {
 				items = append(items, a.Items...)
 			}
@@ -825,19 +917,19 @@ func (c *champSvc) finish(srv string, stt *champState) error {
 			ch.Have = 0
 		}
 		m := store.Mail{SrvID: srv, Subject: "冠军赛奖励", Content: "本次冠军赛你的最终名次是第" + itoa64(e.Rank) + "名，这是名次奖励和竞猜币换成的竞技声望。",
-			FromName: "冠军赛", CreatedBy: "arenachamp", Attachments: attachmentsOf(items)}
+			FromName: "冠军赛", CreatedBy: c.module, Attachments: attachmentsOf(items)}
 		if len(m.Attachments) > 0 {
 			if _, err := c.st.CreateMail(m, []int64{e.RID}); err != nil {
 				return err
 			}
 		}
 		role := &champRole{}
-		if _, err := c.st.LoadState(e.RID, champModule, role); err != nil {
+		if _, err := c.st.LoadState(e.RID, c.module, role); err != nil {
 			return err
 		}
 		if role.Best == 0 || e.Rank < role.Best {
 			role.Best = e.Rank
-			if err := c.st.SaveState(e.RID, champModule, role); err != nil {
+			if err := c.st.SaveState(e.RID, c.module, role); err != nil {
 				return err
 			}
 		}
@@ -846,7 +938,7 @@ func (c *champSvc) finish(srv string, stt *champState) error {
 		if ch.Have <= 0 {
 			continue
 		}
-		m := store.Mail{SrvID: srv, Subject: "冠军赛竞猜奖励", Content: "冠军赛结束了，你的竞猜币已换成竞技声望。", FromName: "冠军赛", CreatedBy: "arenachamp",
+		m := store.Mail{SrvID: srv, Subject: "冠军赛竞猜奖励", Content: "冠军赛结束了，你的竞猜币已换成竞技声望。", FromName: "冠军赛", CreatedBy: c.module,
 			Attachments: attachmentsOf([][2]int64{{8, ch.Have}})}
 		if _, err := c.st.CreateMail(m, []int64{rid}); err != nil {
 			return err

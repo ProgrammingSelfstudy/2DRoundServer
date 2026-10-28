@@ -115,7 +115,11 @@ func TestHolyEqm(t *testing.T) {
 	}
 	before, _ = e.st.RoleItems(role.RID)
 	c.send(11089, proto.Message{"item_ids": []proto.Message{{"item_id": bag[0].Int("id")}}})
-	if r := c.until(11089); r.Int("code") != 1 {
+	gain := c.until(12742) // the gain comes before the answer, which has an empty msg (capture original-2026-10-27)
+	if l := gain.Arr("asset_list"); len(l) != 1 || l[0].Int("bid") != 10030 || l[0].Str("num") != "9" {
+		t.Fatalf("gain: %v", gain)
+	}
+	if r := c.until(11089); r.Int("code") != 1 || r.Str("msg") != "" {
 		t.Fatalf("sale: %v", r)
 	}
 	after, _ = e.st.RoleItems(role.RID)

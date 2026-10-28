@@ -554,13 +554,17 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 		if err := st.SaveHoly(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11089, "code", 1, "出售成功", nil); err != nil {
-			return err
-		}
+		// the original pushes the bag and what was gained first and answers last with an empty msg (capture original-2026-10-27)
 		if err := sendAssets(s, st, role.RID); err != nil {
 			return err
 		}
-		return sendBackpack(s, st)
+		if err := sendBackpack(s, st); err != nil {
+			return err
+		}
+		if err := sendAssetGain(s, gain); err != nil {
+			return err
+		}
+		return reply(s, 11089, "code", 1, "", nil)
 	})
 
 	r.Handle(11092, func(s *gateway.Session, req proto.Message) error {

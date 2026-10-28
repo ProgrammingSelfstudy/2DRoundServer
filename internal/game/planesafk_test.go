@@ -144,7 +144,8 @@ func TestPlanesafkFightRelicAndBoss(t *testing.T) {
 	e.setTile(t, role, 2, 2, pfEvtID(1, 1, 2, 1))
 	c.send(28600, proto.Message{"line": 2, "index": 2, "action": 0})
 	info := c.waitFor(28607)
-	if info.Int("power") <= 0 || len(info.Arr("guards")) == 0 || info.Str("name") == "" {
+	// the strength is in guards_power; power is 0 (capture original-2026-10-27)
+	if info.Int("power") != 0 || info.Int("guards_power") <= 0 || len(info.Arr("guards")) == 0 || info.Str("name") == "" {
 		t.Fatalf("28607: %v", info)
 	}
 	c.waitFor(28600)

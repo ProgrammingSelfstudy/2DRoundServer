@@ -50,14 +50,15 @@ func (p *pfSvc) monsterInfo(s *gateway.Session, role *store.Role, st *pfState, t
 	for i, h := range lineup {
 		pp := store.Partner{BID: h.BID, Lev: int(h.Lev), Star: int(h.Star), BreakLev: int(h.Break)}
 		hp, atk, _, _ := partnerStats(pp)
-		guards = append(guards, proto.Message{"partner_id": i + 1, "pos": h.Pos, "bid": h.BID, "lev": h.Lev, "star": h.Star, "ext_data": []proto.Message{}, "hp_per": 100,
+		guards = append(guards, proto.Message{"partner_id": i + 1, "pos": h.Pos, "bid": h.BID, "lev": h.Lev, "star": h.Star, "ext_data": []proto.Message{{"key": 5, "val": 0}}, "hp_per": 100,
 			"hp_max": hp, "atk": atk, "guards_power": partnerMessage(pp).Int("power")})
 	}
 	face := int64(role.FaceID)
 	if face == 0 {
 		face = store.DefaultFaceID
 	}
-	return s.Send(28607, proto.Message{"power": t.Power, "buffs": buffs, "rid": 0, "srv_id": role.SrvID, "name": e.Name, "face": face, "lev": role.Lev, "guards_power": t.Power,
+	// power is 0 and srv_id empty in the original (capture original-2026-10-27, 16-planes-fight); the strength is in guards_power
+	return s.Send(28607, proto.Message{"power": 0, "buffs": buffs, "rid": 0, "srv_id": "", "name": e.Name, "face": face, "lev": role.Lev, "guards_power": t.Power,
 		"formation_type": 1, "guards": guards, "sprites": []proto.Message{}, "hallows_id": 0, "sprite_lev": 0, "strength": 1000, "face_update_time": 0, "face_file": "", "is_spar": 0})
 }
 

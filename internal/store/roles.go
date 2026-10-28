@@ -126,6 +126,12 @@ func (s *Store) SetRoleLevel(rid int64, lev int) error {
 }
 
 // SetRoleVIP sets a role's VIP level (the caller checks the range). ErrNotFound for an unknown role.
+// SetRoleCreatedAt moves the creation time of a role; the tests of gifts that go by the age of a role use it.
+func (s *Store) SetRoleCreatedAt(rid, at int64) error {
+	_, err := s.db.Exec(`UPDATE roles SET created_at=? WHERE rid=?`, at, rid)
+	return err
+}
+
 func (s *Store) SetRoleVIP(rid int64, vip int) error {
 	r, err := s.db.Exec(`UPDATE roles SET vip_lev=? WHERE rid=?`, vip, rid)
 	if err != nil {

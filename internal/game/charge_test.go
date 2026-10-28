@@ -347,6 +347,10 @@ func TestCycleGifts(t *testing.T) {
 	chargeClock = func() time.Time { return actNow }
 	t.Cleanup(func() { chargeClock = old })
 	c, role := e.enter("cg1", "礼包人")
+	if err := e.st.SetRoleCreatedAt(role.RID, actNow.Add(-24*time.Hour).Unix()); err != nil { // the gift rows go by the role's age; the real creation time is after actNow
+		t.Fatal(err)
+	}
+	role, _ = e.st.RoleByID(role.RID)
 	c.send(21007, proto.Message{"type": 1})
 	r := c.waitFor(21007)
 	if len(r.Arr("first_gift")) != 5 || r.Arr("first_gift")[0].Int("id") != 401 || r.Arr("first_gift")[0].Int("count") != 0 || r.Int("ref_time") != leWeekEnd(actNow) {

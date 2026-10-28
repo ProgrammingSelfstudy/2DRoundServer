@@ -106,16 +106,19 @@ func TestPlanesafkStepsSpringCrossAndMoves(t *testing.T) {
 	}
 	e.setTile(t, role, 2, 2, pfEvtID(1, 1, 2, 3))
 	c.send(28600, proto.Message{"line": 2, "index": 2, "action": 1, "ext_list": []proto.Message{}})
+	if n := c.waitFor(12741); n.Str("msg") != "使用成功，泉水从眼前消失..." {
+		t.Fatalf("spring notice: %v", n)
+	}
 	hp := c.waitFor(28609).Arr("partners")
-	if len(hp) != 1 || hp[0].Int("hp_per") != 70 { // the spring gives 30 per cent
+	if len(hp) != 1 || hp[0].Int("hp_per") != 70 { // the spring gives 30 per cent, and only the heroes that changed are listed
 		t.Fatalf("hp after the spring: %v", hp)
 	}
-	if r := c.waitFor(28600); r.Int("code") != 1 {
-		t.Fatalf("spring: %v", r)
-	}
-	upd := c.waitFor(28606)
+	upd := c.waitFor(28606) // the tiles come before the answer (capture original-2026-10-27)
 	if upd.Int("line") != 2 || upd.Int("index") != 2 {
 		t.Fatalf("28606: %v", upd)
+	}
+	if r := c.waitFor(28600); r.Int("code") != 1 || r.Str("msg") != "" {
+		t.Fatalf("spring: %v", r)
 	}
 	hidden := 0
 	for _, tile := range upd.Arr("tile_list") {
@@ -243,11 +246,18 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 		t.Fatalf("hired nobody: %v", r)
 	}
 	c.send(28600, proto.Message{"line": 2, "index": 2, "action": 1, "ext_list": []proto.Message{{"type": pfExtHire, "val1": 2}}})
-	c.waitFor(28609)
-	c.waitFor(28600)
-	c.send(28613, proto.Message{})
+	// the notice, the moved role, the whole roster (the hired hero has flag 1) and then the answer (capture original-2026-10-27)
+	if n := c.waitFor(12741); n.Str("msg") == "" {
+		t.Fatalf("notice: %v", n)
+	}
+	if mv := c.waitFor(28606); mv.Int("line") != 2 || mv.Int("index") != 2 {
+		t.Fatalf("not moved: %v", mv)
+	}
 	if r := c.waitFor(28613).Arr("partners"); len(r) != 2 || r[1].Int("flag") != 1 {
 		t.Fatalf("roster with a hired hero: %v", r)
+	}
+	if r := c.waitFor(28600); r.Int("code") != 1 || r.Str("msg") != "" {
+		t.Fatalf("hire answer: %v", r)
 	}
 	// the merchant
 	e.setTile(t, role, 3, 3, pfEvtID(1, 1, 3, 6))
@@ -273,10 +283,10 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 	}
 	c.waitFor(28600)
 	c.send(28600, proto.Message{"line": 3, "index": 3, "action": 1, "ext_list": []proto.Message{{"type": pfExtShopLeave}}})
-	c.waitFor(28600)
 	if upd := c.waitFor(28606); upd.Int("line") != 3 {
 		t.Fatalf("after the merchant: %v", upd)
 	}
+	c.waitFor(28600)
 	// floors: the next floor needs the boss down
 	c.send(28604, proto.Message{"floor": 2, "difficulty": 1})
 	if r := c.waitFor(28604); r.Int("flag") != 0 {

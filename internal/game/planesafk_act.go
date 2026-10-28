@@ -39,17 +39,22 @@ func (p *pfSvc) partnerOf(role *store.Role, h pfHero) (store.Partner, bool) {
 
 func (p *pfSvc) roster(s *gateway.Session, _ proto.Message) error {
 	return p.with(s, func(role *store.Role, st *pfState) error {
-		list := []proto.Message{}
-		for _, h := range st.Heroes {
-			pp, ok := p.partnerOf(role, h)
-			if !ok {
-				continue
-			}
-			list = append(list, proto.Message{"flag": h.Flag, "partner_id": h.PID, "bid": h.BID, "lev": h.Lev, "star": h.Star, "power": partnerMessage(pp).Int("power"),
-				"hp_per": h.HP, "ext_data": []proto.Message{}})
-		}
-		return s.Send(28613, proto.Message{"partners": list})
+		return p.sendRoster(s, role, st)
 	})
+}
+
+// sendRoster sends 28613: every hero of the run, the hired ones with flag 1. The original gives each `ext_data [{key 5, val 0}]`.
+func (p *pfSvc) sendRoster(s *gateway.Session, role *store.Role, st *pfState) error {
+	list := []proto.Message{}
+	for _, h := range st.Heroes {
+		pp, ok := p.partnerOf(role, h)
+		if !ok {
+			continue
+		}
+		list = append(list, proto.Message{"flag": h.Flag, "partner_id": h.PID, "bid": h.BID, "lev": h.Lev, "star": h.Star, "power": partnerMessage(pp).Int("power"),
+			"hp_per": h.HP, "ext_data": []proto.Message{{"key": 5, "val": 0}}})
+	}
+	return s.Send(28613, proto.Message{"partners": list})
 }
 
 func (p *pfSvc) pushHP(s *gateway.Session, st *pfState) error {
@@ -289,38 +294,68 @@ func (p *pfSvc) act(s *gateway.Session, req proto.Message) error {
 		case pfEvtMonster, pfEvtGuard:
 			return p.fightTile(s, role, st, t, e, action, req, reply)
 		case pfEvtRecover:
+			before := p.hpOf(st)
 			for i := range st.Heroes {
 				if st.Heroes[i].HP > 0 {
 					st.Heroes[i].HP = min(100, st.Heroes[i].HP+e.extNum("all_add_hp", 1))
 				}
 			}
-			return p.step(s, st, t, reply, true)
+			// the original tells it first and lists only the heroes whose hp changed (an empty list when all were whole)
+			if err := s.Send(12741, proto.Message{"msg": "使用成功，泉水从眼前消失..."}); err != nil {
+				return err
+			}
+			return p.step(s, st, t, reply, p.hpChanged(st, before))
 		case pfEvtRevive:
+			before := p.hpOf(st)
 			p.revive(st, e)
-			return p.step(s, st, t, reply, true)
+			return p.step(s, st, t, reply, p.hpChanged(st, before))
 		case pfEvtLease:
 			return p.lease(s, role, st, t, action, ext, reply)
 		case pfEvtBusinessman:
 			return p.shop(s, role, st, t, action, ext, reply)
 		}
-		return p.step(s, st, t, reply, false)
+		return p.step(s, st, t, reply, nil)
 	})
 }
 
-// step moves the role onto the tile, closes its event and tells the client.
-func (p *pfSvc) step(s *gateway.Session, st *pfState, t *pfTile, reply func(int64, string) error, hp bool) error {
+func (p *pfSvc) hpOf(st *pfState) map[int64]int64 {
+	out := map[int64]int64{}
+	for _, h := range st.Heroes {
+		out[h.PID] = h.HP
+	}
+	return out
+}
+
+// hpChanged lists the heroes whose hp differs from before: what 28609 carries after a fountain.
+func (p *pfSvc) hpChanged(st *pfState, before map[int64]int64) []pfHero {
+	out := []pfHero{}
+	for _, h := range st.Heroes {
+		if was, ok := before[h.PID]; !ok || was != h.HP {
+			out = append(out, h)
+		}
+	}
+	return out
+}
+
+// step moves the role onto the tile, closes its event and tells the client: the hp of the heroes in changed (28609, nil sends
+// nothing), then the tiles, then the answer last (capture original-2026-10-27, 20-planes-afk).
+func (p *pfSvc) step(s *gateway.Session, st *pfState, t *pfTile, reply func(int64, string) error, changed []pfHero) error {
 	st.Line, st.Index = t.Line, t.Index
 	st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
 	st.Done[tileKey(t.Line, t.Index)] = true
-	if hp {
-		if err := p.pushHP(s, st); err != nil {
+	if changed != nil {
+		list := []proto.Message{}
+		for _, h := range changed {
+			list = append(list, proto.Message{"flag": h.Flag, "partner_id": h.PID, "hp_per": h.HP})
+		}
+		if err := s.Send(28609, proto.Message{"partners": list}); err != nil {
 			return err
 		}
 	}
-	if err := reply(1, ""); err != nil {
+	if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()}); err != nil {
 		return err
 	}
-	return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
+	return reply(1, "")
 }
 
 func (p *pfSvc) revive(st *pfState, e pfEventCfg) {
@@ -363,10 +398,20 @@ func (p *pfSvc) lease(s *gateway.Session, role *store.Role, st *pfState, t *pfTi
 			st.NextHire++
 			st.Heroes = append(st.Heroes, pfHero{Flag: 1, PID: pfHireBase + st.NextHire, BID: r.BID, Lev: r.Lev, Star: r.Star, HP: 100})
 			st.Rentals = nil
-			if err := p.step(s, st, t, reply, true); err != nil {
+			// the original: the notice, the moved role, the whole roster and then the answer (capture original-2026-10-27)
+			st.Line, st.Index = t.Line, t.Index
+			st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
+			st.Done[tileKey(t.Line, t.Index)] = true
+			if err := s.Send(12741, proto.Message{"msg": "<div fontcolor=#fff000></div>加入我方队伍，可在英雄列表查看！"}); err != nil {
 				return err
 			}
-			return nil
+			if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()}); err != nil {
+				return err
+			}
+			if err := p.sendRoster(s, role, st); err != nil {
+				return err
+			}
+			return reply(1, "")
 		}
 	}
 	return reply(0, "请选择一位雇佣英雄")
@@ -436,7 +481,7 @@ func (p *pfSvc) shop(s *gateway.Session, role *store.Role, st *pfState, t *pfTil
 		return reply(0, "该物品不存在")
 	case hasExt(ext, pfExtShopLeave):
 		st.ShopOpen, st.ShopSelected, st.Goods = false, false, nil
-		return p.step(s, st, t, reply, false)
+		return p.step(s, st, t, reply, nil)
 	}
 	return reply(0, "无效的操作")
 }

@@ -895,6 +895,7 @@ func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama
 		f.passes[role.RID] = *pass
 	}
 	f.mu.Unlock()
+	fillHalo(intro)
 	for _, m := range []struct {
 		cmd  uint16
 		body proto.Message
@@ -919,6 +920,7 @@ func (f *FightService) begin(s *gateway.Session, role *store.Role, combat int64,
 	}
 	f.active[role.RID] = &fightState{rounds: rounds, won: won, combat: combat, settle: settle}
 	f.mu.Unlock()
+	fillHalo(intro)
 	for _, m := range []struct {
 		cmd  uint16
 		body proto.Message

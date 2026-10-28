@@ -37,7 +37,7 @@ func fixed(m proto.Message) func(proto.Message) proto.Message {
 	return func(proto.Message) proto.Message { return m }
 }
 
-// registerHeroStubs covers what the hero module still lacks: artifacts (11030-11040, 11048, 11060),
+// registerHeroStubs covers what the hero module still lacks: artifacts that are not in artifact.go (11039, 11040, 11060),
 // holy equipment (11086-11094, 25220-25224), soul weapons (11401-11405), resonance empowerment
 // (26401, 26420-26432), the fuse red point (11055 / 11056) and 11018.
 func registerHeroStubs(r *gateway.Router) {
@@ -45,14 +45,7 @@ func registerHeroStubs(r *gateway.Router) {
 		11018: fixed(proto.Message{}),
 		11055: fixed(proto.Message{}),
 		11056: fixed(proto.Message{"is_point": 0}),
-		11037: fixed(proto.Message{"lucky": 0}),
 		11040: fixed(proto.Message{"partners": []proto.Message{}, "all_star": 0, "lev": 0, "decompose_partners": []proto.Message{}}),
-		11048: fixed(proto.Message{"artifact_ref_count": []proto.Message{}}),
-		11030: func(req proto.Message) proto.Message {
-			return proto.Message{"result": 0, "msg": notOpen, "partner_id": req.Int("partner_id")}
-		},
-		11032: refuse("result", nil), 11033: refuse("result", proto.Message{"luck_item": 0}), 11034: refuse("result", nil),
-		11035: refuse("result", nil), 11036: refuse("result", proto.Message{"flag": 0}), 11038: refuse("result", nil),
 		11039: refuse("result", proto.Message{"flag": 0}), 11060: refuse("result", nil),
 		11086: func(req proto.Message) proto.Message { return proto.Message{"partner_id": req.Int("partner_id")} },
 		11087: refuse("code", proto.Message{"list": []proto.Message{}}), 11088: refuse("code", proto.Message{"list": []proto.Message{}}),

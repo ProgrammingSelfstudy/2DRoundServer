@@ -9,12 +9,13 @@ import (
 type Partner struct {
 	PartnerID, RID, BID  int64
 	Lev, Star, BreakLev  int
-	UseSkin              int64    // the skin worn (0 = none)
-	Locked               bool     // locked by the owner: not to be consumed
-	Equips               []Equip  // worn pieces, by slot
-	Talents              []Talent // learned talent skills, by slot
-	ResSlot              int64    // the resonance crystal slot it sits in (0 = none)
-	ShownLev, ShownBreak int      // level and break step it shows while it sits in a slot
+	UseSkin              int64      // the skin worn (0 = none)
+	Locked               bool       // locked by the owner: not to be consumed
+	Equips               []Equip    // worn pieces, by slot
+	Talents              []Talent   // learned talent skills, by slot
+	ResSlot              int64      // the resonance crystal slot it sits in (0 = none)
+	ShownLev, ShownBreak int        // level and break step it shows while it sits in a slot
+	Artifacts            []ArtPiece // worn artifacts (战技), by position
 }
 
 // Equip is one worn piece of equipment.
@@ -56,6 +57,9 @@ func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
 	for i := range out {
 		out[i].Equips = eq[out[i].PartnerID]
 		out[i].Talents = tl[out[i].PartnerID]
+	}
+	if err := s.attachArtifacts(rid, out); err != nil {
+		return nil, err
 	}
 	return out, s.applyResonance(rid, out)
 }
@@ -113,6 +117,11 @@ func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	if err != nil {
 		return &p, err
 	}
+	one := []Partner{p}
+	if err := s.attachArtifacts(rid, one); err != nil {
+		return &p, err
+	}
+	p.Artifacts = one[0].Artifacts
 	if slots, err := s.slotsOf(rid); err != nil || slots[partnerID] == 0 {
 		return &p, err
 	}

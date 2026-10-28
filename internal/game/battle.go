@@ -22,6 +22,7 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 		return s.Send(21322, proto.Message{"code": 0})
 	})
 	registerBattleLeftovers(r, st)
+	RegisterArtifact(r, st)
 	registerHeroStubs(r)
 	registerNoPaymentStubs(r)
 }

@@ -109,7 +109,7 @@ func backpackItems(ledger map[int64]int64) []proto.Message {
 		if n <= 0 {
 			continue
 		}
-		if info, ok := itemTable[id]; ok && goesToBackpack(info.Type) {
+		if info, ok := itemTable[id]; ok && goesToBackpack(info.Type) && !isArtifact(id) { // artifacts are listed piece by piece
 			ids = append(ids, id)
 		}
 	}
@@ -192,7 +192,13 @@ func sendBackpack(s *gateway.Session, st *store.Store) error {
 	if err != nil {
 		return err
 	}
-	if err := s.Send(10500, bagReply(s, backpackItems(ledger))); err != nil {
+	items := backpackItems(ledger)
+	arts, err := loadArtifacts(st, role.RID)
+	if err != nil {
+		return err
+	}
+	items = append(items, artifactBag(arts, len(items)+1)...)
+	if err := s.Send(10500, bagReply(s, items)); err != nil {
 		return err
 	}
 	if err := s.Send(10501, bagReply(s, equipmentBag(ledger))); err != nil {

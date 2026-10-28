@@ -1,4 +1,4 @@
-# 战技（artifact，11030~11040、11048、11060）实现设计（2026-10-28，还没写代码）
+# 战技（artifact，11030~11040、11048、11060）实现设计（2026-10-28；已按这个做了，规则和没做的见 `OPEN_QUESTIONS.md` “战技”一节）
 
 读过客户端 `hero/hero_controller.lua`、`hero/view/artifact/*`、`partner_artifact_data.lua`、`artifact_summon_data.lua` 后的结论。
 

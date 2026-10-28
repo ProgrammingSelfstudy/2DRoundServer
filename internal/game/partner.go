@@ -99,6 +99,7 @@ func partnerStats(p store.Partner) (hp, atk, def, speed int64) {
 	}
 	hp, atk, def, speed = artifactBonus(p.Artifacts, hp, atk, def, speed) // worn artifacts
 	hp, atk, def, speed = holyBonus(p.Holy, hp, atk, def, speed)          // worn holy equipment
+	hp, atk, def, speed = horcruxBonus(p.BID, p.Horcrux, hp, atk, def, speed)
 	return
 }
 
@@ -125,7 +126,7 @@ func partnerMessage(p store.Partner) proto.Message {
 		"partner_id": p.PartnerID, "bid": p.BID, "lev": shownLev, "star": p.Star, "skills": skills,
 		"break_lev": shownBreak, "power": heroPower(atk, hp, def, speed),
 		"is_lock": lockList(p), "use_skin": p.UseSkin, "end_time": 0,
-		"resonate_lev": b2i(p.ResSlot > 0), "resonate_break_lev": 0, "horcrux_status": 0, "horcrux_lev": 0,
+		"resonate_lev": b2i(p.ResSlot > 0), "resonate_break_lev": 0, "horcrux_status": p.Horcrux.Status, "horcrux_lev": p.Horcrux.Lev,
 		"atk": atk, "def_p": def, "def_s": def, "hp": hp, "speed": speed,
 		"hit_rate": a["hit_rate"], "dodge_rate": a["dodge_rate"], "crit_rate": a["crit_rate"], "crit_ratio": a["crit_ratio"],
 		"hit_magic": a["hit_magic"], "dodge_magic": a["dodge_magic"], "def": def,

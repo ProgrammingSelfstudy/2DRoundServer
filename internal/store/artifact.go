@@ -57,8 +57,13 @@ func (s *Store) attachArtifacts(rid int64, ps []Partner) error {
 	if err != nil {
 		return err
 	}
+	hx, err := s.HorcruxOf(rid)
+	if err != nil {
+		return err
+	}
 	for i := range ps {
 		ps[i].Artifacts, ps[i].Holy = nil, nil
+		ps[i].Horcrux = hx.Heroes[ps[i].PartnerID]
 		for _, a := range d.Pieces {
 			if a.Partner == ps[i].PartnerID && a.Pos > 0 {
 				ps[i].Artifacts = append(ps[i].Artifacts, a)

@@ -23,6 +23,7 @@ func RegisterBattle(r *gateway.Router, st *store.Store) {
 	registerBattleLeftovers(r, st)
 	RegisterArtifact(r, st)
 	RegisterHolyEqm(r, st)
+	RegisterHorcrux(r, st)
 	registerHeroStubs(r)
 	registerNoPaymentStubs(r)
 }

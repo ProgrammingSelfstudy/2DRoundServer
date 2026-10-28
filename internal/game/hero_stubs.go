@@ -38,7 +38,7 @@ func fixed(m proto.Message) func(proto.Message) proto.Message {
 }
 
 // registerHeroStubs covers what the hero module still lacks: artifacts that are not in artifact.go (11039, 11040, 11060),
-// soul weapons (11401-11405), resonance empowerment
+// the soul weapon (11401, no table in the client), resonance empowerment
 // (26401, 26420-26432), the fuse red point (11055 / 11056) and 11018.
 func registerHeroStubs(r *gateway.Router) {
 	registerStubs(r, map[uint16]func(proto.Message) proto.Message{
@@ -49,7 +49,6 @@ func registerHeroStubs(r *gateway.Router) {
 		11039: refuse("result", proto.Message{"flag": 0}), 11060: refuse("result", nil),
 		11087: refuse("code", proto.Message{"list": []proto.Message{}}),
 		11401: fixed(proto.Message{}),
-		11402: refuse("result", nil), 11403: refuse("result", nil), 11404: refuse("result", nil), 11405: refuse("code", nil),
 		26401: refuse("result", nil),
 		26420: fixed(proto.Message{"star": 0, "num": 0}),
 		26421: refuse("result", nil),

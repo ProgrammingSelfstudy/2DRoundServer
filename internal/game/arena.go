@@ -19,14 +19,14 @@ const (
 	combatArena      = 2    // BattleConst.Fight_Type.Arena
 	arenaInitScore   = 1000 // init_score
 	arenaMinScore    = 800  // min_score
-	arenaFreeCombats = 5    // combat_num: free challenges a day
+	arenaFreeCombats = 3    // free challenges a day: the table says 5, the original gave 3 on two days running (capture original-2026-10-27)
 	arenaRefreshCD   = 3    // ref_time: seconds between two list refreshes
 	arenaLimitLev    = 8    // limit_lev
 	arenaKeepPermil  = 700  // reset_score: the share of the score kept into the next season
 	arenaTicket      = 10103
 	arenaTicketGems  = 20 // ticket_price
 	arenaLoseRatio   = 600
-	arenaWinCoin     = 20000 // capture original-2026-10-27: a first win gave 20000 gold, the next 15 arena prestige (bid 8): the drops are random, here always the gold
+	arenaWinCoin     = 20000 // capture original-2026-10-27: a win gives one drop, gold 20000, arena prestige (bid 8) 15 or hero exp (bid 22) 8000; a loss gives 600 per mille of the gold
 	arenaOpponents   = 3
 	arenaTopList     = 50
 	arenaRobotBase   = 4000000000 // robot rids start here, above any real role
@@ -83,7 +83,12 @@ func arenaSeason(now time.Time) (key, start, end int64) {
 // a higher one, whatever the winner's own score is (capture original-2026-10-27: 20 against five 1000s, 22
 // against 1107, at 1085, 1105 and 1125). Two points only: the slope is a fit.
 func arenaGain(_, theirs int64) int64 {
-	return min(max(20+(theirs-arenaInitScore)/50, 5), 60)
+	d := theirs - arenaInitScore
+	q := d / 50
+	if d%50 < 0 { // rounds down: 985 gave 19 (capture original-2026-10-28, 22-arena)
+		q--
+	}
+	return min(max(20+q, 5), 60)
 }
 
 // arenaLoss is what the loser of a lost challenge pays: 15 for the win worth 20 (same capture, `lose_score`).
@@ -450,10 +455,25 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			if err != nil {
 				return err
 			}
+			// the backpack, the notice of what came, the chest list again, then the answer (capture original-2026-10-28, 22-arena)
 			if err := sendAssets(s, st, role.RID); err != nil {
 				return err
 			}
 			if err := sendBackpack(s, st); err != nil {
+				return err
+			}
+			if err := sendAssetGain(s, map[int64]int64{c.Items[0][0]: c.Items[0][1]}); err != nil {
+				return err
+			}
+			claimed, err := st.ArenaClaimed(a.RID, a.Season)
+			if err != nil {
+				return err
+			}
+			nums := []proto.Message{}
+			for _, n := range claimed {
+				nums = append(nums, proto.Message{"num": n})
+			}
+			if err := s.Send(20208, proto.Message{"had_combat_num": a.Battles, "num_list": nums}); err != nil {
 				return err
 			}
 			return s.Send(20209, proto.Message{"code": 1, "msg": "领取成功"})
@@ -586,19 +606,24 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if len(foes) == 0 {
 			return refuse("对手已无法应战，请刷新列表")
 		}
-		// pay: a free challenge first, else a ticket
+		// pay: a free challenge first, else a ticket (the backpack is told before anything else)
+		paid := false
 		if a.FreeUsed < arenaFreeCombats {
 			a.FreeUsed++
 		} else if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{arenaTicket: 1}, map[int64]int64{}, map[int64]int64{}); errors.Is(err, store.ErrConflict) {
 			return refuse("挑战次数不足")
 		} else if err != nil {
 			return err
+		} else {
+			paid = true
 		}
 		if err := st.SaveArenaPlayer(a); err != nil {
 			return err
 		}
-		if err := questEvent(s, st, role.RID, evtArena, 1); err != nil {
-			return err
+		if paid {
+			if err := sendBackpack(s, st); err != nil {
+				return err
+			}
 		}
 		intro := proto.Message{
 			"combat_type": combatArena, "formation": []proto.Message{{"group": 1, "formation_type": form.FormationType, "formation_lev": 1}, {"group": 2, "formation_type": oform, "formation_lev": 1}},
@@ -607,7 +632,14 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			"suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 		}
 		rounds, won := buildFight(team, foes, rngOf())
+		// the original: the (empty) buff list, the answer, then the daily quest progress (capture original-2026-10-28, 22-arena)
+		if err := s.Send(13011, proto.Message{"buff_list": []proto.Message{}}); err != nil {
+			return err
+		}
 		if err := s.Send(20203, proto.Message{"code": 1, "msg": ""}); err != nil {
+			return err
+		}
+		if err := questEvent(s, st, role.RID, evtArena, 1); err != nil {
 			return err
 		}
 		idx := slot.Idx
@@ -636,7 +668,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	}
 	arenaTouch(a, s.Now())
 	var gain, lose int64
-	coin := int64(arenaWinCoin)
+	drop := [2]int64{1, arenaWinCoin}
 	result := int64(2)
 	if won {
 		result = 1
@@ -644,8 +676,10 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 		lose = arenaLoss(gain)
 		a.Score += gain
 		a.ContWin++
+		// one drop a win, of the three kinds the captures showed (the odds are not known)
+		drop = [3][2]int64{{1, arenaWinCoin}, {8, 15}, {22, 8000}}[newRng().Intn(3)]
 	} else {
-		coin = coin * arenaLoseRatio / 1000
+		drop[1] = drop[1] * arenaLoseRatio / 1000
 		a.ContWin = 0
 	}
 	a.Battles++
@@ -653,7 +687,9 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	if err := st.SaveArenaPlayer(a); err != nil {
 		return err
 	}
-	if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, map[int64]int64{1: coin}, map[int64]int64{}); err != nil {
+	ga, gi := map[int64]int64{}, map[int64]int64{}
+	splitGains(guildGains([][2]int64{drop}), 1, ga, gi)
+	if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
 		return err
 	}
 	if err := st.MarkArenaSlot(role.RID, idx, 1); err != nil {
@@ -697,11 +733,14 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	if err := sendAssets(s, st, role.RID); err != nil {
 		return err
 	}
-	if err := s.Send(20210, proto.Message{"result": result, "score": a.Score, "get_score": gain, "items": []proto.Message{{"bid": 1, "num": coin}},
+	if err := s.Send(20210, proto.Message{"result": result, "score": a.Score, "get_score": gain, "items": []proto.Message{{"bid": drop[0], "num": drop[1]}},
 		"tar_name": opp.Name, "tar_lev": opp.Lev, "tar_face": opp.Face, "face_update_time": 0, "face_file": "", "tar_score": opp.Score - lose, "lose_score": -lose,
 		"target_role_name": opp.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": replayID,
 		"partner_bid": bid, "partner_hurt": hurt, "partner_total_hurt": total}); err != nil {
 		return err
+	}
+	if !won { // a loss does not touch the list (capture original-2026-10-28, 22-arena)
+		return nil
 	}
 	slots, err := st.ArenaSlots(role.RID)
 	if err != nil {

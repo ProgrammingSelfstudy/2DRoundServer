@@ -15,7 +15,7 @@ func TestArenaChallenge(t *testing.T) {
 	}
 	c.send(20200, proto.Message{})
 	me := c.waitFor(20200)
-	if me.Int("score") != 1000 || me.Int("can_combat_num") != 5 || me.Int("rank") != 1 || me.Int("end_time") <= me.Int("start_time") {
+	if me.Int("score") != 1000 || me.Int("can_combat_num") != 3 || me.Int("rank") != 1 || me.Int("end_time") <= me.Int("start_time") {
 		t.Fatalf("standing: %v", me)
 	}
 	c.send(20201, proto.Message{})
@@ -57,16 +57,18 @@ func TestArenaChallenge(t *testing.T) {
 	if won && (res.Int("score") <= 1000 || res.Int("get_score") <= 0) || !won && (res.Int("score") != 1000 || res.Int("get_score") != 0) {
 		t.Fatalf("score after the fight: %v", res)
 	}
-	upd := c.waitFor(20201)
-	if upd.Int("type") != 1 || len(upd.Arr("f_list")) != 1 || upd.Arr("f_list")[0].Int("status") != 1 {
-		t.Fatalf("slot update: %v", upd)
+	if won { // a loss leaves the list alone (capture original-2026-10-28, 22-arena)
+		upd := c.waitFor(20201)
+		if upd.Int("type") != 1 || len(upd.Arr("f_list")) != 1 || upd.Arr("f_list")[0].Int("status") != 1 {
+			t.Fatalf("slot update: %v", upd)
+		}
 	}
 	c.send(20203, proto.Message{"rid": rid, "srv_id": "symlf_1", "is_auto": 0}) // fought already
 	if r := c.waitFor(20203); r.Int("code") != 0 {
 		t.Fatalf("same opponent twice: %v", r)
 	}
 	c.send(20200, proto.Message{})
-	if me := c.waitFor(20200); me.Int("can_combat_num") != 4 {
+	if me := c.waitFor(20200); me.Int("can_combat_num") != 2 {
 		t.Fatalf("one used: %v", me)
 	}
 	c.send(20222, proto.Message{})
@@ -143,6 +145,13 @@ func TestArenaTicketsChestsAndRank(t *testing.T) {
 		t.Fatalf("chest state: %v", r)
 	}
 	c.send(20209, proto.Message{"num": 10})
+	// the notice of the gain and the chest list come before the answer (capture original-2026-10-28, 22-arena)
+	if n := c.waitFor(12742).Arr("asset_list"); len(n) != 1 || n[0].Int("bid") != 10002 {
+		t.Fatalf("chest notice: %v", n)
+	}
+	if l := c.waitFor(20208); len(l.Arr("num_list")) != 1 {
+		t.Fatalf("chest list after: %v", l)
+	}
 	if r := c.waitFor(20209); r.Int("code") != 1 {
 		t.Fatalf("chest: %v", r)
 	}
@@ -181,5 +190,54 @@ func TestArenaRealOpponentLosesScore(t *testing.T) {
 	b.send(20222, proto.Message{})
 	if l := b.waitFor(20222).Arr("log_list"); len(l) != 1 || l[0].Int("type") != 2 || l[0].Str("name") != "挑战者" {
 		t.Fatalf("their log: %v", l)
+	}
+}
+
+// A challenge answers in the original's order: the backpack when a ticket paid (the original sends the one changed item as 10512,
+// we send the whole bag), the buff list, then the answer (capture original-2026-10-28, 22-arena).
+func TestArenaChallengeFrameOrder(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("ua", "挑战者")
+	if err := e.st.SetRoleLevel(role.RID, 20); err != nil {
+		t.Fatal(err)
+	}
+	c.send(20201, proto.Message{})
+	list := c.waitFor(20201).Arr("f_list")
+	a, _ := e.st.ArenaPlayerOf(role.RID, 1000, 1)
+	a.FreeUsed = arenaFreeCombats // the free ones are gone: a ticket pays
+	if err := e.st.SaveArenaPlayer(a); err != nil {
+		t.Fatal(err)
+	}
+	e.grantAssets(c, role, map[int64]int64{3: 100})
+	c.send(20207, proto.Message{"num": 1})
+	c.waitFor(20207)
+	c.send(20203, proto.Message{"rid": list[0].Int("rid"), "srv_id": "symlf_1", "is_auto": 0})
+	var order []uint16
+	for i := 0; i < 40; i++ {
+		cmd, _ := c.recvNext()
+		if cmd == 10500 || cmd == 13011 || cmd == 20203 {
+			order = append(order, cmd)
+		}
+		if cmd == 20203 {
+			break
+		}
+	}
+	want := []uint16{10500, 13011, 20203}
+	for i := range want {
+		if i >= len(order) || order[i] != want[i] {
+			t.Fatalf("order %v, want %v", order, want)
+		}
+	}
+}
+
+// The three points the captures gave: 1000 gave 20, 1107 gave 22, 985 gave 19 (and the loser paid 14).
+func TestArenaGainPoints(t *testing.T) {
+	for theirs, want := range map[int64]int64{1000: 20, 1107: 22, 985: 19} {
+		if got := arenaGain(1100, theirs); got != want {
+			t.Fatalf("against %d: %d, want %d", theirs, got, want)
+		}
+	}
+	if arenaLoss(19) != 14 || arenaLoss(20) != 15 {
+		t.Fatal("the loser's share")
 	}
 }

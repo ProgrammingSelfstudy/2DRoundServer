@@ -99,16 +99,8 @@ func (p *pfSvc) fightTile(s *gateway.Session, role *store.Role, st *pfState, t *
 	st.FormType, st.Hallows, st.Form = pf.formType, hallows, pf.fighters
 	// choosing a tile hides the line's other tiles before the fight starts: 28606 lists just those (capture original-2026-10-27)
 	st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
-	hidden := []proto.Message{}
-	for _, m := range st.tileList() {
-		if m.Int("line") == t.Line && m.Int("index") != t.Index {
-			hidden = append(hidden, m)
-		}
-	}
-	if len(hidden) > 0 {
-		if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": hidden}); err != nil {
-			return err
-		}
+	if err := p.hideLine(s, st, t); err != nil {
+		return err
 	}
 	if err := reply(1, ""); err != nil {
 		return err
@@ -133,7 +125,6 @@ func (p *pfSvc) settleFight(s *gateway.Session, line, index int64, fighters []pf
 		}
 		var prize [][2]int64
 		result := int64(2)
-		reply := func(int64, string) error { return nil }
 		if won {
 			result = 1
 			rate := int64(1000)
@@ -180,30 +171,57 @@ func (p *pfSvc) settleFight(s *gateway.Session, line, index int64, fighters []pf
 		for _, g := range prize {
 			awards = append(awards, proto.Message{"bid": g[0], "num": g[1]})
 		}
-		if err := s.Send(28608, proto.Message{"result": result, "all_dps": dps, "best_partner": bestBID, "bid": bestBID, "lev": bestLev, "star": bestStar, "use_skin": 0,
-			"target_role_name": e.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "award_list": awards, "line": line, "index": index, "replay_id": 0}); err != nil {
-			return err
-		}
-		if err := p.pushHP(s, st); err != nil {
-			return err
+		send28608 := func() error {
+			return s.Send(28608, proto.Message{"result": result, "all_dps": dps, "best_partner": bestBID, "bid": bestBID, "lev": bestLev, "star": bestStar, "use_skin": 0,
+				"target_role_name": e.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "award_list": awards, "line": line, "index": index, "replay_id": 0})
 		}
 		if !won {
+			if err := send28608(); err != nil {
+				return err
+			}
+			if err := p.pushHP(s, st); err != nil {
+				return err
+			}
 			return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
 		}
-		_ = reply
 		st.Chosen[strconv.FormatInt(t.Line, 10)] = t.Index
 		// a won fight with a relic turns the tile into the relic event and the role stays where it is; the options come when the
 		// tile is asked (28600 action 0) and the role steps onto it when one is chosen (capture original-2026-10-27, 20-planes-afk)
+		relic := false
 		if q, ok := map[int64]int64{3021: 1, 3022: 2, 3023: 3}[e.Exchange]; ok {
 			if opts := p.relicOptions(st, q); len(opts) > 0 {
 				st.BuffOpts = opts
 				t.Evt = e.Exchange
-				return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
+				relic = true
 			}
 		}
-		st.Line, st.Index = t.Line, t.Index
-		st.Done[tileKey(t.Line, t.Index)] = true
-		return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()})
+		if !relic {
+			st.Line, st.Index = t.Line, t.Index
+			st.Done[tileKey(t.Line, t.Index)] = true
+		}
+		// the original, after the assets: for a boss the war order and the chest flag, then the tiles, the report and the hp of
+		// the heroes that fought (capture original-2026-10-27, 21-planes-afk-2)
+		if line == pfBossLine {
+			if err := s.Send(28616, p.orderMessage(s, st)); err != nil {
+				return err
+			}
+			if err := s.Send(28624, proto.Message{"is_can_reward": 1, "is_reward": b2i(st.Taken[strconv.FormatInt(st.Floor, 10)])}); err != nil {
+				return err
+			}
+		}
+		if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": st.tileList()}); err != nil {
+			return err
+		}
+		if err := send28608(); err != nil {
+			return err
+		}
+		fought := []proto.Message{}
+		for _, sl := range fighters {
+			if h := p.heroOf(st, sl.Flag, sl.ID); h != nil {
+				fought = append(fought, proto.Message{"flag": h.Flag, "partner_id": h.PID, "hp_per": h.HP})
+			}
+		}
+		return s.Send(28609, proto.Message{"partners": fought})
 	})
 }
 
@@ -263,4 +281,18 @@ func (p *pfSvc) chooseBuff(s *gateway.Session, role *store.Role, st *pfState, t 
 		}
 	}
 	return reply(0, "请选择遗物")
+}
+
+// hideLine tells the client to hide the other tiles of the line the role chose a tile in: 28606 lists just those.
+func (p *pfSvc) hideLine(s *gateway.Session, st *pfState, t *pfTile) error {
+	hidden := []proto.Message{}
+	for _, m := range st.tileList() {
+		if m.Int("line") == t.Line && m.Int("index") != t.Index {
+			hidden = append(hidden, m)
+		}
+	}
+	if len(hidden) == 0 {
+		return nil
+	}
+	return s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": hidden})
 }

@@ -374,7 +374,11 @@ func (p *pfSvc) nextFloor(s *gateway.Session, req proto.Message) error {
 		if err := p.newFloor(role, st, floor, diff, s.Now().UnixNano()); err != nil {
 			return err
 		}
+		// the answer, the position on the new floor (no tiles yet) and the whole board (capture original-2026-10-27, 21-planes-afk-2)
 		if err := s.Send(28604, proto.Message{"flag": 1, "msg": ""}); err != nil {
+			return err
+		}
+		if err := s.Send(28606, proto.Message{"floor": st.Floor, "line": st.Line, "index": st.Index, "tile_list": []proto.Message{}}); err != nil {
 			return err
 		}
 		return s.Send(28603, p.boardMessage(st))
@@ -398,6 +402,13 @@ func (p *pfSvc) takeFloor(s *gateway.Session, req proto.Message) error {
 		if err := p.gain(s, role, prize); err != nil {
 			return err
 		}
-		return s.Send(28605, proto.Message{"flag": 1, "msg": "领取成功"})
+		// the assets, the board with the chest taken, the loot of the round, then the answer with an empty msg (same capture)
+		if err := s.Send(28603, p.boardMessage(st)); err != nil {
+			return err
+		}
+		if err := p.lootOf(s, st); err != nil {
+			return err
+		}
+		return s.Send(28605, proto.Message{"flag": 1, "msg": ""})
 	})
 }

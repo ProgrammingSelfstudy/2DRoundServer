@@ -136,6 +136,9 @@ func TestPlanesafkStepsSpringCrossAndMoves(t *testing.T) {
 	}
 	e.setTile(t, role, 3, 3, pfEvtID(1, 1, 3, 4)) // a cross: nobody fell, so the weakest is made whole
 	c.send(28600, proto.Message{"line": 3, "index": 3, "action": 1})
+	if n := c.waitFor(12741); n.Str("msg") != "使用成功，十字架从眼前消失..." {
+		t.Fatalf("cross notice: %v", n)
+	}
 	if hp := c.waitFor(28609).Arr("partners"); hp[0].Int("hp_per") != 100 {
 		t.Fatalf("cross: %v", hp)
 	}
@@ -167,11 +170,29 @@ func TestPlanesafkFightRelicAndBoss(t *testing.T) {
 	}
 	c.send(20062, proto.Message{})
 	c.waitFor(20062)
-	res := c.waitFor(28608)
+	// a win: the tiles, the report, then the hp of the heroes that fought (capture 21-planes-afk-2); a loss keeps the old order
+	got := map[uint16]proto.Message{}
+	var order []uint16
+	for i := 0; i < 30 && len(got) < 3; i++ {
+		cmd, m := c.recvNext()
+		if cmd == 28606 || cmd == 28608 || cmd == 28609 {
+			got[cmd] = m
+			order = append(order, cmd)
+		}
+	}
+	res, upd := got[28608], got[28606]
+	if res == nil || got[28609] == nil || upd == nil {
+		t.Fatalf("settle frames: %v", order)
+	}
 	if res.Int("line") != 2 || res.Int("index") != 2 || len(res.Arr("hurt_statistics")) != 1 {
 		t.Fatalf("28608: %v", res)
 	}
-	c.waitFor(28609)
+	if len(got[28609].Arr("partners")) != 1 {
+		t.Fatalf("28609 lists the fighters only: %v", got[28609])
+	}
+	if res.Int("result") == 1 && (order[0] != 28606 || order[1] != 28608 || order[2] != 28609) {
+		t.Fatalf("settle order: %v", order)
+	}
 	if res.Int("result") != 1 {
 		t.Skip("the fight was lost; relic not tested")
 	}
@@ -179,7 +200,6 @@ func TestPlanesafkFightRelicAndBoss(t *testing.T) {
 		t.Fatalf("a win pays: %v", res)
 	}
 	// the tile became the relic event and the role stayed put (capture original-2026-10-27); asking the tile shows the options
-	upd := c.waitFor(28606)
 	if upd.Int("line") != 1 {
 		t.Fatalf("the role moved: %v", upd)
 	}
@@ -267,7 +287,7 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 	e.setTile(t, role, 3, 3, pfEvtID(1, 1, 3, 6))
 	c.send(28600, proto.Message{"line": 3, "index": 3, "action": 0})
 	sh := c.waitFor(28621)
-	if len(sh.Arr("item_list")) != 8 || sh.Int("is_select") != 0 {
+	if len(sh.Arr("item_list")) != 4 || sh.Int("is_select") != 0 || sh.Arr("item_list")[0].Int("pos") != 4 {
 		t.Fatalf("shop: %v", sh)
 	}
 	c.waitFor(28600)
@@ -282,7 +302,7 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 	}
 	e.grantAssets(c, role, map[int64]int64{3: 5000})
 	c.send(28600, proto.Message{"line": 3, "index": 3, "action": 1, "ext_list": []proto.Message{{"type": pfExtShopBuy, "val1": 1}}})
-	if sh := c.waitFor(28621); sh.Arr("item_list")[0].Int("is_flag") != 1 {
+	if sh := c.waitFor(28621); sh.Arr("item_list")[3].Int("is_flag") != 1 { // position 1 is the last of the list
 		t.Fatalf("bought: %v", sh)
 	}
 	c.waitFor(28600)
@@ -301,7 +321,12 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 	st.Cleared["1"] = true
 	e.st.SaveState(role.RID, pfModule, st)
 	c.send(28605, proto.Message{"floor": 1})
-	if r := c.waitFor(28605); r.Int("flag") != 1 {
+	// the board with the chest taken, the loot of the round, then the answer with an empty msg (capture 21-planes-afk-2)
+	if b := c.waitFor(28603); b.Int("is_reward") != 1 {
+		t.Fatalf("board after the chest: %v", b)
+	}
+	c.waitFor(28625)
+	if r := c.waitFor(28605); r.Int("flag") != 1 || r.Str("msg") != "" {
 		t.Fatalf("floor chest: %v", r)
 	}
 	c.send(28605, proto.Message{"floor": 1})
@@ -311,6 +336,10 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 	c.send(28604, proto.Message{"floor": 2, "difficulty": 1})
 	if r := c.waitFor(28604); r.Int("flag") != 1 {
 		t.Fatalf("next floor: %v", r)
+	}
+	// the position on the new floor with no tiles, then the whole board (capture 21-planes-afk-2)
+	if m := c.waitFor(28606); m.Int("floor") != 2 || len(m.Arr("tile_list")) != 0 {
+		t.Fatalf("new floor position: %v", m)
 	}
 	if b := c.waitFor(28603); b.Int("floor") != 2 || b.Int("map_id") != 2002 || b.Int("line") != 1 {
 		t.Fatalf("floor 2: %v", b)

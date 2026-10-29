@@ -130,22 +130,25 @@ func (p *pfSvc) buffList(s *gateway.Session, _ proto.Message) error {
 }
 
 func (p *pfSvc) lootList(s *gateway.Session, _ proto.Message) error {
-	return p.with(s, func(role *store.Role, st *pfState) error {
-		sum := map[int64]int64{}
-		var ids []int64
-		for _, e := range st.Loot {
-			if sum[e[0]] == 0 {
-				ids = append(ids, e[0])
-			}
-			sum[e[0]] += e[1]
+	return p.with(s, func(role *store.Role, st *pfState) error { return p.lootOf(s, st) })
+}
+
+// lootOf sends the totals of everything the round gave so far (28625).
+func (p *pfSvc) lootOf(s *gateway.Session, st *pfState) error {
+	sum := map[int64]int64{}
+	var ids []int64
+	for _, e := range st.Loot {
+		if sum[e[0]] == 0 {
+			ids = append(ids, e[0])
 		}
-		sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-		out := []proto.Message{}
-		for _, id := range ids {
-			out = append(out, proto.Message{"base_id": id, "num": sum[id]})
-		}
-		return s.Send(28625, proto.Message{"item_list": out})
-	})
+		sum[e[0]] += e[1]
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	out := []proto.Message{}
+	for _, id := range ids {
+		out = append(out, proto.Message{"base_id": id, "num": sum[id]})
+	}
+	return s.Send(28625, proto.Message{"item_list": out})
 }
 
 // rentalHeroes makes the heroes a hire event offers: strong heroes of other roles are what the original shows; we
@@ -207,17 +210,21 @@ func (p *pfSvc) orderLev(st *pfState) int64 {
 
 func (p *pfSvc) orderInfo(s *gateway.Session, _ proto.Message) error {
 	return p.with(s, func(role *store.Role, st *pfState) error {
-		days := int64(44)
-		if len(pfCfg.Order.Days) > 0 {
-			days = pfCfg.Order.Days[0].PeriodDay
-		}
-		list := []proto.Message{}
-		for _, l := range p.orderLevels() {
-			list = append(list, proto.Message{"id": l.Lev, "award_status": b2i(st.OrderTaken[strconv.FormatInt(l.Lev, 10)]), "rmb_award_status": 0})
-		}
-		return s.Send(28616, proto.Message{"period": 1, "cur_day": (s.Now().Unix()-st.OrderStart)/86400 + 1, "end_time": st.OrderStart + days*86400,
-			"lev": p.orderLev(st), "rmb_status": 0, "win_count": st.Points, "list": list})
+		return s.Send(28616, p.orderMessage(s, st))
 	})
+}
+
+func (p *pfSvc) orderMessage(s *gateway.Session, st *pfState) proto.Message {
+	days := int64(44)
+	if len(pfCfg.Order.Days) > 0 {
+		days = pfCfg.Order.Days[0].PeriodDay
+	}
+	list := []proto.Message{}
+	for _, l := range p.orderLevels() {
+		list = append(list, proto.Message{"id": l.Lev, "award_status": b2i(st.OrderTaken[strconv.FormatInt(l.Lev, 10)]), "rmb_award_status": 0})
+	}
+	return proto.Message{"period": 1, "cur_day": (s.Now().Unix()-st.OrderStart)/86400 + 1, "end_time": st.OrderStart + days*86400,
+		"lev": p.orderLev(st), "rmb_status": 0, "win_count": st.Points, "list": list}
 }
 
 func (p *pfSvc) orderTake(s *gateway.Session, req proto.Message) error {
@@ -308,6 +315,10 @@ func (p *pfSvc) act(s *gateway.Session, req proto.Message) error {
 		case pfEvtRevive:
 			before := p.hpOf(st)
 			p.revive(st, e)
+			// the notice comes first, as with the fountain (capture original-2026-10-27, 21-planes-afk-2)
+			if err := s.Send(12741, proto.Message{"msg": "使用成功，十字架从眼前消失..."}); err != nil {
+				return err
+			}
 			return p.step(s, st, t, reply, p.hpChanged(st, before))
 		case pfEvtLease:
 			return p.lease(s, role, st, t, action, ext, reply)
@@ -419,20 +430,21 @@ func (p *pfSvc) lease(s *gateway.Session, role *store.Role, st *pfState, t *pfTi
 
 func (p *pfSvc) goodsMessage(st *pfState, line, index int64) proto.Message {
 	items := []proto.Message{}
-	for _, g := range st.Goods {
+	for i := len(st.Goods) - 1; i >= 0; i-- { // the original lists the last position first
+		g := st.Goods[i]
 		items = append(items, proto.Message{"pos": g.Pos, "id": g.ID, "is_flag": b2i(g.Bought)})
 	}
 	return proto.Message{"item_list": items, "is_select": b2i(st.ShopSelected), "line": line, "index": index}
 }
 
-// shop: a traveling merchant. Asking shows the greeting (is_select 0); going in (6) shows eight goods; buying (7) takes
+// shop: a traveling merchant. Asking shows the greeting (is_select 0); going in (6) shows four goods and hides the line's other tiles; buying (7) takes
 // the price in gems; leaving (8) ends the event.
 func (p *pfSvc) shop(s *gateway.Session, role *store.Role, st *pfState, t *pfTile, action int64, ext map[int64][2]int64, reply func(int64, string) error) error {
 	if !st.ShopOpen {
 		st.ShopOpen, st.ShopSelected = true, false
 		rng := newRng()
 		st.Goods = nil
-		for i, k := range rng.Perm(len(pfCfg.Shop))[:8] {
+		for i, k := range rng.Perm(len(pfCfg.Shop))[:4] {
 			st.Goods = append(st.Goods, pfGood{Pos: int64(i + 1), ID: pfCfg.Shop[k].ID})
 		}
 	}
@@ -445,6 +457,9 @@ func (p *pfSvc) shop(s *gateway.Session, role *store.Role, st *pfState, t *pfTil
 	case hasExt(ext, pfExtShopEnter):
 		st.ShopSelected = true
 		if err := s.Send(28621, p.goodsMessage(st, t.Line, t.Index)); err != nil {
+			return err
+		}
+		if err := p.hideLine(s, st, t); err != nil {
 			return err
 		}
 		return reply(1, "")
@@ -476,7 +491,7 @@ func (p *pfSvc) shop(s *gateway.Session, role *store.Role, st *pfState, t *pfTil
 			if err := s.Send(28621, p.goodsMessage(st, t.Line, t.Index)); err != nil {
 				return err
 			}
-			return reply(1, "购买成功")
+			return reply(1, "")
 		}
 		return reply(0, "该物品不存在")
 	case hasExt(ext, pfExtShopLeave):

@@ -78,8 +78,12 @@ func TestEndlessRunFightsBuffsAndRewards(t *testing.T) {
 		t.Fatalf("choose: %v", r)
 	}
 	bd := c.waitFor(23902)
-	if bd.Int("round") != 1 || len(bd.Arr("buff_list")) != 1 || bd.Arr("buff_list")[0].Int("id") != pick || bd.Int("rest_round") != 5 || bd.Int("type") != endOld {
+	if bd.Int("round") != 1 || len(bd.Arr("buff_list")) != 1 || bd.Arr("buff_list")[0].Int("id") != pick || bd.Int("rest_round") != 1 || bd.Int("max_reward_round") != 5 || bd.Int("type") != endOld {
 		t.Fatalf("23902: %v", bd)
+	}
+	// the buff lasts five rounds (the heal, group 3, one)
+	if want := int64(5); bd.Arr("buff_list")[0].Int("group_id") == endHealGroup && bd.Arr("buff_list")[0].Int("count") != 1 || bd.Arr("buff_list")[0].Int("group_id") != endHealGroup && bd.Arr("buff_list")[0].Int("count") != want {
+		t.Fatalf("buff count: %v", bd)
 	}
 	if m := c.waitFor(20027); m.Int("combat_type") != combatEndless {
 		t.Fatalf("intro: %v", m)
@@ -127,7 +131,7 @@ func TestEndlessRunFightsBuffsAndRewards(t *testing.T) {
 func TestEndlessFirstRewardsAndSupportHeroes(t *testing.T) {
 	e, c, role, hero := endEnv(t)
 	c.send(23903, proto.Message{"type": endOld})
-	if r := c.waitFor(23903); r.Int("id") != 1 || r.Int("status") != 0 || r.Int("max_id") != 300 {
+	if r := c.waitFor(23903); r.Int("id") != 1 || r.Int("status") != 0 || r.Int("max_id") != 0 {
 		t.Fatalf("23903: %v", r)
 	}
 	c.send(23904, proto.Message{"id": 1, "type": endOld})
@@ -139,7 +143,7 @@ func TestEndlessFirstRewardsAndSupportHeroes(t *testing.T) {
 	st.mode(endOld).Max = 12
 	e.st.SaveState(role.RID, endlessModule, st)
 	c.send(23903, proto.Message{"type": endOld})
-	if r := c.waitFor(23903); r.Int("status") != 1 {
+	if r := c.waitFor(23903); r.Int("status") != 1 || r.Int("max_id") != 12 {
 		t.Fatalf("23903 after: %v", r)
 	}
 	c.send(23904, proto.Message{"id": 1, "type": endOld})
@@ -202,5 +206,42 @@ func TestEndlessFirstRewardsAndSupportHeroes(t *testing.T) {
 	}
 	if o := c.waitFor(23910); len(o.Arr("partner")) != 2 {
 		t.Fatalf("team: %v", o)
+	}
+}
+
+// Past the five rounds of the day every round pays a flat 3000 exp and 2500 gold (capture 2026-10-29), and leaving
+// is a success with the wave it ended on.
+func TestEndlessFlatRewardPastTheDailyLimit(t *testing.T) {
+	e, c, role, hero := endEnv(t)
+	c.send(23901, endTeam(hero, endOld))
+	if r := c.waitFor(23901); r.Int("code") != 1 {
+		t.Fatalf("start: %v", r)
+	}
+	opts := c.waitFor(23910)
+	c.settle()
+	st := e.endState(t, role)
+	st.mode(endOld).DayPass = 5
+	e.st.SaveState(role.RID, endlessModule, st)
+	c.send(23911, proto.Message{"buff_id": opts.Arr("list")[0].Int("buff_id")})
+	c.waitFor(23911)
+	c.waitFor(20027)
+	c.send(20062, proto.Message{})
+	c.waitFor(20062)
+	res := c.waitFor(20006)
+	if res.Int("result") != 1 {
+		t.Skip("the first round was lost")
+	}
+	items := res.Arr("item_rewards")
+	if len(items) != 2 || items[0].Int("bid") != 22 || items[0].Int("num") != 3000 || items[1].Int("bid") != 1 || items[1].Int("num") != 2500 {
+		t.Fatalf("flat reward: %v", res)
+	}
+	c.send(20008, proto.Message{})
+	c.waitFor(20008)
+	left := c.waitFor(20006)
+	if left.Int("result") != 1 || left.Str("target_role_name") != "第2波" || len(left.Arr("item_rewards")) != 2 || left.Arr("item_rewards")[0].Int("is_bind") != 0 {
+		t.Fatalf("leaving: %v", left)
+	}
+	if empty := c.waitFor(20006); empty.Int("show_panel_type") != 0 || len(empty.Arr("item_rewards")) != 0 {
+		t.Fatalf("the empty second 20006: %v", empty)
 	}
 }

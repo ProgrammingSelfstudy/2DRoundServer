@@ -167,11 +167,11 @@ func (e *endSvc) pushBattle(s *gateway.Session, role *store.Role, st *endState) 
 		t = endOld
 	}
 	m := st.mode(t)
-	var next, limit int64
+	var next int64
 	status := int64(0)
 	for _, r := range endCfg.First[t-1] {
 		if !m.Taken[strconv.FormatInt(r.ID, 10)] {
-			next, limit, status = r.ID, r.LimitID, int64(b2i(m.Max >= r.LimitID))
+			next, status = r.ID, int64(b2i(m.Max >= r.LimitID))
 			break
 		}
 	}
@@ -179,11 +179,25 @@ func (e *endSvc) pushBattle(s *gateway.Session, role *store.Role, st *endState) 
 	for _, b := range run.Buffs {
 		buffs = append(buffs, proto.Message{"id": b.ID, "group_id": b.Group, "count": b.Count})
 	}
-	acc := []proto.Message{}
+	// acc_reward adds the rewards of the run up by item, gold first (capture)
+	var gold, exp int64
 	for _, a := range run.Acc {
-		acc = append(acc, proto.Message{"base_id": a[0], "num": a[1]})
+		if a[0] == 1 {
+			gold += a[1]
+		} else {
+			exp += a[1]
+		}
 	}
-	return s.Send(23902, proto.Message{"round": run.Round, "max_round": m.Max, "buff_list": buffs, "rest_round": run.Rest, "max_reward_round": limit, "reward_flag": status,
+	acc := []proto.Message{}
+	if gold > 0 {
+		acc = append(acc, proto.Message{"base_id": 1, "num": gold})
+	}
+	if exp > 0 {
+		acc = append(acc, proto.Message{"base_id": 22, "num": exp})
+	}
+	// max_reward_round is the daily limit of rewarded rounds; rest_round is 1 while the day's rounds are not used up (capture)
+	rest := int64(b2i(m.DayPass <= endCfg.num("dayreward_roundnum")))
+	return s.Send(23902, proto.Message{"round": run.Round, "max_round": m.Max, "buff_list": buffs, "rest_round": rest, "max_reward_round": endCfg.num("dayreward_roundnum"), "reward_flag": status,
 		"acc_reward": acc, "id": next, "status": status, "type": t})
 }
 
@@ -199,16 +213,12 @@ func (e *endSvc) chooseBuff(s *gateway.Session, req proto.Message) error {
 			if o.ID != pick {
 				continue
 			}
-			held := false
-			for i := range st.Run.Buffs {
-				if st.Run.Buffs[i].ID == pick {
-					st.Run.Buffs[i].Count++
-					held = true
-				}
+			// the chosen buff lasts until the next choice (the heal, group 3, is a single use): capture, count 5 then 4, 3, 2, 1
+			lasts := endCfg.num("buffchoice_interval")
+			if o.Group == endHealGroup {
+				lasts = 1
 			}
-			if !held {
-				st.Run.Buffs = append(st.Run.Buffs, endBuffHold{ID: pick, Group: o.Group, Count: 1})
-			}
+			st.Run.Buffs = []endBuffHold{{ID: pick, Group: o.Group, Count: lasts}}
 			st.Run.Choosing, st.Run.Opts, st.Run.Rest = false, nil, endCfg.num("buffchoice_interval")
 			if err := s.Send(23911, proto.Message{"code": 1, "msg": ""}); err != nil {
 				return err
@@ -273,7 +283,10 @@ func (e *endSvc) settle(s *gateway.Session, round int64, fighters []pfSlot, form
 		m := st.mode(run.Type)
 		var prize [][2]int64
 		key := strconv.FormatInt(round, 10)
-		if int(round) <= len(endCfg.Floors[run.Type-1]) && !m.Paid[key] {
+		if m.DayPass >= endCfg.num("dayreward_roundnum") {
+			// past the daily limit every round pays a flat amount (capture 2026-10-29: rounds 6~9, 3000 exp and 2500 gold each)
+			prize = append(prize, [2]int64{22, endOverExp}, [2]int64{1, endOverGold})
+		} else if int(round) <= len(endCfg.Floors[run.Type-1]) && !m.Paid[key] {
 			m.Paid[key] = true
 			for _, p := range endCfg.Floors[run.Type-1][round-1].Items {
 				prize = append(prize, [2]int64{p[0], p[1]})
@@ -304,6 +317,13 @@ func (e *endSvc) settle(s *gateway.Session, round int64, fighters []pfSlot, form
 			"target_role_name": "试炼守卫", "hurt_statistics": []proto.Message{}, "adventure_end_hp": 0, "room_id": 0, "ext_list": []proto.Message{}}); err != nil {
 			return err
 		}
+		kept := run.Buffs[:0]
+		for _, b := range run.Buffs {
+			if b.Count--; b.Count > 0 {
+				kept = append(kept, b)
+			}
+		}
+		run.Buffs = kept
 		run.Round++
 		run.Rest--
 		if err := e.pushBattle(s, role, st); err != nil {
@@ -317,6 +337,11 @@ func (e *endSvc) settle(s *gateway.Session, round int64, fighters []pfSlot, form
 	})
 }
 
+const (
+	endOverExp, endOverGold = 3000, 2500 // paid for every round past the daily limit
+	endHealGroup            = 3          // the buff group that heals once
+)
+
 // finishRun ends the run: the fight was lost, everybody fell, or the role left.
 func (e *endSvc) finishRun(s *gateway.Session, role *store.Role, st *endState, left bool) error {
 	run := st.Run
@@ -324,13 +349,35 @@ func (e *endSvc) finishRun(s *gateway.Session, role *store.Role, st *endState, l
 	if !run.Active {
 		return nil
 	}
-	items := []proto.Message{}
+	// the rewards add up by item, exp first; leaving the fight is a success with the wave it ended on (capture)
+	var gold, exp int64
 	for _, g := range run.Acc {
-		items = append(items, proto.Message{"bid": g[0], "is_bind": 1, "num": g[1], "id": 0})
+		if g[0] == 1 {
+			gold += g[1]
+		} else {
+			exp += g[1]
+		}
 	}
-	if err := s.Send(20006, proto.Message{"result": 2, "item_rewards": items, "show_panel_type": 1, "current_time": 0, "best_time": 0, "combat_type": combatEndless,
-		"target_role_name": "试炼守卫", "hurt_statistics": []proto.Message{}, "adventure_end_hp": 0, "room_id": 0, "ext_list": []proto.Message{}}); err != nil {
+	items := []proto.Message{}
+	if exp > 0 {
+		items = append(items, proto.Message{"bid": 22, "is_bind": 0, "num": exp, "id": 0})
+	}
+	if gold > 0 {
+		items = append(items, proto.Message{"bid": 1, "is_bind": 0, "num": gold, "id": 0})
+	}
+	result, target := int64(2), "试炼守卫"
+	if left {
+		result, target = 1, "第"+strconv.FormatInt(run.Round, 10)+"波"
+	}
+	if err := s.Send(20006, proto.Message{"result": result, "item_rewards": items, "show_panel_type": 1, "current_time": 0, "best_time": 0, "combat_type": combatEndless,
+		"target_role_name": target, "hurt_statistics": []proto.Message{}, "adventure_end_hp": 0, "room_id": 0, "ext_list": []proto.Message{}}); err != nil {
 		return err
+	}
+	if left {
+		if err := s.Send(20006, proto.Message{"result": 1, "item_rewards": []proto.Message{}, "show_panel_type": 0, "current_time": 0, "best_time": 0, "combat_type": combatEndless,
+			"target_role_name": "", "hurt_statistics": []proto.Message{}, "adventure_end_hp": 0, "room_id": 0, "ext_list": []proto.Message{}}); err != nil {
+			return err
+		}
 	}
 	return e.sendInfo(s, role, st)
 }

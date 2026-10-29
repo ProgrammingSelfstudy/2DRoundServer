@@ -41,12 +41,15 @@ func registerBattleLeftovers(r *gateway.Router, st *store.Store) {
 			if s.Role() == nil {
 				return nil
 			}
-			if cmd == 20008 { // leaving a fight ends the runs that go on from fight to fight
+			if err := s.Send(cmd, proto.Message{"code": 1, "msg": ""}); err != nil {
+				return err
+			}
+			if cmd == 20008 { // leaving a fight ends the runs that go on from fight to fight; the answer comes first (capture)
 				if h, ok := fightExitHooks.Load(st); ok {
 					h.(func(*gateway.Session))(s)
 				}
 			}
-			return s.Send(cmd, proto.Message{"code": 1, "msg": ""})
+			return nil
 		})
 	}
 	r.Handle(20026, func(s *gateway.Session, _ proto.Message) error {

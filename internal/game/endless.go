@@ -388,7 +388,7 @@ func (e *endSvc) first(s *gateway.Session, req proto.Message) error {
 		}
 		m := st.mode(t)
 		rows := endCfg.First[t-1]
-		var next, maxID int64
+		var next, last int64
 		status := int64(0)
 		taken := []proto.Message{}
 		for _, r := range rows {
@@ -402,12 +402,13 @@ func (e *endSvc) first(s *gateway.Session, req proto.Message) error {
 			}
 		}
 		if len(rows) > 0 {
-			maxID = rows[len(rows)-1].ID
+			last = rows[len(rows)-1].ID
 		}
 		if next == 0 {
-			next = maxID
+			next = last
 		}
-		return s.Send(23903, proto.Message{"id": next, "status": status, "max_id": maxID, "rewarded": taken, "type": t})
+		// max_id is the role's highest round: the client compares it with limit_id and counts down "N rounds to go" (capture: 0 for a new role)
+		return s.Send(23903, proto.Message{"id": next, "status": status, "max_id": m.Max, "rewarded": taken, "type": t})
 	})
 }
 

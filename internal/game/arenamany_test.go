@@ -137,8 +137,10 @@ func TestArenamanyPartyWithRobotAndRole(t *testing.T) {
 	if r := c1.waitFor(29000); len(r.Arr("team_members")) != 2 {
 		t.Fatalf("leader is told: %v", r)
 	}
-	c2.send(29000, proto.Message{}) // answered after the handler above has saved
-	c2.waitFor(29000)
+	// 29000 is also pushed by answer: receiving it cannot acknowledge our next request.
+	// 29010 is reply-only and takes the same board lock after answer has saved.
+	c2.send(29010, proto.Message{})
+	c2.waitFor(29010)
 	b := e.amBoard(t, r1.SrvID)
 	if b.Roles[r1.RID].Partner != r2.RID || !b.Roles[r1.RID].Leader || b.Roles[r2.RID].Partner != r1.RID || b.Roles[r2.RID].Leader {
 		t.Fatalf("board: %+v %+v", b.Roles[r1.RID], b.Roles[r2.RID])
@@ -147,10 +149,8 @@ func TestArenamanyPartyWithRobotAndRole(t *testing.T) {
 	if r := c1.waitFor(29007); r.Int("code") != 1 {
 		t.Fatalf("kick: %v", r)
 	}
-	c1.send(29000, proto.Message{})
-	c1.waitFor(29000)
-	c1.send(29000, proto.Message{})
-	c1.waitFor(29000)
+	c1.send(29010, proto.Message{})
+	c1.waitFor(29010)
 	if e.amBoard(t, r1.SrvID).Roles[r2.RID].Partner != 0 {
 		t.Fatal("the kicked role still has a teammate")
 	}

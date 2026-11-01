@@ -145,24 +145,21 @@ func TestWarOrderAdvanceCard(t *testing.T) {
 		t.Fatalf("free track: %v", r)
 	}
 	// the product is delivered: the card is on for the month, and cannot be bought twice
-	hook := chargeHooks[warAdvanceCharge]
-	if hook == nil {
-		t.Fatal("no hook for the advance card")
+	if chargeHooks[warAdvanceCharge] == nil || chargeGuards[warAdvanceCharge] == nil {
+		t.Fatal("advance card payment registration missing")
 	}
-	if _, _, err := hook(e.st, role, ChargeProduct{}, 1); err != nil {
+	if err := warAdvanceGuardAt(e.st, role, now); err != nil {
 		t.Fatal(err)
 	}
-	if st, _, _, _, _ := loadWar(e.st, role, time.Now()); !st.Premium {
-		t.Fatal("not marked")
+	if err := warAdvanceGrantAt(e.st, role, now); err != nil {
+		t.Fatal(err)
 	}
-	if err := chargeGuards[warAdvanceCharge](e.st, role); err == nil {
+	// No manual month/flag rewrite: paying must retain this month's earned levels and free claims.
+	if st, _, _, _, err := loadWar(e.st, role, now); err != nil || !st.Premium || len(st.Levs) != 2 {
+		t.Fatalf("card lost current-month progress: %+v %v", st, err)
+	}
+	if err := warAdvanceGuardAt(e.st, role, now); err == nil {
 		t.Fatal("bought twice")
-	}
-	// the card is the real clock's month; the rewards below are of the test's month (October), so move the flag there
-	st, _, _, _, _ := loadWar(e.st, role, now)
-	st.Premium = true
-	if err := e.st.SaveState(role.RID, warOrderModule, st); err != nil {
-		t.Fatal(err)
 	}
 	c.send(25308, proto.Message{})
 	if r := c.waitFor(25308); r.Int("flag") != 1 {
@@ -199,5 +196,50 @@ func TestWarStateTakeLevel(t *testing.T) {
 	}
 	if got := s.takenLevels(); len(got) != 1 || got[0].Int("status") != 1 || got[0].Int("rmb_status") != 1 {
 		t.Fatalf("taken: %v", got)
+	}
+}
+
+func TestWarOrderAdvanceMonthBoundary(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	before := time.Date(2026, time.October, 31, 23, 59, 59, 0, dayZone)
+	e.setNow(before)
+	_, role := e.enter("womonth", "月界测试")
+	state, p, _, _, err := loadWar(e.st, role, before)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state.Exp = p.Levs[1].Exp
+	state.Levs = []int64{p.Levs[0].Lev, p.Levs[1].Lev}
+	if err := e.st.SaveState(role.RID, warOrderModule, state); err != nil {
+		t.Fatal(err)
+	}
+	if err := warAdvanceGrantAt(e.st, role, before); err != nil {
+		t.Fatal(err)
+	}
+	paid, _, _, _, _ := loadWar(e.st, role, before)
+	if !paid.Premium || paid.Exp != state.Exp || len(paid.Levs) != 2 {
+		t.Fatalf("same month progress: %+v", paid)
+	}
+	if err := warAdvanceGuardAt(e.st, role, before); err == nil {
+		t.Fatal("same month paid twice")
+	}
+	after := before.Add(time.Second)
+	fresh, _, _, _, _ := loadWar(e.st, role, after)
+	if fresh.Premium || fresh.Exp != 0 || len(fresh.Levs) != 0 {
+		t.Fatalf("next month did not reset: %+v", fresh)
+	}
+	if err := warAdvanceGuardAt(e.st, role, after); err != nil {
+		t.Fatal(err)
+	}
+	if err := warAdvanceGrantAt(e.st, role, after); err != nil {
+		t.Fatal(err)
+	}
+	next, _, _, _, _ := loadWar(e.st, role, after)
+	if !next.Premium || next.Month != 202611 || next.Exp != 0 {
+		t.Fatalf("new confirmation month: %+v", next)
+	}
+	// March has no configured period and cannot be sold by the payment guard.
+	if err := warAdvanceGuardAt(e.st, role, time.Date(2027, time.March, 1, 0, 0, 0, 0, dayZone)); err == nil {
+		t.Fatal("sold inactive month")
 	}
 }

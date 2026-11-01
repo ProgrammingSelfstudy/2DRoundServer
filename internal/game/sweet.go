@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"sort"
+	"sync"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -126,8 +127,13 @@ func (w *sweetWorld) settle(st *store.Store, srv string) error {
 // the number of rewards the server has reached (our reading); the maximum is base_max_score.
 func RegisterSweet(r *gateway.Router, st *store.Store) {
 	maxAcc := sweetCfg.Const["base_max_score"]
+	// SQLite serializes individual queries, not this load/mutate/save sequence.
+	// All roles on this gateway share the server total, so serialize the whole update.
+	var mu sync.Mutex
 	// with loads the server's and the role's side for the activity running now (nothing running: the last one is settled).
 	with := func(s *gateway.Session, fn func(role *store.Role, w *sweetWorld, d *sweetRole, end int64, open bool) (bool, error)) error {
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil

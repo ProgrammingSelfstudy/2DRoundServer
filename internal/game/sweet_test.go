@@ -1,6 +1,7 @@
 package game
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -94,5 +95,48 @@ func TestSweet(t *testing.T) {
 	ca.waitFor(28500)
 	if again, _ := e.st.MailsForRole(role); len(again) != len(mails) {
 		t.Fatalf("mailed twice: %d -> %d", len(mails), len(again))
+	}
+}
+
+// Concurrent sessions must add to one server total, not overwrite each other's snapshot.
+func TestSweetConcurrentDonations(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	ca, a := e.enter("sc1", "并发甲")
+	cb, b := e.enter("sc2", "并发乙")
+	start := dayStart(actNow).Unix()
+	e.addActivity(t, store.Activity{SrvID: a.SrvID, CampID: sweetCamp, BID: 91049, Status: 1, StartAt: start, EndAt: start + 7*86400, Spec: actSpecJSON(t, false)})
+	item := sweetItems[0].Item
+	const donations = 20
+	e.give(ca, a, map[int64]int64{item: donations})
+	e.give(cb, b, map[int64]int64{item: donations})
+	var wg sync.WaitGroup
+	for _, c := range []*client{ca, cb} {
+		wg.Add(1)
+		go func(c *client) {
+			defer wg.Done()
+			for i := 0; i < donations; i++ {
+				c.send(28502, proto.Message{"id": item, "num": 1})
+				if r := c.waitFor(28502); r.Int("code") != 1 {
+					t.Errorf("donation failed: %v", r)
+					return
+				}
+				c.waitFor(10500)
+			}
+		}(c)
+	}
+	wg.Wait()
+	for _, c := range []*client{ca, cb} {
+		c.send(28500, proto.Message{})
+		r := c.waitFor(28500)
+		if r.Int("acc_score") != 2*donations*sweetItems[0].Score || r.Int("my_score") != donations*sweetItems[0].Score {
+			t.Fatalf("lost donation: %v", r)
+		}
+	}
+	for _, role := range []*store.Role{a, b} {
+		items, err := e.st.RoleItems(role.RID)
+		if err != nil || items[item] != 0 {
+			t.Fatalf("inventory mismatch: %v %v", items, err)
+		}
 	}
 }

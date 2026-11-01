@@ -12,7 +12,7 @@ import (
 var combatHaloJSON []byte
 
 // combatHalo is a camp halo of a battle: it is on a side when the side has exactly these camps with exactly these head counts
-// (client combat_halo_data.lua); `condition` names a weaker halo that this one replaces.
+// (client combat_halo_data.lua). Condition is formation-preview suppression, not a wire filter.
 type combatHalo struct {
 	ID        int64      `json:"id"`
 	Condition int64      `json:"condition"`
@@ -30,14 +30,17 @@ var combatHalos = func() []combatHalo {
 	return f.Halos
 }()
 
-// campHalos are the halos of a side with these camps, by id (the client's getFormIdListByCamp).
+// campHalos are the activated halo IDs sent in a battle's 20027, sorted by ID.
+// Counts must exactly match each listed camp; unlisted camps do not disqualify a row.
+// Do not apply battle_model.getFormIdListByCamp's formation-preview Condition filter:
+// retained battle captures send every matching ID (five different camps -> 21,22,23).
+// battle_scene_view decodes these wire IDs directly instead of recomputing the preview.
 func campHalos(camps []int64) []int64 {
 	count := map[int64]int64{}
 	for _, c := range camps {
 		count[c]++
 	}
 	have := map[int64]bool{}
-	replaced := map[int64]bool{}
 	for _, h := range combatHalos {
 		ok := true
 		for _, p := range h.PosInfo {
@@ -47,16 +50,11 @@ func campHalos(camps []int64) []int64 {
 		}
 		if ok {
 			have[h.ID] = true
-			if h.Condition != 0 {
-				replaced[h.Condition] = true
-			}
 		}
 	}
 	var out []int64
 	for id := range have {
-		if !replaced[id] {
-			out = append(out, id)
-		}
+		out = append(out, id)
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i] < out[j] })
 	return out

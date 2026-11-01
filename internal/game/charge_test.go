@@ -771,6 +771,7 @@ func TestMergeGoal(t *testing.T) {
 
 func TestCrossClosed(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
+	e.setNow(champAt(26, 12, 0, 0)) // Monday; the separate cross-champion test covers Sunday opening.
 	c, _ := e.enter("cc1", "跨服人")
 	c.send(27700, proto.Message{})
 	if r := c.waitFor(27700); r.Int("step_status") != 0 || r.Int("zone_id") != 0 {
@@ -780,7 +781,7 @@ func TestCrossClosed(t *testing.T) {
 	if r := c.waitFor(27704); r.Int("code") != 0 || r.Str("msg") == "" {
 		t.Fatalf("27704: %v", r)
 	}
-	c.send(26200, proto.Message{}) // the cross champion is on Sundays (arenachampion.go); this is a Monday-less test clock
+	c.send(26200, proto.Message{}) // the cross champion is on Sundays (arenachampion.go); the fixed test clock is a Monday
 	if r := c.waitFor(26200); r.Int("is_open") != 0 || r.Int("step") != 0 {
 		t.Fatalf("26200: %v", r)
 	}

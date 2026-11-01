@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Extract the camp halos of a battle (combat_halo_data.lua): which mix of camps (camp, head count) gives which halo, which weaker
-halo it replaces (`condition`) and the attributes it adds.
+halo suppresses it in the formation preview (`condition`) and the attributes it adds.
+Battle 20027 wire halos are established separately by retained captures, not by the preview filter.
 
 usage: extract_combathalo.py LUA_DIR OUT_JSON
   LUA_DIR  .../outputs/readable-source/lua/ePoCrKQkWA3vpiOwu2oNfOh02MOeNheW

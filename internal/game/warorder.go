@@ -239,27 +239,13 @@ func loadWar(st *store.Store, role *store.Role, now time.Time) (*warState, *warP
 // that exist, the others stay open. The advance card (paid track, the extra experience pack) needs payments, which we
 // have none of, so its track stays locked. The months of the periods, the window and the price of a level are our rules.
 func RegisterWarOrder(r *gateway.Router, st *store.Store) {
-	// the advance card (product 901): paid for the month the confirmation falls in, once
+	// Payment confirmations use the real confirmation month in production. The
+	// operation takes its clock explicitly so tests never mix it with a session's clock.
 	RegisterChargeGuard(warAdvanceCharge, func(st *store.Store, role *store.Role) error {
-		state, p, _, _, err := loadWar(st, role, time.Now())
-		if err != nil {
-			return err
-		}
-		switch {
-		case p == nil:
-			return errNotPayable("战令活动未开启")
-		case state.Premium:
-			return errNotPayable("本月已激活进阶卡")
-		}
-		return nil
+		return warAdvanceGuardAt(st, role, time.Now())
 	})
 	RegisterChargeHook(warAdvanceCharge, func(st *store.Store, role *store.Role, _ ChargeProduct, _ int64) (map[int64]int64, map[int64]int64, error) {
-		state, _, _, _, err := loadWar(st, role, time.Now())
-		if err != nil {
-			return nil, nil, err
-		}
-		state.Premium = true
-		return nil, nil, st.SaveState(role.RID, warOrderModule, state)
+		return nil, nil, warAdvanceGrantAt(st, role, time.Now())
 	})
 	r.Handle(25300, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
@@ -540,4 +526,28 @@ func warOrderEvent(s *gateway.Session, st *store.Store, role *store.Role, label 
 		return s.Send(25301, proto.Message{"list": changed})
 	}
 	return nil
+}
+
+// warAdvanceGuardAt and warAdvanceGrantAt share the payment confirmation clock.
+// A new month intentionally starts a new card; buying in the same month preserves progress.
+func warAdvanceGuardAt(st *store.Store, role *store.Role, now time.Time) error {
+	state, p, _, _, err := loadWar(st, role, now)
+	if err != nil {
+		return err
+	}
+	switch {
+	case p == nil:
+		return errNotPayable("战令活动未开启")
+	case state.Premium:
+		return errNotPayable("本月已激活进阶卡")
+	}
+	return nil
+}
+func warAdvanceGrantAt(st *store.Store, role *store.Role, now time.Time) error {
+	state, _, _, _, err := loadWar(st, role, now)
+	if err != nil {
+		return err
+	}
+	state.Premium = true
+	return st.SaveState(role.RID, warOrderModule, state)
 }

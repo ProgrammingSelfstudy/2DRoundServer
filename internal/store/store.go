@@ -27,7 +27,7 @@ var (
 )
 
 type Store struct {
-	db          *sql.DB
+	db          sqlStoreDB
 	now         func() time.Time
 	chargeLocks [64]sync.Mutex // bounded per-Store stripes, shared by confirms and admin resets
 }

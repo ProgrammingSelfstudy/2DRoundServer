@@ -227,3 +227,28 @@ a sequence of service snapshots, not a transaction across all services. Rankings
 reflect saved standings; no administrative GET advances a game clock/rollover.
 Sixteen registrations expose their existing score/tie ordering; the rest have no
 Rank callback. No global JSON editor or settlement write is enabled by 3a.
+
+### Due-only settlement (phase 3b)
+
+`POST /api/servers/{id}/seasons/{key}/settle` requires `manage` and a body
+`{"reason":"..."}` (1-200 Unicode characters, nonblank, no controls). It forwards
+to `POST /ops/season/settle?srv=&key=` with the authenticated actor/IP; end users
+cannot supply those internal actor fields. The loopback gateway commits the
+`server.season.settle` audit with payout and state in one database transaction.
+No duplicate audit is written by the proxy. A failed transaction leaves all three
+unchanged; accepted not_due/already requests are audited too.
+
+Only arenateam, elitematch, crossarena, arenamany, daysrank, guildwar, arenachamp and
+crosschamp are enabled. Other registered keys return 405. Unknown keys or foreign
+servers return 404; gateway failures return 502. Results contain settled, reason
+and season: running is `false/not_due`, completed/repeated catch-up is
+`false/already`, actual catch-up is `true/settled`. A previous team arena season
+may have been caught up while the new season is still running; season.settled
+continues to describe the current season.
+
+The native service clock/calendar is authoritative. No future clock, early
+championship advancement/cancellation, or new championship/guild-war creation is
+allowed. Cross/multi arena payout still waits for native rollover. The owner
+mutex serializes admin catch-up with native rollover/ticker. Original rewards,
+rank ordering and eligibility remain unchanged. Production-player operations and
+cross-process service locking are outside these local tests.

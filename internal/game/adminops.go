@@ -147,6 +147,23 @@ func (m *MailService) registerAdminOps(mux *http.ServeMux) {
 		_, err := m.Store.Server(srv)
 		return srv, err
 	}
+	mux.HandleFunc("POST /ops/season/settle", func(w http.ResponseWriter, r *http.Request) {
+		srv, err := valid(r)
+		if err != nil {
+			opsWrite(w, nil, err)
+			return
+		}
+		var op AdminOperation
+		if !readAdminOperation(w, r, &op) {
+			return
+		}
+		if !validAdminReason(op.Reason) {
+			opsWrite(w, nil, &opsError{422, "reason must be 1 to 200 nonblank characters without controls"})
+			return
+		}
+		out, err := settleGlobal(m.Store, srv, r.URL.Query().Get("key"), clock(), op)
+		opsWrite(w, out, err)
+	})
 	mux.HandleFunc("GET /ops/global", func(w http.ResponseWriter, r *http.Request) {
 		srv, err := valid(r)
 		if err != nil {

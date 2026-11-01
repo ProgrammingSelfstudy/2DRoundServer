@@ -80,11 +80,24 @@ func (s *Store) CreateMail(m Mail, rids []int64) (*Mail, error) {
 		m.FromName = "GM"
 	}
 	m.CreatedAt = s.unix()
+	if scoped, ok := s.db.(*transactionDB); ok {
+		return insertMail(scoped.Tx, m, rids)
+	}
 	tx, err := s.db.Begin()
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
+	created, err := insertMail(tx, m, rids)
+	if err != nil {
+		return nil, err
+	}
+	return created, tx.Commit()
+}
+
+// insertMail preserves ordinary CreateMail semantics and joins an outer admin
+// transaction when one was explicitly supplied by the owning gateway service.
+func insertMail(tx *sql.Tx, m Mail, rids []int64) (*Mail, error) {
 	res, err := tx.Exec(`INSERT INTO mails(srv_id,subject,content,from_name,created_by,created_at,expire_at,scope,type) VALUES(?,?,?,?,?,?,?,?,?)`,
 		m.SrvID, m.Subject, m.Content, m.FromName, m.CreatedBy, m.CreatedAt, m.ExpireAt, m.Scope, m.Type)
 	if err != nil {
@@ -104,7 +117,7 @@ func (s *Store) CreateMail(m Mail, rids []int64) (*Mail, error) {
 			return nil, err
 		}
 	}
-	return &m, tx.Commit()
+	return &m, nil
 }
 
 func (s *Store) attachmentsOf(q interface {

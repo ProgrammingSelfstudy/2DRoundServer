@@ -5,7 +5,7 @@
 ## 口径与生成
 
 - `role`：`LoadState/SaveState` 的模块参数；`global`：`LoadGlobal/SaveGlobal` 的模块参数。相同 key 在两个范围出现须分别登记，不按 key 去重。
-- 源码扫描到 **343 处持久化调用、77 项玩家模块、30 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查 85 个以 `Module`/`Mod` 结尾的字符串模块常量。计划中的“约65/31”是估计，不能当验收数量。
+- 源码扫描到 **349 处持久化调用、77 项玩家模块、30 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查 85 个以 `Module`/`Mod` 结尾的字符串模块常量。计划中的“约65/31”是估计，不能当验收数量。
 - `table`：92 张显式建表，来自 `internal/store/migrations/*.sql` 和 `store.go` 的启动建表；包括游戏相关表及4张安全/运维表 `admins`、`audit_logs`、`login_tokens`、`schema_migrations`，后者也列出以说明边界。SQLite 自动维护的 `sqlite_sequence` 等内部表不由项目注册，不计入。
 - 下表的范围、键和源码列由 `tools/admincoverage` 扫描结果生成；中文窗口、当前能力、后续处置和原因经人工补充。窗口协议用于定位游戏功能，不等于后台 HTTP 路由。**“当前未接”是待补缺口，不是永久排除；“拟提供”不表示已经实现或已经授权具体写操作。**
 - 本文机器可读表格是覆盖清单；阶段1已在各模块文件的 `init()` 中注册到 `internal/game/adminreg.go` 的 `AdminModules()`。完整性门禁同时核对源码扫描、本文及运行时注册，任一边缺项都失败。测试采用精确的 `(scope,key)` 对比，不能用一个任意 `*` 冒充全覆盖。
@@ -126,20 +126,20 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | 范围 | 模块键 | 中文名/对应窗口 | 当前后台能力 | 后续拟提供 | 缺口或限制原因 | 源码依据 |
 | --- | --- | --- | --- | --- | --- | --- |
 | global | `adventure_mine_world` | 空岛灵矿共享占领（20640–20660） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [adventure_mine.go](../internal/game/adventure_mine.go) |
-| global | `arenachamp` | 本服冠军赛（20250–20282） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
-| global | `arenamany` | 多人竞技场（29000–29035） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenamany.go](../internal/game/arenamany.go) |
-| global | `arenateam` | 组队竞技场全服赛季（27200–27256） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenateam.go](../internal/game/arenateam.go) |
-| global | `crossarena` | 跨服竞技场（25600–25618） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[crossarena.go](../internal/game/crossarena.go) |
-| global | `crosschamp` | 跨服冠军赛（26200–26215） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
-| global | `daysrank` | 七天排行（22700–22704） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [daysrank.go](../internal/game/daysrank.go) |
+| global | `arenachamp` | 本服冠军赛（20250–20282） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
+| global | `arenamany` | 多人竞技场（29000–29035） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [arenamany.go](../internal/game/arenamany.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
+| global | `arenateam` | 组队竞技场全服赛季（27200–27256） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [arenateam.go](../internal/game/arenateam.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
+| global | `crossarena` | 跨服竞技场（25600–25618） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [arenachampion.go](../internal/game/arenachampion.go)、[crossarena.go](../internal/game/crossarena.go) |
+| global | `crosschamp` | 跨服冠军赛（26200–26215） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
+| global | `daysrank` | 七天排行（22700–22704） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [daysrank.go](../internal/game/daysrank.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
 | global | `dial` | 转盘抽奖/记录（16670–16676） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [dial.go](../internal/game/dial.go) |
 | global | `dramapass` | 推图通关录像/进度榜（13002、13015、13020） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [drama_pass.go](../internal/game/drama_pass.go) |
-| global | `elitematch` | 精英段位赛（24900–24946） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [elitematch_season.go](../internal/game/elitematch_season.go) |
+| global | `elitematch` | 精英段位赛（24900–24946） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [elitematch_season.go](../internal/game/elitematch_season.go) |
 | global | `endless_rank` | 无尽试炼排行榜（23903/23907） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [endless.go](../internal/game/endless.go) |
 | global | `escort_board` | 护送共享记录/劫掠（24000–24020） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [escort.go](../internal/game/escort.go) |
 | global | `guildmarket:*` | 公会宝库共享库存（26900–26903） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guildmarket.go](../internal/game/guildmarket.go) |
 | global | `guildredbag` | 公会红包簿（13534–13546） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guild_redbag.go](../internal/game/guild_redbag.go) |
-| global | `guildwar` | 公会战（24200–24223） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [guildwar.go](../internal/game/guildwar.go) |
+| global | `guildwar` | 公会战（24200–24223） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [guildwar.go](../internal/game/guildwar.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
 | global | `homeworld_board` | 家园共享人气榜（26020/26021） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [homeworld.go](../internal/game/homeworld.go) |
 | global | `ladder` | 天梯（24300–24318） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [ladder.go](../internal/game/ladder.go) |
 | global | `levgift` | 升级礼包/全服限量（21200/21201） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [levgift.go](../internal/game/levgift.go) |
@@ -271,3 +271,25 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 阶段2在e222311隔离基线上复现了两个既有补单缺陷：旧已付订单重放仍执行可写钩子，以及并发确认同一待付订单执行两次钩子。最小修复为同Store实例的角色付款/重置共享锁、锁内重读订单并提前拒绝非待付状态；保留原有SQL原子状态检查、before比较及事务审计，不改奖励/限购规则。此进程内锁不是分布式锁，不声称覆盖多admin实例/多Store跨进程并发确认。
 
 本阶段测试使用临时SQLite、httptest和本机真实TCP游戏handler；未操作真实玩家或外部付款，也未验证多进程部署。全服网关ops、结算和前端留到后续阶段；抓包、前端依赖/锁文件和生产UI快照不改。仅本地提交，停于阶段2等待审阅，不推送。
+
+## Phase 3b: due-only catch-up
+
+The eight approved season keys above now support catch-up through their live
+service locks. Other global modules remain read-only (405 for settle). No future
+clock is injected, no active championship is advanced/cancelled, and no new
+championship or guild war is created. Existing calendars, eligibility, rewards and
+mail functions are reused. Cross/multi arena payout still waits for rollover.
+
+The gateway commits administrative settlement mail, role/global state and the
+trusted actor/reason audit in one transaction. The admin proxy never writes global
+state or a duplicate audit. Partial mail failure and audit failure roll back all
+three. This atomic unit applies to the new admin operation; existing native timer
+failure boundaries and multi-gateway/cross-process locking are not claimed changed.
+
+Team-arena AdminCatchup records a processed admin request in this calendar cycle;
+it does not mark the current live season settled or affect gameplay rules. Multi
+arena reuses its existing Settled field. Tests compare actual payout counts from
+single-reference settlement with simultaneous native/admin settlement for all
+eight keys, including each champion variant. Running seasons remain unchanged;
+repeats do not send mail again. Phase 3a text above is its historical snapshot;
+this section and the updated rows describe the current 3b capability.

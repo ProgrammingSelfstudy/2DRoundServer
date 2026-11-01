@@ -147,6 +147,10 @@ type atTeam struct {
 type atReq struct{ TID, RID, Time int64 }
 
 type atBoard struct {
+	// AdminCatchup records a processed admin catch-up in this calendar cycle;
+	// it never controls gameplay rewards, phase, eligibility or season rollover.
+	AdminCatchup int64
+
 	Next    int64
 	Teams   map[int64]*atTeam
 	Applies []atReq // a role asks a team

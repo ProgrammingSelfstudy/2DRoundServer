@@ -29,6 +29,15 @@
 
 ## 最新进度与交接（2026-11-01）
 
+Phase 3a local commit: `16d4128a98c701329cd25a8aa3666bd2ce93ad6c`.
+Phase 3b implementation and full validation passed. Commit title:
+`Add due-only season settlement through gateway services`. Eight authorized keys
+passed running/not_due, due payout, repeat/already and native/admin concurrency
+checks (actual mail count equals a single-reference payout). Partial mail and
+audit failures roll back mail/state/audit. HTTP permission/reason/trusted actor
+checks and real gateway integration passed. Team AdminCatchup is request-receipt
+metadata only. Validation: go vet; four-package race (game181.089s/admin38.135s/store11.645s); frontend type check, existing 28 tests and make build all passed. Node22.23.4/Corepack pnpm10.11.0; captures/UI/dependencies unchanged. Continue 3c after this commit; no push.
+
 **阶段0–2已通过审核；阶段3正在执行，阶段4–6未开始。** 本轮基线 `c140a39`。阶段3a已实现网关所属服务锁内的30项全服状态读取、16项现有排名投影、赛季信息与区服概览，后台只转发，缺网关不回退读库。阶段3a验收已通过：`go vet ./...`、四包race（game166.470秒、admin35.597秒、store11.180秒）、前端类型检查、原28项测试和`make build`。30项逐项GET前后存档字节不变，真实服务锁阻塞、未知键/跨服拒绝和后台502无回退专项通过；UI快照与抓包无变化。阶段3a提交标题 `Add gateway-owned global read APIs and season views`，用 `git log -1 --format="%H %s" -- internal/game/adminops.go` 查询完整号。后续继续3b到期补结算和3c世界等级覆盖；本轮不push。
 
 以下为阶段2及之前的历史记录，旧状态不代表本轮任务授权。

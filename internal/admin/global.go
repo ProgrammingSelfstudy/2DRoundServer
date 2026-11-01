@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"2droundserver/internal/game"
 	"2droundserver/internal/store"
@@ -112,4 +115,35 @@ func (s *Server) globalRead(w http.ResponseWriter, r *http.Request, path string,
 		return
 	}
 	writeJSON(w, 200, raw)
+}
+
+func (s *Server) settleServerSeason(w http.ResponseWriter, r *http.Request, p *principal) {
+	srv, ok := s.globalServer(w, r)
+	if !ok {
+		return
+	}
+	key := r.PathValue("key")
+	if _, ok := game.FindAdminModule("global", key); !ok {
+		fail(w, 404, "no such global module")
+		return
+	}
+	var body struct {
+		Reason string `json:"reason"`
+	}
+	if !decode(w, r, &body) {
+		return
+	}
+	if !validReason(body.Reason) {
+		fail(w, 422, "reason must be 1 to 200 nonblank characters without controls")
+		return
+	}
+	op := game.AdminOperation{Reason: body.Reason, AdminID: p.Admin.ID, AdminName: p.Admin.Username, IP: clientIP(r)}
+	q := url.Values{"srv": {srv}, "key": {key}}
+	raw, ok := s.globalProxy(w, r, "/ops/season/settle?"+q.Encode(), op)
+	if ok {
+		writeJSON(w, 200, raw)
+	}
+}
+func validReason(reason string) bool {
+	return strings.TrimSpace(reason) != "" && utf8.RuneCountInString(reason) <= 200 && strings.IndexFunc(reason, unicode.IsControl) < 0
 }

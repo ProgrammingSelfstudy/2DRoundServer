@@ -1,42 +1,41 @@
 # 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
 
-## 当前任务：阶段 4（审核方已授权，2026-11-01）
+## 当前任务：阶段 5（审核方已授权，2026-11-01）
 
-**阶段 0–3 已通过审核。现在只做阶段 4（专用表只读视图），做完停下，不要继续阶段 5。** 先 `git pull`。
+**阶段 0–4 已通过审核。现在只做阶段 5（前端），做完停下，不要进入阶段 6。** 先 `git pull`。基线包含审核方对两处间歇失败测试的修复：`7e969b8`（return action）、`cbd35ba`（adventure：服务端先回复后存档，测试读早了；加心跳同步）。
 
-阶段 3 审核结论：结算只补到期未结算的赛季、幂等、与游戏换届共用同一把锁、结算与审计同事务，通过。已知限制（不要改）：结算期间 SQLite 事务较长，其它写入短暂排队；邮件在提交前可能先推送给在线玩家。
+阶段 4 审核结论：表视图 82 项静态白名单，敏感列在查询层排除（`chat_offline` 无正文、`replays` 无脚本、无凭据），全部只读，通过。已知并接受：`tickets` 的 `phone/email/phone_info` 对 viewer 可读（现有工单页本来就显示联系方式）。
 
-**阶段 4 全部只读，不做任何表的写接口。** `ADMIN_COVERAGE.md` 里每张表“不提供任意逐表编辑/清空”的结论不变，需要改数据的仍走已有的专用接口（发放、封禁、重置白名单）。
+**阶段 5 是纯前端。不改 Go 后端、不改接口、不改游戏规则。** 如果发现后端接口缺字段或不好用，在进度段写明并停下报告，不要自己改后端。
 
-做法：和玩家模块注册表同一思路，建一个**表视图注册表**，用白名单配置 + 通用只读查询覆盖 `ADMIN_COVERAGE.md` 里的游戏相关表，不要为 90 多张表逐个手写接口。
+可用的后端接口（全部已实现，响应格式以代码和测试为准，先读 `internal/admin/*.go` 再写前端类型）：
+- 模块：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`（`levManage`，body `{item, reason}`，409 玩家在线，502 网关不可达/在线状态未知，422 item 或原因不合法）
+- 充值：`GET /api/roles/{id}/charge`
+- 表视图：`GET /api/tables`、`GET /api/roles/{id}/tables`、`GET /api/roles/{id}/tables/{name}?limit=&offset=`、`GET /api/guilds/{id}/tables/{name}`、`GET /api/servers/{id}/tables/{name}`
+- 区服玩法：`GET /api/servers/{id}/overview`、`/modules`、`/modules/{key}`、`/modules/{key}/rank`、`/modules/{key}/season`、`POST /api/servers/{id}/seasons/{key}/settle`（`levManage`，body 带原因）、`GET/PUT /api/servers/{id}/worldlev`（PUT `levManage`）
 
-1. **注册表**（建议 `internal/store/admin_tables.go`）：每张表一条配置：表名、中文名、分组（英雄/阵容/公会/好友/任务/竞技场/邮件/充值/其它）、归属范围（`role`、`guild`、`server`）、归属列、**可查看的列白名单**、稳定排序（主键或 `id DESC`）。通用查询**只用白名单列和注册的表名拼 SQL，所有值走参数绑定，不接受调用方传入的列名、表名、排序或条件**。
-2. **接口**（全部 `levRead`）：
-   - `GET /api/tables`：注册表清单（名、中文名、分组、范围、列）
-   - `GET /api/roles/{id}/tables`：该角色在各 `role` 范围表里的行数摘要（用 COUNT，不返回数据）
-   - `GET /api/roles/{id}/tables/{name}?limit=&offset=`：分页返回行和 total；`limit` 默认 50、上限 200，越界返回 422
-   - `GET /api/guilds/{id}/tables/{name}`、`GET /api/servers/{id}/tables/{name}`：同样分页，用于公会范围和区服范围的表
-   - 范围不匹配（拿 role 的表去 guild 路径查）、未注册表名、不存在的角色/公会返回 404
-3. **敏感与大字段**（必须在白名单层面排除，不是前端隐藏）：
-   - 绝不返回：`admins` 的密码哈希、`login_tokens` 的任何凭据、`audit_logs` 和 `schema_migrations`（它们已有专用页或不提供，不进注册表）
-   - `chat_offline`：**不返回消息正文**，只给发送者、时间、长度
-   - `replays`：只给元数据，不返回战斗脚本大字段
-   - `global_state`、`module_state` 不进这个注册表（已有模块接口）
-   - 任何带 JSON 大字段的表，字段较大时在后端截断到 4KB 并标注 `truncated`
-4. **角色详情要看到的几组**（前端留到阶段 5，这里保证后端接口数据齐）：英雄列表（`partners` 含天赋 `partner_talents`、装备 `hero_equips`、皮肤 `role_skins`、外观 `role_looks`）、阵容（`formations` + `formation_slots`）、公会与职位（`guild_members` 含职位和捐献）、好友与黑名单、申请、日常任务与成就、竞技场（`arena_players`、`arena_logs`、`arena_slots`）、角色收件（`role_mails`，按角色列出邮件主题、读取、领取状态，需要联 `mails` 的主题）、角色订单（已有 `GET /api/roles/{id}/charge`，不要重复实现）。联表的部分在注册表里写成明确的只读视图配置，同样只允许白名单列。
-5. **覆盖门禁升级**：`ADMIN_COVERAGE.md` 的每张 `table` 行要么在表视图注册表里有注册，要么明确写“有专用页/不提供”及原因，两边不一致测试失败。**同步更新这些行的“当前后台能力”和“后续拟提供”两列。**
-6. **测试**：
-   - 对每个注册的表，用迁移建出的真实 schema 检查白名单列都存在（防止列名写错）
-   - 敏感列不在任何返回里（对注册表整体断言，不是抽查）
-   - 所有接口不写库：读前后各表行数和 `module_state`/`global_state` 不变
-   - 分页稳定（同一数据翻页不重复不漏）、limit 上限、越界 422
-   - 三档权限：未登录 401，viewer 可读
-   - 范围不匹配/未注册表名/不存在的归属 ID 返回 404
-   - `chat_offline` 不含正文，`replays` 不含脚本
-7. 约束：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，不 push。不新增任何写接口。
-8. 验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build`。出现与本阶段无关的失败，先在上一个提交复现再报告。完成后在下面进度段更新阶段 4 提交号和验证结果，如实写出没验证的部分。
+要做的页面和页签：
+1. **角色详情新增页签**（`src/views/roles/RoleDialog.vue` 及配套组件）：
+   - **充值状态**：展示 `GET /api/roles/{id}/charge` 的各分组（首充每个窗口、每日首充、月卡 ×2、月基金 ×2、限时礼包、周/月礼包、订单）。每个可重置项旁一个“重置”按钮，**仅 superadmin 可见**；点击弹确认框，必须填原因（1–200 字，无控制字符）。
+   - **模块数据**：列出该角色已有的模块，有视图显示视图，没有则显示格式化 JSON；只读。
+   - **数据表**：按分组（英雄/阵容/公会/好友/任务/竞技场/邮件/其它）列出 `GET /api/roles/{id}/tables` 的行数摘要，点开一张表用 `limit/offset/total` 分页显示明细；`truncated` 字段要有标记。
+2. **新页 `/#/game-status`“玩法状态”**（`levRead`，三档可读）：先选区服，再显示概况（世界等级的计算值/覆盖值/生效值、开服第 N 天、开服时间、竞技场本季起止）、排名（下拉选有排名的模块）、赛季（列出有赛季的模块，状态/到期/已结算）、全服数据浏览。写操作仅 superadmin 可见：**立即结算**（二次确认 + 原因，已结算/未到期要用接口返回的 `already`/`not_due` 给出明确提示，不要当作失败）、**设置世界等级覆盖**（等级、到期时间、原因；0 表示取消覆盖）。
+3. **新页 `/#/modules`“模块总表”**（三档可读）：展示 `GET /api/modules` 的注册表，标出有无视图/排名/重置项，用来核对“都接了”。
+4. **公会详情**补一个“数据表”入口，用 `GET /api/guilds/{id}/tables/{name}` 显示公会范围的表；区服页补一个“玩法状态”跳转。
+5. **统一交互**：
+   - 409 提示“玩家在线，请先踢下线”，旁边给踢线按钮（复用现有踢线）
+   - 502 提示“网关不可用，未修改”（读接口则提示“网关不可用，无法读取”），**不要把 502 显示成数据为空**
+   - 沿用 `useCommand` 提交锁、`useCollection`、`CollectionPage`/`RecordTable`、`src/domain/management.ts` 的权限表和 `src/routers/menu.ts`；新页面按路由懒加载，不用 KeepAlive，不在隐藏页轮询
+   - 写操作结果不明（网络中断、超时、5xx）时不自动重试，沿用现有的“先核对再解除锁定”做法
+   - 权限以服务端为准：viewer/operator 看不到任何重置、结算、世界等级写按钮，直接调接口也是 403
+6. **测试**（`web/admin/tests/`）：原有 28 项必须全部保留；新增权限可见性、重置原因与 item 校验、409/502/422 文案映射、`already`/`not_due` 映射、表分页参数（limit 1–200）、`truncated` 处理。
+7. **构建与快照**：用 Node 22.23.4 + corepack pnpm 10.11.0，不加依赖、不改 lockfile。跑 `make admin-ui-embed`，**把更新后的 `internal/admin/ui` 快照一起提交**；`make build` 必须通过。
+8. **验证**：`make admin-ui-check`、`make admin-ui-test`、`make build`、`go vet ./...`、`go test -race ./internal/admin`（前端快照的静态资源回归在里面）。另外用 `make admin-live-sandbox`（带真实网关）实际打开新页面和三个角色页签，记录每个页面的结果；**没有在浏览器里亲自点过的页面，必须在进度段明确写“未浏览器验证”**，不要写成已验证。完成后在下面进度段更新阶段 5 提交号和验证结果，如实写出没验证的部分。
+9. 约束：不 push；不碰 `testdata/captures`；不改 Go 后端。
 
 ## 最新进度与交接（2026-11-01）
+
+> **最新状态（审核方更新）：阶段 0–4 已通过审核；阶段 5（前端）已授权，进行中；阶段 6 尚未开始。** 下面各阶段交付记录里的“等待审阅”“不push”“不进入阶段N”等措辞只对当时有效，已过期，以最上面“当前任务”为准。阶段 5 完成后停下，不要自动进入阶段 6。
 
 **阶段4已完整实现、通过验收并完成本地提交，停下等待审阅；不push、不进入阶段5。**
 

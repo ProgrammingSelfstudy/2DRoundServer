@@ -1,31 +1,40 @@
 # 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
 
-## 当前任务：阶段 3（审核方已授权，2026-11-01）
+## 当前任务：阶段 4（审核方已授权，2026-11-01）
 
-**阶段 0、1、2 已通过审核。现在只做阶段 3（全服数据、排名、赛季结算、世界等级，经网关），做完停下，不要继续阶段 4。** 先 `git pull`。
+**阶段 0–3 已通过审核。现在只做阶段 4（专用表只读视图），做完停下，不要继续阶段 5。** 先 `git pull`。
 
-阶段 2 审核结论与遗留决定：
-- 视图复用原有 `view()`/`roll()`，周礼包视图不写库，重置白名单均由配置表枚举，测试齐全，通过。
-- 审核方认可 Codex 在 `ConfirmChargeOrder` 加按角色锁并提前复核订单状态（防止重置后重放旧订单），不要回退。
-- **首充重置保留现有行为（删整行，下次打开窗口按已付总额重新激活，可再领一次）**，用户决定先不验证、不改；月卡仍是“重置后需再付一笔”。两者口径不同，这是已知的，请在 `docs/OPEN_QUESTIONS.md` 记一条“首充重置会按已付总额重新激活，月卡不会，未与原服核对”，不要在这一阶段改它。
+阶段 3 审核结论：结算只补到期未结算的赛季、幂等、与游戏换届共用同一把锁、结算与审计同事务，通过。已知限制（不要改）：结算期间 SQLite 事务较长，其它写入短暂排队；邮件在提交前可能先推送给在线玩家。
 
-阶段 3 要求（细则见下面“阶段 3”一节）。建议分三个提交，**每个提交都要全绿**，全部做完再停：
+**阶段 4 全部只读，不做任何表的写接口。** `ADMIN_COVERAGE.md` 里每张表“不提供任意逐表编辑/清空”的结论不变，需要改数据的仍走已有的专用接口（发放、封禁、重置白名单）。
 
-**3a 只读**：网关控制口 `GET /ops/global`、`GET /ops/rank`、`GET /ops/season`（读取一律在所属服务的锁下，不直接读库绕过服务）；后台转发 `GET /api/servers/{id}/modules`、`/modules/{key}`、`/rank`、`/season` 和 `GET /api/servers/{id}/overview`（世界等级、开服第 N 天、开服时间、竞技场本季起止）。全服模块注册 `View`/`Rank` 时同样复用原有逻辑。网关不可达一律 502，**不降级成直接读库**。
+做法：和玩家模块注册表同一思路，建一个**表视图注册表**，用白名单配置 + 通用只读查询覆盖 `ADMIN_COVERAGE.md` 里的游戏相关表，不要为 90 多张表逐个手写接口。
 
-**3b 结算**：`POST /ops/season/settle` 与后台 `POST /api/servers/{id}/seasons/{key}/settle`（`levManage`，原因必填 1–200 字，记审计）。
-- 只给已有 settle 函数且规则已写好的模块：`arenateam`（`atSvc.settleSeason`）、`elitematch`（`eliteSvc.settleSeasons/settleHalf`）、`crossarena`（`caSvc.settle`）、`arenamany`（`amSvc.settle`）、`daysrank`（`drWorld.settle`）、`guildwar`（`gwSvc.settleAll`）、冠军赛。其他模块返回 405，并在 `ADMIN_COVERAGE.md` 写明原因。**上一轮确认的 23 项活动/排行榜仍然只查看，不结算。**
-- **审核方对计划原文的收紧：结算只补做“按游戏自己的时钟已经到期、但还没结算”的赛季/届次，等价于立刻跑一次定时器本来要做的判断；不得强行提前结束进行中的赛季，也不得强行推进或取消进行中的冠军赛。** 进行中返回 `{"settled":false,"reason":"not_due"}`。
-- **必须幂等**：已结算返回 `{"settled":false,"reason":"already"}`，重复调用不重复发奖励、不重复发邮件。测试对每个模块调两次，断言奖励和邮件数量不变。
-- 结算必须在所属服务的锁下执行，并与该服务的定时器互斥（二者同时触发只结算一次）。
-
-**3c 世界等级**：`GET/PUT /ops/worldlev`（网关）与 `GET/PUT /api/servers/{id}/worldlev`（GET `levRead`，PUT `levManage`，原因必填，审计）。覆盖值存 global_state `"worldlev"`，格式 `{override, until}`，0 表示不覆盖，过期自动失效。`store.WorldLevel` 优先用没过期的覆盖值（`login.go:202`、`rolemisc.go:70` 两处调用都要生效）。改完向在线玩家推一次 10905。**新增的 `worldlev` 全服模块必须同时登记到 `ADMIN_COVERAGE.md` 和注册表，否则覆盖门禁会失败。**
-
-通用要求：
-- 后台进程**不得**直接写 `global_state`；所有写都经网关控制口，在服务锁内完成。网关控制口仍只绑 loopback。
-- 测试：三档权限、网关不可达 502 且库未变、结算幂等、结算与定时器互斥、进行中不结算、世界等级覆盖生效与过期、覆盖值对登录和 10905 都生效。
-- 约束不变：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，不 push；前端留到阶段 5。
-- 验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build`。出现与本阶段无关的失败，先在上一个提交复现再报告。完成后在下面进度段更新阶段 3 提交号和验证结果，如实写出没验证的部分。
+1. **注册表**（建议 `internal/store/admin_tables.go`）：每张表一条配置：表名、中文名、分组（英雄/阵容/公会/好友/任务/竞技场/邮件/充值/其它）、归属范围（`role`、`guild`、`server`）、归属列、**可查看的列白名单**、稳定排序（主键或 `id DESC`）。通用查询**只用白名单列和注册的表名拼 SQL，所有值走参数绑定，不接受调用方传入的列名、表名、排序或条件**。
+2. **接口**（全部 `levRead`）：
+   - `GET /api/tables`：注册表清单（名、中文名、分组、范围、列）
+   - `GET /api/roles/{id}/tables`：该角色在各 `role` 范围表里的行数摘要（用 COUNT，不返回数据）
+   - `GET /api/roles/{id}/tables/{name}?limit=&offset=`：分页返回行和 total；`limit` 默认 50、上限 200，越界返回 422
+   - `GET /api/guilds/{id}/tables/{name}`、`GET /api/servers/{id}/tables/{name}`：同样分页，用于公会范围和区服范围的表
+   - 范围不匹配（拿 role 的表去 guild 路径查）、未注册表名、不存在的角色/公会返回 404
+3. **敏感与大字段**（必须在白名单层面排除，不是前端隐藏）：
+   - 绝不返回：`admins` 的密码哈希、`login_tokens` 的任何凭据、`audit_logs` 和 `schema_migrations`（它们已有专用页或不提供，不进注册表）
+   - `chat_offline`：**不返回消息正文**，只给发送者、时间、长度
+   - `replays`：只给元数据，不返回战斗脚本大字段
+   - `global_state`、`module_state` 不进这个注册表（已有模块接口）
+   - 任何带 JSON 大字段的表，字段较大时在后端截断到 4KB 并标注 `truncated`
+4. **角色详情要看到的几组**（前端留到阶段 5，这里保证后端接口数据齐）：英雄列表（`partners` 含天赋 `partner_talents`、装备 `hero_equips`、皮肤 `role_skins`、外观 `role_looks`）、阵容（`formations` + `formation_slots`）、公会与职位（`guild_members` 含职位和捐献）、好友与黑名单、申请、日常任务与成就、竞技场（`arena_players`、`arena_logs`、`arena_slots`）、角色收件（`role_mails`，按角色列出邮件主题、读取、领取状态，需要联 `mails` 的主题）、角色订单（已有 `GET /api/roles/{id}/charge`，不要重复实现）。联表的部分在注册表里写成明确的只读视图配置，同样只允许白名单列。
+5. **覆盖门禁升级**：`ADMIN_COVERAGE.md` 的每张 `table` 行要么在表视图注册表里有注册，要么明确写“有专用页/不提供”及原因，两边不一致测试失败。**同步更新这些行的“当前后台能力”和“后续拟提供”两列。**
+6. **测试**：
+   - 对每个注册的表，用迁移建出的真实 schema 检查白名单列都存在（防止列名写错）
+   - 敏感列不在任何返回里（对注册表整体断言，不是抽查）
+   - 所有接口不写库：读前后各表行数和 `module_state`/`global_state` 不变
+   - 分页稳定（同一数据翻页不重复不漏）、limit 上限、越界 422
+   - 三档权限：未登录 401，viewer 可读
+   - 范围不匹配/未注册表名/不存在的归属 ID 返回 404
+   - `chat_offline` 不含正文，`replays` 不含脚本
+7. 约束：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，不 push。不新增任何写接口。
+8. 验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build`。出现与本阶段无关的失败，先在上一个提交复现再报告。完成后在下面进度段更新阶段 4 提交号和验证结果，如实写出没验证的部分。
 
 ## 最新进度与交接（2026-11-01）
 

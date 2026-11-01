@@ -34,6 +34,8 @@ func advForm(t *testing.T, e *env, c *client, role *store.Role) int64 {
 		t.Fatalf("20605: %v", r)
 	}
 	c.waitFor(20604)
+	// 20605 answers and pushes before it saves the state; the heartbeat answer means the handler has finished
+	c.settle()
 	return heroes[0].PartnerID
 }
 
@@ -213,6 +215,7 @@ func TestAdventureRoomsCollectQuizGuessAndNextFloor(t *testing.T) {
 		t.Fatalf("guess: %v", g)
 	}
 	c.waitFor(20620)
+	c.settle() // the guess answers before it saves; a late save must not land over the state saved below
 	// the way on opens only after the guard of room 11
 	st = e.advState(t, role)
 	if st.room(advDoorRoom).Status != roomLock {
@@ -266,6 +269,7 @@ func TestAdventureShopAndRoundReset(t *testing.T) {
 	if b := c.waitFor(20600); b.Int("id") != 1 || b.Int("pass_id") != 12 {
 		t.Fatalf("new round: %v", b)
 	}
+	c.settle() // 20600 answers before it saves the new round
 	st = e.advState(t, role)
 	if st.LastNum != 1 || len(st.Buffs) != 2 || len(st.BoxTaken) != 0 {
 		t.Fatalf("round state: %+v", st)

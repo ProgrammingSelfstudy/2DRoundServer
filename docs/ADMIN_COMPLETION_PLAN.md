@@ -1,5 +1,25 @@
 # 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
 
+## 最新进度与交接（2026-11-01）
+
+**阶段 0 已完成，等待审阅；阶段 1–6 尚未开始。** 本段是进度备注，不代表后续业务功能已经接通，也不代表阶段 0 已经审核通过。
+
+- 实现提交：`b1f0dc3d11e15bebecd7d9a6f4a859f588980b48`（`Inventory admin data coverage and enforce registry completeness`），基线为计划提交 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。
+- 审阅入口：[ADMIN_COVERAGE.md](ADMIN_COVERAGE.md)。按源码登记 **77 个玩家模块项、30 个全服模块项、92 张表**，覆盖 **343 处持久化调用及 85 个模块常量**。数量含动态前缀族，不是后台功能完成率。
+- 扫描范围包括 `internal/game` 及 `internal/store` 的持久化封装，避免漏掉战技、神装、魂器、赋能；清单分别记录当前能力、后续拟提供能力及限制原因。
+- 完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。未提前实现阶段 1 的运行时注册表、模块 API 或写库入口。
+- 已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
+- 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
+- 后续动作：先审阶段 0 清单与测试，再按本计划另行授权推进阶段 1；不要根据本段备注自动继续阶段 1–6。
+
+拉取后可复核：
+
+```sh
+git show --stat b1f0dc3d11e15bebecd7d9a6f4a859f588980b48
+go run ./tools/admincoverage
+go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|Registry)' -v
+```
+
 ## Context
 
 新版后台（`web/admin`，Geeker-Admin，16 页）已经覆盖了 Go 现有的全部管理接口。没接进后台的是**游戏侧数据**：

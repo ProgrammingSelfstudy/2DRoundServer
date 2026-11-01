@@ -145,6 +145,7 @@ type eliteSvc struct {
 // season rewards and the pass (24952-24955) are not done. Our rules where the client does not say, not captured.
 func RegisterElitematch(r *gateway.Router, db *store.Store) {
 	e := &eliteSvc{st: db}
+	bindAdminGlobal(db, eliteModule, &e.mu, e)
 	fights := fightServiceOf(db)
 	e.rng = func() *rand.Rand {
 		if fights.Rand != nil {
@@ -920,6 +921,6 @@ func (e *eliteSvc) saveManifesto(s *gateway.Session, req proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: eliteModule, Title: "精英段位赛", Window: "24900–24946", Scope: "global", New: adminState[eliteWorld]})
+	registerAdminModule(AdminModule{Key: eliteModule, Title: "精英段位赛", Window: "24900–24946", Scope: "global", View: adminGlobalView, Rank: globalRankFor(eliteModule), New: adminState[eliteWorld]})
 	registerAdminModule(AdminModule{Key: eliteModule, Title: "精英段位赛", Window: "24900–24946", Scope: "role", New: adminState[eliteRole]})
 }

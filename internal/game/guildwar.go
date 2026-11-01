@@ -497,6 +497,9 @@ type gwCtx struct {
 }
 
 func (g *gwSvc) with(s *gateway.Session, fn func(c *gwCtx) (save bool, err error)) error {
+	mu := adminModuleMutex(g.st, guildWarModule)
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -553,6 +556,7 @@ func (g *gwSvc) pushSide(p *gwPair, idx int, cmd uint16, m proto.Message) {
 // Register is RegisterGuildWar.
 func RegisterGuildWar(r *gateway.Router, st *store.Store, hub *gateway.Hub) {
 	g := &gwSvc{st: st, fights: fightServiceOf(st), hub: hub, rng: newRng}
+	bindAdminGlobal(st, guildWarModule, adminModuleMutex(st, guildWarModule), g)
 	r.Handle(24204, g.status)
 	r.Handle(24205, g.battleList)
 	r.Handle(24200, g.info)
@@ -730,17 +734,7 @@ func (g *gwSvc) ranks(s *gateway.Session, _ proto.Message) error {
 		out := []proto.Message{}
 		if c.pair != nil {
 			me := &c.pair.Sides[c.me]
-			ps := append([]gwPerson(nil), me.People...)
-			sort.SliceStable(ps, func(i, j int) bool {
-				if me.Score[ps[i].RID] != me.Score[ps[j].RID] {
-					return me.Score[ps[i].RID] > me.Score[ps[j].RID]
-				}
-				return ps[i].RID < ps[j].RID
-			})
-			for i, p := range ps {
-				out = append(out, proto.Message{"rank": i + 1, "rid": p.RID, "srv_id": me.SrvID, "face": p.Face, "lev": p.Lev, "name": p.Name, "star": me.Stars[p.RID],
-					"war_score": me.Score[p.RID], "look_id": 0, "face_update_time": 0, "face_file": ""})
-			}
+			out = me.rankMessages()
 		}
 		return false, s.Send(24213, proto.Message{"ranks": out})
 	})
@@ -1003,5 +997,21 @@ func (s *gwSide) defenseOne(h *gwHold) proto.Message {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: guildWarModule, Title: "公会战", Window: "24200–24223", Scope: "global", New: adminState[gwWar]})
+	registerAdminModule(AdminModule{Key: guildWarModule, Title: "公会战", Window: "24200–24223", Scope: "global", View: adminGlobalView, Rank: globalRankFor(guildWarModule), New: adminState[gwWar]})
+}
+
+func (me *gwSide) rankMessages() []proto.Message {
+	out := []proto.Message{}
+	ps := append([]gwPerson(nil), me.People...)
+	sort.SliceStable(ps, func(i, j int) bool {
+		if me.Score[ps[i].RID] != me.Score[ps[j].RID] {
+			return me.Score[ps[i].RID] > me.Score[ps[j].RID]
+		}
+		return ps[i].RID < ps[j].RID
+	})
+	for i, p := range ps {
+		out = append(out, proto.Message{"rank": i + 1, "rid": p.RID, "srv_id": me.SrvID, "face": p.Face, "lev": p.Lev, "name": p.Name, "star": me.Stars[p.RID],
+			"war_score": me.Score[p.RID], "look_id": 0, "face_update_time": 0, "face_file": ""})
+	}
+	return out
 }

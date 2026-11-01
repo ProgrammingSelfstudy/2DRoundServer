@@ -44,35 +44,10 @@ func (e *eliteSvc) settleSeasons(srv string, now time.Time) error {
 // in the first places, by rank (higher rank first, then score) and with the rank the table asks; at the end of a season
 // (an even k) every rank goes back to the one the table maps it to, with the rewards of the old one open again.
 func (e *eliteSvc) settleHalf(srv string, k int64) error {
-	roles, err := e.st.RankRoles(srv)
+	rows, err := e.rankRows(srv)
 	if err != nil {
 		return err
 	}
-	type row struct {
-		rid int64
-		er  *eliteRole
-	}
-	var rows []row
-	for _, r := range roles {
-		er := &eliteRole{}
-		found, err := e.st.LoadState(r.RID, eliteModule, er)
-		if err != nil {
-			return err
-		}
-		if found && er.Lev > 0 {
-			rows = append(rows, row{r.RID, er})
-		}
-	}
-	sort.SliceStable(rows, func(i, j int) bool {
-		a, b := rows[i].er, rows[j].er
-		if a.Lev != b.Lev {
-			return a.Lev > b.Lev
-		}
-		if a.Score != b.Score {
-			return a.Score > b.Score
-		}
-		return rows[i].rid < rows[j].rid
-	})
 	season := (k + 1) / 2
 	half := "上半赛季"
 	if k%2 == 0 {
@@ -107,4 +82,38 @@ func (e *eliteSvc) settleHalf(srv string, k int64) error {
 		}
 	}
 	return nil
+}
+
+type eliteRankRow struct {
+	rid int64
+	er  *eliteRole
+}
+
+func (e *eliteSvc) rankRows(srv string) ([]eliteRankRow, error) {
+	roles, err := e.st.RankRoles(srv)
+	if err != nil {
+		return nil, err
+	}
+	var rows []eliteRankRow
+	for _, r := range roles {
+		er := &eliteRole{}
+		found, err := e.st.LoadState(r.RID, eliteModule, er)
+		if err != nil {
+			return nil, err
+		}
+		if found && er.Lev > 0 {
+			rows = append(rows, eliteRankRow{r.RID, er})
+		}
+	}
+	sort.SliceStable(rows, func(i, j int) bool {
+		a, b := rows[i].er, rows[j].er
+		if a.Lev != b.Lev {
+			return a.Lev > b.Lev
+		}
+		if a.Score != b.Score {
+			return a.Score > b.Score
+		}
+		return rows[i].rid < rows[j].rid
+	})
+	return rows, nil
 }

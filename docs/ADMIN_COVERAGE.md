@@ -1,6 +1,6 @@
-# 后台数据覆盖注册表（更新至阶段 2）
+# 后台数据覆盖注册表（更新至阶段 3a）
 
-本清单以仓库内 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md) 为执行计划，审查基线为 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。阶段0建立清单与完整性门禁；阶段1实现了107项运行时注册、玩家侧只读模块API及未启用白名单的重置机制，审查基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。阶段2基线为 `e222311`，六类充值模块已接专用只读视图和配置白名单重置（见下表）；其他模块保持只读，所有 `Editable=false`。没有PUT编辑、全服数据接口、前端页签或结算入口。
+本清单以仓库内 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md) 为执行计划，审查基线为 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。阶段0建立清单与完整性门禁；阶段1实现了107项运行时注册、玩家侧只读模块API及未启用白名单的重置机制，审查基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。阶段2基线为 `e222311`，六类充值模块已接专用只读视图和配置白名单重置（见下表）；其他模块保持只读，所有 `Editable=false`。阶段3a已接网关持锁全服只读API、16项现有排名投影和赛季/区服概览；没有PUT编辑、前端页签或结算写入口。
 
 ## 口径与生成
 
@@ -30,7 +30,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 核对来源：[实际路由](../internal/admin/server.go)、[角色详情](../internal/admin/handlers.go)、[支付接口](../internal/admin/pay.go)、[新前端路由](../web/admin/src/routers/index.ts)、[角色详情界面](../web/admin/src/views/roles/RoleDialog.vue)。
 
 - 现有 `read/write/manage` 对应 viewer/operator/superadmin；管理员、审计、备份读取仅 manage，支付写入及区服/管理员维护也仅 manage。原有业务权限不在本阶段改变。
-- **阶段1已提供77项玩家模块的通用只读API，107项均可查询注册元数据；30项全服模块的数据读取仍留待阶段3。** 活动配置 `/api/activities` 不是角色 `activity` JSON；充值确认按规则更新状态，也不等于能查看/重置首充、月卡或限购。角色已有状态列表会标注未知遗留key；未知key详情返回404，已注册但尚无状态的key返回exists=false/data=null，不创建行。阶段2仅六类充值模块绑定View和Resets，Rank仍全部未绑定；`GET /api/roles/{id}/charge`汇总9个具体充值模块与该角色订单。
+- **阶段1已提供77项玩家模块的通用只读API，107项均可查询注册元数据；30项全服模块的数据读取已在阶段3a经网关接入。** 活动配置 `/api/activities` 不是角色 `activity` JSON；充值确认按规则更新状态，也不等于能查看/重置首充、月卡或限购。角色已有状态列表会标注未知遗留key；未知key详情返回404，已注册但尚无状态的key返回exists=false/data=null，不创建行。阶段2仅六类充值模块绑定View和Resets，全服16项现有Rank已绑定；`GET /api/roles/{id}/charge`汇总9个具体充值模块与该角色订单。
 - 当前角色详情仅基本资料、在线/封禁、资产和物品账本；已有发英雄、皮肤、外观按钮，但没有拥有列表、英雄属性/装备/阵容、任务/好友、收件及角色订单汇总。全局订单和发件历史也不能当作这些角色页签。
 - 现有写操作并非全部执行新计划的“先查离线、不可达不写”；本阶段不更改旧接口或规则。后续新增玩家数据写必须先网关在线校验（在线409、未知502），再读before、写入、审计。不能用当前踢线选项代替这一前置条件。
 - 全服数据后续必须经网关，在所属服务的锁/定时器边界内读取/修改；禁止后台直接调用 `SaveGlobal`。专用表若同样受网关服务锁保护，也不能因其是SQL表就绕开该边界。
@@ -121,40 +121,40 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 ## 全服模块（30项）
 
-每一项已有真实state构造器和注册元数据，但仍缺网关管理读取入口。下列8个赛季状态项（两类冠军赛分列）才进入计划明确的结算审查集合；登记不是幂等性已验收。其他项的“仅查看”明确不提供强制结算，原因是没有计划批准、已验证的统一结算入口，不能新造发奖/赛季规则。
+阶段3a每项均已接网关所属服务锁内的原始JSON/状态投影读取；有既有排名的16项已绑定Rank。下列8个赛季状态项（两类冠军赛分列）才进入计划明确的结算审查集合；登记不是幂等性已验收。其他项的“仅查看”明确不提供强制结算，原因是没有计划批准、已验证的统一结算入口，不能新造发奖/赛季规则。
 
 | 范围 | 模块键 | 中文名/对应窗口 | 当前后台能力 | 后续拟提供 | 缺口或限制原因 | 源码依据 |
 | --- | --- | --- | --- | --- | --- | --- |
-| global | `adventure_mine_world` | 空岛灵矿共享占领（20640–20660） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [adventure_mine.go](../internal/game/adventure_mine.go) |
-| global | `arenachamp` | 本服冠军赛（20250–20282） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
-| global | `arenamany` | 多人竞技场（29000–29035） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenamany.go](../internal/game/arenamany.go) |
-| global | `arenateam` | 组队竞技场全服赛季（27200–27256） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenateam.go](../internal/game/arenateam.go) |
-| global | `crossarena` | 跨服竞技场（25600–25618） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[crossarena.go](../internal/game/crossarena.go) |
-| global | `crosschamp` | 跨服冠军赛（26200–26215） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
-| global | `daysrank` | 七天排行（22700–22704） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [daysrank.go](../internal/game/daysrank.go) |
-| global | `dial` | 转盘抽奖/记录（16670–16676） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [dial.go](../internal/game/dial.go) |
-| global | `dramapass` | 推图通关录像/进度榜（13002、13015、13020） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [drama_pass.go](../internal/game/drama_pass.go) |
-| global | `elitematch` | 精英段位赛（24900–24946） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [elitematch_season.go](../internal/game/elitematch_season.go) |
-| global | `endless_rank` | 无尽试炼排行榜（23903/23907） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [endless.go](../internal/game/endless.go) |
-| global | `escort_board` | 护送共享记录/劫掠（24000–24020） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [escort.go](../internal/game/escort.go) |
-| global | `guildmarket:*` | 公会宝库共享库存（26900–26903） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guildmarket.go](../internal/game/guildmarket.go) |
-| global | `guildredbag` | 公会红包簿（13534–13546） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guild_redbag.go](../internal/game/guild_redbag.go) |
-| global | `guildwar` | 公会战（24200–24223） | 注册元数据可读；未接网关数据API | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [guildwar.go](../internal/game/guildwar.go) |
-| global | `homeworld_board` | 家园共享人气榜（26020/26021） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [homeworld.go](../internal/game/homeworld.go) |
-| global | `ladder` | 天梯（24300–24318） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [ladder.go](../internal/game/ladder.go) |
-| global | `levgift` | 升级礼包/全服限量（21200/21201） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [levgift.go](../internal/game/levgift.go) |
-| global | `monopoly_g*` | 和之国火祭公会状态（27400–27506） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [monopoly.go](../internal/game/monopoly.go) |
-| global | `petard` | 花火大会（27000–27008） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [petard.go](../internal/game/petard.go) |
-| global | `practisetower_rank` | 兔丼监狱共享记录/排行（29100–29107） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [practisetower.go](../internal/game/practisetower.go) |
-| global | `primus` | 霸气修炼（20700–20706） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [primus.go](../internal/game/primus.go) |
-| global | `returnaction` | 回归活动（27900–27915） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [returnaction.go](../internal/game/returnaction.go) |
-| global | `sandybeach` | 沙滩Boss（25400–25405） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [sandybeach.go](../internal/game/sandybeach.go) |
-| global | `smashegg_log` | 砸金蛋共享记录（16684/16685） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [smashegg.go](../internal/game/smashegg.go) |
-| global | `snatch` | 节日夺宝（25700–25704、26300/26301） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [snatch.go](../internal/game/snatch.go) |
-| global | `sweet` | 甜蜜大作战（28500–28502） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [sweet.go](../internal/game/sweet.go) |
-| global | `termbegins` | 开学季（26700–26712） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [termbegins.go](../internal/game/termbegins.go) |
-| global | `treasure` | 幸运/高级探宝（16637–16643） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [treasure.go](../internal/game/treasure.go) |
-| global | `yearmonster` | 年兽活动（28200–28224） | 注册元数据可读；未接网关数据API | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [yearmonster.go](../internal/game/yearmonster.go) |
+| global | `adventure_mine_world` | 空岛灵矿共享占领（20640–20660） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [adventure_mine.go](../internal/game/adventure_mine.go) |
+| global | `arenachamp` | 本服冠军赛（20250–20282） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
+| global | `arenamany` | 多人竞技场（29000–29035） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenamany.go](../internal/game/arenamany.go) |
+| global | `arenateam` | 组队竞技场全服赛季（27200–27256） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenateam.go](../internal/game/arenateam.go) |
+| global | `crossarena` | 跨服竞技场（25600–25618） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[crossarena.go](../internal/game/crossarena.go) |
+| global | `crosschamp` | 跨服冠军赛（26200–26215） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
+| global | `daysrank` | 七天排行（22700–22704） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [daysrank.go](../internal/game/daysrank.go) |
+| global | `dial` | 转盘抽奖/记录（16670–16676） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [dial.go](../internal/game/dial.go) |
+| global | `dramapass` | 推图通关录像/进度榜（13002、13015、13020） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [drama_pass.go](../internal/game/drama_pass.go) |
+| global | `elitematch` | 精英段位赛（24900–24946） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [elitematch_season.go](../internal/game/elitematch_season.go) |
+| global | `endless_rank` | 无尽试炼排行榜（23903/23907） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [endless.go](../internal/game/endless.go) |
+| global | `escort_board` | 护送共享记录/劫掠（24000–24020） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [escort.go](../internal/game/escort.go) |
+| global | `guildmarket:*` | 公会宝库共享库存（26900–26903） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guildmarket.go](../internal/game/guildmarket.go) |
+| global | `guildredbag` | 公会红包簿（13534–13546） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guild_redbag.go](../internal/game/guild_redbag.go) |
+| global | `guildwar` | 公会战（24200–24223） | 网关服务锁内只读原始JSON及状态投影（read） | 查看、专用赛季视图/排名、赛季操作（阶段3/5，待幂等验收） | 仅允许网关持锁复用既有结算；重复调用不得重复邮件/发奖 | [guildwar.go](../internal/game/guildwar.go) |
+| global | `homeworld_board` | 家园共享人气榜（26020/26021） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [homeworld.go](../internal/game/homeworld.go) |
+| global | `ladder` | 天梯（24300–24318） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [ladder.go](../internal/game/ladder.go) |
+| global | `levgift` | 升级礼包/全服限量（21200/21201） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [levgift.go](../internal/game/levgift.go) |
+| global | `monopoly_g*` | 和之国火祭公会状态（27400–27506） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [monopoly.go](../internal/game/monopoly.go) |
+| global | `petard` | 花火大会（27000–27008） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [petard.go](../internal/game/petard.go) |
+| global | `practisetower_rank` | 兔丼监狱共享记录/排行（29100–29107） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [practisetower.go](../internal/game/practisetower.go) |
+| global | `primus` | 霸气修炼（20700–20706） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [primus.go](../internal/game/primus.go) |
+| global | `returnaction` | 回归活动（27900–27915） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [returnaction.go](../internal/game/returnaction.go) |
+| global | `sandybeach` | 沙滩Boss（25400–25405） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [sandybeach.go](../internal/game/sandybeach.go) |
+| global | `smashegg_log` | 砸金蛋共享记录（16684/16685） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [smashegg.go](../internal/game/smashegg.go) |
+| global | `snatch` | 节日夺宝（25700–25704、26300/26301） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [snatch.go](../internal/game/snatch.go) |
+| global | `sweet` | 甜蜜大作战（28500–28502） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [sweet.go](../internal/game/sweet.go) |
+| global | `termbegins` | 开学季（26700–26712） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [termbegins.go](../internal/game/termbegins.go) |
+| global | `treasure` | 幸运/高级探宝（16637–16643） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [treasure.go](../internal/game/treasure.go) |
+| global | `yearmonster` | 年兽活动（28200–28224） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [yearmonster.go](../internal/game/yearmonster.go) |
 
 ## 专用表与基础设施（92张）
 
@@ -257,9 +257,9 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 ## 供后续阶段审阅的缺口
 
-1. **阶段1已实现运行时注册与玩家原始数据查看**：107项有真实state构造器，77项玩家模块可查原始JSON，三个前缀族验证窗口key或正数公会GID。所有GET不写库。阶段2六类充值专用视图及白名单重置已实现；其余专用视图/排名尚未实现，107项登记不等于后续业务功能全部完成。重置基础机制使用before值比较，数据变更与审计同一事务提交，审计失败回滚。
+1. **阶段1已实现运行时注册与玩家原始数据查看**：107项有真实state构造器，77项玩家模块可查原始JSON，三个前缀族验证窗口key或正数公会GID。所有GET不写库。阶段2六类充值专用视图及白名单重置已实现；阶段3a已接全服状态投影与16项原有排名，其余专用前端尚未实现，107项登记不等于后续业务功能全部完成。重置基础机制使用before值比较，数据变更与审计同一事务提交，审计失败回滚。
 2. **阶段2已接充值状态汇总和白名单重置**：六组模块覆盖9个具体key；汇总附真实role_charge和仅该角色的订单分页。累计实付、VIP经验、历史购买次数和其他模块不可编辑。月卡Base策略已注明并登记OPEN_QUESTIONS；View中的协议字段来自现有游戏逻辑，状态投影不写回。
-3. **全服与赛季入口缺失（阶段3）**：全服30项都没有管理代理；排名需绑定现有查询。计划指定的现有结算函数由服务锁保护，必须补幂等验收后才能开放。其余模块不提供强制结算，避免推导未知规则。
+3. **全服只读已接入（阶段3a）**：全服30项经真实服务锁读取，16项Rank复用现有排序；赛季/区服概览只读。计划指定的结算写入口留待3b幂等验收后开放。其余模块不提供强制结算，避免推导未知规则。
 4. **世界等级是计算结果，不是现存模块**：`store.WorldLevel`及`openday.go`已有计算；区服的开服时间已能编辑。计划中的global键 `worldlev`、覆盖值/过期时间和 `/ops/worldlev` 均尚不存在，故不伪装成当前扫描项；阶段3新增后必须补注册行。现有 `global_state` 不能预先直接写入此键。
 5. **专用表不止八类（阶段4）**：英雄/装备、阵容、公会职位、好友、任务、竞技场、角色邮件、角色订单是优先只读页签；签到、邀请、商店、召唤、共鸣、推图/副本、领奖流水等其余表同样在本表逐项验收。表缺视图是待补缺口，不是“16页已迁移”就算完成。
 6. **前端和阶段6收口仍待做**：没有模块总表、玩法状态、充值状态及上述角色页签；本文不将ROADMAP标完成，不改前端权限或依赖，不更新UI快照，不进入后续阶段。

@@ -175,6 +175,7 @@ type caCtx struct {
 // RegisterCrossArena registers the cross-server arena (25600-25618).
 func RegisterCrossArena(r *gateway.Router, db *store.Store) {
 	c := &caSvc{st: db}
+	bindAdminGlobal(db, caModule, &c.mu, c)
 	fights := fightServiceOf(db)
 	c.rng = func() *rand.Rand {
 		if fights.Rand != nil {
@@ -1177,5 +1178,5 @@ func (c *caSvc) addLog(cx *caCtx, r *caRole, typ, ret int64, plan *caDuels, foe 
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: caModule, Title: "跨服竞技场", Window: "25600–25618", Scope: "global", New: adminState[caBoard]})
+	registerAdminModule(AdminModule{Key: caModule, Title: "跨服竞技场", Window: "25600–25618", Scope: "global", View: adminGlobalView, Rank: globalRankFor(caModule), New: adminState[caBoard]})
 }

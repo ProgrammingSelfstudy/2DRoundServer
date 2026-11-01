@@ -52,10 +52,11 @@ func TestModuleAPIReadPermissionsAndNoWrites(t *testing.T) {
 	if len(catalog.Items) != len(game.AdminModules()) {
 		t.Fatal("catalog incomplete")
 	}
+	ranks := map[string]bool{"arenateam": true, "arenamany": true, "crossarena": true, "elitematch": true, "guildwar": true, "daysrank": true, "arenachamp": true, "crosschamp": true, "ladder": true, "endless_rank": true, "practisetower_rank": true, "sandybeach": true, "sweet": true, "yearmonster": true, "termbegins": true, "homeworld_board": true}
 	for _, m := range catalog.Items {
 		charge := m.Scope == "role" && (m.Key == "firstcharge_*" || m.Key == "daycharge" || m.Key == "monthcard" || m.Key == "monthfund" || m.Key == "limitgift" || m.Key == "cyclegift")
-		if m.Editable || m.HasRank || m.Resets == nil || m.HasView != charge || (len(m.Resets) > 0) != charge {
-			t.Fatalf("unexpected phase-2 capabilities: %+v", m)
+		if m.Editable || m.HasRank != (m.Scope == "global" && ranks[m.Key]) || m.Resets == nil || m.HasView != (charge || m.Scope == "global") || (len(m.Resets) > 0) != charge {
+			t.Fatalf("unexpected phase-3 capabilities: %+v", m)
 		}
 	}
 	got := e.do(viewer, "GET", base+"/monthcard", nil)
@@ -82,8 +83,8 @@ func TestModuleAPIReadPermissionsAndNoWrites(t *testing.T) {
 	if got := e.do(super, "PUT", base+"/monthcard", seed); got.Status != 405 {
 		t.Fatalf("JSON edit route should not exist: %d", got.Status)
 	}
-	if got := e.do(viewer, "GET", "/api/servers/symlf_1/modules", nil); got.Status != 404 {
-		t.Fatalf("phase-3 route unexpectedly exists: %d", got.Status)
+	if got := e.do(viewer, "GET", "/api/servers/symlf_1/modules", nil); got.Status != 502 {
+		t.Fatalf("global data must require the gateway: %d", got.Status)
 	}
 	if got := e.do(viewer, "GET", "/api/roles/9999999/modules", nil); got.Status != 404 {
 		t.Fatalf("missing role: %d", got.Status)

@@ -169,6 +169,7 @@ func (g *GuildService) redbagRow(b *redbag, rid int64) proto.Message {
 }
 
 func (g *GuildService) registerRedbag(r *gateway.Router) {
+	bindAdminGlobal(g.Store, redbagModule, &redbagMu, nil)
 	r.Handle(13534, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {
@@ -455,6 +456,6 @@ func (g *GuildService) redbagCounts(rid int64, now time.Time) (sent, recv int64)
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: redbagModule, Title: "公会红包簿", Window: "13534–13546", Scope: "global", New: adminState[redbagBook]})
+	registerAdminModule(AdminModule{Key: redbagModule, Title: "公会红包簿", Window: "13534–13546", Scope: "global", View: adminGlobalView, New: adminState[redbagBook]})
 	registerAdminModule(AdminModule{Key: redbagDayMod, Title: "公会红包每日领取", Window: "13534–13546", Scope: "role", New: adminState[redbagDay]})
 }

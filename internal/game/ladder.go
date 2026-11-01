@@ -128,6 +128,7 @@ type ladderSvc struct {
 // the challenger's team. Our rules where the client does not say, not captured.
 func RegisterLadder(r *gateway.Router, db *store.Store) {
 	l := &ladderSvc{st: db}
+	bindAdminGlobal(db, ladderModule, &l.mu, l)
 	fights := fightServiceOf(db)
 	l.rng = func() *rand.Rand {
 		if fights.Rand != nil {
@@ -896,6 +897,6 @@ func (l *ladderSvc) share(s *gateway.Session, _ proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: ladderModule, Title: "天梯", Window: "24300–24318", Scope: "global", New: adminState[ladderBoard]})
+	registerAdminModule(AdminModule{Key: ladderModule, Title: "天梯", Window: "24300–24318", Scope: "global", View: adminGlobalView, Rank: globalRankFor(ladderModule), New: adminState[ladderBoard]})
 	registerAdminModule(AdminModule{Key: ladderModule, Title: "天梯", Window: "24300–24318", Scope: "role", New: adminState[ladderRole]})
 }

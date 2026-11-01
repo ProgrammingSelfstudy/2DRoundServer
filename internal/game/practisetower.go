@@ -110,6 +110,7 @@ type ptSvc struct {
 // Our rules, not captured.
 func RegisterPracticeTower(r *gateway.Router, db *store.Store) {
 	p := &ptSvc{st: db, fights: fightServiceOf(db)}
+	bindAdminGlobal(db, ptRankModule, adminModuleMutex(db, ptRankModule), p)
 	r.Handle(29100, p.info)
 	r.Handle(29101, p.fight)
 	r.Handle(29103, p.redo)
@@ -189,6 +190,9 @@ func (p *ptSvc) rankOf(srv string, rid int64) (rank int64, rows []ptRankRow, err
 }
 
 func (p *ptSvc) note(role *store.Role, st *ptState) error {
+	mu := adminModuleMutex(p.st, ptRankModule)
+	mu.Lock()
+	defer mu.Unlock()
 	r := &ptRanks{}
 	if _, err := p.st.LoadGlobal(role.SrvID, ptRankModule, r); err != nil {
 		return err
@@ -465,6 +469,6 @@ func (p *ptSvc) myRank(s *gateway.Session, _ proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: ptRankModule, Title: "兔丼监狱共享记录/排行", Window: "29100–29107", Scope: "global", New: adminState[ptRanks]})
+	registerAdminModule(AdminModule{Key: ptRankModule, Title: "兔丼监狱共享记录/排行", Window: "29100–29107", Scope: "global", View: adminGlobalView, Rank: globalRankFor(ptRankModule), New: adminState[ptRanks]})
 	registerAdminModule(AdminModule{Key: ptModule, Title: "兔丼监狱个人进度", Window: "29100–29107", Scope: "role", New: adminState[ptState]})
 }

@@ -169,6 +169,7 @@ func (r *gmRole) dayBuy() []proto.Message {
 // 30 days and leave at 05:00 of the next day. Not done: the system sources (guild secret area, guild war) do not fill the
 // treasury, and equipment is neither put nor listed.
 func RegisterGuildMarket(r *gateway.Router, db *store.Store, hub *gateway.Hub) {
+	bindAdminGlobal(db, "guildmarket:*", &gmMu, nil)
 	// with runs fn for a member of a guild that opened the treasury, with the guild's stock (expired goods already out).
 	with := func(s *gateway.Session, cmd uint16, fn func(role *store.Role, gid int64, g *gmGuild, d *gmRole, fail func(string) error) error) error {
 		role := s.Role()
@@ -399,6 +400,6 @@ func notifyChange(hub *gateway.Hub, db *store.Store, gid int64, g *gmGuild, base
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: "guildmarket:*", Title: "公会宝库共享库存", Window: "26900–26903", Scope: "global", New: adminState[gmGuild], Match: adminPositiveSuffix("guildmarket:")})
+	registerAdminModule(AdminModule{Key: "guildmarket:*", Title: "公会宝库共享库存", Window: "26900–26903", Scope: "global", View: adminGlobalView, New: adminState[gmGuild], Match: adminPositiveSuffix("guildmarket:")})
 	registerAdminModule(AdminModule{Key: gmRoleModule, Title: "公会宝库个人凭证", Window: "26900–26903", Scope: "role", New: adminState[gmRole]})
 }

@@ -118,6 +118,7 @@ func dialPush(l []dialLog, e dialLog) []dialLog {
 // give awards. It runs while the operator has the activity with camp_id 93022 open in the schedule. The diamond price
 // of a turn in the table is 22 billion, so a turn is paid with keys only.
 func RegisterDial(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, dialModule, &dialMu, nil)
 	load := func(role *store.Role, now time.Time) (*dialRole, *dialWorld, int64, bool, error) {
 		start, _, open := ActivityOpen(st, role.SrvID, dialCamp, now)
 		d, w := &dialRole{}, &dialWorld{}
@@ -361,6 +362,6 @@ func RegisterDial(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: dialModule, Title: "转盘抽奖/记录", Window: "16670–16676", Scope: "global", New: adminState[dialWorld]})
+	registerAdminModule(AdminModule{Key: dialModule, Title: "转盘抽奖/记录", Window: "16670–16676", Scope: "global", View: adminGlobalView, New: adminState[dialWorld]})
 	registerAdminModule(AdminModule{Key: dialModule, Title: "转盘抽奖/记录", Window: "16670–16676", Scope: "role", New: adminState[dialRole]})
 }

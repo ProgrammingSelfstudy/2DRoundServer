@@ -371,6 +371,9 @@ func ymSave(st *store.Store, c *ymCtx) error {
 }
 
 func ymWith(s *gateway.Session, st *store.Store, fn func(c *ymCtx) error) error {
+	mu := adminModuleMutex(st, ymModule)
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -493,6 +496,7 @@ func ymRedPoints(c *ymCtx) int64 {
 // minutes). Not made: the barriers and the puzzle events, the exchange windows of the table are in the past and the client shows them
 // as over whatever the server says.
 func RegisterYearMonster(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, ymModule, adminModuleMutex(st, ymModule), nil)
 	r.OnEnter(func(s *gateway.Session, _ proto.Message) error {
 		if role := s.Role(); role != nil {
 			return ymSendAssets(s, st, role.RID)
@@ -1115,6 +1119,6 @@ func ymResult(s *gateway.Session, st *store.Store, c *ymCtx, t ymTile, kind, dam
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: ymModule, Title: "年兽活动", Window: "28200–28224", Scope: "global", New: adminState[ymWorld]})
+	registerAdminModule(AdminModule{Key: ymModule, Title: "年兽活动", Window: "28200–28224", Scope: "global", View: adminGlobalView, Rank: globalRankFor(ymModule), New: adminState[ymWorld]})
 	registerAdminModule(AdminModule{Key: ymModule, Title: "年兽活动", Window: "28200–28224", Scope: "role", New: adminState[ymRole]})
 }

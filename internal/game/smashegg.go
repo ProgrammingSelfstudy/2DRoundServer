@@ -76,6 +76,7 @@ type eggSvc struct{ st *store.Store }
 // (one free a day, then for diamonds; free again once all six are smashed), buying hammers and the records of prizes of
 // the role and of the server. The event is always open. Our rules, not captured.
 func RegisterSmashegg(r *gateway.Router, db *store.Store) {
+	bindAdminGlobal(db, eggLogModule, adminModuleMutex(db, eggLogModule), nil)
 	e := &eggSvc{st: db}
 	r.Handle(16680, e.info)
 	r.Handle(16681, e.refresh)
@@ -86,6 +87,9 @@ func RegisterSmashegg(r *gateway.Router, db *store.Store) {
 }
 
 func (e *eggSvc) with(s *gateway.Session, fn func(role *store.Role, st *eggState) error) error {
+	mu := adminModuleMutex(e.st, eggLogModule)
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -342,6 +346,6 @@ func (e *eggSvc) records(s *gateway.Session, req proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: eggLogModule, Title: "砸金蛋共享记录", Window: "16684/16685", Scope: "global", New: adminState[eggLog]})
+	registerAdminModule(AdminModule{Key: eggLogModule, Title: "砸金蛋共享记录", Window: "16684/16685", Scope: "global", View: adminGlobalView, New: adminState[eggLog]})
 	registerAdminModule(AdminModule{Key: eggModule, Title: "砸金蛋个人状态", Window: "16680–16685", Scope: "role", New: adminState[eggState]})
 }

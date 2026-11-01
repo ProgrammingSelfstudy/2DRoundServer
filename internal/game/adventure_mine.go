@@ -252,6 +252,7 @@ func (c *mineCtx) holdLimit() int64 {
 }
 
 func registerAdventureMine(r *gateway.Router, a *adv) {
+	bindAdminGlobal(a.st, mineWorldModule, &mineMu, nil)
 	r.Handle(20640, a.mineList)
 	r.Handle(20641, a.mineInfo)
 	r.Handle(20642, a.mineDefense)
@@ -770,6 +771,6 @@ var _ = errors.New
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: mineWorldModule, Title: "空岛灵矿共享占领", Window: "20640–20660", Scope: "global", New: adminState[mineWorld]})
+	registerAdminModule(AdminModule{Key: mineWorldModule, Title: "空岛灵矿共享占领", Window: "20640–20660", Scope: "global", View: adminGlobalView, New: adminState[mineWorld]})
 	registerAdminModule(AdminModule{Key: mineModule, Title: "空岛灵矿个人状态", Window: "20640–20660", Scope: "role", New: adminState[mineRole]})
 }

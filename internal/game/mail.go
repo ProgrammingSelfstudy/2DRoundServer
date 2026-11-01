@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"log"
+	"time"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -19,6 +20,8 @@ type MailService struct {
 	Log   *log.Logger
 	// Notices, when set, also gets the notice push endpoints on AdminHandler.
 	Notices *NoticeService
+	// Now is the gateway clock used by the control endpoint.
+	Now func() time.Time
 }
 
 func (m *MailService) Register(r *gateway.Router) {

@@ -163,6 +163,7 @@ func snatchGoodByID(id int64) (snatchGood, bool) {
 // minimum of people beyond the full slots), the winner takes the prize by mail, everyone else gets the score item (37007, 3 per
 // ticket) by mail, the round's group goes by the day, and the server is one zone.
 func RegisterSnatch(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, snatchModule, adminModuleMutex(st, snatchModule), nil)
 	var score [2]int64
 	_ = json.Unmarshal(snatchCfg.Const["item_score"], &score)
 
@@ -295,6 +296,9 @@ func RegisterSnatch(r *gateway.Router, st *store.Store) {
 		return proto.Message{"state": state, "state_time": stateTime, "holiday_snatch_info": list, "logs": logMsgs(w.Logs)}, nil
 	}
 	r.Handle(25700, func(s *gateway.Session, _ proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -306,6 +310,9 @@ func RegisterSnatch(r *gateway.Router, st *store.Store) {
 		return s.Send(25700, m)
 	})
 	r.Handle(25701, func(s *gateway.Session, req proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -375,6 +382,9 @@ func RegisterSnatch(r *gateway.Router, st *store.Store) {
 		return s.Send(25700, m)
 	})
 	r.Handle(25702, func(s *gateway.Session, req proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -410,6 +420,9 @@ func RegisterSnatch(r *gateway.Router, st *store.Store) {
 		return s.Send(25702, out)
 	})
 	r.Handle(25703, func(s *gateway.Session, _ proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -421,6 +434,9 @@ func RegisterSnatch(r *gateway.Router, st *store.Store) {
 		return s.Send(25703, proto.Message{"logs": logMsgs(w.Logs)})
 	})
 	r.Handle(25704, func(s *gateway.Session, _ proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -448,9 +464,15 @@ func RegisterSnatch(r *gateway.Router, st *store.Store) {
 	})
 	// the personal gift is paid: the page is empty and nothing activates it
 	r.Handle(26300, func(s *gateway.Session, _ proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		return s.Send(26300, proto.Message{"end_time": 0, "count": 0, "award_id": 0})
 	})
 	r.Handle(26301, func(s *gateway.Session, _ proto.Message) error {
+		mu := adminModuleMutex(st, snatchModule)
+		mu.Lock()
+		defer mu.Unlock()
 		return s.Send(26301, proto.Message{"flag": 0})
 	})
 }
@@ -469,6 +491,6 @@ func openOrNot(st *store.Store, role *store.Role, now time.Time) (start, end int
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: snatchModule, Title: "节日夺宝", Window: "25700–25704、26300/26301", Scope: "global", New: adminState[snatchWorld]})
+	registerAdminModule(AdminModule{Key: snatchModule, Title: "节日夺宝", Window: "25700–25704、26300/26301", Scope: "global", View: adminGlobalView, New: adminState[snatchWorld]})
 	registerAdminModule(AdminModule{Key: snatchModule, Title: "节日夺宝", Window: "25700–25704、26300/26301", Scope: "role", New: adminState[snatchRole]})
 }

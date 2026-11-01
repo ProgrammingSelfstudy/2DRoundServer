@@ -28,6 +28,7 @@ func TestAdminCoverageRegistryComplete(t *testing.T) {
 	}
 	live := map[string]AdminModule{}
 	charge := map[string]bool{"firstcharge_*": true, "daycharge": true, "monthcard": true, "monthfund": true, "limitgift": true, "cyclegift": true}
+	ranks := map[string]bool{"arenateam": true, "arenamany": true, "crossarena": true, "elitematch": true, "guildwar": true, "daysrank": true, "arenachamp": true, "crosschamp": true, "ladder": true, "endless_rank": true, "practisetower_rank": true, "sandybeach": true, "sweet": true, "yearmonster": true, "termbegins": true, "homeworld_board": true}
 	for _, m := range AdminModules() {
 		id := m.Scope + ":" + m.Key
 		if _, duplicate := live[id]; duplicate {
@@ -35,8 +36,8 @@ func TestAdminCoverageRegistryComplete(t *testing.T) {
 		}
 		live[id] = m
 		allowed := m.Scope == "role" && charge[m.Key]
-		if m.New == nil || reflect.ValueOf(m.New()).Kind() != reflect.Pointer || m.Editable || m.Rank != nil || (len(m.Resets) > 0) != allowed || (m.View != nil) != allowed {
-			t.Fatalf("invalid constructor or unauthorized phase-2 capability on %s", id)
+		if m.New == nil || reflect.ValueOf(m.New()).Kind() != reflect.Pointer || m.Editable || (m.Rank != nil) != (m.Scope == "global" && ranks[m.Key]) || (len(m.Resets) > 0) != allowed || (m.View != nil) != (allowed || m.Scope == "global") {
+			t.Fatalf("invalid constructor or unauthorized phase-3 capability on %s", id)
 		}
 		if m.Title == "" || m.Window == "" {
 			t.Fatalf("missing runtime metadata for %s", id)

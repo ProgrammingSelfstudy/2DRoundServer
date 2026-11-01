@@ -229,6 +229,9 @@ func ReturnEntered(st *store.Store, role *store.Role, now time.Time) {
 }
 
 func retWith(s *gateway.Session, st *store.Store, fn func(c *retCtx) error) error {
+	mu := adminModuleMutex(st, retModule)
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -257,6 +260,9 @@ func retTaskMsg(c *retCtx, t retTask) proto.Message {
 
 // returnEvent counts a game event for the tasks of the day and tells a returning role when one is ready (27906).
 func returnEvent(s *gateway.Session, st *store.Store, role *store.Role, label string, n int64) error {
+	mu := adminModuleMutex(st, retModule)
+	mu.Lock()
+	defer mu.Unlock()
 	if role == nil || n <= 0 {
 		return nil
 	}
@@ -346,6 +352,9 @@ func retGrabMsg(g retGrab) proto.Message {
 // returnRedbagUse is 10515 of the red packet item: each one sent becomes a packet in the server's list. Not told to others: they
 // see it the next time they open the list.
 func returnRedbagUse(s *gateway.Session, st *store.Store, role *store.Role, n int64, reply func(int, string) error) error {
+	mu := adminModuleMutex(st, retModule)
+	mu.Lock()
+	defer mu.Unlock()
 	c, err := retLoad(st, role, s.Now())
 	if err != nil {
 		return err
@@ -401,6 +410,7 @@ func returnRedbagUse(s *gateway.Session, st *store.Store, role *store.Role, n in
 // here (the friend duels with returning players that give them are not counted): the operator hands them out. The tickets are
 // not recalled in coins at the end of the activity.
 func RegisterReturnAction(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, retModule, adminModuleMutex(st, retModule), nil)
 	r.Handle(27900, func(s *gateway.Session, _ proto.Message) error {
 		return retWith(s, st, func(c *retCtx) error {
 			flag := int64(1)
@@ -786,6 +796,6 @@ func retDraw(drawn []int64) retEntry {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: retModule, Title: "回归活动", Window: "27900–27915", Scope: "global", New: adminState[retWorld]})
+	registerAdminModule(AdminModule{Key: retModule, Title: "回归活动", Window: "27900–27915", Scope: "global", View: adminGlobalView, New: adminState[retWorld]})
 	registerAdminModule(AdminModule{Key: retModule, Title: "回归活动", Window: "27900–27915", Scope: "role", New: adminState[retRole]})
 }

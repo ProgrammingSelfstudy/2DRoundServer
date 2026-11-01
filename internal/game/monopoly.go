@@ -145,6 +145,7 @@ type monoSvc struct {
 // scissors, story talks, red bags, buffs, flags), the explore value that belongs to the guild and unlocks its guard
 // bosses, the guild's attack and hp buffs and the guild's damage rankings. Our rules, not captured.
 func RegisterMonopoly(r *gateway.Router, db *store.Store) {
+	bindAdminGlobal(db, "monopoly_g*", adminModuleMutex(db, "monopoly_g*"), nil)
 	m := &monoSvc{st: db, fights: fightServiceOf(db)}
 	r.Handle(27400, m.info)
 	r.Handle(27401, m.enter)
@@ -159,6 +160,9 @@ func RegisterMonopoly(r *gateway.Router, db *store.Store) {
 func monoKey(id int64) string { return strconv.FormatInt(id, 10) }
 
 func (m *monoSvc) with(s *gateway.Session, fn func(role *store.Role, st *monoState) error) error {
+	mu := adminModuleMutex(m.st, "monopoly_g*")
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -777,6 +781,6 @@ func (m *monoSvc) guards(s *gateway.Session, req proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: "monopoly_g*", Title: "和之国火祭公会状态", Window: "27400–27506", Scope: "global", New: adminState[monoGuild], Match: adminPositiveSuffix("monopoly_g")})
+	registerAdminModule(AdminModule{Key: "monopoly_g*", Title: "和之国火祭公会状态", Window: "27400–27506", Scope: "global", View: adminGlobalView, New: adminState[monoGuild], Match: adminPositiveSuffix("monopoly_g")})
 	registerAdminModule(AdminModule{Key: monoModule, Title: "和之国火祭个人状态", Window: "27400–27506", Scope: "role", New: adminState[monoState]})
 }

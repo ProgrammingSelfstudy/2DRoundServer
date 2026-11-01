@@ -259,6 +259,9 @@ func (m *monoSvc) fightBoss(s *gateway.Session, req proto.Message) error {
 }
 
 func (m *monoSvc) settleBoss(s *gateway.Session, role *store.Role, g *store.Guild, mapID int64, cfg monoBossCfg, slots []store.FormationSlot, damage int64, chase bool) error {
+	mu := adminModuleMutex(m.st, "monopoly_g*")
+	mu.Lock()
+	defer mu.Unlock()
 	mg, err := m.loadGuild(g)
 	if err != nil {
 		return err

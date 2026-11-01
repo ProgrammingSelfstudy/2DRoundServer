@@ -131,6 +131,7 @@ func trPick(pool [][2]float64, rng *rand.Rand) int64 {
 // diamonds); the wheel is new every day. Where the client has no table (which position a draw lands on, what a multi draw
 // pulls in addition) the rule is ours: not captured.
 func RegisterTreasure(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, trModule, &trMu, nil)
 	rng := newRng
 	type ctx struct {
 		role *store.Role
@@ -412,6 +413,6 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: trModule, Title: "幸运/高级探宝", Window: "16637–16643", Scope: "global", New: adminState[trWorld]})
+	registerAdminModule(AdminModule{Key: trModule, Title: "幸运/高级探宝", Window: "16637–16643", Scope: "global", View: adminGlobalView, New: adminState[trWorld]})
 	registerAdminModule(AdminModule{Key: trModule, Title: "幸运/高级探宝", Window: "16637–16643", Scope: "role", New: adminState[trRole]})
 }

@@ -200,6 +200,7 @@ type tbSvc struct {
 // (damage total, fewer than 100 players count as 100), the rounds cut from the schedule's start, the monster's hp from the
 // recommended power, the mop-up (26709) repeating the last damage.
 func RegisterTermBegins(r *gateway.Router, db *store.Store) {
+	bindAdminGlobal(db, tbModule, adminModuleMutex(db, tbModule), nil)
 	t := &tbSvc{st: db, fights: fightServiceOf(db)}
 	r.Handle(26700, t.page)
 	r.Handle(26701, t.buy)
@@ -242,6 +243,9 @@ type tbCtx struct {
 // with loads the state of the role and the server in the round of now, rolls them over to it (mailing the rank of the round that
 // went by) and saves them after fn.
 func (t *tbSvc) with(s *gateway.Session, fn func(c *tbCtx) error) error {
+	mu := adminModuleMutex(t.st, tbModule)
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -788,6 +792,6 @@ func (t *tbSvc) summary(s *gateway.Session, _ proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: tbModule, Title: "开学季", Window: "26700–26712", Scope: "global", New: adminState[tbWorld]})
+	registerAdminModule(AdminModule{Key: tbModule, Title: "开学季", Window: "26700–26712", Scope: "global", View: adminGlobalView, Rank: globalRankFor(tbModule), New: adminState[tbWorld]})
 	registerAdminModule(AdminModule{Key: tbModule, Title: "开学季", Window: "26700–26712", Scope: "role", New: adminState[tbRole]})
 }

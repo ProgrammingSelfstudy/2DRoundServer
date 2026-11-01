@@ -175,6 +175,7 @@ type atSvc struct {
 // where the client does not say, not captured. hub may be nil (no pushes).
 func RegisterArenateam(r *gateway.Router, db *store.Store, hub *gateway.Hub) {
 	a := &atSvc{st: db, hub: hub}
+	bindAdminGlobal(db, atModule, &a.mu, a)
 	fights := fightServiceOf(db)
 	a.rng = func() *rand.Rand {
 		if fights.Rand != nil {
@@ -2108,6 +2109,6 @@ func (a *atSvc) report(s *gateway.Session, req proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: atModule, Title: "组队竞技场全服赛季", Window: "27200–27256", Scope: "global", New: adminState[atBoard]})
+	registerAdminModule(AdminModule{Key: atModule, Title: "组队竞技场全服赛季", Window: "27200–27256", Scope: "global", View: adminGlobalView, Rank: globalRankFor(atModule), New: adminState[atBoard]})
 	registerAdminModule(AdminModule{Key: atRoleModule, Title: "组队竞技场个人状态", Window: "27200–27256", Scope: "role", New: adminState[atRole]})
 }

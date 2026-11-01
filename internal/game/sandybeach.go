@@ -180,8 +180,12 @@ type sbCtx struct {
 // monsters' hp (500 per point of damage score) and the effect texts of the layers are not in the client's tables: the effects
 // are not applied.
 func RegisterSandybeach(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, sbModule, adminModuleMutex(st, sbModule), nil)
 	fights := fightServiceOf(st)
 	with := func(s *gateway.Session, fn func(c *sbCtx) (bool, error)) error {
+		mu := adminModuleMutex(st, sbModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -429,6 +433,6 @@ func RegisterSandybeach(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: sbModule, Title: "沙滩Boss", Window: "25400–25405", Scope: "global", New: adminState[sbWorld]})
+	registerAdminModule(AdminModule{Key: sbModule, Title: "沙滩Boss", Window: "25400–25405", Scope: "global", View: adminGlobalView, Rank: globalRankFor(sbModule), New: adminState[sbWorld]})
 	registerAdminModule(AdminModule{Key: sbModule, Title: "沙滩Boss", Window: "25400–25405", Scope: "role", New: adminState[sbRole]})
 }

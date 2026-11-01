@@ -126,6 +126,7 @@ func petardClaimMsg(c petardClaim) proto.Message {
 // on the server; the heat gives awards. It runs while the operator has the activity with camp_id 93037 open in the
 // schedule. The red bag's diamonds, its shares and the heat that one item adds are ours; the table has none of them.
 func RegisterPetard(r *gateway.Router, st *store.Store, hub *gateway.Hub) {
+	bindAdminGlobal(st, petardModule, &petardMu, nil)
 	load := func(role *store.Role, now time.Time) (*petardRole, *petardWorld, int64, bool, error) {
 		start, end, open := ActivityOpen(st, role.SrvID, petardCamp, now)
 		d, w := &petardRole{}, &petardWorld{}
@@ -447,6 +448,6 @@ func rand63(n int64) int64 {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: petardModule, Title: "花火大会", Window: "27000–27008", Scope: "global", New: adminState[petardWorld]})
+	registerAdminModule(AdminModule{Key: petardModule, Title: "花火大会", Window: "27000–27008", Scope: "global", View: adminGlobalView, New: adminState[petardWorld]})
 	registerAdminModule(AdminModule{Key: petardModule, Title: "花火大会", Window: "27000–27008", Scope: "role", New: adminState[petardRole]})
 }

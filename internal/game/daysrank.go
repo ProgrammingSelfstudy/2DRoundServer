@@ -249,6 +249,7 @@ func daysQuestValue(st *store.Store, rid int64, label string, param []any, targe
 // places are frozen and get the rewards by mail, and the first place needs the value the table asks. Beside them the
 // quests of each ranking (22703, 22704). The cross-server list is empty. Titles are not given: there is no title system.
 func RegisterDaysRank(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, drModule, &drMu, nil)
 	type ctx struct {
 		role       *store.Role
 		w          *drWorld
@@ -447,6 +448,6 @@ func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "global", New: adminState[drWorld]})
+	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "global", View: adminGlobalView, Rank: globalRankFor(drModule), New: adminState[drWorld]})
 	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "role", New: adminState[drRole]})
 }

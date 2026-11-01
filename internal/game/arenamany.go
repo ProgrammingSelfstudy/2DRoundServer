@@ -139,6 +139,7 @@ type amSvc struct {
 // client does not say, not captured. hub may be nil (no pushes).
 func RegisterArenamany(r *gateway.Router, db *store.Store, hub *gateway.Hub) {
 	a := &amSvc{st: db, at: &atSvc{st: db, hub: hub}}
+	bindAdminGlobal(db, amModule, &a.mu, a)
 	fights := fightServiceOf(db)
 	a.rng = func() *rand.Rand {
 		if fights.Rand != nil {
@@ -1184,5 +1185,5 @@ func (a *amSvc) fight(s *gateway.Session, c *amCtx, req proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: amModule, Title: "多人竞技场", Window: "29000–29035", Scope: "global", New: adminState[amBoard]})
+	registerAdminModule(AdminModule{Key: amModule, Title: "多人竞技场", Window: "29000–29035", Scope: "global", View: adminGlobalView, Rank: globalRankFor(amModule), New: adminState[amBoard]})
 }

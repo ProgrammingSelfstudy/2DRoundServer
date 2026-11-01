@@ -29,6 +29,10 @@
 
 ## 最新进度与交接（2026-11-01）
 
+**阶段0–2已通过审核；阶段3正在执行，阶段4–6未开始。** 本轮基线 `c140a39`。阶段3a已实现网关所属服务锁内的30项全服状态读取、16项现有排名投影、赛季信息与区服概览，后台只转发，缺网关不回退读库。阶段3a验收已通过：`go vet ./...`、四包race（game166.470秒、admin35.597秒、store11.180秒）、前端类型检查、原28项测试和`make build`。30项逐项GET前后存档字节不变，真实服务锁阻塞、未知键/跨服拒绝和后台502无回退专项通过；UI快照与抓包无变化。阶段3a提交标题 `Add gateway-owned global read APIs and season views`，用 `git log -1 --format="%H %s" -- internal/game/adminops.go` 查询完整号。后续继续3b到期补结算和3c世界等级覆盖；本轮不push。
+
+以下为阶段2及之前的历史记录，旧状态不代表本轮任务授权。
+
 **阶段 0、阶段 1 已通过审核；阶段 2 已完成实现和验证，等待审阅；阶段 3–6 尚未开始。** 本轮仅本地提交，不推送，不自动进入阶段3。
 
 - 阶段2实现提交标题：`Add charge views and whitelisted reset workflows`。本段与实现一起提交；完整提交号用 `git log -1 --format='%H %s' -- internal/game/admincharge.go` 查询。拉取基线为 `e222311`，包含 `7e969b8` 的ReturnAction测试同步修复。
@@ -176,7 +180,7 @@ func AdminModules() []AdminModule
 - `GET /ops/season?srv=&key=`：当前赛季或届次、阶段、起止时间、是否已结算、发奖情况。
 - `POST /ops/season/settle?srv=&key=`：在服务锁下调用**已有**的 settle 函数，**必须幂等**：已结算的直接返回 `{"settled":false,"reason":"already"}`。
 
-  只给结算函数已有、规则已写好的模块：arenateam、elitematch、crossarena、arenamany、daysrank、guildwar、冠军赛（本届强制推进到发奖或取消）。其他模块 settle 返回 405，并在覆盖清单里写明原因。
+  只给结算函数已有、规则已写好的模块：arenateam、elitematch、crossarena、arenamany、daysrank、guildwar、冠军赛（只补自然到期且未结算的届次，进行中不可推进或取消）。其他模块 settle 返回 405，并在覆盖清单里写明原因。
 - `GET/PUT /ops/worldlev?srv=`：世界等级覆盖值，存在 global_state `"worldlev"`，格式 `{override, until}`。`store.WorldLevel` 优先用没过期的覆盖值；0 表示不覆盖。改完推一次 10905 给在线玩家。
 
 为此给各服务加一个统一接口，例如：

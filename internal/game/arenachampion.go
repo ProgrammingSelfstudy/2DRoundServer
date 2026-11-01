@@ -211,6 +211,7 @@ func RegisterArenaChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub)
 	c.module, c.days, c.startHour, c.startMin = champModule, []time.Weekday{time.Wednesday, time.Saturday}, champStartHour, champStartMin
 	c.awards = champCfg.Awards
 	c.entrants = db.ArenaTop
+	bindAdminGlobal(db, c.module, &c.mu, c)
 	c.register(r)
 	// the original sends the last match's best three with the city (20282); a server that has had no match has none
 	r.OnEnter(func(s *gateway.Session, _ proto.Message) error {
@@ -285,6 +286,7 @@ func RegisterCrossChampion(r *gateway.Router, db *store.Store, hub *gateway.Hub)
 		}
 		return rows, nil
 	}
+	bindAdminGlobal(db, c.module, &c.mu, c)
 	c.register(r)
 	return c
 }
@@ -973,8 +975,8 @@ func (c *champSvc) finish(srv string, stt *champState) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: champModule, Title: "本服冠军赛", Window: "20250–20282", Scope: "global", New: adminState[champState]})
-	registerAdminModule(AdminModule{Key: "crosschamp", Title: "跨服冠军赛", Window: "26200–26215", Scope: "global", New: adminState[champState]})
+	registerAdminModule(AdminModule{Key: champModule, Title: "本服冠军赛", Window: "20250–20282", Scope: "global", View: adminGlobalView, Rank: globalRankFor(champModule), New: adminState[champState]})
+	registerAdminModule(AdminModule{Key: "crosschamp", Title: "跨服冠军赛", Window: "26200–26215", Scope: "global", View: adminGlobalView, Rank: globalRankFor("crosschamp"), New: adminState[champState]})
 	registerAdminModule(AdminModule{Key: champModule, Title: "本服冠军赛", Window: "20250–20282", Scope: "role", New: adminState[champRole]})
 	registerAdminModule(AdminModule{Key: "crosschamp", Title: "跨服冠军赛", Window: "26200–26215", Scope: "role", New: adminState[champRole]})
 }

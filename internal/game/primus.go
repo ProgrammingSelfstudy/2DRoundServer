@@ -115,8 +115,12 @@ type primusSvc struct {
 // the role for 20 minutes. Our rules, not captured: how strong the boss is (the challenger's own team, a little weaker, the more
 // so the fewer evolutions), that a won fight adds the evolutions the challenger chose to the seat, and no titles (no honour system).
 func RegisterPrimus(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, primusModule, adminModuleMutex(st, primusModule), nil)
 	g := &primusSvc{st: st, fights: fightServiceOf(st)}
 	with := func(s *gateway.Session, fn func(role *store.Role, w *primusWorld, d *primusRole) (bool, error)) error {
+		mu := adminModuleMutex(st, primusModule)
+		mu.Lock()
+		defer mu.Unlock()
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -255,6 +259,9 @@ func RegisterPrimus(r *gateway.Router, st *store.Store) {
 }
 
 func (g *primusSvc) settle(s *gateway.Session, pos, evo int64, won bool, target string) error {
+	mu := adminModuleMutex(g.st, primusModule)
+	mu.Lock()
+	defer mu.Unlock()
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -311,6 +318,6 @@ func (g *primusSvc) pushSeats(s *gateway.Session, w *primusWorld, role *store.Ro
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: primusModule, Title: "霸气修炼", Window: "20700–20706", Scope: "global", New: adminState[primusWorld]})
+	registerAdminModule(AdminModule{Key: primusModule, Title: "霸气修炼", Window: "20700–20706", Scope: "global", View: adminGlobalView, New: adminState[primusWorld]})
 	registerAdminModule(AdminModule{Key: primusModule, Title: "霸气修炼", Window: "20700–20706", Scope: "role", New: adminState[primusRole]})
 }

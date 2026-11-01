@@ -134,6 +134,7 @@ type escSvc struct {
 // hours are doubled.
 func RegisterEscort(r *gateway.Router, st *store.Store) {
 	e := &escSvc{st: st, fights: fightServiceOf(st)}
+	bindAdminGlobal(st, escBoard, &e.mu, e)
 	r.Handle(24000, e.list)
 	r.Handle(24001, e.refresh)
 	r.Handle(24002, e.hire)
@@ -893,6 +894,6 @@ func (e *escSvc) askHelp(s *gateway.Session, req proto.Message) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: escBoard, Title: "护送共享记录/劫掠", Window: "24000–24020", Scope: "global", New: adminState[escGlobal]})
+	registerAdminModule(AdminModule{Key: escBoard, Title: "护送共享记录/劫掠", Window: "24000–24020", Scope: "global", View: adminGlobalView, New: adminState[escGlobal]})
 	registerAdminModule(AdminModule{Key: escModule, Title: "护送个人状态", Window: "24000–24020", Scope: "role", New: adminState[escState]})
 }

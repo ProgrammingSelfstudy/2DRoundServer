@@ -39,6 +39,7 @@ func AssetLabelNames() []string {
 //	GET  /online?rid=N     whether role N is online
 func (m *MailService) AdminHandler() http.Handler {
 	mux := http.NewServeMux()
+	m.registerAdminOps(mux)
 	mux.HandleFunc("POST /push/mail", func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 		if err != nil || id <= 0 {

@@ -142,7 +142,7 @@ first-charge/month-card activation and daily/cycle roll use existing game logic 
 never save, initialize rows, grant rewards or trigger new limited-gift offers.
 A registered but absent row returns `exists:false`, `data:null`; charge views can
 still show computed defaults. Unknown keys/suffixes are 404. Global metadata does
-not expose global data: server/global routes, rank and frontend remain later work.
+not expose global data: phase 3a now provides gateway-owned server/global reads and registered rankings; frontend remains later work.
 All `editable` flags stay false, and no PUT editor exists.
 
 `GET /api/roles/{id}/charge` returns `rid`, read-only `charge` totals, nine concrete
@@ -204,3 +204,26 @@ claimed verified. No reward amounts, limits or eligibility formulas were changed
   the same origin.
 - The gateway control endpoint (`gateway.admin_addr`) has no authentication and must
   stay on loopback; this API is the only thing that should call it.
+
+### Global reads (phase 3a)
+
+All routes below require `read`. Data is obtained only from the gateway control
+endpoint, under each registered live service's lock. GET never invokes a writable
+loader or timer: it does not initialize rows, roll seasons, grant rewards or mail.
+Unregistered service owners and unreachable/invalid upstream responses produce 502;
+there is no direct-database fallback. The gateway only serves its configured server.
+
+| Admin route | Gateway route | Result |
+| --- | --- | --- |
+| `GET /api/servers/{id}/modules` | `GET /ops/global?srv=` | registered fixed keys (including absent states) and saved, validated concrete guild keys |
+| `GET /api/servers/{id}/modules/{key}` | `GET /ops/global?srv=&key=` | key, exists, raw data, view.state and view.season |
+| `GET /api/servers/{id}/modules/{key}/rank?limit=` | `GET /ops/rank?srv=&key=&limit=` | registered existing rankings, default 50/max 200; unsupported modules 405 |
+| `GET /api/servers/{id}/modules/{key}/season` | `GET /ops/season?srv=&key=` | existing calendars and persisted settlement markers; unsupported season projections have supported=false |
+| `GET /api/servers/{id}/overview` | `GET /ops/overview?srv=` | world_lev, effective open_time/open_day and arena season/start/end |
+
+Raw data preserves unknown fields and integer precision. Guild prefixes accept only
+canonical positive GIDs; unknown global keys and foreign servers are 404. A list is
+a sequence of service snapshots, not a transaction across all services. Rankings
+reflect saved standings; no administrative GET advances a game clock/rollover.
+Sixteen registrations expose their existing score/tie ordering; the rest have no
+Rank callback. No global JSON editor or settlement write is enabled by 3a.

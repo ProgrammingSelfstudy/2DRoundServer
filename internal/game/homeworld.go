@@ -134,6 +134,7 @@ var homeLock sync.Mutex
 // visits and likes of other homes, the sets of furniture with their rewards and the weekly popularity rank. Our rules
 // where the client does not say, not captured. 10502 (the home bag) lists the furniture.
 func RegisterHomeworld(r *gateway.Router, db *store.Store) {
+	bindAdminGlobal(db, homeBoardModule, &homeLock, nil)
 	h := &homeSvc{st: db, mu: &homeLock}
 	r.Handle(26001, h.myHome)
 	r.Handle(26002, h.save)
@@ -870,18 +871,7 @@ func (h *homeSvc) rank(s *gateway.Session, _ proto.Message) error {
 	if err != nil {
 		return err
 	}
-	rids := make([]int64, 0, len(b.Weekly))
-	for rid := range b.Weekly {
-		if b.score(rid) > 0 {
-			rids = append(rids, rid)
-		}
-	}
-	sort.Slice(rids, func(i, j int) bool {
-		if a, c := b.score(rids[i]), b.score(rids[j]); a != c {
-			return a > c
-		}
-		return rids[i] < rids[j]
-	})
+	rids := b.ranked()
 	var mine int64
 	list := []proto.Message{}
 	for i, rid := range rids {
@@ -1099,6 +1089,22 @@ func sendHomeBag(s *gateway.Session, st *store.Store) error {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: homeBoardModule, Title: "家园共享人气榜", Window: "26020/26021", Scope: "global", New: adminState[homeBoard]})
+	registerAdminModule(AdminModule{Key: homeBoardModule, Title: "家园共享人气榜", Window: "26020/26021", Scope: "global", View: adminGlobalView, Rank: globalRankFor(homeBoardModule), New: adminState[homeBoard]})
 	registerAdminModule(AdminModule{Key: homeModule, Title: "家园个人状态", Window: "26001–26021", Scope: "role", New: adminState[homeState]})
+}
+
+func (b *homeBoard) ranked() []int64 {
+	rids := make([]int64, 0, len(b.Weekly))
+	for rid := range b.Weekly {
+		if b.score(rid) > 0 {
+			rids = append(rids, rid)
+		}
+	}
+	sort.Slice(rids, func(i, j int) bool {
+		if a, c := b.score(rids[i]), b.score(rids[j]); a != c {
+			return a > c
+		}
+		return rids[i] < rids[j]
+	})
+	return rids
 }

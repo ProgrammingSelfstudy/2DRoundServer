@@ -39,6 +39,9 @@ type passRecord struct {
 
 // dramaPassKeep adds a clear to the board of its dungeon on the role's server.
 func dramaPassKeep(st *store.Store, role *store.Role, dun int64, rec passRecord) error {
+	mu := adminModuleMutex(st, dramaPassModule)
+	mu.Lock()
+	defer mu.Unlock()
 	all := map[int64]passBoard{}
 	if _, err := st.LoadGlobal(role.SrvID, dramaPassModule, &all); err != nil {
 		return err
@@ -65,6 +68,7 @@ func dramaPassKeep(st *store.Store, role *store.Role, dun int64, rec passRecord)
 // RegisterDramaPass registers the campaign's pass videos (13015), the progress among all players (13020) and the
 // go-to-next-chapter button (13002).
 func RegisterDramaPass(r *gateway.Router, st *store.Store) {
+	bindAdminGlobal(st, dramaPassModule, adminModuleMutex(st, dramaPassModule), nil)
 	r.Handle(13015, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
 		if role == nil {
@@ -130,5 +134,5 @@ func RegisterDramaPass(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: dramaPassModule, Title: "推图通关录像/进度榜", Window: "13002、13015、13020", Scope: "global", New: adminState[map[int64]passBoard]})
+	registerAdminModule(AdminModule{Key: dramaPassModule, Title: "推图通关录像/进度榜", Window: "13002、13015、13020", Scope: "global", View: adminGlobalView, New: adminState[map[int64]passBoard]})
 }

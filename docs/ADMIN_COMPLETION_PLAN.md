@@ -1,28 +1,31 @@
 # 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
 
-## 当前任务：阶段 2（审核方已授权，2026-11-01）
+## 当前任务：阶段 3（审核方已授权，2026-11-01）
 
-**阶段 0、阶段 1 已通过审核。现在只做阶段 2（充值类专用视图和重置），做完单独 commit 并停下，不要继续阶段 3。** 先 `git pull`，基线包含审核方对间歇失败测试的修复 `7e969b8`（`TestReturnActionWhoComesBack`：27902 先回复后存档，测试重置被晚到的存档覆盖，现在先等一个不写库的 10905）。
+**阶段 0、1、2 已通过审核。现在只做阶段 3（全服数据、排名、赛季结算、世界等级，经网关），做完停下，不要继续阶段 4。** 先 `git pull`。
 
-阶段 1 审核结论：注册表 107 项齐全、门禁有效、GET 不写库、重置机制先查在线（在线 409，不可达/未知 502）、改库与审计同事务。阶段 2 在此机制上接具体模块，**不要改机制的顺序和语义**。
+阶段 2 审核结论与遗留决定：
+- 视图复用原有 `view()`/`roll()`，周礼包视图不写库，重置白名单均由配置表枚举，测试齐全，通过。
+- 审核方认可 Codex 在 `ConfirmChargeOrder` 加按角色锁并提前复核订单状态（防止重置后重放旧订单），不要回退。
+- **首充重置保留现有行为（删整行，下次打开窗口按已付总额重新激活，可再领一次）**，用户决定先不验证、不改；月卡仍是“重置后需再付一笔”。两者口径不同，这是已知的，请在 `docs/OPEN_QUESTIONS.md` 记一条“首充重置会按已付总额重新激活，月卡不会，未与原服核对”，不要在这一阶段改它。
 
-阶段 2 要求（细则见下面"阶段 2"一节，这里只列容易漏的）：
-1. 给这些模块注册 `View`，**复用**各自已有的 `view()` / `roll()`，不要另写规则：`firstcharge_*`（每个窗口）、`daycharge`、`monthcard`、`monthfund`、`limitgift`、`cyclegift`。View 必须**只读**：`cyclegift` 的 `roll(now)` 只在内存里滚动，不写回库；月卡 `view(i, rc, today)` 需要 `store.RoleCharge`，用只读查询取。
-2. 注册白名单 `Resets`（只给这些，别的模块一律不开）：
-   - `firstcharge_*`：`all`（删整行）
-   - `daycharge`：清当天
-   - `monthcard`：`0`、`1` 两张卡各一项；`Base` 设为当前已付金额，防止下次误判已激活。规则未确认，写代码注释，并在 `docs/OPEN_QUESTIONS.md` 加一条
-   - `monthfund`：`0`、`1`
-   - `limitgift`：按礼包 id 一项。id 是动态的，若现有 `Resets` 静态切片不够用，**只扩展机制以支持“由模块校验的动态 item”**，不得放宽成任意字符串；id 必须是配置表里存在的。`cyclegift` 同理，按 charge id
-3. 新增 `GET /api/roles/{id}/charge`（`levRead`）：汇总以上视图，再附该角色的充值订单（复用 pay 的 store 查询，只读）。
-4. 测试：
-   - 每个 View 的字段与游戏协议回包一致（对同一份状态，分别调用视图和游戏 handler 的 `view()` 结果比较）
-   - 每个 Reset：重置后再走一次游戏 handler，能重新达成或领取，且**不重复发奖**
-   - `cyclegift` 视图不写库（读前后 `module_state` 行不变）
-   - 动态 item 不在配置表里返回 422
-   - 在线 409、不可达 502 仍成立
-5. 约束不变：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，不 push。前端留到阶段 5。
-6. 验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build`。**如果出现与阶段 2 无关的失败，先在上一个提交上复现再报告，不要在进度段写“全部通过”。** 完成后在下面进度段更新阶段 2 的提交号和验证结果，如实写出没验证的部分。
+阶段 3 要求（细则见下面“阶段 3”一节）。建议分三个提交，**每个提交都要全绿**，全部做完再停：
+
+**3a 只读**：网关控制口 `GET /ops/global`、`GET /ops/rank`、`GET /ops/season`（读取一律在所属服务的锁下，不直接读库绕过服务）；后台转发 `GET /api/servers/{id}/modules`、`/modules/{key}`、`/rank`、`/season` 和 `GET /api/servers/{id}/overview`（世界等级、开服第 N 天、开服时间、竞技场本季起止）。全服模块注册 `View`/`Rank` 时同样复用原有逻辑。网关不可达一律 502，**不降级成直接读库**。
+
+**3b 结算**：`POST /ops/season/settle` 与后台 `POST /api/servers/{id}/seasons/{key}/settle`（`levManage`，原因必填 1–200 字，记审计）。
+- 只给已有 settle 函数且规则已写好的模块：`arenateam`（`atSvc.settleSeason`）、`elitematch`（`eliteSvc.settleSeasons/settleHalf`）、`crossarena`（`caSvc.settle`）、`arenamany`（`amSvc.settle`）、`daysrank`（`drWorld.settle`）、`guildwar`（`gwSvc.settleAll`）、冠军赛。其他模块返回 405，并在 `ADMIN_COVERAGE.md` 写明原因。**上一轮确认的 23 项活动/排行榜仍然只查看，不结算。**
+- **审核方对计划原文的收紧：结算只补做“按游戏自己的时钟已经到期、但还没结算”的赛季/届次，等价于立刻跑一次定时器本来要做的判断；不得强行提前结束进行中的赛季，也不得强行推进或取消进行中的冠军赛。** 进行中返回 `{"settled":false,"reason":"not_due"}`。
+- **必须幂等**：已结算返回 `{"settled":false,"reason":"already"}`，重复调用不重复发奖励、不重复发邮件。测试对每个模块调两次，断言奖励和邮件数量不变。
+- 结算必须在所属服务的锁下执行，并与该服务的定时器互斥（二者同时触发只结算一次）。
+
+**3c 世界等级**：`GET/PUT /ops/worldlev`（网关）与 `GET/PUT /api/servers/{id}/worldlev`（GET `levRead`，PUT `levManage`，原因必填，审计）。覆盖值存 global_state `"worldlev"`，格式 `{override, until}`，0 表示不覆盖，过期自动失效。`store.WorldLevel` 优先用没过期的覆盖值（`login.go:202`、`rolemisc.go:70` 两处调用都要生效）。改完向在线玩家推一次 10905。**新增的 `worldlev` 全服模块必须同时登记到 `ADMIN_COVERAGE.md` 和注册表，否则覆盖门禁会失败。**
+
+通用要求：
+- 后台进程**不得**直接写 `global_state`；所有写都经网关控制口，在服务锁内完成。网关控制口仍只绑 loopback。
+- 测试：三档权限、网关不可达 502 且库未变、结算幂等、结算与定时器互斥、进行中不结算、世界等级覆盖生效与过期、覆盖值对登录和 10905 都生效。
+- 约束不变：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，不 push；前端留到阶段 5。
+- 验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build`。出现与本阶段无关的失败，先在上一个提交复现再报告。完成后在下面进度段更新阶段 3 提交号和验证结果，如实写出没验证的部分。
 
 ## 最新进度与交接（2026-11-01）
 

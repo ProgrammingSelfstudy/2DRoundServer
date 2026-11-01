@@ -38,7 +38,7 @@
 
 ## 最新进度与交接（2026-11-01）
 
-**阶段3实现及验收已完成，仅本地提交，停在阶段3等待审阅；不push，不进入阶段4。**
+**阶段 0–3 已通过审核；阶段 4 已授权，进行中；阶段 5–6 尚未开始。** 下面是各阶段交付时的记录，其中“等待审阅”“不push”“不进入阶段N”之类措辞只对当时有效，已过期；以最上面“当前任务”为准。阶段 4 完成后停下，不要自动进入阶段 5。
 
 Phase 3 implementation and full validation passed. Baseline:
 `c140a39`. Stay on main, local commits only; no push or phase 4. Phase 0-2 have
@@ -114,7 +114,7 @@ commit scope have been checked; no unrelated working files are included.
 - 阶段0完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。阶段0当时未实现运行时注册表、模块API或写库入口；阶段1增量见上。
 - 阶段0已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
 - 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作：阶段2实现完成，等待审核；阶段3–6仍须逐阶段另行授权，不要自动继续，不推送。
+- 后续动作（已更新）：阶段 2、3 已通过审核，阶段 4 已授权；阶段 5–6 仍须审核方逐阶段另行授权，不要自动继续。
 
 拉取后可复核：
 

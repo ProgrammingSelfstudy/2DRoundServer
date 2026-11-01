@@ -1,0 +1,33 @@
+@use "@/styles/reset";
+@use "@/styles/common";
+@use "@/styles/element-dark";
+@use "@/styles/element";
+
+.page-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.page-toolbar h1 {
+  margin: 0;
+  font-size: 22px;
+}
+.hint {
+  color: var(--el-text-color-secondary);
+  line-height: 1.8;
+}
+.dashboard-page,
+.management-page {
+  padding: 20px;
+  background: var(--el-bg-color);
+  border-radius: 8px;
+}
+.management-page .el-pagination {
+  margin-top: 20px;
+}
+.management-page .el-alert {
+  margin-bottom: 16px;
+}

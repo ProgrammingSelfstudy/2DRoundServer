@@ -1,5 +1,7 @@
 # 2DRoundServer
 
+> 新版管理前端（Geeker-Admin）环境搭建、独立端口及隔离数据库启动说明：[`web/admin/README.md`](web/admin/README.md)。已接真实登录/权限，旧后台全部 16 个业务页已迁移，含账号、工单、兑换码、举报、公会、公告、审计、备份、管理员和本人改密；现由 Go 默认提供新版，旧源码仅留作参考。构建与真实网关联调见 [`docs/ADMIN_UI_INTEGRATION.md`](docs/ADMIN_UI_INTEGRATION.md)。
+
 Go backend for the restored 2DRound client (Cocos2d-x Lua, One Piece themed).
 It is an independent implementation: the wire protocol was **recovered from a
 decompiled client and checked on a real device**, not taken from the original
@@ -23,6 +25,7 @@ go test -race ./...
 node --test internal/admin/webtest/lib.test.mjs   # the web UI's pure logic
 go run ./cmd/loginhttp -config configs/dev.yaml   # :8081
 go run ./cmd/gateway   -config configs/dev.yaml   # :8800 (+ loopback control endpoint :8801)
+make admin-ui-embed    # regenerate the tracked UI after frontend edits (Node 22.22.2 / pnpm 10.11.0)
 go run ./cmd/admin     -config configs/dev.yaml   # :8080, prints the first admin password once
 ```
 `go run ./cmd/pcapdecode -in session.pcapng` reads a packet capture of the original game (pcap or pcapng, e.g. from the Android app PCAPdroid) and prints every game frame decoded with the server's field tables as JSON lines; it only reads the file (`docs/CAPTURE_GUIDE.md` says what to capture). A scripted client, `go run ./cmd/bot -user <name>` (against a running `loginhttp` and `gateway`), plays the main line over the real wire (login, create role, hero list, formation, three campaign fights, hook income, quests, achievements, summon state, ranking) and prints one line per step; it exits 1 when a step fails. It checks the real processes, configuration and database without a phone (it caught nothing yet, but the unit tests never start the binaries).

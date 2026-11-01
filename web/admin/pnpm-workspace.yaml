@@ -1,0 +1,13 @@
+packages:
+  - .
+# Only native/runtime setup for these dependencies may run during installation.
+# No upstream Husky/prepare script is retained in package.json.
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - vue-demi
+# Upstream svg plugin imports fast-glob without declaring it.
+packageExtensions:
+  'vite-plugin-svg-icons@2.0.1':
+    dependencies:
+      fast-glob: 3.3.3

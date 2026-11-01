@@ -11,3 +11,12 @@
 *.exe
 *.test
 .DS_Store
+
+# Vendored Geeker-Admin source assets (runtime screenshots above stay ignored)
+!/web/admin/src/assets/**/*.png
+!/web/admin/public/*.png
+
+# Generated production UI snapshot is tracked so a clean Go checkout builds.
+!/internal/admin/ui/assets/*.png
+/internal/admin/ui.staging/
+/bin/

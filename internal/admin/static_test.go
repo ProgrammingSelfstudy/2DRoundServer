@@ -2,7 +2,10 @@ package admin
 
 import (
 	"io"
+	"io/fs"
 	"net/http"
+	"path"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -25,7 +28,7 @@ func get(t *testing.T, e *env, path string, hdr ...string) (*http.Response, stri
 func TestWebUIIsServedWithStrictHeaders(t *testing.T) {
 	e := newEnv(t)
 	res, body := get(t, e, "/")
-	if res.StatusCode != 200 || !strings.HasPrefix(res.Header.Get("Content-Type"), "text/html") || !strings.Contains(body, `src="/app.js"`) {
+	if res.StatusCode != 200 || !strings.HasPrefix(res.Header.Get("Content-Type"), "text/html") || !strings.Contains(body, `type="module"`) {
 		t.Fatalf("index: %d %q", res.StatusCode, res.Header.Get("Content-Type"))
 	}
 	csp := res.Header.Get("Content-Security-Policy")
@@ -34,7 +37,7 @@ func TestWebUIIsServedWithStrictHeaders(t *testing.T) {
 			t.Errorf("CSP lacks %q: %s", must, csp)
 		}
 	}
-	for _, never := range []string{"unsafe-inline", "unsafe-eval", "*", "http:", "https:"} {
+	for _, never := range []string{"unsafe-eval", "*", "http:", "https:"} {
 		if strings.Contains(csp, never) {
 			t.Errorf("CSP must not contain %q: %s", never, csp)
 		}
@@ -45,7 +48,11 @@ func TestWebUIIsServedWithStrictHeaders(t *testing.T) {
 	if strings.Contains(strings.ToLower(body), "<script>") || strings.Contains(body, "onclick=") {
 		t.Error("index.html must not contain inline script")
 	}
-	for path, ct := range map[string]string{"/app.js": "text/javascript", "/style.css": "text/css"} {
+	if !strings.Contains(csp, "style-src 'self' 'unsafe-inline'") || !strings.Contains(csp, "script-src 'self';") || !strings.Contains(csp, "font-src 'self';") {
+		t.Fatalf("unexpected Vue CSP: %s", csp)
+	}
+	assets := productionAssets(t, body)
+	for path, ct := range assets {
 		r, _ := get(t, e, path)
 		if r.StatusCode != 200 || !strings.HasPrefix(r.Header.Get("Content-Type"), ct) {
 			t.Errorf("%s: %d %q", path, r.StatusCode, r.Header.Get("Content-Type"))
@@ -55,15 +62,21 @@ func TestWebUIIsServedWithStrictHeaders(t *testing.T) {
 
 func TestWebUIRevalidatesWithETag(t *testing.T) {
 	e := newEnv(t)
-	res, _ := get(t, e, "/app.js")
+	_, index := get(t, e, "/")
+	var asset string
+	for p := range productionAssets(t, index) {
+		asset = p
+		break
+	}
+	res, _ := get(t, e, asset)
 	etag := res.Header.Get("ETag")
 	if etag == "" || res.Header.Get("Cache-Control") != "no-cache" {
 		t.Fatalf("etag=%q cache=%q", etag, res.Header.Get("Cache-Control"))
 	}
-	if r, _ := get(t, e, "/app.js", "If-None-Match", etag); r.StatusCode != 304 {
+	if r, _ := get(t, e, asset, "If-None-Match", etag); r.StatusCode != 304 {
 		t.Fatalf("a matching ETag must give 304, got %d", r.StatusCode)
 	}
-	if r, _ := get(t, e, "/app.js", "If-None-Match", `"stale"`); r.StatusCode != 200 {
+	if r, _ := get(t, e, asset, "If-None-Match", `"stale"`); r.StatusCode != 200 {
 		t.Fatalf("a stale ETag must give the file: %d", r.StatusCode)
 	}
 }
@@ -92,5 +105,68 @@ func TestWebUIServesFilesOnly(t *testing.T) {
 	res.Body.Close()
 	if res.StatusCode != 405 {
 		t.Fatalf("POST /: %d", res.StatusCode)
+	}
+}
+
+// Check real generated files, not a hand-written HTML fixture or an old UI fallback.
+func productionAssets(t *testing.T, index string) map[string]string {
+	t.Helper()
+	out := map[string]string{}
+	for _, match := range regexp.MustCompile(`(?:src|href)="(/assets/[^" ]+)"`).FindAllStringSubmatch(index, -1) {
+		out[match[1]] = contentTypes[path.Ext(match[1])]
+	}
+	if len(out) < 2 {
+		t.Fatal("Vite production script/CSS missing; run make admin-ui-embed")
+	}
+	root, _ := fs.Sub(webFiles, "ui")
+	fs.WalkDir(root, "assets", func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		ext := path.Ext(p)
+		if !d.IsDir() && (ext == ".ttf" || ext == ".otf" || ext == ".png" || ext == ".svg") {
+			out["/"+p] = contentTypes[ext]
+		}
+		return nil
+	})
+	return out
+}
+
+// Vite emits an underscore-prefixed helper: plain recursive go:embed excludes it.
+// Verify every JS dependency of every generated chunk, including lazy page chunks.
+func TestProductionChunkDependenciesAreEmbedded(t *testing.T) {
+	e := newEnv(t)
+	root, _ := fs.Sub(webFiles, "ui")
+	refs := regexp.MustCompile(`["'](?:\./|/assets/)([^"' /]+\.(?:js|css))["']`)
+	count := 0
+	err := fs.WalkDir(root, "assets", func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || path.Ext(p) != ".js" {
+			return nil
+		}
+		b, err := fs.ReadFile(root, p)
+		if err != nil {
+			return err
+		}
+		for _, m := range refs.FindAllStringSubmatch(string(b), -1) {
+			dep := "assets/" + m[1]
+			if _, err := fs.Stat(root, dep); err != nil {
+				t.Errorf("%s requires missing embedded %s: %v", p, dep, err)
+			}
+			res, _ := get(t, e, "/"+dep)
+			if res.StatusCode != 200 {
+				t.Errorf("dependency %s HTTP %d", dep, res.StatusCode)
+			}
+			count++
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count == 0 {
+		t.Fatal("no generated chunk dependencies checked")
 	}
 }

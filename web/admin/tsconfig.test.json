@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "lib": ["ES2022", "DOM"],
+    "outDir": ".test-dist",
+    "rootDir": "."
+  },
+  "include": ["tests/**/*.ts", "src/auth/session.ts", "src/auth/permissions.ts", "src/api/client.ts"]
+}

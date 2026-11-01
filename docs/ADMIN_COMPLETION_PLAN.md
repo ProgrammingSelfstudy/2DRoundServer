@@ -23,9 +23,9 @@
 
 ## 最新进度与交接（2026-11-01）
 
-**阶段 0 已通过审核；阶段 1 已完成实现和验证，等待审阅；阶段 2–6 尚未开始。** 本轮仅本地提交，不推送。本段不是阶段 2 的开工授权。
+**阶段 0 已通过审核；阶段 1 已完成实现和验证，等待审阅；阶段 2–6 尚未开始。** 用户后续明确授权：将阶段1实现及本次交接备注推送到现有 `main`，不新建分支。此次推送仅同步审阅材料，不代表阶段1已经审核通过，也不是阶段2的开工授权；其他阶段默认不推送的约束继续有效。
 
-- 阶段1实现提交标题：`Register admin modules and add read-only role state APIs`。本段与实现同一次提交；提交号通过 `git log -1 --format='%H %s' -- internal/game/adminreg.go` 读取，避免在提交内部填写依赖自身内容的哈希。阶段1拉取基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。
+- 阶段1实现提交：`98965e830663083448fdf55cdbc3a44bcd772055`（`Register admin modules and add read-only role state APIs`）。该提交包含90个文件，其中79个模块文件追加注册声明；阶段1拉取基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。
 - 已完成107项运行时注册（77个玩家模块项、30个全服模块项），各模块文件init注册真实state构造器，三个前缀族验证真实窗口key/正数公会GID。覆盖门禁现在同时比对源码、`ADMIN_COVERAGE.md` 与 `AdminModules()`。
 - 新增玩家侧4个API：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`。GET不写库；未注册key为404；已注册但未保存的状态不创建默认行。
 - 所有 `Editable=false`、`Resets=[]`，没有PUT编辑。重置机制先核对网关离线状态（在线409、不可达/状态未知502），再验证显式item白名单；`all`不例外。当前离线请求因无生产白名单返回422，没有启用任何具体充值重置。
@@ -39,13 +39,13 @@
 - 阶段0完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。阶段0当时未实现运行时注册表、模块API或写库入口；阶段1增量见上。
 - 阶段0已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
 - 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作：停在阶段1等待审核；阶段2–6仍须审核方逐阶段另行授权，不要自动继续，不推送。
+- 后续动作：仅按本次授权同步阶段1及备注到 `main`，随后停在阶段1等待审核；阶段2–6仍须审核方逐阶段另行授权，不要自动继续。
 
 拉取后可复核：
 
 ```sh
 git show --stat b1f0dc3d11e15bebecd7d9a6f4a859f588980b48
-git log -1 --format='%H %s' -- internal/game/adminreg.go
+git show --stat 98965e830663083448fdf55cdbc3a44bcd772055
 go run ./tools/admincoverage
 go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|Registry)' -v
 ```

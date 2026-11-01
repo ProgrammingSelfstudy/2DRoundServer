@@ -1,29 +1,32 @@
 # 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
 
-## 当前任务：阶段 1（审核方已授权，2026-11-01）
+## 当前任务：阶段 2（审核方已授权，2026-11-01）
 
-**阶段 0 已通过审核。现在只做阶段 1，做完单独 commit 并停下，不要继续阶段 2。** 拉到本段说明后直接按下面执行。
+**阶段 0、阶段 1 已通过审核。现在只做阶段 2（充值类专用视图和重置），做完单独 commit 并停下，不要继续阶段 3。** 先 `git pull`，基线包含审核方对间歇失败测试的修复 `7e969b8`（`TestReturnActionWhoComesBack`：27902 先回复后存档，测试重置被晚到的存档覆盖，现在先等一个不写库的 10905）。
 
-审核方的决定：
-- `ADMIN_COVERAGE.md` 里标了"不提供自由编辑/强制结算"的 **23 项**（`sweet`、`termbegins`、`sandybeach`、`petard`、`snatch`、`treasure`、`yearmonster` 等活动和排行榜），这一轮**只做查看**，不做结算和编辑。原因：它们的结算规则大多没抓包确认，强行结算可能发错奖。
-- 阶段 1 里 `Editable` 全部为 `false`，**不开放整份 JSON 编辑**，`PUT /api/roles/{id}/modules/{key}` 不做。
-- `Resets` 只给阶段 2 点名的充值类模块。阶段 1 只把重置的机制和白名单校验做好，先不接具体模块。
+阶段 1 审核结论：注册表 107 项齐全、门禁有效、GET 不写库、重置机制先查在线（在线 409，不可达/未知 502）、改库与审计同事务。阶段 2 在此机制上接具体模块，**不要改机制的顺序和语义**。
 
-阶段 1 要求：
-1. 新增 `internal/game/adminreg.go`，定义 `AdminModule` 和 `AdminModules()`，每个模块文件在 `init()` 里注册。覆盖 `ADMIN_COVERAGE.md` 的全部 107 项，包括三个前缀族 `firstcharge_*`、`guildmarket:*`、`monopoly_g*`。
-2. 把阶段 0 的完整性门禁升级为：`ADMIN_COVERAGE.md` 的每一项都必须在 `AdminModules()` 里有注册，反之亦然，不一致就让测试失败。
-3. 新增 `internal/admin/modules.go`，只做玩家侧接口：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`。
-   - reset 的顺序固定：先查网关在线（在线 409，网关不可达 502，两种情况都不写库）→ 读 before → 写入 → 带原因写审计。原因必填，1–200 字。
-   - 全服侧 `/api/servers/...` 留给阶段 3，前端留给阶段 5。
-4. 所有 GET 不得写库。视图必须复用模块已有的 `view()`/`roll()`，不要另写规则。
-5. 测试：三档权限、在线 409、网关不可达 502 且库未变、读接口不写库、未知 key 返回 404、reset 的 item 不在白名单返回 422。
-6. 约束：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，**不 push**。
-
-验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build` 全部通过。完成后在下面的进度段更新阶段 1 的提交号和验证结果，并如实写出没验证的部分。
+阶段 2 要求（细则见下面"阶段 2"一节，这里只列容易漏的）：
+1. 给这些模块注册 `View`，**复用**各自已有的 `view()` / `roll()`，不要另写规则：`firstcharge_*`（每个窗口）、`daycharge`、`monthcard`、`monthfund`、`limitgift`、`cyclegift`。View 必须**只读**：`cyclegift` 的 `roll(now)` 只在内存里滚动，不写回库；月卡 `view(i, rc, today)` 需要 `store.RoleCharge`，用只读查询取。
+2. 注册白名单 `Resets`（只给这些，别的模块一律不开）：
+   - `firstcharge_*`：`all`（删整行）
+   - `daycharge`：清当天
+   - `monthcard`：`0`、`1` 两张卡各一项；`Base` 设为当前已付金额，防止下次误判已激活。规则未确认，写代码注释，并在 `docs/OPEN_QUESTIONS.md` 加一条
+   - `monthfund`：`0`、`1`
+   - `limitgift`：按礼包 id 一项。id 是动态的，若现有 `Resets` 静态切片不够用，**只扩展机制以支持“由模块校验的动态 item”**，不得放宽成任意字符串；id 必须是配置表里存在的。`cyclegift` 同理，按 charge id
+3. 新增 `GET /api/roles/{id}/charge`（`levRead`）：汇总以上视图，再附该角色的充值订单（复用 pay 的 store 查询，只读）。
+4. 测试：
+   - 每个 View 的字段与游戏协议回包一致（对同一份状态，分别调用视图和游戏 handler 的 `view()` 结果比较）
+   - 每个 Reset：重置后再走一次游戏 handler，能重新达成或领取，且**不重复发奖**
+   - `cyclegift` 视图不写库（读前后 `module_state` 行不变）
+   - 动态 item 不在配置表里返回 422
+   - 在线 409、不可达 502 仍成立
+5. 约束不变：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，不 push。前端留到阶段 5。
+6. 验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build`。**如果出现与阶段 2 无关的失败，先在上一个提交上复现再报告，不要在进度段写“全部通过”。** 完成后在下面进度段更新阶段 2 的提交号和验证结果，如实写出没验证的部分。
 
 ## 最新进度与交接（2026-11-01）
 
-**阶段 0 已通过审核；阶段 1 已完成实现和验证，等待审阅；阶段 2–6 尚未开始。** 用户后续明确授权：将阶段1实现及本次交接备注推送到现有 `main`，不新建分支。此次推送仅同步审阅材料，不代表阶段1已经审核通过，也不是阶段2的开工授权；其他阶段默认不推送的约束继续有效。
+**阶段 0、阶段 1 已通过审核；阶段 2 已授权，进行中；阶段 3–6 尚未开始。** 下面是阶段 0、1 交付时的记录，其中“等待审阅”类措辞已过期，以本段和“当前任务”为准。
 
 - 阶段1实现提交：`98965e830663083448fdf55cdbc3a44bcd772055`（`Register admin modules and add read-only role state APIs`）。该提交包含90个文件，其中79个模块文件追加注册声明；阶段1拉取基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。
 - 已完成107项运行时注册（77个玩家模块项、30个全服模块项），各模块文件init注册真实state构造器，三个前缀族验证真实窗口key/正数公会GID。覆盖门禁现在同时比对源码、`ADMIN_COVERAGE.md` 与 `AdminModules()`。
@@ -39,7 +42,7 @@
 - 阶段0完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。阶段0当时未实现运行时注册表、模块API或写库入口；阶段1增量见上。
 - 阶段0已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
 - 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作：仅按本次授权同步阶段1及备注到 `main`，随后停在阶段1等待审核；阶段2–6仍须审核方逐阶段另行授权，不要自动继续。
+- 后续动作：阶段 1 已通过审核，阶段 2 已授权（见上面"当前任务"）。阶段 3–6 仍须审核方逐阶段另行授权，不要自动继续。
 
 拉取后可复核：
 

@@ -358,3 +358,9 @@ func RegisterDial(r *gateway.Router, st *store.Store) {
 		return s.Send(16674, proto.Message{"type": req.Int("type"), "log_list": list})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: dialModule, Title: "转盘抽奖/记录", Window: "16670–16676", Scope: "global", New: adminState[dialWorld]})
+	registerAdminModule(AdminModule{Key: dialModule, Title: "转盘抽奖/记录", Window: "16670–16676", Scope: "role", New: adminState[dialRole]})
+}

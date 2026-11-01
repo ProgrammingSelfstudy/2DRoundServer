@@ -414,3 +414,8 @@ func sevenGoalEvent(s *gateway.Session, st *store.Store, role *store.Role, label
 	}
 	return nil
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: sevenGoalModule, Title: "七日目标", Window: "13604–13609", Scope: "role", New: adminState[sevenState]})
+}

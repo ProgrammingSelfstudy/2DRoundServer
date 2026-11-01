@@ -390,3 +390,8 @@ func RegisterFortuneBag(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: fbModule, Title: "福袋翻牌", Window: "28300–28308", Scope: "role", New: adminState[fbRole]})
+}

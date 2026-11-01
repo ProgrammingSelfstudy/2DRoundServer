@@ -350,3 +350,8 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 		return s.Send(23219, proto.Message{"flag": 0, "msg": "暂未开放"})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: timeSummonModule, Title: "限定召唤", Window: "23216–23219", Scope: "role", New: adminState[timeSummonRole]})
+}

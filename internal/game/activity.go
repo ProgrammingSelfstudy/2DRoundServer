@@ -529,3 +529,8 @@ func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now
 		}
 	}
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: actModule, Title: "活动个人目标/领取", Window: "16601–16620、16687", Scope: "role", New: adminState[actState]})
+}

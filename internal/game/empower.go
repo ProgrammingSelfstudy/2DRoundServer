@@ -332,3 +332,8 @@ func RegisterEmpower(r *gateway.Router, st *store.Store) {
 		return s.Send(26423, proto.Message{"partner_id": req.Int("partner_id"), "power": power})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "empower", Title: "共鸣赋能", Window: "26420–26424", Scope: "role", New: adminState[store.EmpowerDoc]})
+}

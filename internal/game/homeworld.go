@@ -1096,3 +1096,9 @@ func sendHomeBag(s *gateway.Session, st *store.Store) error {
 	}
 	return s.Send(10502, bagReply(s, homeBag(ledger)))
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: homeBoardModule, Title: "家园共享人气榜", Window: "26020/26021", Scope: "global", New: adminState[homeBoard]})
+	registerAdminModule(AdminModule{Key: homeModule, Title: "家园个人状态", Window: "26001–26021", Scope: "role", New: adminState[homeState]})
+}

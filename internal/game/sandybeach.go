@@ -426,3 +426,9 @@ func RegisterSandybeach(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: sbModule, Title: "沙滩Boss", Window: "25400–25405", Scope: "global", New: adminState[sbWorld]})
+	registerAdminModule(AdminModule{Key: sbModule, Title: "沙滩Boss", Window: "25400–25405", Scope: "role", New: adminState[sbRole]})
+}

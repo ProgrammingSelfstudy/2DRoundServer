@@ -489,3 +489,8 @@ func (h *heavenSvc) saveForms(s *gateway.Session, req proto.Message) error {
 		return s.Send(25211, proto.Message{"code": 1, "msg": "保存成功"})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: heavenModule, Title: "天界", Window: "25200–25232", Scope: "role", New: adminState[heavenState]})
+}

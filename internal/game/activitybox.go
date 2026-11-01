@@ -124,3 +124,8 @@ func RegisterActivityBox(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: activityBoxModule, Title: "日常活跃宝箱", Window: "20300/20301", Scope: "role", New: adminState[activityBoxState]})
+}

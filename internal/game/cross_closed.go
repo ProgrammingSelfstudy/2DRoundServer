@@ -129,3 +129,8 @@ func RegisterCrossClosed(r *gateway.Router, st *store.Store) {
 		return s.Send(27726, proto.Message{"formations": list})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "peakformations", Title: "巅峰冠军赛三队阵容", Window: "27725/27726", Scope: "role", New: adminState[peakFormations]})
+}

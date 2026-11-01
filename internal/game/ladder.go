@@ -893,3 +893,9 @@ func (l *ladderSvc) heroCard(s *gateway.Session, _ proto.Message) error {
 func (l *ladderSvc) share(s *gateway.Session, _ proto.Message) error {
 	return s.Send(24318, proto.Message{"result": 0, "msg": "请在录像界面分享"})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: ladderModule, Title: "天梯", Window: "24300–24318", Scope: "global", New: adminState[ladderBoard]})
+	registerAdminModule(AdminModule{Key: ladderModule, Title: "天梯", Window: "24300–24318", Scope: "role", New: adminState[ladderRole]})
+}

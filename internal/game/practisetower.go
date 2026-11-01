@@ -462,3 +462,9 @@ func (p *ptSvc) myRank(s *gateway.Session, _ proto.Message) error {
 	}
 	return s.Send(29106, proto.Message{"role_rank": rank})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: ptRankModule, Title: "兔丼监狱共享记录/排行", Window: "29100–29107", Scope: "global", New: adminState[ptRanks]})
+	registerAdminModule(AdminModule{Key: ptModule, Title: "兔丼监狱个人进度", Window: "29100–29107", Scope: "role", New: adminState[ptState]})
+}

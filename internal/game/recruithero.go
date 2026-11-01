@@ -167,3 +167,8 @@ func RegisterRecruitHero(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: recruitModule, Title: "新人招募", Window: "25100/25101", Scope: "role", New: adminState[recruitState]})
+}

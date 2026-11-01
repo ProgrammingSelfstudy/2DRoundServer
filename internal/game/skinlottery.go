@@ -184,3 +184,8 @@ func RegisterSkinLottery(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: slModule, Title: "世界征兵", Window: "26600–26602", Scope: "role", New: adminState[slRole]})
+}

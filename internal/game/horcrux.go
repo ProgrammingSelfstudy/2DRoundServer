@@ -259,3 +259,8 @@ func RegisterHorcrux(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "horcrux", Title: "魂器觉醒/强化", Window: "11402–11405", Scope: "role", New: adminState[store.HorcruxDoc]})
+}

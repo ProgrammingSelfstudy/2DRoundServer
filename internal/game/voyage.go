@@ -438,3 +438,8 @@ func (v *voyageSvc) refresh(s *gateway.Session, _ proto.Message) error {
 		return v.sendInfo(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: voyageModule, Title: "远航订单", Window: "23800–23806", Scope: "role", New: adminState[voyageState]})
+}

@@ -409,3 +409,9 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 		return sendAssets(s, st, c.role.RID)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: trModule, Title: "幸运/高级探宝", Window: "16637–16643", Scope: "global", New: adminState[trWorld]})
+	registerAdminModule(AdminModule{Key: trModule, Title: "幸运/高级探宝", Window: "16637–16643", Scope: "role", New: adminState[trRole]})
+}

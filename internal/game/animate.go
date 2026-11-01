@@ -511,3 +511,8 @@ func RegisterAnimate(r *gateway.Router, st *store.Store) {
 		return "", nil
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: animateModule, Title: "元宵花灯/厨房", Window: "24801–24809", Scope: "role", New: adminState[animateRole]})
+}

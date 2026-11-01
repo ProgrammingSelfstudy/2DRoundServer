@@ -23,20 +23,29 @@
 
 ## 最新进度与交接（2026-11-01）
 
-**阶段 0 已完成并通过审核；阶段 1 进行中，阶段 2–6 尚未开始。** 本段是进度备注，不代表后续业务功能已经接通。
+**阶段 0 已通过审核；阶段 1 已完成实现和验证，等待审阅；阶段 2–6 尚未开始。** 本轮仅本地提交，不推送。本段不是阶段 2 的开工授权。
 
-- 实现提交：`b1f0dc3d11e15bebecd7d9a6f4a859f588980b48`（`Inventory admin data coverage and enforce registry completeness`），基线为计划提交 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。
+- 阶段1实现提交标题：`Register admin modules and add read-only role state APIs`。本段与实现同一次提交；提交号通过 `git log -1 --format='%H %s' -- internal/game/adminreg.go` 读取，避免在提交内部填写依赖自身内容的哈希。阶段1拉取基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。
+- 已完成107项运行时注册（77个玩家模块项、30个全服模块项），各模块文件init注册真实state构造器，三个前缀族验证真实窗口key/正数公会GID。覆盖门禁现在同时比对源码、`ADMIN_COVERAGE.md` 与 `AdminModules()`。
+- 新增玩家侧4个API：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`。GET不写库；未注册key为404；已注册但未保存的状态不创建默认行。
+- 所有 `Editable=false`、`Resets=[]`，没有PUT编辑。重置机制先核对网关离线状态（在线409、不可达/状态未知502），再验证显式item白名单；`all`不例外。当前离线请求因无生产白名单返回422，没有启用任何具体充值重置。
+- 已验证隔离测试描述符的重置成功路径：先读before、在内存应用白名单操作、比较before后写入；数据与带key/item/reason及before/after摘要的审计在同一事务提交。并发变化返回409，审计失败回滚数据。测试描述符不进入生产注册表。
+- 阶段1已通过：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`（game约161秒）；注册表/构造器/前缀及API专项测试；`make admin-ui-check`、原28项前端测试、`make build`。继续使用指定Node 22.23.4和Corepack pnpm 10.11.0；UI快照及锁文件没有变化。
+- 验证边界：HTTP测试使用临时SQLite与httptest网关，事务失败用隔离数据库触发器注入。没有对真实玩家启用重置，也未做实际在线玩家的阶段2充值重置联动；专用View/Rank、全服ops、PUT编辑和前端均未实现。玩法语句和抓包未改；`tcRole`仅从函数局部移到包作用域供注册使用。
+
+- 阶段0实现提交：`b1f0dc3d11e15bebecd7d9a6f4a859f588980b48`（`Inventory admin data coverage and enforce registry completeness`），基线为计划提交 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。
 - 审阅入口：[ADMIN_COVERAGE.md](ADMIN_COVERAGE.md)。按源码登记 **77 个玩家模块项、30 个全服模块项、92 张表**，覆盖 **343 处持久化调用及 85 个模块常量**。数量含动态前缀族，不是后台功能完成率。
 - 扫描范围包括 `internal/game` 及 `internal/store` 的持久化封装，避免漏掉战技、神装、魂器、赋能；清单分别记录当前能力、后续拟提供能力及限制原因。
-- 完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。未提前实现阶段 1 的运行时注册表、模块 API 或写库入口。
-- 已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
+- 阶段0完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。阶段0当时未实现运行时注册表、模块API或写库入口；阶段1增量见上。
+- 阶段0已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
 - 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作：阶段 0 已通过审核，阶段 1 已授权（见上面"当前任务"）。阶段 2–6 仍须审核方逐阶段另行授权，不要自动继续。
+- 后续动作：停在阶段1等待审核；阶段2–6仍须审核方逐阶段另行授权，不要自动继续，不推送。
 
 拉取后可复核：
 
 ```sh
 git show --stat b1f0dc3d11e15bebecd7d9a6f4a859f588980b48
+git log -1 --format='%H %s' -- internal/game/adminreg.go
 go run ./tools/admincoverage
 go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|Registry)' -v
 ```

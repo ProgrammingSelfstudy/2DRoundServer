@@ -1174,3 +1174,8 @@ func (c *caSvc) addLog(cx *caCtx, r *caRole, typ, ret int64, plan *caDuels, foe 
 	r.Logs = append([]caLog{l}, r.Logs...)
 	r.Logs = r.Logs[:min(len(r.Logs), caLogKeep)]
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: caModule, Title: "跨服竞技场", Window: "25600–25618", Scope: "global", New: adminState[caBoard]})
+}

@@ -35,6 +35,10 @@ demoting or disabling an admin, or changing their password, takes effect at once
 | `POST /api/accounts/{id}/ban` `{reason}`, `.../unban` | write | ban also revokes game tokens and kicks the account's online roles |
 | `GET /api/roles?q=&srv_id=` | read | search by role name, account or id |
 | `GET /api/roles/{id}` | read | one role with its owner `account`, `online` (`null` + `online_error` when the gateway is down), `banned`, `assets` (`label`, `name`, `val`) and `items` (`base_id`, `name`, `num`, `listed`: whether the game's backpack shows it; equipment is in the ledger but not listed) |
+| `GET /api/modules` | read | all 107 runtime registrations (role/global): key, title, window, scope, has_view, has_rank, editable, resets |
+| `GET /api/roles/{id}/modules` | read | existing saved module rows only: concrete key, registered flag, stored byte count and registry metadata; unknown legacy keys are marked, not silently dropped |
+| `GET /api/roles/{id}/modules/{key}` | read | concrete registered role key, exact raw JSON, exists and registry metadata; an absent saved row returns exists=false/data=null without initialization |
+| `POST /api/roles/{id}/modules/{key}/reset` | manage | `{item,reason}`; gateway offline check, explicit whitelist, compare-before write and transactional audit; phase 1 has no enabled reset items |
 | `POST /api/roles/{id}/level` `{lev, kick?}` | write | sets the level (1 to 200); the client reads it at login, so an online role sees it after reconnecting, and `kick: true` disconnects it for that; `{ok, lev, was}`; 422 for a level out of range; audited as `role.level` with the old and new level |
 | `POST /api/roles/{id}/vip` `{vip_lev, kick?}` | write | sets the VIP level (0 to 30; 0 is none); the client reads it at login, so an online role sees it after reconnecting, and `kick: true` disconnects it for that; `{ok, vip_lev, was}`; 422 for a level out of range; audited as `role.vip` with the old and new level. The role detail (`GET /api/roles/{id}`) carries `role.vip_lev` |
 | `POST /api/roles/{id}/grant` `{grants: [{kind, asset?, item_id?, num}]}` | write | puts currencies (`kind: asset`, by `asset` name from `/api/meta`) and items (`kind: item`, by `item_id`) straight into the role's ledgers, the same ones a claimed mail fills, without a mail; the same validation as mail attachments (1 to 1,000,000,000 each, known currency or item, no currency as an item), 1 to 20 entries, the same entry twice adds up; an online role is sent its currencies (10302) and backpack (10500) at once through the gateway's `POST /push/refresh?rid=`; `{ok, granted, refreshed}`, `refreshed` is `null` and `push_error` set when the gateway cannot be reached (the grant stands); 422 for a bad entry, 404 for an unknown role; audited as `role.grant` with the entries. Granting experience (`exp`) levels the role up |
@@ -128,6 +132,32 @@ role if it is online. Everything that moves money needs the `manage` role.
 login · 403 role too low, wrong current password · 404 not found · 409 conflict
 (duplicate, self-lockout, server has roles) · 413 body over 1 MB · 422 validation ·
 429 login locked.
+
+### Module API boundaries (phase 1)
+
+All module GETs are read-only. They do not call gameplay loaders, roll state or
+create defaults. Raw JSON preserves unknown fields and large integer values.
+Unknown keys (including unknown first-charge suffixes) are 404; first-charge
+families accept only the four configured windows. Guild-ID prefixes belong to
+global modules and are not exposed through role routes.
+
+Every module currently has `editable:false`, `resets:[]`, `has_view:false` and
+`has_rank:false`. No PUT editor or server/global-state data route was added.
+Global metadata in `/api/modules` does not imply a global data API is available.
+Specialized views, ranks, concrete charge resets and the frontend remain later work.
+
+Reset is superadmin-only. A reason must contain 1–200 Unicode characters, with no
+control characters or whitespace-only content. A known-online role returns 409;
+gateway errors, missing/null/non-boolean online status return 502 without writing.
+Only an explicit item whitelist can allow a reset: `all` is not an implicit bypass.
+With the phase-1 empty whitelist, a valid offline request returns 422.
+
+The mechanism decodes a fresh real state type, rejecting unknown fields before a
+typed reset can discard them. Data and `role.module.reset` audit are committed in
+one transaction; the audit records key, item, reason, before/after SHA-256 and byte
+counts plus changed top-level field names. Audit failures roll back data, and an
+intervening state change returns 409 instead of overwriting it. The success path
+is tested with isolated test descriptors; no production reset is enabled.
 
 ## Security notes
 

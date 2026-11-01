@@ -466,3 +466,9 @@ func awardMsgs(l [][2]int64) []proto.Message {
 func openOrNot(st *store.Store, role *store.Role, now time.Time) (start, end int64, open bool) {
 	return ActivityOpen(st, role.SrvID, snatchCamp, now)
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: snatchModule, Title: "节日夺宝", Window: "25700–25704、26300/26301", Scope: "global", New: adminState[snatchWorld]})
+	registerAdminModule(AdminModule{Key: snatchModule, Title: "节日夺宝", Window: "25700–25704、26300/26301", Scope: "role", New: adminState[snatchRole]})
+}

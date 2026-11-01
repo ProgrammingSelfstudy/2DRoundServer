@@ -103,3 +103,8 @@ func registerGrowWay(r *gateway.Router, st *store.Store) {
 			"max_num": d.Count, "room_grow_info": growPage(d, req.Int("start"), req.Int("num"))})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: growModule, Title: "成长之路", Window: "25830/25832", Scope: "role", New: adminState[growDoc]})
+}

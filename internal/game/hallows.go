@@ -886,3 +886,8 @@ func (h *hwSvc) wear(s *gateway.Session, req proto.Message) error {
 		return nil
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: hallowsModule, Title: "神技", Window: "24100–24135", Scope: "role", New: adminState[hwState]})
+}

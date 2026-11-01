@@ -141,3 +141,8 @@ func RegisterDayCharge(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: dayChargeModule, Title: "每日首充", Window: "21010/21011", Scope: "role", New: adminState[dayChargeState]})
+}

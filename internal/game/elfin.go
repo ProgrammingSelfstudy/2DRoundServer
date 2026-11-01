@@ -822,3 +822,8 @@ func (e *elfinSvc) setSlots(s *gateway.Session, req proto.Message) error {
 		return e.pushTree(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: elfinModule, Title: "精灵/古树/队伍", Window: "26500–26564", Scope: "role", New: adminState[elfinState]})
+}

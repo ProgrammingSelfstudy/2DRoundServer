@@ -370,3 +370,8 @@ func (p *presageSvc) buyCoin(s *gateway.Session, req proto.Message) error {
 	}
 	return presageReply(s, 16692, true, "购买成功", nil)
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: presageModule, Title: "预知召唤/松果宝藏", Window: "16690–16694", Scope: "role", New: adminState[presageState]})
+}

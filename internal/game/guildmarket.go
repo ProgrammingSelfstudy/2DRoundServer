@@ -396,3 +396,9 @@ func notifyChange(hub *gateway.Hub, db *store.Store, gid int64, g *gmGuild, base
 	}
 	return except.Send(26904, proto.Message{"item_list": list})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "guildmarket:*", Title: "公会宝库共享库存", Window: "26900–26903", Scope: "global", New: adminState[gmGuild], Match: adminPositiveSuffix("guildmarket:")})
+	registerAdminModule(AdminModule{Key: gmRoleModule, Title: "公会宝库个人凭证", Window: "26900–26903", Scope: "role", New: adminState[gmRole]})
+}

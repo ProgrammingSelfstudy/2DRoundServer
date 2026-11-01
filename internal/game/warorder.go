@@ -551,3 +551,8 @@ func warAdvanceGrantAt(st *store.Store, role *store.Role, now time.Time) error {
 	state.Premium = true
 	return st.SaveState(role.RID, warOrderModule, state)
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: warOrderModule, Title: "战令", Window: "25300–25309", Scope: "role", New: adminState[warState]})
+}

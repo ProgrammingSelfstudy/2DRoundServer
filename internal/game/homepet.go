@@ -777,3 +777,8 @@ func (h *petSvc) drop(s *gateway.Session, req proto.Message) error {
 
 // sendPetBag sends the sprite bag (10503) whatever is in it: the pet's food, items and treasures live there with the sprites.
 func sendPetBag(s *gateway.Session, st *store.Store) error { return sendSpriteBag(s, st) }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: petModule, Title: "家园宠物旅行", Window: "26100–26113", Scope: "role", New: adminState[petState]})
+}

@@ -444,3 +444,9 @@ func rand63(n int64) int64 {
 	}
 	return int64(summonRand() * float64(n))
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: petardModule, Title: "花火大会", Window: "27000–27008", Scope: "global", New: adminState[petardWorld]})
+	registerAdminModule(AdminModule{Key: petardModule, Title: "花火大会", Window: "27000–27008", Scope: "role", New: adminState[petardRole]})
+}

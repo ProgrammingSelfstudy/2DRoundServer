@@ -150,3 +150,8 @@ func RegisterStoneShop(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: ssModule, Title: "神秘商店", Window: "16688/16689", Scope: "role", New: adminState[ssRole]})
+}

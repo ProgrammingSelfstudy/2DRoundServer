@@ -1108,3 +1108,8 @@ func (a *adv) takeBox(s *gateway.Session, req proto.Message) error {
 		return s.Send(20635, proto.Message{"code": 0, "msg": "无法领取"})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: advModule, Title: "空岛冒险", Window: "20600–20636", Scope: "role", New: adminState[advState]})
+}

@@ -1181,3 +1181,8 @@ func (a *amSvc) fight(s *gateway.Session, c *amCtx, req proto.Message) error {
 	}
 	return fightServiceOf(a.st).begin(s, c.role, combatAMP, plan.intro, plan.rounds[0], plan.duels[0].Ret == 1, settle)
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: amModule, Title: "多人竞技场", Window: "29000–29035", Scope: "global", New: adminState[amBoard]})
+}

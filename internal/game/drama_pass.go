@@ -127,3 +127,8 @@ func RegisterDramaPass(r *gateway.Router, st *store.Store) {
 		return s.Send(13002, proto.Message{"code": 0, "msg": "已经通关全部章节"})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: dramaPassModule, Title: "推图通关录像/进度榜", Window: "13002、13015、13020", Scope: "global", New: adminState[map[int64]passBoard]})
+}

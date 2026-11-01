@@ -264,3 +264,8 @@ func RegisterWhiteDay(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: wdModule, Title: "女神试炼", Window: "28800–28803", Scope: "role", New: adminState[wdRole]})
+}

@@ -774,3 +774,9 @@ func (m *monoSvc) guards(s *gateway.Session, req proto.Message) error {
 		return s.Send(27410, proto.Message{"id": id, "rid": 0, "srv_id": role.SrvID, "name": name, "face": face, "lev": role.Lev, "power": power, "guards": guards})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "monopoly_g*", Title: "和之国火祭公会状态", Window: "27400–27506", Scope: "global", New: adminState[monoGuild], Match: adminPositiveSuffix("monopoly_g")})
+	registerAdminModule(AdminModule{Key: monoModule, Title: "和之国火祭个人状态", Window: "27400–27506", Scope: "role", New: adminState[monoState]})
+}

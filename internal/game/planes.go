@@ -585,3 +585,8 @@ func (p *plSvc) rentalInfo(s *gateway.Session, req proto.Message) error {
 
 var _ = errors.New
 var _ = sort.Ints
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: plModule, Title: "秘境", Window: "23100–23123", Scope: "role", New: adminState[plState]})
+}

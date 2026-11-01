@@ -383,3 +383,8 @@ func RegisterElement(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: elementModule, Title: "元素圣殿/领地挑战", Window: "25000–25006", Scope: "role", New: adminState[elementState]})
+}

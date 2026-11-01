@@ -180,3 +180,8 @@ func RegisterCycleGifts(r *gateway.Router, st *store.Store) {
 			"reg_day": (now.Unix()-role.CreatedAt)/86400 + 1, "first_gift": list})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: cycleGiftModule, Title: "每周福利/月度礼包限购", Window: "21007", Scope: "role", New: adminState[cycleGiftState]})
+}

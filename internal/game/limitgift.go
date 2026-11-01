@@ -203,3 +203,8 @@ func RegisterLimitGift(r *gateway.Router, st *store.Store) {
 		return s.Send(21210, proto.Message{"gifts": list})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: limitGiftModule, Title: "养成/等级限时礼包", Window: "21210/21211", Scope: "role", New: adminState[limitGiftState]})
+}

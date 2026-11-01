@@ -442,3 +442,9 @@ func (e *endSvc) takeFirst(s *gateway.Session, req proto.Message) error {
 }
 
 func timeFromUnix(n int64) time.Time { return time.Unix(n, 0) }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: endlessRankMod, Title: "无尽试炼排行榜", Window: "23903/23907", Scope: "global", New: adminState[endRanks]})
+	registerAdminModule(AdminModule{Key: endlessModule, Title: "无尽试炼个人进度", Window: "23900–23913", Scope: "role", New: adminState[endState]})
+}

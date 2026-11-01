@@ -177,3 +177,8 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: loginDayModule, Title: "登录天数/登录奖励", Window: "10922–10925、21100/21101", Scope: "role", New: adminState[loginDayState]})
+}

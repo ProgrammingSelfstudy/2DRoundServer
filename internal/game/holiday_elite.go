@@ -287,3 +287,8 @@ func holEliteGains(list [][2]int64) []sellGain {
 	}
 	return out
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: holEliteModule, Title: "节日精英召唤/新春赐福", Window: "23220–23222", Scope: "role", New: adminState[holEliteRole]})
+}

@@ -147,3 +147,8 @@ func RegisterTouchGold(r *gateway.Router, st *store.Store) {
 		return sendAssets(s, st, role.RID)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: touchGoldModule, Title: "点金手", Window: "23606/23607", Scope: "role", New: adminState[touchGoldState]})
+}

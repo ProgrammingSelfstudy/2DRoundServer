@@ -277,3 +277,9 @@ func RegisterSweet(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: sweetModule, Title: "甜蜜大作战", Window: "28500–28502", Scope: "global", New: adminState[sweetWorld]})
+	registerAdminModule(AdminModule{Key: sweetModule, Title: "甜蜜大作战", Window: "28500–28502", Scope: "role", New: adminState[sweetRole]})
+}

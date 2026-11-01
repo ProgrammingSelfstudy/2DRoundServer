@@ -320,3 +320,8 @@ func (c *campSvc) settle(s *gateway.Session, id int64, won bool) error {
 		return nil
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: campModule, Title: "训练营", Window: "27600–27603", Scope: "role", New: adminState[campState]})
+}

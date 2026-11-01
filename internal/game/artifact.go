@@ -779,3 +779,8 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		return reply(s, 11032, 0, notOpen, nil)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "artifact", Title: "战技实例/重铸/穿戴", Window: "11030–11036", Scope: "role", New: adminState[store.ArtifactDoc]})
+}

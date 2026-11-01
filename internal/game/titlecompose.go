@@ -125,3 +125,8 @@ func RegisterTitleCompose(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: titleLevelModule, Title: "称号合成等级", Window: "23304", Scope: "role", New: adminState[titleLevelDoc]})
+}

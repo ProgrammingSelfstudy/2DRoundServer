@@ -205,3 +205,8 @@ func (e *encounterSvc) library(s *gateway.Session, _ proto.Message) error {
 		return s.Send(27102, proto.Message{"id_list": list})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: encounterModule, Title: "英雄物语", Window: "27100–27104", Scope: "role", New: adminState[encounterState]})
+}

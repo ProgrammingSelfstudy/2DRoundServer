@@ -970,3 +970,11 @@ func (c *champSvc) finish(srv string, stt *champState) error {
 	ev.Done = true
 	return nil
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: champModule, Title: "本服冠军赛", Window: "20250–20282", Scope: "global", New: adminState[champState]})
+	registerAdminModule(AdminModule{Key: "crosschamp", Title: "跨服冠军赛", Window: "26200–26215", Scope: "global", New: adminState[champState]})
+	registerAdminModule(AdminModule{Key: champModule, Title: "本服冠军赛", Window: "20250–20282", Scope: "role", New: adminState[champRole]})
+	registerAdminModule(AdminModule{Key: "crosschamp", Title: "跨服冠军赛", Window: "26200–26215", Scope: "role", New: adminState[champRole]})
+}

@@ -479,3 +479,8 @@ func (v *vedioSvc) play(s *gateway.Session, req proto.Message) error {
 	_ = v.st.BumpReplay(r.ID, 0, 0, 1)
 	return v.fights.begin(s, role, d.Combat, intro, rounds, d.Won, func(*gateway.Session, bool) error { return nil })
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: vedioModule, Title: "录像个人收藏/点赞", Window: "19901–19908、20034/20036", Scope: "role", New: adminState[vedioState]})
+}

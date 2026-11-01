@@ -136,3 +136,8 @@ func RegisterMergeGoal(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: mergeGoalModule, Title: "合服目标", Window: "27300/27301", Scope: "role", New: adminState[mergeGoalRole]})
+}

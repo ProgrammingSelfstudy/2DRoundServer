@@ -444,3 +444,9 @@ func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "global", New: adminState[drWorld]})
+	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "role", New: adminState[drRole]})
+}

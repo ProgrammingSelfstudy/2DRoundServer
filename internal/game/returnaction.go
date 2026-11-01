@@ -783,3 +783,9 @@ func retDraw(drawn []int64) retEntry {
 	sort.Slice(may, func(i, j int) bool { return may[i].ID < may[j].ID })
 	return may[rand.Intn(len(may))]
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: retModule, Title: "回归活动", Window: "27900–27915", Scope: "global", New: adminState[retWorld]})
+	registerAdminModule(AdminModule{Key: retModule, Title: "回归活动", Window: "27900–27915", Scope: "role", New: adminState[retRole]})
+}

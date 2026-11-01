@@ -308,3 +308,9 @@ func (g *primusSvc) pushSeats(s *gateway.Session, w *primusWorld, role *store.Ro
 	}
 	return s.Send(20701, proto.Message{"list": list})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: primusModule, Title: "霸气修炼", Window: "20700–20706", Scope: "global", New: adminState[primusWorld]})
+	registerAdminModule(AdminModule{Key: primusModule, Title: "霸气修炼", Window: "20700–20706", Scope: "role", New: adminState[primusRole]})
+}

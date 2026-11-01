@@ -351,3 +351,8 @@ func newWarOrderEvent(s *gateway.Session, st *store.Store, role *store.Role, lab
 	}
 	return nil
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: newWarOrderModule, Title: "海贼夺宝", Window: "28700–28708", Scope: "role", New: adminState[warState]})
+}

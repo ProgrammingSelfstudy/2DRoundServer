@@ -1112,3 +1112,9 @@ func ymResult(s *gateway.Session, st *store.Store, c *ymCtx, t ymTile, kind, dam
 	}
 	return s.Send(28200, ymBase(st, c))
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: ymModule, Title: "年兽活动", Window: "28200–28224", Scope: "global", New: adminState[ymWorld]})
+	registerAdminModule(AdminModule{Key: ymModule, Title: "年兽活动", Window: "28200–28224", Scope: "role", New: adminState[ymRole]})
+}

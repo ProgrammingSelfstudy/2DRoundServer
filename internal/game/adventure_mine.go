@@ -767,3 +767,9 @@ func (a *adv) mineHallows(s *gateway.Session, _ proto.Message) error {
 }
 
 var _ = errors.New
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: mineWorldModule, Title: "空岛灵矿共享占领", Window: "20640–20660", Scope: "global", New: adminState[mineWorld]})
+	registerAdminModule(AdminModule{Key: mineModule, Title: "空岛灵矿个人状态", Window: "20640–20660", Scope: "role", New: adminState[mineRole]})
+}

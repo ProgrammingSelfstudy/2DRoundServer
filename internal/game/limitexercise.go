@@ -366,3 +366,8 @@ func (l *leSvc) settle(s *gateway.Session, order, damage int64, slots []store.Fo
 		return l.send(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: leModule, Title: "试炼之境", Window: "25410–25414", Scope: "role", New: adminState[leState]})
+}

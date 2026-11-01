@@ -180,3 +180,8 @@ func RegisterMonthCard(r *gateway.Router, st *store.Store) {
 		return sendAssets(s, st, c.role.RID)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: monthCardModule, Title: "两档月卡", Window: "16705–16708", Scope: "role", New: adminState[monthCardState]})
+}

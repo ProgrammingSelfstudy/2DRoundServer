@@ -2105,3 +2105,9 @@ func (a *atSvc) report(s *gateway.Session, req proto.Message) error {
 	}
 	return s.Send(27256, proto.Message{"id": req.Int("id"), "arena_replay_infos": infos})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: atModule, Title: "组队竞技场全服赛季", Window: "27200–27256", Scope: "global", New: adminState[atBoard]})
+	registerAdminModule(AdminModule{Key: atRoleModule, Title: "组队竞技场个人状态", Window: "27200–27256", Scope: "role", New: adminState[atRole]})
+}

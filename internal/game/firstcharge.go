@@ -215,3 +215,15 @@ func RegisterFirstCharge(r *gateway.Router, st *store.Store) {
 		})
 	}
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "firstcharge_*", Title: "四组首充窗口", Window: "21000/21001、21012–21014、21030–21033", Scope: "role", New: adminState[firstChargeState], Match: func(key string) bool {
+		for _, fs := range firstSets {
+			if key == "firstcharge_"+fs.key {
+				return true
+			}
+		}
+		return false
+	}})
+}

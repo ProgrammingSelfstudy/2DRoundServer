@@ -804,3 +804,8 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 		return nil
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: "holyeqm", Title: "神装实例/洗练/方案", Window: "11086–11094、25220–25224", Scope: "role", New: adminState[store.HolyDoc]})
+}

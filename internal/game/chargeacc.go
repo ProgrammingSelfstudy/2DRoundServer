@@ -100,3 +100,8 @@ func RegisterChargeAcc(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: chargeAccModule, Title: "累计充值奖励", Window: "16700、16712/16713", Scope: "role", New: adminState[chargeAccState]})
+}

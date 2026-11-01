@@ -917,3 +917,9 @@ func (e *eliteSvc) saveManifesto(s *gateway.Session, req proto.Message) error {
 	}
 	return s.Send(24946, proto.Message{"code": 1, "msg": "设置成功"})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: eliteModule, Title: "精英段位赛", Window: "24900–24946", Scope: "global", New: adminState[eliteWorld]})
+	registerAdminModule(AdminModule{Key: eliteModule, Title: "精英段位赛", Window: "24900–24946", Scope: "role", New: adminState[eliteRole]})
+}

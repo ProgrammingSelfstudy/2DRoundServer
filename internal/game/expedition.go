@@ -508,3 +508,8 @@ func (e *expSvc) choose(s *gateway.Session, req proto.Message) error {
 		return e.sendInfo(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: expModule, Title: "英雄远征", Window: "24400–24415", Scope: "role", New: adminState[expState]})
+}

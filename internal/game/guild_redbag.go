@@ -452,3 +452,9 @@ func (g *GuildService) redbagCounts(rid int64, now time.Time) (sent, recv int64)
 	}
 	return d.Sent, d.Recv
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: redbagModule, Title: "公会红包簿", Window: "13534–13546", Scope: "global", New: adminState[redbagBook]})
+	registerAdminModule(AdminModule{Key: redbagDayMod, Title: "公会红包每日领取", Window: "13534–13546", Scope: "role", New: adminState[redbagDay]})
+}

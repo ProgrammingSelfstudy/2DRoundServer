@@ -785,3 +785,9 @@ func (t *tbSvc) summary(s *gateway.Session, _ proto.Message) error {
 			"count": c.r.Paper, "order": min(c.r.Order-1, c.cfg.MaxOrder)})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: tbModule, Title: "开学季", Window: "26700–26712", Scope: "global", New: adminState[tbWorld]})
+	registerAdminModule(AdminModule{Key: tbModule, Title: "开学季", Window: "26700–26712", Scope: "role", New: adminState[tbRole]})
+}

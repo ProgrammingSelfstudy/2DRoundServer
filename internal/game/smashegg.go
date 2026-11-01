@@ -339,3 +339,9 @@ func (e *eggSvc) records(s *gateway.Session, req proto.Message) error {
 		return s.Send(16685, proto.Message{"type": typ, "log_list": list})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: eggLogModule, Title: "砸金蛋共享记录", Window: "16684/16685", Scope: "global", New: adminState[eggLog]})
+	registerAdminModule(AdminModule{Key: eggModule, Title: "砸金蛋个人状态", Window: "16680–16685", Scope: "role", New: adminState[eggState]})
+}

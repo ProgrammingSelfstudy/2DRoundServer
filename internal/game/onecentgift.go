@@ -151,3 +151,8 @@ func RegisterOneCentGift(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: oneCentModule, Title: "一元/一分钱礼包", Window: "16651/16652", Scope: "role", New: adminState[oneCentState]})
+}

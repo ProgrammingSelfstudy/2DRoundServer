@@ -114,6 +114,10 @@ func (s *Server) Handler() http.Handler {
 
 	route("GET /api/roles", levRead, s.listRoles)
 	route("GET /api/roles/{id}", levRead, s.roleDetail)
+	route("GET /api/modules", levRead, s.listModules)
+	route("GET /api/roles/{id}/modules", levRead, s.listRoleModules)
+	route("GET /api/roles/{id}/modules/{key}", levRead, s.roleModule)
+	route("POST /api/roles/{id}/modules/{key}/reset", levManage, s.resetRoleModule)
 	route("POST /api/roles/{id}/kick", levWrite, s.kickRole)
 	route("POST /api/roles/{id}/level", levWrite, s.setRoleLevel)
 	route("POST /api/roles/{id}/vip", levWrite, s.setRoleVIP)

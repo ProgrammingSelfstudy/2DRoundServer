@@ -356,3 +356,8 @@ func RegisterHalidom(r *gateway.Router, db *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: halidomModule, Title: "元素信念", Window: "22200–22205", Scope: "role", New: adminState[hdState]})
+}

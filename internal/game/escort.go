@@ -890,3 +890,9 @@ func (e *escSvc) askHelp(s *gateway.Session, req proto.Message) error {
 		return refuse("掠夺记录不存在")
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: escBoard, Title: "护送共享记录/劫掠", Window: "24000–24020", Scope: "global", New: adminState[escGlobal]})
+	registerAdminModule(AdminModule{Key: escModule, Title: "护送个人状态", Window: "24000–24020", Scope: "role", New: adminState[escState]})
+}

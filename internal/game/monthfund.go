@@ -188,3 +188,8 @@ func RegisterMonthFund(r *gateway.Router, st *store.Store) {
 		return sendBackpack(s, st)
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: monthFundModule, Title: "两档月基金", Window: "24700–24702", Scope: "role", New: adminState[monthFundState]})
+}

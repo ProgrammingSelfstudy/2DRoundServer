@@ -1000,3 +1000,8 @@ func (s *gwSide) defenseOne(h *gwHold) proto.Message {
 	m["srv_id"] = s.SrvID
 	return m
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: guildWarModule, Title: "公会战", Window: "24200–24223", Scope: "global", New: adminState[gwWar]})
+}

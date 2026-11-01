@@ -297,3 +297,8 @@ func RegisterLuckyDog(r *gateway.Router, st *store.Store) {
 		})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: luckyModule, Title: "幸运锦鲤", Window: "28400–28403", Scope: "role", New: adminState[luckyRole]})
+}

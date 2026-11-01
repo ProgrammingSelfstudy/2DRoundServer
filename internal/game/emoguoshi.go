@@ -543,3 +543,8 @@ func (e *emoSvc) decompose(s *gateway.Session, req proto.Message) error {
 		return s.Send(31130, proto.Message{"result": 1, "msg": "分解成功"})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: emoModule, Title: "恶魔果实图鉴", Window: "31101–31130", Scope: "role", New: adminState[emoState]})
+}

@@ -71,6 +71,9 @@ type lgRole struct {
 
 var lgMu sync.Mutex
 
+// tcRole is package-scoped so the read-only admin registry uses the real state type.
+type tcRole struct{ Day int64 }
+
 // RegisterLevGift registers the level-up gifts (an operator opens an activity with panel_type 15): a gift for each
 // level, a limited number of each for the whole server, one per role. And the time collect (16697, 16698): in the hours
 // of the day the activity gives one item once a day; the client never asks for 16697, the server pushes it.
@@ -183,7 +186,6 @@ func RegisterLevGift(r *gateway.Router, st *store.Store) {
 	})
 
 	// the time collect
-	type tcRole struct{ Day int64 }
 	collect := func(s *gateway.Session) (role *store.Role, camp, day int64, ok bool, err error) {
 		if role = s.Role(); role == nil {
 			return nil, 0, 0, false, nil
@@ -289,4 +291,11 @@ func openByBID(st *store.Store, srv string, bid int64, now time.Time) (actEntry,
 		}
 	}
 	return actEntry{}, false
+}
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: lgModule, Title: "升级礼包/全服限量", Window: "21200/21201", Scope: "global", New: adminState[lgWorld]})
+	registerAdminModule(AdminModule{Key: lgModule, Title: "升级礼包/全服限量", Window: "21200/21201", Scope: "role", New: adminState[lgRole]})
+	registerAdminModule(AdminModule{Key: tcModule, Title: "定时领取", Window: "16697/16698", Scope: "role", New: adminState[tcRole]})
 }

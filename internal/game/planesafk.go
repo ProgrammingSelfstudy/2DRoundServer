@@ -412,3 +412,8 @@ func (p *pfSvc) takeFloor(s *gateway.Session, req proto.Message) error {
 		return s.Send(28605, proto.Message{"flag": 1, "msg": ""})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: pfModule, Title: "长环岛冒险", Window: "28600–28626", Scope: "role", New: adminState[pfState]})
+}

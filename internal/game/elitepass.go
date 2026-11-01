@@ -239,3 +239,8 @@ func RegisterElitePass(r *gateway.Router, st *store.Store) {
 		return s.Send(24955, proto.Message{"is_pop": 0, "cur_day": day})
 	})
 }
+
+// Register the persisted state without loading or changing gameplay data.
+func init() {
+	registerAdminModule(AdminModule{Key: elitePassModule, Title: "段位赛令牌活动", Window: "24952–24955", Scope: "role", New: adminState[elitePassState]})
+}

@@ -1,7 +1,6 @@
 package game
 
 import (
-	"2droundserver/internal/store"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -9,6 +8,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"2droundserver/internal/store"
 )
 
 var settlementKeys = []string{atModule, eliteModule, caModule, amModule, drModule, guildWarModule, champModule, "crosschamp"}
@@ -84,7 +85,11 @@ func seedSettlement(t *testing.T, key string, due bool) (*env, http.Handler, *st
 	case champModule, "crosschamp":
 		t0 := now.Unix()
 		if due {
-			t0 = now.Unix() - champLength() - 60
+			_, owner, err := globalOwner(e.st, key)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t0, _ = owner.service.(*champSvc).eventAt(now)
 		}
 		ev := &champEvent{Key: dayKey(time.Unix(t0, 0)), T0: t0, Entries: []champEntrant{{arenaOpp: arenaOpp{RID: role.RID, SrvID: role.SrvID, Name: role.Name}, Rank: 1}}, Bets: map[int64][]champBet{}, Chips: map[int64]*champChips{role.RID: {Have: 100}}, Seen: map[int64]bool{}}
 		// The game's own rounds have finished; only its normal final payout is pending.
@@ -180,6 +185,10 @@ func nativeSettlement(e *env, key string) error {
 	if err != nil {
 		return err
 	}
+	if c, ok := o.service.(*champSvc); ok {
+		c.tick()
+		return nil
+	}
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	now := e.gw.Now()
@@ -194,20 +203,6 @@ func nativeSettlement(e *env, key string) error {
 		err = s.settleSeasons("symlf_1", now)
 	case *gwSvc:
 		_, _, _, err = s.ensure("symlf_1", now)
-	case *champSvc:
-		// Saved round is already past its natural end; advance is what load/tick runs.
-		b := &champState{}
-		_, err = e.st.LoadGlobal("symlf_1", s.module, b)
-		if err == nil && !b.Ev.Done {
-			_, err = s.advance("symlf_1", b, s.now())
-			if err == nil {
-				if s.cross {
-					err = e.st.SaveGlobal("symlf_1", "crosschamp", b)
-				} else {
-					err = e.st.SaveGlobal("symlf_1", champModule, b)
-				}
-			}
-		}
 	default:
 		w := &drWorld{}
 		_, err = e.st.LoadGlobal("symlf_1", drModule, w)

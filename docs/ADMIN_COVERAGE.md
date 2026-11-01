@@ -1,11 +1,11 @@
-# 后台数据覆盖注册表（更新至阶段 3a）
+# 后台数据覆盖注册表（更新至阶段 3）
 
-本清单以仓库内 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md) 为执行计划，审查基线为 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。阶段0建立清单与完整性门禁；阶段1实现了107项运行时注册、玩家侧只读模块API及未启用白名单的重置机制，审查基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。阶段2基线为 `e222311`，六类充值模块已接专用只读视图和配置白名单重置（见下表）；其他模块保持只读，所有 `Editable=false`。阶段3a已接网关持锁全服只读API、16项现有排名投影和赛季/区服概览；没有PUT编辑、前端页签或结算写入口。
+执行计划见 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md)。阶段3拉取基线为 `c140a39`；当前108项运行时注册（77玩家、31全服）。阶段2的六类充值视图/重置保持不变；阶段3已接全服状态、16项现有排名、赛季及区服概览、8个审定赛季状态项的自然到期补结算和世界等级覆盖。全服操作只经网关，在真实服务锁内执行；补结算和世界等级修改与审计同事务。全部 `Editable=false`，不提供全局JSON编辑；前端仍待阶段5。
 
 ## 口径与生成
 
 - `role`：`LoadState/SaveState` 的模块参数；`global`：`LoadGlobal/SaveGlobal` 的模块参数。相同 key 在两个范围出现须分别登记，不按 key 去重。
-- 源码扫描到 **349 处持久化调用、77 项玩家模块、30 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查 85 个以 `Module`/`Mod` 结尾的字符串模块常量。计划中的“约65/31”是估计，不能当验收数量。
+- 源码扫描到 **352 处持久化调用、77 项玩家模块、31 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查86个以 `Module`/`Mod` 结尾的字符串模块常量。阶段3新增 `worldlev`；计划中的“约65/31”是估计，不能当验收数量。
 - `table`：92 张显式建表，来自 `internal/store/migrations/*.sql` 和 `store.go` 的启动建表；包括游戏相关表及4张安全/运维表 `admins`、`audit_logs`、`login_tokens`、`schema_migrations`，后者也列出以说明边界。SQLite 自动维护的 `sqlite_sequence` 等内部表不由项目注册，不计入。
 - 下表的范围、键和源码列由 `tools/admincoverage` 扫描结果生成；中文窗口、当前能力、后续处置和原因经人工补充。窗口协议用于定位游戏功能，不等于后台 HTTP 路由。**“当前未接”是待补缺口，不是永久排除；“拟提供”不表示已经实现或已经授权具体写操作。**
 - 本文机器可读表格是覆盖清单；阶段1已在各模块文件的 `init()` 中注册到 `internal/game/adminreg.go` 的 `AdminModules()`。完整性门禁同时核对源码扫描、本文及运行时注册，任一边缺项都失败。测试采用精确的 `(scope,key)` 对比，不能用一个任意 `*` 冒充全覆盖。
@@ -30,7 +30,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 核对来源：[实际路由](../internal/admin/server.go)、[角色详情](../internal/admin/handlers.go)、[支付接口](../internal/admin/pay.go)、[新前端路由](../web/admin/src/routers/index.ts)、[角色详情界面](../web/admin/src/views/roles/RoleDialog.vue)。
 
 - 现有 `read/write/manage` 对应 viewer/operator/superadmin；管理员、审计、备份读取仅 manage，支付写入及区服/管理员维护也仅 manage。原有业务权限不在本阶段改变。
-- **阶段1已提供77项玩家模块的通用只读API，107项均可查询注册元数据；30项全服模块的数据读取已在阶段3a经网关接入。** 活动配置 `/api/activities` 不是角色 `activity` JSON；充值确认按规则更新状态，也不等于能查看/重置首充、月卡或限购。角色已有状态列表会标注未知遗留key；未知key详情返回404，已注册但尚无状态的key返回exists=false/data=null，不创建行。阶段2仅六类充值模块绑定View和Resets，全服16项现有Rank已绑定；`GET /api/roles/{id}/charge`汇总9个具体充值模块与该角色订单。
+- **77项玩家模块和31项全服模块均有只读API，108项可查询注册元数据。** 全服读取只经网关；无网关或缺服务绑定返回502，不降级读库。GET不创建默认行、不触发结算；原始data与内存view分别返回。阶段2六类充值重置保持原白名单，阶段3全服16项Rank复用现有排序；`GET /api/roles/{id}/charge`仍汇总9个具体充值模块与该角色订单。
 - 当前角色详情仅基本资料、在线/封禁、资产和物品账本；已有发英雄、皮肤、外观按钮，但没有拥有列表、英雄属性/装备/阵容、任务/好友、收件及角色订单汇总。全局订单和发件历史也不能当作这些角色页签。
 - 现有写操作并非全部执行新计划的“先查离线、不可达不写”；本阶段不更改旧接口或规则。后续新增玩家数据写必须先网关在线校验（在线409、未知502），再读before、写入、审计。不能用当前踢线选项代替这一前置条件。
 - 全服数据后续必须经网关，在所属服务的锁/定时器边界内读取/修改；禁止后台直接调用 `SaveGlobal`。专用表若同样受网关服务锁保护，也不能因其是SQL表就绕开该边界。
@@ -119,9 +119,9 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `whiteday` | 女神试炼（28800–28803） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [whiteday.go](../internal/game/whiteday.go) |
 | role | `yearmonster` | 年兽活动（28200–28224） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [yearmonster.go](../internal/game/yearmonster.go) |
 
-## 全服模块（30项）
+## 全服模块（31项）
 
-阶段3a每项均已接网关所属服务锁内的原始JSON/状态投影读取；有既有排名的16项已绑定Rank。下列8个赛季状态项（两类冠军赛分列）才进入计划明确的结算审查集合；登记不是幂等性已验收。其他项的“仅查看”明确不提供强制结算，原因是没有计划批准、已验证的统一结算入口，不能新造发奖/赛季规则。
+31项均已接网关所属服务锁内的原始JSON/状态投影读取；16项现有排名已绑定Rank。下列8个赛季状态项（两类冠军赛分列）已验证到期补结算、重复调用及原生滚动/定时器并发；其余23项不提供结算（405）。其中worldlev另有专用PUT覆盖入口，其余保持只读；不新造活动结算或发奖规则。
 
 | 范围 | 模块键 | 中文名/对应窗口 | 当前后台能力 | 后续拟提供 | 缺口或限制原因 | 源码依据 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -155,6 +155,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | global | `termbegins` | 开学季（26700–26712） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [termbegins.go](../internal/game/termbegins.go) |
 | global | `treasure` | 幸运/高级探宝（16637–16643） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [treasure.go](../internal/game/treasure.go) |
 | global | `yearmonster` | 年兽活动（28200–28224） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（阶段3/5，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [yearmonster.go](../internal/game/yearmonster.go) |
+| global | `worldlev` | World level override (10192/10905) | Gateway-owned read; manage PUT with reason/audit and online push | Implemented in phase 3c | 0 disables; until=0 persistent; expiry uses game clock; original top-10 average remains the fallback | [worldlevel.go](../internal/store/worldlevel.go) |
 
 ## 专用表与基础设施（92张）
 
@@ -259,8 +260,8 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 1. **阶段1已实现运行时注册与玩家原始数据查看**：107项有真实state构造器，77项玩家模块可查原始JSON，三个前缀族验证窗口key或正数公会GID。所有GET不写库。阶段2六类充值专用视图及白名单重置已实现；阶段3a已接全服状态投影与16项原有排名，其余专用前端尚未实现，107项登记不等于后续业务功能全部完成。重置基础机制使用before值比较，数据变更与审计同一事务提交，审计失败回滚。
 2. **阶段2已接充值状态汇总和白名单重置**：六组模块覆盖9个具体key；汇总附真实role_charge和仅该角色的订单分页。累计实付、VIP经验、历史购买次数和其他模块不可编辑。月卡Base策略已注明并登记OPEN_QUESTIONS；View中的协议字段来自现有游戏逻辑，状态投影不写回。
-3. **全服只读已接入（阶段3a）**：全服30项经真实服务锁读取，16项Rank复用现有排序；赛季/区服概览只读。计划指定的结算写入口留待3b幂等验收后开放。其余模块不提供强制结算，避免推导未知规则。
-4. **世界等级是计算结果，不是现存模块**：`store.WorldLevel`及`openday.go`已有计算；区服的开服时间已能编辑。计划中的global键 `worldlev`、覆盖值/过期时间和 `/ops/worldlev` 均尚不存在，故不伪装成当前扫描项；阶段3新增后必须补注册行。现有 `global_state` 不能预先直接写入此键。
+3. **阶段3全服入口已接入**：31项经真实服务锁读取，16项Rank复用现有排序；赛季/区服概览只读。8个审定赛季状态项已验证自然到期补结算、重复与原生滚动/实际冠军赛tick并发；其他23项无结算入口（405），不提前结束或取消进行中的赛季。
+4. **阶段3c已接世界等级覆盖**：新增并登记 `worldlev`，专用GET/PUT经网关。0表示不覆盖，until=0长期生效，过期按游戏时钟自动恢复原前10名平均等级；读取不清理存档。登录10192、请求10905、PUT后的10905推送均使用相同有效值。后台不直接改全服状态，PUT与带原因的审计同事务；返回计算值、配置值及有效值。
 5. **专用表不止八类（阶段4）**：英雄/装备、阵容、公会职位、好友、任务、竞技场、角色邮件、角色订单是优先只读页签；签到、邀请、商店、召唤、共鸣、推图/副本、领奖流水等其余表同样在本表逐项验收。表缺视图是待补缺口，不是“16页已迁移”就算完成。
 6. **前端和阶段6收口仍待做**：没有模块总表、玩法状态、充值状态及上述角色页签；本文不将ROADMAP标完成，不改前端权限或依赖，不更新UI快照，不进入后续阶段。
 
@@ -270,12 +271,13 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 阶段2在e222311隔离基线上复现了两个既有补单缺陷：旧已付订单重放仍执行可写钩子，以及并发确认同一待付订单执行两次钩子。最小修复为同Store实例的角色付款/重置共享锁、锁内重读订单并提前拒绝非待付状态；保留原有SQL原子状态检查、before比较及事务审计，不改奖励/限购规则。此进程内锁不是分布式锁，不声称覆盖多admin实例/多Store跨进程并发确认。
 
-本阶段测试使用临时SQLite、httptest和本机真实TCP游戏handler；未操作真实玩家或外部付款，也未验证多进程部署。全服网关ops、结算和前端留到后续阶段；抓包、前端依赖/锁文件和生产UI快照不改。仅本地提交，停于阶段2等待审阅，不推送。
+以上为阶段0–2的历史验收边界。阶段3已在隔离SQLite、httptest及真实本机TCP验证网关读取、补结算和世界等级；未操作生产玩家/付款，未验证跨进程服务锁。抓包、前端依赖/锁文件和生产UI快照未改；本轮只做本地提交，停在阶段3，不自动进入阶段4。
 
 ## Phase 3b: due-only catch-up
 
 The eight approved season keys above now support catch-up through their live
-service locks. Other global modules remain read-only (405 for settle). No future
+service locks. Other global modules have no settlement entry (405); worldlev has
+its separate typed PUT control from phase 3c. No future
 clock is injected, no active championship is advanced/cancelled, and no new
 championship or guild war is created. Existing calendars, eligibility, rewards and
 mail functions are reused. Cross/multi arena payout still waits for rollover.

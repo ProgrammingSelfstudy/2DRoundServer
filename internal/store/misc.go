@@ -159,8 +159,8 @@ func (s *Store) Reports(limit int) ([]Report, error) {
 	return out, rows.Err()
 }
 
-// WorldLevel is the average level of the highest-level roles of a server (at most 10), 0 without roles.
-func (s *Store) WorldLevel(srvID string) (int, error) {
+// ComputedWorldLevel is the unchanged average of up to 10 highest-level active roles, 0 without roles.
+func (s *Store) ComputedWorldLevel(srvID string) (int, error) {
 	rows, err := s.db.Query(`SELECT lev FROM roles WHERE srv_id=? AND status=1 ORDER BY lev DESC LIMIT 10`, srvID)
 	if err != nil {
 		return 0, err

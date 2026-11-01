@@ -95,7 +95,15 @@ func globalSnapshot(st *store.Store, srv, key string, m AdminModule, o adminGlob
 	if err != nil {
 		return nil, err
 	}
-	return map[string]any{"key": key, "exists": found, "data": raw, "view": map[string]any{"state": state, "season": season}}, nil
+	view := map[string]any{"state": state, "season": season}
+	if key == store.WorldLevelModule {
+		details, err := st.WorldLevelInfoAt(srv, now)
+		if err != nil {
+			return nil, err
+		}
+		view["details"] = details
+	}
+	return map[string]any{"key": key, "exists": found, "data": raw, "view": view}, nil
 }
 func adminGlobalView(st *store.Store, srv, key string, now time.Time) (any, error) {
 	m, o, err := globalOwner(st, key)
@@ -147,6 +155,7 @@ func (m *MailService) registerAdminOps(mux *http.ServeMux) {
 		_, err := m.Store.Server(srv)
 		return srv, err
 	}
+	m.registerWorldLevelOps(mux, valid, clock)
 	mux.HandleFunc("POST /ops/season/settle", func(w http.ResponseWriter, r *http.Request) {
 		srv, err := valid(r)
 		if err != nil {
@@ -280,7 +289,7 @@ func (m *MailService) registerAdminOps(mux *http.ServeMux) {
 			opsWrite(w, nil, err)
 			return
 		}
-		lev, err := m.Store.WorldLevel(srv)
+		world, err := worldLevelInfo(m.Store, srv, clock())
 		if err != nil {
 			opsWrite(w, nil, err)
 			return
@@ -290,6 +299,6 @@ func (m *MailService) registerAdminOps(mux *http.ServeMux) {
 			open = sv.CreatedAt
 		}
 		key, start, end := arenaSeason(clock())
-		opsWrite(w, map[string]any{"srv_id": srv, "world_lev": lev, "open_time": open, "open_day": openDay(time.Unix(open, 0), clock()), "arena": map[string]any{"season": key, "start_time": start, "end_time": end}}, nil)
+		opsWrite(w, map[string]any{"srv_id": srv, "world_lev": world.Effective, "world_level": world, "open_time": open, "open_day": openDay(time.Unix(open, 0), clock()), "arena": map[string]any{"season": key, "start_time": start, "end_time": end}}, nil)
 	})
 }

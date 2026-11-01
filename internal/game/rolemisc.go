@@ -67,7 +67,7 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		lev, err := st.WorldLevel(role.SrvID)
+		lev, err := st.WorldLevelAt(role.SrvID, s.Now())
 		if err != nil {
 			return err
 		}

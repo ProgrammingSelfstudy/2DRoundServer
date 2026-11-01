@@ -147,3 +147,30 @@ func (s *Server) settleServerSeason(w http.ResponseWriter, r *http.Request, p *p
 func validReason(reason string) bool {
 	return strings.TrimSpace(reason) != "" && utf8.RuneCountInString(reason) <= 200 && strings.IndexFunc(reason, unicode.IsControl) < 0
 }
+
+func (s *Server) serverWorldLevel(w http.ResponseWriter, r *http.Request, p *principal) {
+	s.globalRead(w, r, "/ops/worldlev", false)
+}
+func (s *Server) setServerWorldLevel(w http.ResponseWriter, r *http.Request, p *principal) {
+	srv, ok := s.globalServer(w, r)
+	if !ok {
+		return
+	}
+	var body struct {
+		Override int    `json:"override"`
+		Until    int64  `json:"until"`
+		Reason   string `json:"reason"`
+	}
+	if !decode(w, r, &body) {
+		return
+	}
+	if !validReason(body.Reason) || body.Override < 0 || body.Override > 200 || body.Until < 0 {
+		fail(w, 422, "override must be 0 to 200, until nonnegative and reason 1 to 200 characters")
+		return
+	}
+	op := game.AdminWorldLevelRequest{AdminOperation: game.AdminOperation{Reason: body.Reason, AdminID: p.Admin.ID, AdminName: p.Admin.Username, IP: clientIP(r)}, Override: body.Override, Until: body.Until}
+	raw, ok := s.globalProxy(w, r, "/ops/worldlev?"+url.Values{"srv": {srv}}.Encode(), op)
+	if ok {
+		writeJSON(w, 200, raw)
+	}
+}

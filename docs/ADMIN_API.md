@@ -35,7 +35,9 @@ demoting or disabling an admin, or changing their password, takes effect at once
 | `POST /api/accounts/{id}/ban` `{reason}`, `.../unban` | write | ban also revokes game tokens and kicks the account's online roles |
 | `GET /api/roles?q=&srv_id=` | read | search by role name, account or id |
 | `GET /api/roles/{id}` | read | one role with its owner `account`, `online` (`null` + `online_error` when the gateway is down), `banned`, `assets` (`label`, `name`, `val`) and `items` (`base_id`, `name`, `num`, `listed`: whether the game's backpack shows it; equipment is in the ledger but not listed) |
-| `GET /api/modules` | read | all 107 runtime registrations (role/global): key, title, window, scope, has_view, has_rank, editable, resets |
+| `GET /api/modules` | read | all 108 runtime registrations (role/global): key, title, window, scope, has_view, has_rank, editable, resets |
+| `GET /api/servers/{id}/worldlev` | read | computed/configured/effective world level through the gateway |
+| `PUT /api/servers/{id}/worldlev` | manage | `{override,until,reason}`; gateway-owned transaction/audit, then 10905 push |
 | `GET /api/roles/{id}/charge?limit=&offset=` | read | nine concrete charge-module views, role_charge totals and only this role's orders with real items/total/limit/offset pagination |
 | `GET /api/roles/{id}/modules` | read | existing saved module rows only: concrete key, registered flag, stored byte count and registry metadata; unknown legacy keys are marked, not silently dropped |
 | `GET /api/roles/{id}/modules/{key}` | read | concrete registered role key, exact raw JSON, exists and registry metadata; an absent saved row returns exists=false/data=null without initialization |
@@ -217,7 +219,7 @@ there is no direct-database fallback. The gateway only serves its configured ser
 | --- | --- | --- |
 | `GET /api/servers/{id}/modules` | `GET /ops/global?srv=` | registered fixed keys (including absent states) and saved, validated concrete guild keys |
 | `GET /api/servers/{id}/modules/{key}` | `GET /ops/global?srv=&key=` | key, exists, raw data, view.state and view.season |
-| `GET /api/servers/{id}/modules/{key}/rank?limit=` | `GET /ops/rank?srv=&key=&limit=` | registered existing rankings, default 50/max 200; unsupported modules 405 |
+| `GET /api/servers/{id}/modules/{key}/rank?limit=` | `GET /ops/rank?srv=&key=&limit=` | existing rankings, default 50/max 200 per category/guild list; unsupported modules 405 |
 | `GET /api/servers/{id}/modules/{key}/season` | `GET /ops/season?srv=&key=` | existing calendars and persisted settlement markers; unsupported season projections have supported=false |
 | `GET /api/servers/{id}/overview` | `GET /ops/overview?srv=` | world_lev, effective open_time/open_day and arena season/start/end |
 
@@ -252,3 +254,29 @@ allowed. Cross/multi arena payout still waits for native rollover. The owner
 mutex serializes admin catch-up with native rollover/ticker. Original rewards,
 rank ordering and eligibility remain unchanged. Production-player operations and
 cross-process service locking are outside these local tests.
+
+### World-level controls (phase 3c)
+
+`GET /api/servers/{id}/worldlev` (read) forwards to `GET /ops/worldlev?srv=`.
+It returns override, until, computed, effective and active. The original computed
+value remains the average of the highest-level active roles (at most ten).
+
+`PUT /api/servers/{id}/worldlev` (manage) accepts override (0–200), until
+(nonnegative Unix seconds) and a required reason. It forwards to the loopback
+gateway's PUT endpoint with the trusted actor/IP. Zero disables the override;
+until=0 means no expiry. At now >= until an override is inactive; reads preserve
+the expired saved row and return the computed fallback. No clock is accepted from
+the admin caller. Login 10192 and request 10905 use the session's game clock too.
+
+The gateway holds the world-level owner lock and commits configuration plus the
+`server.worldlev` audit (before/after/reason/actor) in one transaction, then sends
+one 10905 to each currently online role of that server. PUT returns world_level,
+pushed and push_errors; a failed push does not undo the committed setting/audit.
+Concurrent PUTs retain push order under this same owner lock. Overview now also
+returns world_level alongside world_lev. Generic worldlev reads include the
+computed/effective details and remain read-only. No generic JSON editor is added.
+
+Tests cover the expiry boundary, zero/permanent modes, GET byte preservation,
+actual TCP login/10905 and post-PUT push, three permission levels, trusted actor
+fields, invalid values/reasons, unavailable gateway with unchanged state/audit,
+and source/document/runtime coverage for the new persisted worldlev module.

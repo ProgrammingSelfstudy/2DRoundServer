@@ -121,6 +121,8 @@ func (s *Server) Handler() http.Handler {
 	route("GET /api/servers/{id}/modules/{key}/season", levRead, s.serverSeason)
 	route("GET /api/servers/{id}/overview", levRead, s.serverOverview)
 	route("POST /api/servers/{id}/seasons/{key}/settle", levManage, s.settleServerSeason)
+	route("GET /api/servers/{id}/worldlev", levRead, s.serverWorldLevel)
+	route("PUT /api/servers/{id}/worldlev", levManage, s.setServerWorldLevel)
 	route("GET /api/roles/{id}/modules", levRead, s.listRoleModules)
 	route("GET /api/roles/{id}/charge", levRead, s.roleCharge)
 	route("GET /api/roles/{id}/modules/{key}", levRead, s.roleModule)

@@ -1,8 +1,6 @@
 package admin
 
 import (
-	"2droundserver/internal/game"
-	"2droundserver/internal/gateway"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -11,6 +9,9 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"2droundserver/internal/game"
+	"2droundserver/internal/gateway"
 )
 
 func TestGlobalReadProxyPermissionsRoutingAndNoFallback(t *testing.T) {
@@ -170,5 +171,77 @@ func TestSettlementAPIWithRealGatewayCommitsOnePayoutAndAudit(t *testing.T) {
 	// Viewer sees settled state through the same real gateway.
 	if r := e.do(viewer, "GET", "/api/servers/symlf_1/modules/daysrank/season", nil); r.Status != 200 || r.JSON()["settled"] != true {
 		t.Fatalf("read settled state: %d %s", r.Status, r.Body)
+	}
+}
+
+func TestWorldLevelAPIManagePermissionsExpiryAndGatewayFailure(t *testing.T) {
+	e := newEnv(t)
+	viewer, operator, super := e.tokens()
+	e.seedServer("symlf_1")
+	role := e.seedRole("world-api", "symlf_1", "world-api")
+	if err := e.st.SetRoleLevel(role.RID, 35); err != nil {
+		t.Fatal(err)
+	}
+	gw := httptest.NewServer((&game.MailService{Store: e.st, SrvID: "symlf_1", Hub: gateway.NewHub(), Now: e.s.Now}).AdminHandler())
+	defer gw.Close()
+	e.s.GatewayURL = gw.URL
+	path := "/api/servers/symlf_1/worldlev"
+	beforeAudit := len(e.auditActions())
+	for _, token := range []string{viewer, operator, super} {
+		r := e.do(token, "GET", path, nil)
+		if r.Status != 200 || r.JSON()["effective"] != float64(35) {
+			t.Fatalf("world GET: %d %s", r.Status, r.Body)
+		}
+	}
+	if r := e.do("", "GET", path, nil); r.Status != 401 {
+		t.Fatal("world GET is public")
+	}
+	if _, found, _ := e.st.GlobalModule("symlf_1", "worldlev"); found {
+		t.Fatal("GET initialized override")
+	}
+	body := map[string]any{"override": 88, "until": e.s.Now().Add(time.Minute).Unix(), "reason": "world override"}
+	for _, tc := range []struct {
+		token  string
+		status int
+	}{{"", 401}, {viewer, 403}, {operator, 403}, {super, 200}} {
+		if r := e.do(tc.token, "PUT", path, body); r.Status != tc.status {
+			t.Fatalf("world PUT permissions: %d %s", r.Status, r.Body)
+		}
+	}
+	if len(e.auditActions()) != beforeAudit+1 {
+		t.Fatal("PUT audit count or unauthorized write")
+	}
+	r := e.do(viewer, "GET", path, nil)
+	if r.Status != 200 || r.JSON()["active"] != true || r.JSON()["computed"] != float64(35) || r.JSON()["effective"] != float64(88) {
+		t.Fatalf("active world info: %s", r.Body)
+	}
+	raw, _, _ := e.st.GlobalModule("symlf_1", "worldlev")
+	e.clock.Add(int64(time.Minute))
+	r = e.do(viewer, "GET", path, nil)
+	if r.JSON()["active"] != false || r.JSON()["effective"] != float64(35) {
+		t.Fatal("API expiry uses wrong clock")
+	}
+	saved, _, _ := e.st.GlobalModule("symlf_1", "worldlev")
+	if !bytes.Equal(raw, saved) {
+		t.Fatal("expired GET rewrote state")
+	}
+	for _, bad := range []map[string]any{{"override": -1, "reason": "bad"}, {"override": 201, "reason": "bad"}, {"override": 80, "until": -1, "reason": "bad"}, {"override": 80, "reason": " "}, {"override": 80, "reason": strings.Repeat("x", 201)}} {
+		if r := e.do(super, "PUT", path, bad); r.Status != 422 {
+			t.Fatalf("bad override accepted: %d", r.Status)
+		}
+	}
+	if r := e.do(super, "PUT", path, map[string]any{"override": 80, "reason": "spoof", "admin_id": 999}); r.Status != 400 {
+		t.Fatal("client supplied internal actor fields")
+	}
+	auditCount := len(e.auditActions())
+	gw.Close()
+	for _, method := range []string{"GET", "PUT"} {
+		if r := e.do(super, method, path, body); r.Status != 502 {
+			t.Fatalf("gateway-down world %s: %d", method, r.Status)
+		}
+	}
+	final, _, _ := e.st.GlobalModule("symlf_1", "worldlev")
+	if !bytes.Equal(raw, final) || len(e.auditActions()) != auditCount {
+		t.Fatal("gateway failure or rejected PUT wrote state/audit")
 	}
 }

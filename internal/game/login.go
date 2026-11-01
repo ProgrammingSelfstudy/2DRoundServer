@@ -199,7 +199,7 @@ func (l *Login) enter(s *gateway.Session, req proto.Message, cmd uint16) error {
 	if l.OnlineGift != nil {
 		l.OnlineGift.Entered(role.RID, s.Now())
 	}
-	worldLev, err := l.Store.WorldLevel(l.SrvID)
+	worldLev, err := l.Store.WorldLevelAt(l.SrvID, s.Now())
 	if err != nil {
 		return err
 	}

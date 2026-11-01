@@ -1,7 +1,6 @@
 package game
 
 import (
-	"2droundserver/internal/store"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -9,6 +8,8 @@ import (
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"2droundserver/internal/store"
 )
 
 // This envelope is constructed by authenticated admin code. The loopback-only

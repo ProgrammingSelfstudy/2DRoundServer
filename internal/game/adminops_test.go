@@ -153,3 +153,26 @@ func TestAdminGlobalRanksReuseExistingOrdering(t *testing.T) {
 		t.Fatal("rank uses different scoring/qualification/ties")
 	}
 }
+
+func TestAdminGlobalMultiCategoryRanksKeepEveryCategory(t *testing.T) {
+	e := newEnv(t, time.Hour)
+	r := &endRanks{Lists: map[string][]endRankRow{"1": {{RID: 1, Val: 10}, {RID: 2, Val: 20}}, "2": {{RID: 3, Val: 30}, {RID: 4, Val: 40}}}}
+	if err := e.st.SaveGlobal("symlf_1", endlessRankMod, r); err != nil {
+		t.Fatal(err)
+	}
+	m, _ := FindAdminModule("global", endlessRankMod)
+	rows, err := m.Rank(e.st, "symlf_1", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 2 {
+		t.Fatal("first ranking exhausted the limit and hid another category")
+	}
+	for i, row := range rows {
+		data := row.Data.(map[string]any)
+		typ := int64(i + 1)
+		if data["type"] != typ || row.Rank != 1 || data["row"].(endRankRow).RID != r.sorted(typ)[0].RID {
+			t.Fatal("multi-category ordering differs from game")
+		}
+	}
+}

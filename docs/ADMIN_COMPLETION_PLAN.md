@@ -29,16 +29,50 @@
 
 ## 最新进度与交接（2026-11-01）
 
-Phase 3a local commit: `16d4128a98c701329cd25a8aa3666bd2ce93ad6c`.
-Phase 3b implementation and full validation passed. Commit title:
-`Add due-only season settlement through gateway services`. Eight authorized keys
-passed running/not_due, due payout, repeat/already and native/admin concurrency
-checks (actual mail count equals a single-reference payout). Partial mail and
-audit failures roll back mail/state/audit. HTTP permission/reason/trusted actor
-checks and real gateway integration passed. Team AdminCatchup is request-receipt
-metadata only. Validation: go vet; four-package race (game181.089s/admin38.135s/store11.645s); frontend type check, existing 28 tests and make build all passed. Node22.23.4/Corepack pnpm10.11.0; captures/UI/dependencies unchanged. Continue 3c after this commit; no push.
+**阶段3实现及验收已完成，仅本地提交，停在阶段3等待审阅；不push，不进入阶段4。**
 
-**阶段0–2已通过审核；阶段3正在执行，阶段4–6未开始。** 本轮基线 `c140a39`。阶段3a已实现网关所属服务锁内的30项全服状态读取、16项现有排名投影、赛季信息与区服概览，后台只转发，缺网关不回退读库。阶段3a验收已通过：`go vet ./...`、四包race（game166.470秒、admin35.597秒、store11.180秒）、前端类型检查、原28项测试和`make build`。30项逐项GET前后存档字节不变，真实服务锁阻塞、未知键/跨服拒绝和后台502无回退专项通过；UI快照与抓包无变化。阶段3a提交标题 `Add gateway-owned global read APIs and season views`，用 `git log -1 --format="%H %s" -- internal/game/adminops.go` 查询完整号。后续继续3b到期补结算和3c世界等级覆盖；本轮不push。
+Phase 3 implementation and full validation passed. Baseline:
+`c140a39`. Stay on main, local commits only; no push or phase 4. Phase 0-2 have
+passed review. Current inventory: 108 registrations (77 role, 31 global), 352
+persistence calls, 86 module constants and 92 tables.
+
+- 3a: `16d4128a98c701329cd25a8aa3666bd2ce93ad6c`
+  `Add gateway-owned global read APIs and season views`.
+  All 30 original global owners bound to their real service locks; 16 existing
+  rankings, season snapshots and server overview. GET never rolls/saves state;
+  no gateway fallback. Vet, four-package race (game166.470s/admin35.597s/store11.180s),
+  frontend type check, existing 28 tests and make build passed before commit.
+- 3b: `ded2c6e8c6bf9216bc16ae32992080b9d47aa667`
+  `Add due-only season settlement through gateway services`.
+  Eight approved season keys only; native calendars/settlement functions and the
+  exact owner lock. No early ending, cancellation or new championship/guild war.
+  Administrative payout mail, state and trusted actor/reason audit are atomic.
+  Every key passed running/not_due, due payout, repeated/already and concurrent
+  native/admin checks against a single-payout mail count. Partial-mail and audit
+  failures roll back. Vet, race (game181.089s/admin38.135s/store11.645s), frontend
+  checks, 28 tests and build passed before commit.
+- 3c title: `Add gateway world level overrides and finish stage 3 validation`.
+  New registered worldlev; computed/configured/effective levels; override0 disables,
+  until0 is persistent and expiry uses the game clock without rewriting the row.
+  Login10192, request10905 and post-PUT online push verified over actual TCP.
+  Backend GET/PUT permissions, invalid fields, trusted actors and gateway-down
+  502 with unchanged configuration/audit passed. Generic/global/overview reads
+  include the new module. Multi-category rankings cap each category, preserving
+  visibility of all categories; championship concurrency regression now runs the
+  actual live tick alongside administrative settlement.
+
+All writes remain gateway-owned; no admin direct-global persistence, JSON editor,
+phase4 role tables or phase5 UI added. Captures, dependency locks and production UI
+snapshots remain unchanged. Tests use isolated SQLite/httptest/local TCP accounts;
+no real player/payment or multi-gateway/cross-process lock validation is claimed.
+Existing native timer database-failure transaction boundaries are not changed.
+The first-charge/month-card reset policy difference is recorded in OPEN_QUESTIONS
+without changing either behavior. Source/document/runtime coverage and the final
+commit scope have been checked; no unrelated working files are included.
+
+阶段3c完整验收：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`全部通过（game188.080秒、admin40.766秒、store12.447秒）；`make admin-ui-check`、原28项前端测试及`make build`通过。使用指定Node22.23.4与Corepack pnpm10.11.0；构建只有既有Vite大包提示，生产UI快照未变化。3a、3b在各自提交前也分别完成了同套完整检查，结果见上。
+
+3c与本段一起提交，标题 `Add gateway world level overrides and finish stage 3 validation`；完整号用 `git log -1 --format='%H %s' -- internal/store/worldlevel.go` 查询。当前阶段3增加31项全服逐项只读、16项排名（多分类分别限量）、8项到期/重复/原生并发结算、失败回滚、世界等级登录/10905/过期和权限/502等回归。没有对生产玩家或真实付款操作；跨进程服务锁和多网关部署未验证，前端及阶段4仍待后续授权。
 
 以下为阶段2及之前的历史记录，旧状态不代表本轮任务授权。
 
@@ -113,7 +147,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
   - `drWorld.settle`（`daysrank.go:168`）
   - `gwSvc.settleAll`（`guildwar.go:345`）
   - 冠军赛 ticker（`arenachampion.go:332`）、活动 ticker（`activity.go:521`）
-- 世界等级：`store.WorldLevel` 按前 10 名平均等级算，没有覆盖值。开服时间已经能在 `/servers` 页编辑；开服天数在 `openday.go`。
+- World level: original top-10 average remains ComputedWorldLevel; registered worldlev now supplies an active override until expiry. 开服时间已经能在 `/servers` 页编辑；开服天数在 `openday.go`。
 - 网关控制口：`internal/game/adminhttp.go`，只绑 loopback、没有鉴权。`/push/charge`、`/push/refresh`、`/kick`、`/online` 都可以复用。
 - 后台调网关用 `s.gateway(...)`，参考 `kickRole`（`internal/admin/handlers.go:842`）；审计用 `s.audit(...)`。`internal/admin` 已经 import `internal/game`。
 

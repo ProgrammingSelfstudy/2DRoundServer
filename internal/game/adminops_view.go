@@ -102,8 +102,10 @@ func globalSeason(st *store.Store, srv string, state, service any, now time.Time
 
 func globalRanks(st *store.Store, srv string, state, service any, limit int) ([]AdminRankRow, error) {
 	out := []AdminRankRow{}
+	added := 0
 	add := func(rank int64, data any) {
-		if len(out) < limit {
+		if added < limit {
+			added++
 			out = append(out, AdminRankRow{Rank: rank, Data: data})
 		}
 	}
@@ -124,6 +126,7 @@ func globalRanks(st *store.Store, srv string, state, service any, limit int) ([]
 		for _, p := range b.Pairs {
 			for i := range p.Sides {
 				side := &p.Sides[i]
+				added = 0
 				for _, row := range side.rankMessages() {
 					add(row.Int("rank"), map[string]any{"gid": side.GID, "row": row})
 				}
@@ -159,6 +162,7 @@ func globalRanks(st *store.Store, srv string, state, service any, limit int) ([]
 		}
 	case *drWorld:
 		for _, rk := range drCfg.Ranks {
+			added = 0
 			if b.Settled {
 				for i, v := range b.Frozen[itoa64(rk.ID)] {
 					add(int64(i+1), map[string]any{"type": rk.ID, "rid": v.RID, "val": v.Val})
@@ -184,6 +188,7 @@ func globalRanks(st *store.Store, srv string, state, service any, limit int) ([]
 		}
 	case *endRanks:
 		for typ := int64(1); typ <= 4; typ++ {
+			added = 0
 			for i, v := range b.sorted(typ) {
 				add(int64(i+1), map[string]any{"type": typ, "row": v})
 			}

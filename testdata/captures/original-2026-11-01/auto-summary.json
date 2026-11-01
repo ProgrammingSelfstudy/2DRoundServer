@@ -1,0 +1,17 @@
+{
+  "scope_count": 20,
+  "scopes_with_action_results": 13,
+  "scopes_with_windows_or_state_only": 7,
+  "new_battles": 24,
+  "wins": 5,
+  "losses": 19,
+  "replays_not_counted_as_new_battles": 1,
+  "decoded_frames": 9283,
+  "decode_errors": 0,
+  "exported_rows": 1054,
+  "unique_exported_frames": 1052,
+  "remaining_scenario_groups": 32,
+  "known_gem_spend": 800,
+  "server_implementation_changed": false,
+  "note": "Counts describe this capture pass only; remaining groups include unattempted scenarios, and are not a project completion percentage."
+}

@@ -1,0 +1,326 @@
+{
+  "batch": "followup-tower-expedition",
+  "source": "cap-20261101-085514-5ff187b7.pcap",
+  "snapshot": "final-snapshot.pcap",
+  "snapshot_bytes": 889781,
+  "snapshot_sha256": "874a352e4d7faa495c4f17a9e34f3c8dda2d518f09695158a75ee4bcb9fdaad5",
+  "source_still_receiving": false,
+  "decoded_frames": 3545,
+  "decode_errors": 0,
+  "last_frame_utc": "2026-11-01T02:22:55.855936Z",
+  "selection": "Disjoint UI-time scopes and command allowlist; root followup files use final snapshot. Archived check12 is provenance only, not additional evidence or battle count. No raw payload/network endpoints exported.",
+  "scopes": [
+    {
+      "name": "tower",
+      "file": "followup-tower.jsonl",
+      "frames": 118,
+      "commands": {
+        "11211": 8,
+        "11212": 8,
+        "11322": 8,
+        "11323": 4,
+        "11325": 12,
+        "11327": 4,
+        "11329": 2,
+        "20000": 4,
+        "20001": 8,
+        "20002": 10,
+        "20004": 10,
+        "20005": 10,
+        "20006": 4,
+        "20019": 10,
+        "20027": 4,
+        "20060": 4,
+        "20063": 8
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "f40ab7a90459997417859ed6967fcb9280611a6b2e935b2339318a3a2d7cf7a7"
+    },
+    {
+      "name": "gear",
+      "file": "followup-gear.jsonl",
+      "frames": 0,
+      "commands": {},
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "longring",
+      "file": "followup-longring.jsonl",
+      "frames": 589,
+      "commands": {
+        "12741": 10,
+        "12742": 3,
+        "16401": 14,
+        "20000": 14,
+        "20001": 28,
+        "20002": 14,
+        "20004": 14,
+        "20005": 14,
+        "20006": 14,
+        "20019": 14,
+        "20027": 14,
+        "20060": 6,
+        "20063": 28,
+        "28600": 134,
+        "28601": 2,
+        "28602": 2,
+        "28603": 9,
+        "28604": 4,
+        "28605": 6,
+        "28606": 54,
+        "28607": 14,
+        "28608": 14,
+        "28609": 22,
+        "28610": 32,
+        "28611": 4,
+        "28612": 32,
+        "28613": 32,
+        "28614": 12,
+        "28616": 3,
+        "28621": 2,
+        "28622": 2,
+        "28624": 3,
+        "28625": 18,
+        "28626": 1
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "529077ccaf1678c080609bf7a528f18ab310778bed6e504a4fd5b56688a22b37"
+    },
+    {
+      "name": "voyage-baseline",
+      "file": "followup-voyage-baseline.jsonl",
+      "frames": 4,
+      "commands": {
+        "23800": 2,
+        "23805": 2
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "b3bfe4c57b06d485af9fc75ee2d7cfc3937ef3f6f826627150d0b1f41c557fb1"
+    },
+    {
+      "name": "voyage",
+      "file": "followup-voyage.jsonl",
+      "frames": 5,
+      "commands": {
+        "10302": 1,
+        "10512": 1,
+        "12742": 1,
+        "23806": 2
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "cb0eef9cff76c5e93f70f2f4431fa56aaf207da64ba602b3accb4a62e3ce42ec"
+    },
+    {
+      "name": "endless",
+      "file": "followup-endless.jsonl",
+      "frames": 35,
+      "commands": {
+        "20000": 1,
+        "20001": 2,
+        "20002": 1,
+        "20004": 1,
+        "20005": 1,
+        "20006": 2,
+        "20019": 1,
+        "20027": 1,
+        "20060": 4,
+        "20063": 2,
+        "23900": 3,
+        "23901": 2,
+        "23902": 3,
+        "23903": 3,
+        "23906": 1,
+        "23910": 1,
+        "23911": 2,
+        "23913": 4
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "9b58dd906e9ee4ae36397e00d9658daa2ec93e54d3dab506f5f0302fc08b7117"
+    },
+    {
+      "name": "ladder",
+      "file": "followup-ladder.jsonl",
+      "frames": 99,
+      "commands": {
+        "10302": 3,
+        "11211": 4,
+        "11212": 6,
+        "16401": 3,
+        "20000": 3,
+        "20001": 6,
+        "20002": 5,
+        "20004": 5,
+        "20005": 5,
+        "20006": 3,
+        "20019": 5,
+        "20027": 3,
+        "20060": 8,
+        "20063": 6,
+        "24300": 7,
+        "24301": 7,
+        "24302": 8,
+        "24303": 6,
+        "24307": 3,
+        "24317": 3
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "02aa7dfdf93c9e382efe62cc87f398c299794b35dea24984d9432e604afbe026"
+    },
+    {
+      "name": "elite",
+      "file": "followup-elite.jsonl",
+      "frames": 52,
+      "commands": {
+        "10302": 1,
+        "10512": 1,
+        "10957": 1,
+        "10958": 1,
+        "16401": 1,
+        "20000": 1,
+        "20001": 2,
+        "20002": 2,
+        "20004": 2,
+        "20005": 2,
+        "20006": 1,
+        "20019": 2,
+        "20027": 1,
+        "20060": 2,
+        "20063": 2,
+        "24900": 4,
+        "24901": 4,
+        "24902": 1,
+        "24905": 2,
+        "24906": 1,
+        "24920": 8,
+        "24950": 1,
+        "24952": 1,
+        "26555": 6,
+        "26556": 2
+      },
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl",
+      "sha256": "84fa2b0d47b339440dd30e3a9099a18621e116157b9445779bdfe816429780be"
+    }
+  ],
+  "exported_rows": 902,
+  "unique_exported_source_lines": 902,
+  "battles": {
+    "tower": {
+      "count": 4,
+      "results": {
+        "2": 2,
+        "1": 2
+      }
+    },
+    "longring": {
+      "count": 14,
+      "results": {
+        "2": 1,
+        "1": 13
+      }
+    },
+    "ladder": {
+      "count": 3,
+      "results": {
+        "1": 2,
+        "2": 1
+      }
+    },
+    "elite": {
+      "count": 1,
+      "results": {
+        "1": 1
+      }
+    },
+    "endless": {
+      "count": 1,
+      "outcomes": {
+        "loss": 1
+      },
+      "basis": "script and unchanged day_pass_round, not generic 20006 result"
+    }
+  },
+  "schema_version": 2,
+  "source_bytes": 889781,
+  "source_sha256": "874a352e4d7faa495c4f17a9e34f3c8dda2d518f09695158a75ee4bcb9fdaad5",
+  "decoded_file": "final-decoded.jsonl",
+  "decoded_sha256": "51f7479fd7407f5adc6b50c2290192d8ab8543b8d2ad21d38a174da82501fee7",
+  "decoder_sha256": "f5f7319fe09c60c586d426af9a2760d6d54d9d0c21684faf7cb006aa1a2960ae",
+  "source_line_definition": "1-based line in final-decoded.jsonl generated from final-snapshot.pcap; each exported row names both files. Earlier checkN references retain their own snapshot/decoded files outside repository.",
+  "first_frame_utc": "2026-11-01T00:55:34.88404Z",
+  "stop_evidence": "followup-stop-evidence.json",
+  "battle_summary": "followup-battle-summary.json",
+  "source_line_migration": "followup-source-line-migration.json",
+  "previous_checkpoint": {
+    "manifest": "followup-checkpoints/check12/followup-manifest.json",
+    "artifacts_hashes": "followup-checkpoints/check12/artifact-hashes.json",
+    "snapshot": "check12-snapshot.pcap",
+    "decoded": "check12-decoded.jsonl",
+    "preserved_exported_rows": 850
+  },
+  "total_battles": 23,
+  "battle_outcomes": {
+    "win": 18,
+    "loss": 5
+  },
+  "formation_status": {
+    "main_attack_type0": {
+      "restored": false,
+      "last_saved": [
+        {
+          "id": 965,
+          "pos": 6
+        }
+      ],
+      "request_source_line": 1780,
+      "success_response_source_line": 3411,
+      "expected_restore": [
+        {
+          "id": 388,
+          "pos": 3
+        }
+      ],
+      "note": "Latest user instruction stopped game operations before restoration; no later type0 save in final capture."
+    },
+    "ladder_defense_type9": {
+      "restored": true,
+      "last_saved": [
+        {
+          "id": 388,
+          "pos": 3
+        }
+      ],
+      "request_source_line": 1763,
+      "success_response_source_line": 3399
+    },
+    "elite_type1": {
+      "last_observed": [
+        {
+          "id": 2,
+          "pos": 6
+        },
+        {
+          "id": 1,
+          "pos": 1
+        }
+      ],
+      "last_query_response_source_line": 3543,
+      "saved_this_batch": false,
+      "note": "Independent team; no 24921 in final capture."
+    }
+  },
+  "artifacts": {
+    "followup-source-line-migration.json": "49a851e3d5b3285b3749e116c11be2afd5f748e192cdc1254f0f091a6067a8e2",
+    "followup-battle-summary.json": "fe68b62fd16ee21ec1543b8d6ac964f3fb91a891c1ffbb568de46a9d320ded0c",
+    "followup-stop-evidence.json": "96161f0c21e549daaf5929b133b06ea09325e0e30457664c40355555412f1ce6",
+    "followup-ui-actions.json": "946db5eab5965c97ced3289dab9615f5d29d0feee4cebf71246e28c12b76705b"
+  }
+}

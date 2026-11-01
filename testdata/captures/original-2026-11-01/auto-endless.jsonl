@@ -1,0 +1,12 @@
+{"t":"2026-10-31T17:18:19.425292Z","dir":"c2s","cmd":20060,"stream":"game-1","source_line":555,"msg":{"combat_type":11}}
+{"t":"2026-10-31T17:18:19.474173Z","dir":"s2c","cmd":20060,"stream":"game-1","source_line":6181,"msg":{"combat_type":11,"type":0}}
+{"t":"2026-10-31T17:18:19.633693Z","dir":"c2s","cmd":23903,"stream":"game-1","source_line":559,"msg":{"type":5}}
+{"t":"2026-10-31T17:18:19.637228Z","dir":"c2s","cmd":23900,"stream":"game-1","source_line":561}
+{"t":"2026-10-31T17:18:19.678764Z","dir":"s2c","cmd":23903,"stream":"game-1","source_line":6183,"msg":{"id":2,"max_id":9,"rewarded":[{"id":1}],"status":0,"type":5}}
+{"t":"2026-10-31T17:18:19.708738Z","dir":"s2c","cmd":23900,"stream":"game-1","source_line":6184,"msg":{"current_round":1,"day_pass_round":0,"is_appoint":1,"is_employ":0,"is_reward":0,"list":[],"max_round":9,"my_idx":24,"new_current_round":1,"new_day_pass_round":0,"new_max_round":0,"new_my_idx":0,"new_rank_list":[],"next_time":254500,"next_type":2,"rank_list":[{"idx":1,"name":"label-14","rid":900008,"srv_id":"server-1","val":1500},{"idx":2,"name":"label-15","rid":900009,"srv_id":"server-1","val":1313},{"idx":3,"name":"label-16","rid":900010,"srv_id":"server-1","val":1017}],"select_type":1,"type":0}}
+{"t":"2026-10-31T17:18:30.203657Z","dir":"c2s","cmd":23907,"stream":"game-1","source_line":565}
+{"t":"2026-10-31T17:18:30.246332Z","dir":"s2c","cmd":23907,"stream":"game-1","source_line":6186,"msg":{"list":[]}}
+{"t":"2026-10-31T17:18:40.835341Z","dir":"c2s","cmd":23903,"stream":"game-1","source_line":569,"msg":{"type":1}}
+{"t":"2026-10-31T17:18:40.876694Z","dir":"s2c","cmd":23903,"stream":"game-1","source_line":6188,"msg":{"id":1,"max_id":0,"rewarded":[],"status":0,"type":1}}
+{"t":"2026-10-31T17:19:03.069154Z","dir":"c2s","cmd":20060,"stream":"game-1","source_line":574,"msg":{"combat_type":0}}
+{"t":"2026-10-31T17:19:03.112939Z","dir":"s2c","cmd":20060,"stream":"game-1","source_line":6191,"msg":{"combat_type":0,"type":0}}

@@ -1,0 +1,1924 @@
+{
+  "evidence_kind": "ADB UI intent; operation success must be checked against responses",
+  "screenshots_retained_outside_repository": true,
+  "events": [
+    {
+      "t": "2026-11-01T00:55:14.150559+00:00",
+      "action": "tap 431 123 capture-start"
+    },
+    {
+      "t": "2026-11-01T00:55:28.688329+00:00",
+      "action": "tap 176 829 login-saved"
+    },
+    {
+      "t": "2026-11-01T00:55:34.915833+00:00",
+      "action": "tap 313 1253 start-game"
+    },
+    {
+      "t": "2026-11-01T00:55:47.440120+00:00",
+      "action": "tap 413 1354 open-trials"
+    },
+    {
+      "t": "2026-11-01T00:55:54.160817+00:00",
+      "action": "tap 48 1351 city-for-tower"
+    },
+    {
+      "t": "2026-11-01T00:56:00.267439+00:00",
+      "action": "swipe 160 701 560 701 city-left"
+    },
+    {
+      "t": "2026-11-01T00:56:06.585212+00:00",
+      "action": "tap 179 439 voyage-menu"
+    },
+    {
+      "t": "2026-11-01T00:56:14.100656+00:00",
+      "action": "tap 74 1176 voyage-back"
+    },
+    {
+      "t": "2026-11-01T00:56:20.858354+00:00",
+      "action": "swipe 166 701 559 701 city-far-left"
+    },
+    {
+      "t": "2026-11-01T00:56:29.741022+00:00",
+      "action": "tap 315 1335 adventure"
+    },
+    {
+      "t": "2026-11-01T00:56:42.830784+00:00",
+      "action": "tap 44 1351 city-return"
+    },
+    {
+      "t": "2026-11-01T00:56:50.027282+00:00",
+      "action": "swipe 570 714 65 714 city-right"
+    },
+    {
+      "t": "2026-11-01T00:56:57.784236+00:00",
+      "action": "swipe 563 715 74 715 city-far-right"
+    },
+    {
+      "t": "2026-11-01T00:57:05.555561+00:00",
+      "action": "tap 456 450 open-tower"
+    },
+    {
+      "t": "2026-11-01T00:57:11.755622+00:00",
+      "action": "tap 325 861 tower36-preview"
+    },
+    {
+      "t": "2026-11-01T00:57:19.792735+00:00",
+      "action": "tap 315 1060 tower36-formation"
+    },
+    {
+      "t": "2026-11-01T00:57:26.719339+00:00",
+      "action": "tap 96 932 tower-remove-lv165"
+    },
+    {
+      "t": "2026-11-01T00:57:33.803391+00:00",
+      "action": "tap 543 933 tower-add-lv45"
+    },
+    {
+      "t": "2026-11-01T00:57:40.379192+00:00",
+      "action": "tap 96 1037 tower-add-lv40-a"
+    },
+    {
+      "t": "2026-11-01T00:57:49.631219+00:00",
+      "action": "tap 207 1037 tower-add-lv40-b"
+    },
+    {
+      "t": "2026-11-01T00:58:02.408387+00:00",
+      "action": "tap 318 1042 tower-add-lv35-a"
+    },
+    {
+      "t": "2026-11-01T00:58:09.280784+00:00",
+      "action": "tap 428 1040 tower-add-lv35-b"
+    },
+    {
+      "t": "2026-11-01T00:58:16.132210+00:00",
+      "action": "tap 317 1162 tower36-fight-lowteam"
+    },
+    {
+      "t": "2026-11-01T01:23:04.633877+00:00",
+      "action": "tap 456 450 resumed-tower-status"
+    },
+    {
+      "t": "2026-11-01T01:23:19.201404+00:00",
+      "action": "tap 314 1060 tower36-skip-probe-formation"
+    },
+    {
+      "t": "2026-11-01T01:23:35.003227+00:00",
+      "action": "tap 318 1162 tower36-manual-skip-probe"
+    },
+    {
+      "t": "2026-11-01T01:24:32.640453+00:00",
+      "action": "tap 565 209 tower-rules"
+    },
+    {
+      "t": "2026-11-01T01:24:49.962167+00:00",
+      "action": "tap 310 548 tower-close-rules"
+    },
+    {
+      "t": "2026-11-01T01:25:03.037713+00:00",
+      "action": "tap 314 1060 tower36-strong-formation"
+    },
+    {
+      "t": "2026-11-01T01:25:21.873111+00:00",
+      "action": "tap 96 1038 tower-remove-lv40-for-strong"
+    },
+    {
+      "t": "2026-11-01T01:25:36.269324+00:00",
+      "action": "tap 96 933 tower-add-lv165"
+    },
+    {
+      "t": "2026-11-01T01:25:45.521200+00:00",
+      "action": "tap 317 1162 tower36-strong-fight"
+    },
+    {
+      "t": "2026-11-01T01:26:07.373281+00:00",
+      "action": "tap 466 885 tower37-next"
+    },
+    {
+      "t": "2026-11-01T01:26:20.341043+00:00",
+      "action": "tap 317 1060 tower37-formation"
+    },
+    {
+      "t": "2026-11-01T01:26:33.822454+00:00",
+      "action": "tap 317 1162 tower37-strong-fight"
+    },
+    {
+      "t": "2026-11-01T01:26:57.869458+00:00",
+      "action": "tap 224 1346 gear-open-bag"
+    },
+    {
+      "t": "2026-11-01T01:27:08.401101+00:00",
+      "action": "tap 91 491 gear-equipment-tab"
+    },
+    {
+      "t": "2026-11-01T01:27:28.509844+00:00",
+      "action": "swipe 555 494 120 494 gear-tabs-more"
+    },
+    {
+      "t": "2026-11-01T01:27:41.572854+00:00",
+      "action": "tap 539 492 gear-holy-bag"
+    },
+    {
+      "t": "2026-11-01T01:27:50.998403+00:00",
+      "action": "tap 203 840 gear-existing-preview-item"
+    },
+    {
+      "t": "2026-11-01T01:28:01.610993+00:00",
+      "action": "tap 315 982 gear-reopen-wash-preview"
+    },
+    {
+      "t": "2026-11-01T01:28:09.325010+00:00",
+      "action": "tap 595 368 gear-retain-preview-close"
+    },
+    {
+      "t": "2026-11-01T01:28:18.884684+00:00",
+      "action": "tap 433 983 gear-wear-route"
+    },
+    {
+      "t": "2026-11-01T01:28:29.164772+00:00",
+      "action": "tap 141 584 gear-max-hero-inspect"
+    },
+    {
+      "t": "2026-11-01T01:28:39.659185+00:00",
+      "action": "tap 409 1342 longring-adventure-menu"
+    },
+    {
+      "t": "2026-11-01T01:28:50.047683+00:00",
+      "action": "tap 316 1043 longring-open"
+    },
+    {
+      "t": "2026-11-01T01:28:58.458658+00:00",
+      "action": "tap 231 1086 longring-first-guard"
+    },
+    {
+      "t": "2026-11-01T01:29:08.631950+00:00",
+      "action": "tap 211 1087 longring-defeat-formation"
+    },
+    {
+      "t": "2026-11-01T01:29:19.017065+00:00",
+      "action": "tap 96 932 longring-remove-strong"
+    },
+    {
+      "t": "2026-11-01T01:29:27.985835+00:00",
+      "action": "tap 207 933 longring-lowhero-add"
+    },
+    {
+      "t": "2026-11-01T01:29:36.325424+00:00",
+      "action": "tap 316 1166 longring-lowteam-save"
+    },
+    {
+      "t": "2026-11-01T01:29:45.628955+00:00",
+      "action": "tap 417 1086 longring-lowteam-fight"
+    },
+    {
+      "t": "2026-11-01T01:29:54.707616+00:00",
+      "action": "tap 464 839 longring-lowteam-confirm"
+    },
+    {
+      "t": "2026-11-01T01:30:24.029741+00:00",
+      "action": "tap 228 1089 longring-retry-guard"
+    },
+    {
+      "t": "2026-11-01T01:30:33.337993+00:00",
+      "action": "tap 212 1086 longring-recovery-formation"
+    },
+    {
+      "t": "2026-11-01T01:30:46.307161+00:00",
+      "action": "tap 97 934 longring-restore-strong"
+    },
+    {
+      "t": "2026-11-01T01:31:00.599338+00:00",
+      "action": "tap 315 1164 longring-strong-save"
+    },
+    {
+      "t": "2026-11-01T01:31:15.018153+00:00",
+      "action": "tap 417 1085 longring-strong-fight"
+    },
+    {
+      "t": "2026-11-01T01:31:24.027355+00:00",
+      "action": "tap 463 838 longring-strong-confirm"
+    },
+    {
+      "t": "2026-11-01T01:31:34.329473+00:00",
+      "action": "tap 604 582 longring-strong-skip"
+    },
+    {
+      "t": "2026-11-01T01:31:44.174040+00:00",
+      "action": "tap 594 376 longring-close-stats"
+    },
+    {
+      "t": "2026-11-01T01:31:53.662343+00:00",
+      "action": "tap 316 1010 longring-success-close"
+    },
+    {
+      "t": "2026-11-01T01:32:03.087652+00:00",
+      "action": "tap 314 740 longring-relic-health"
+    },
+    {
+      "t": "2026-11-01T01:32:11.714132+00:00",
+      "action": "tap 316 968 longring-relic-health-confirm"
+    },
+    {
+      "t": "2026-11-01T01:32:20.052130+00:00",
+      "action": "tap 151 976 longring-recruit-node"
+    },
+    {
+      "t": "2026-11-01T01:32:28.204574+00:00",
+      "action": "tap 92 673 longring-recruit-crane"
+    },
+    {
+      "t": "2026-11-01T01:32:38.962846+00:00",
+      "action": "tap 315 1036 longring-recruit-confirm"
+    },
+    {
+      "t": "2026-11-01T01:32:48.928282+00:00",
+      "action": "tap 232 853 longring-line4-guard"
+    },
+    {
+      "t": "2026-11-01T01:32:58.401846+00:00",
+      "action": "tap 417 1087 longring-line4-fight"
+    },
+    {
+      "t": "2026-11-01T01:33:07.010974+00:00",
+      "action": "tap 463 839 longring-line4-confirm"
+    },
+    {
+      "t": "2026-11-01T01:33:28.857284+00:00",
+      "action": "tap 315 1000 longring-line4-result-close"
+    },
+    {
+      "t": "2026-11-01T01:33:38.518541+00:00",
+      "action": "tap 510 740 longring-relic-warrior-damage"
+    },
+    {
+      "t": "2026-11-01T01:33:48.047827+00:00",
+      "action": "tap 509 966 longring-warrior-relic-confirm"
+    },
+    {
+      "t": "2026-11-01T01:33:58.856719+00:00",
+      "action": "tap 315 736 longring-line5-guard"
+    },
+    {
+      "t": "2026-11-01T01:34:08.705857+00:00",
+      "action": "tap 418 1086 longring-line5-fight"
+    },
+    {
+      "t": "2026-11-01T01:34:20.931550+00:00",
+      "action": "tap 463 838 longring-line5-confirm"
+    },
+    {
+      "t": "2026-11-01T01:34:46.118580+00:00",
+      "action": "tap 313 997 longring-line5-close"
+    },
+    {
+      "t": "2026-11-01T01:34:56.614477+00:00",
+      "action": "tap 122 743 longring-crystal-relic"
+    },
+    {
+      "t": "2026-11-01T01:35:05.848516+00:00",
+      "action": "tap 122 969 longring-crystal-relic-confirm"
+    },
+    {
+      "t": "2026-11-01T01:35:15.413567+00:00",
+      "action": "tap 394 631 longring-spring-node"
+    },
+    {
+      "t": "2026-11-01T01:35:24.693369+00:00",
+      "action": "tap 317 1100 longring-spring-use"
+    },
+    {
+      "t": "2026-11-01T01:35:34.310569+00:00",
+      "action": "tap 472 631 longring-line7-guard"
+    },
+    {
+      "t": "2026-11-01T01:35:43.712182+00:00",
+      "action": "tap 417 1086 longring-line7-fight"
+    },
+    {
+      "t": "2026-11-01T01:35:55.881937+00:00",
+      "action": "tap 463 838 longring-line7-confirm"
+    },
+    {
+      "t": "2026-11-01T01:36:13.103610+00:00",
+      "action": "tap 314 1002 longring-line7-close"
+    },
+    {
+      "t": "2026-11-01T01:36:23.040197+00:00",
+      "action": "tap 122 741 longring-victory-flag-select"
+    },
+    {
+      "t": "2026-11-01T01:36:34.723151+00:00",
+      "action": "tap 121 968 longring-victory-flag-confirm"
+    },
+    {
+      "t": "2026-11-01T01:36:45.333582+00:00",
+      "action": "tap 393 631 longring-revive-node"
+    },
+    {
+      "t": "2026-11-01T01:36:54.837045+00:00",
+      "action": "tap 315 1099 longring-revive-use"
+    },
+    {
+      "t": "2026-11-01T01:37:07.352921+00:00",
+      "action": "tap 315 630 longring-floor1-boss"
+    },
+    {
+      "t": "2026-11-01T01:37:22.042726+00:00",
+      "action": "tap 417 1087 longring-floor1-boss-fight"
+    },
+    {
+      "t": "2026-11-01T01:37:32.105165+00:00",
+      "action": "tap 463 838 longring-floor1-boss-confirm"
+    },
+    {
+      "t": "2026-11-01T01:37:50.892681+00:00",
+      "action": "tap 315 1005 longring-floor1-boss-close"
+    },
+    {
+      "t": "2026-11-01T01:37:59.776201+00:00",
+      "action": "tap 510 741 longring-floor1-orange-relic"
+    },
+    {
+      "t": "2026-11-01T01:38:10.236216+00:00",
+      "action": "tap 509 968 longring-floor1-orange-confirm"
+    },
+    {
+      "t": "2026-11-01T01:38:24.033501+00:00",
+      "action": "tap 316 418 longring-floor1-chest"
+    },
+    {
+      "t": "2026-11-01T01:38:36.869139+00:00",
+      "action": "tap 315 983 longring-floor1-chest-close"
+    },
+    {
+      "t": "2026-11-01T01:38:47.129333+00:00",
+      "action": "tap 315 415 longring-floor2-enter"
+    },
+    {
+      "t": "2026-11-01T01:39:01.366529+00:00",
+      "action": "tap 393 1093 longring-floor2-first-guard"
+    },
+    {
+      "t": "2026-11-01T01:39:11.272106+00:00",
+      "action": "tap 417 1086 longring-floor2-first-fight"
+    },
+    {
+      "t": "2026-11-01T01:39:22.256931+00:00",
+      "action": "tap 463 838 longring-floor2-first-confirm"
+    },
+    {
+      "t": "2026-11-01T01:39:40.464833+00:00",
+      "action": "tap 314 1003 longring-floor2-first-close"
+    },
+    {
+      "t": "2026-11-01T01:39:50.690009+00:00",
+      "action": "tap 122 743 longring-floor2-relic-speed"
+    },
+    {
+      "t": "2026-11-01T01:40:00.110502+00:00",
+      "action": "tap 122 968 longring-floor2-relic-confirm"
+    },
+    {
+      "t": "2026-11-01T01:40:11.099190+00:00",
+      "action": "tap 472 977 longring-floor2-line3-guard"
+    },
+    {
+      "t": "2026-11-01T01:40:22.385905+00:00",
+      "action": "tap 417 1086 longring-floor2-line3-fight"
+    },
+    {
+      "t": "2026-11-01T01:40:36.648438+00:00",
+      "action": "tap 463 838 longring-floor2-line3-confirm"
+    },
+    {
+      "t": "2026-11-01T01:41:13.967407+00:00",
+      "action": "tap 315 1002 longring-floor2-line3-close"
+    },
+    {
+      "t": "2026-11-01T01:41:23.702352+00:00",
+      "action": "tap 510 741 longring-floor2-vitality-relic"
+    },
+    {
+      "t": "2026-11-01T01:41:33.435245+00:00",
+      "action": "tap 510 968 longring-floor2-vitality-confirm"
+    },
+    {
+      "t": "2026-11-01T01:41:45.036231+00:00",
+      "action": "tap 394 853 longring-floor2-spring"
+    },
+    {
+      "t": "2026-11-01T01:41:58.501861+00:00",
+      "action": "tap 315 1100 longring-floor2-heal-revived"
+    },
+    {
+      "t": "2026-11-01T01:44:10.404153+00:00",
+      "action": "tap 473 739 longring-merchant-open"
+    },
+    {
+      "t": "2026-11-01T01:44:48.911699+00:00",
+      "action": "tap 315 944 longring-merchant-enter"
+    },
+    {
+      "t": "2026-11-01T01:54:27.429946+00:00",
+      "action": "tap 315 944 longring-merchant-abandon"
+    },
+    {
+      "t": "2026-11-01T01:55:06.173771+00:00",
+      "action": "tap 394 624 longring-floor2-line6-guard"
+    },
+    {
+      "t": "2026-11-01T01:55:20.250164+00:00",
+      "action": "tap 416 1085 longring-floor2-line6-fight"
+    },
+    {
+      "t": "2026-11-01T01:55:26.696455+00:00",
+      "action": "tap 464 838 longring-floor2-line6-confirm"
+    },
+    {
+      "t": "2026-11-01T01:55:44.417931+00:00",
+      "action": "tap 315 996 longring-floor2-line6-close"
+    },
+    {
+      "t": "2026-11-01T01:55:50.763945+00:00",
+      "action": "tap 511 741 longring-floor2-physical-relic"
+    },
+    {
+      "t": "2026-11-01T01:55:58.204567+00:00",
+      "action": "tap 508 968 longring-floor2-physical-confirm"
+    },
+    {
+      "t": "2026-11-01T01:56:05.537389+00:00",
+      "action": "tap 471 622 longring-floor2-line7-guard"
+    },
+    {
+      "t": "2026-11-01T01:56:12.180813+00:00",
+      "action": "tap 416 1085 longring-floor2-line7-fight"
+    },
+    {
+      "t": "2026-11-01T01:56:19.672011+00:00",
+      "action": "tap 464 838 longring-floor2-line7-confirm"
+    },
+    {
+      "t": "2026-11-01T01:56:33.669965+00:00",
+      "action": "tap 314 999 longring-floor2-line7-close"
+    },
+    {
+      "t": "2026-11-01T01:56:39.001760+00:00",
+      "action": "tap 509 740 longring-floor2-deepen-relic"
+    },
+    {
+      "t": "2026-11-01T01:56:44.753421+00:00",
+      "action": "tap 509 966 longring-floor2-deepen-confirm"
+    },
+    {
+      "t": "2026-11-01T01:56:51.978898+00:00",
+      "action": "tap 231 626 longring-floor2-line8-spring"
+    },
+    {
+      "t": "2026-11-01T01:57:00.587719+00:00",
+      "action": "tap 316 1180 longring-floor2-full-spring-close"
+    },
+    {
+      "t": "2026-11-01T01:57:07.222913+00:00",
+      "action": "tap 393 626 longring-floor2-line8-revive"
+    },
+    {
+      "t": "2026-11-01T01:57:13.208329+00:00",
+      "action": "tap 314 1100 longring-floor2-revive-all-full"
+    },
+    {
+      "t": "2026-11-01T01:57:21.012011+00:00",
+      "action": "tap 463 838 longring-floor2-revive-full-confirm"
+    },
+    {
+      "t": "2026-11-01T01:57:27.349919+00:00",
+      "action": "tap 315 622 longring-floor2-boss"
+    },
+    {
+      "t": "2026-11-01T01:57:33.289909+00:00",
+      "action": "tap 417 1085 longring-floor2-boss-fight"
+    },
+    {
+      "t": "2026-11-01T01:57:43.096040+00:00",
+      "action": "tap 464 838 longring-floor2-boss-confirm"
+    },
+    {
+      "t": "2026-11-01T01:57:58.758643+00:00",
+      "action": "tap 315 999 longring-floor2-boss-close"
+    },
+    {
+      "t": "2026-11-01T01:58:04.764759+00:00",
+      "action": "tap 508 738 longring-floor2-poison-relic"
+    },
+    {
+      "t": "2026-11-01T01:58:10.482363+00:00",
+      "action": "tap 509 967 longring-floor2-poison-confirm"
+    },
+    {
+      "t": "2026-11-01T01:58:16.852692+00:00",
+      "action": "tap 315 418 longring-floor2-chest"
+    },
+    {
+      "t": "2026-11-01T01:58:24.072299+00:00",
+      "action": "tap 315 981 longring-floor2-chest-close"
+    },
+    {
+      "t": "2026-11-01T01:58:32.729585+00:00",
+      "action": "tap 315 418 longring-floor3-enter"
+    },
+    {
+      "t": "2026-11-01T01:58:43.392297+00:00",
+      "action": "tap 233 1100 longring-floor3-first-spring"
+    },
+    {
+      "t": "2026-11-01T01:58:50.834422+00:00",
+      "action": "tap 315 1100 longring-floor3-spring-use"
+    },
+    {
+      "t": "2026-11-01T01:58:59.556253+00:00",
+      "action": "tap 464 838 longring-floor3-spring-full-confirm"
+    },
+    {
+      "t": "2026-11-01T01:59:07.387543+00:00",
+      "action": "tap 315 979 longring-floor3-line3-guard"
+    },
+    {
+      "t": "2026-11-01T01:59:13.676823+00:00",
+      "action": "tap 417 1085 longring-floor3-line3-fight"
+    },
+    {
+      "t": "2026-11-01T01:59:20.078537+00:00",
+      "action": "tap 464 838 longring-floor3-line3-confirm"
+    },
+    {
+      "t": "2026-11-01T01:59:45.511111+00:00",
+      "action": "tap 315 999 longring-floor3-line3-close"
+    },
+    {
+      "t": "2026-11-01T01:59:53.546767+00:00",
+      "action": "tap 122 740 longring-floor3-third-floor-flag"
+    },
+    {
+      "t": "2026-11-01T02:00:01.126412+00:00",
+      "action": "tap 122 967 longring-floor3-flag-confirm"
+    },
+    {
+      "t": "2026-11-01T02:00:09.680542+00:00",
+      "action": "tap 233 853 longring-floor3-line4-spring"
+    },
+    {
+      "t": "2026-11-01T02:00:18.045191+00:00",
+      "action": "tap 315 1100 longring-floor3-line4-spring-use"
+    },
+    {
+      "t": "2026-11-01T02:00:26.062899+00:00",
+      "action": "tap 464 838 longring-floor3-line4-spring-confirm"
+    },
+    {
+      "t": "2026-11-01T02:00:36.198290+00:00",
+      "action": "tap 153 738 longring-floor3-line5-revive"
+    },
+    {
+      "t": "2026-11-01T02:00:47.317968+00:00",
+      "action": "tap 315 1100 longring-floor3-line5-revive-use"
+    },
+    {
+      "t": "2026-11-01T02:01:00.777513+00:00",
+      "action": "tap 464 838 longring-floor3-line5-revive-confirm"
+    },
+    {
+      "t": "2026-11-01T02:01:10.870605+00:00",
+      "action": "tap 233 624 longring-floor3-line6-hire"
+    },
+    {
+      "t": "2026-11-01T02:01:17.989021+00:00",
+      "action": "tap 93 928 longring-floor3-hire-law"
+    },
+    {
+      "t": "2026-11-01T02:01:25.322842+00:00",
+      "action": "tap 315 1037 longring-floor3-hire-confirm"
+    },
+    {
+      "t": "2026-11-01T02:01:36.041263+00:00",
+      "action": "tap 315 624 longring-floor3-line7-guard"
+    },
+    {
+      "t": "2026-11-01T02:01:45.485514+00:00",
+      "action": "tap 417 1085 longring-floor3-line7-fight"
+    },
+    {
+      "t": "2026-11-01T02:01:56.812828+00:00",
+      "action": "tap 464 838 longring-floor3-line7-confirm"
+    },
+    {
+      "t": "2026-11-01T02:02:20.940667+00:00",
+      "action": "tap 315 998 longring-floor3-line7-close"
+    },
+    {
+      "t": "2026-11-01T02:02:31.348208+00:00",
+      "action": "tap 315 741 longring-floor3-vitality-relic"
+    },
+    {
+      "t": "2026-11-01T02:02:40.755716+00:00",
+      "action": "tap 315 967 longring-floor3-vitality-confirm"
+    },
+    {
+      "t": "2026-11-01T02:02:49.073740+00:00",
+      "action": "tap 233 625 longring-floor3-last-spring"
+    },
+    {
+      "t": "2026-11-01T02:03:01.489172+00:00",
+      "action": "tap 315 1100 longring-floor3-last-spring-use"
+    },
+    {
+      "t": "2026-11-01T02:03:10.029145+00:00",
+      "action": "tap 464 838 longring-floor3-last-spring-confirm"
+    },
+    {
+      "t": "2026-11-01T02:03:22.132905+00:00",
+      "action": "tap 315 625 longring-floor3-boss"
+    },
+    {
+      "t": "2026-11-01T02:03:33.749149+00:00",
+      "action": "tap 417 1085 longring-floor3-boss-fight"
+    },
+    {
+      "t": "2026-11-01T02:03:41.726035+00:00",
+      "action": "tap 464 838 longring-floor3-boss-confirm"
+    },
+    {
+      "t": "2026-11-01T02:04:01.898133+00:00",
+      "action": "tap 315 998 longring-floor3-boss-close"
+    },
+    {
+      "t": "2026-11-01T02:04:10.249950+00:00",
+      "action": "tap 315 418 longring-floor3-chest"
+    },
+    {
+      "t": "2026-11-01T02:04:19.566802+00:00",
+      "action": "tap 315 980 longring-floor3-chest-close"
+    },
+    {
+      "t": "2026-11-01T02:04:31.444953+00:00",
+      "action": "tap 315 850 longring-finish-exploration"
+    },
+    {
+      "t": "2026-11-01T02:04:42.807924+00:00",
+      "action": "tap 565 196 longring-return"
+    },
+    {
+      "t": "2026-11-01T02:04:54.006806+00:00",
+      "action": "tap 45 1347 remaining-city"
+    },
+    {
+      "t": "2026-11-01T02:05:04.077061+00:00",
+      "action": "swipe 161 700 562 700 remaining-city-left"
+    },
+    {
+      "t": "2026-11-01T02:05:14.890519+00:00",
+      "action": "swipe 162 700 562 700 remaining-city-far-left"
+    },
+    {
+      "t": "2026-11-01T02:05:25.838067+00:00",
+      "action": "tap 248 439 remaining-voyage-menu"
+    },
+    {
+      "t": "2026-11-01T02:05:39.906253+00:00",
+      "action": "tap 315 1345 remaining-adventure-map"
+    },
+    {
+      "t": "2026-11-01T02:05:50.009841+00:00",
+      "action": "tap 563 318 voyage-followup-open"
+    },
+    {
+      "t": "2026-11-01T02:06:01.853754+00:00",
+      "action": "tap 522 1086 voyage-followup-claim-all"
+    },
+    {
+      "t": "2026-11-01T02:06:21.143728+00:00",
+      "action": "tap 315 971 voyage-followup-reward-close"
+    },
+    {
+      "t": "2026-11-01T02:06:36.019325+00:00",
+      "action": "tap 315 1166 voyage-followup-close"
+    },
+    {
+      "t": "2026-11-01T02:06:48.341379+00:00",
+      "action": "tap 411 1345 remaining-trials"
+    },
+    {
+      "t": "2026-11-01T02:06:57.397556+00:00",
+      "action": "tap 313 755 endless-followup-open"
+    },
+    {
+      "t": "2026-11-01T02:07:06.255301+00:00",
+      "action": "tap 315 1192 endless-followup-formation"
+    },
+    {
+      "t": "2026-11-01T02:07:21.780858+00:00",
+      "action": "tap 96 934 endless-remove-strong"
+    },
+    {
+      "t": "2026-11-01T02:07:30.376059+00:00",
+      "action": "tap 318 934 endless-add-lowhero"
+    },
+    {
+      "t": "2026-11-01T02:07:38.797995+00:00",
+      "action": "tap 315 1164 endless-lowteam-fight"
+    },
+    {
+      "t": "2026-11-01T02:07:47.539955+00:00",
+      "action": "tap 478 970 endless-select-heal-buff"
+    },
+    {
+      "t": "2026-11-01T02:08:17.735329+00:00",
+      "action": "tap 69 1294 endless-followup-return"
+    },
+    {
+      "t": "2026-11-01T02:08:32.151124+00:00",
+      "action": "tap 45 1345 remaining-city-for-pvp"
+    },
+    {
+      "t": "2026-11-01T02:08:40.253815+00:00",
+      "action": "swipe 563 700 72 700 remaining-city-right"
+    },
+    {
+      "t": "2026-11-01T02:08:49.496137+00:00",
+      "action": "tap 314 445 remaining-crossbattle-menu"
+    },
+    {
+      "t": "2026-11-01T02:08:57.520746+00:00",
+      "action": "tap 176 433 ladder-followup-open"
+    },
+    {
+      "t": "2026-11-01T02:09:07.647699+00:00",
+      "action": "tap 572 649 ladder-followup-opponent"
+    },
+    {
+      "t": "2026-11-01T02:09:19.056082+00:00",
+      "action": "tap 481 874 ladder-followup-formation"
+    },
+    {
+      "t": "2026-11-01T02:09:54.415555+00:00",
+      "action": "tap 465 911 ladder-first-result-close"
+    },
+    {
+      "t": "2026-11-01T02:10:03.033912+00:00",
+      "action": "tap 157 874 ladder-followup-adjust"
+    },
+    {
+      "t": "2026-11-01T02:10:11.490179+00:00",
+      "action": "tap 96 933 ladder-remove-strong"
+    },
+    {
+      "t": "2026-11-01T02:10:19.899565+00:00",
+      "action": "tap 318 933 ladder-add-lowhero"
+    },
+    {
+      "t": "2026-11-01T02:10:32.246114+00:00",
+      "action": "tap 315 1164 ladder-save-lowteam"
+    },
+    {
+      "t": "2026-11-01T02:10:44.630381+00:00",
+      "action": "tap 481 874 ladder-lowteam-fight"
+    },
+    {
+      "t": "2026-11-01T02:11:23.004963+00:00",
+      "action": "tap 568 649 ladder-restore-opponent-preview"
+    },
+    {
+      "t": "2026-11-01T02:11:31.660820+00:00",
+      "action": "tap 157 874 ladder-restore-formation"
+    },
+    {
+      "t": "2026-11-01T02:11:40.859320+00:00",
+      "action": "tap 318 933 ladder-restore-remove-low"
+    },
+    {
+      "t": "2026-11-01T02:11:49.388320+00:00",
+      "action": "tap 96 933 ladder-restore-add-strong"
+    },
+    {
+      "t": "2026-11-01T02:11:59.108065+00:00",
+      "action": "tap 315 1164 ladder-restore-save"
+    },
+    {
+      "t": "2026-11-01T02:12:08.214339+00:00",
+      "action": "tap 133 1346 ladder-offense-hero-menu"
+    },
+    {
+      "t": "2026-11-01T02:12:17.528798+00:00",
+      "action": "tap 133 1346 ladder-offense-hero-menu-open"
+    },
+    {
+      "t": "2026-11-01T02:12:27.233323+00:00",
+      "action": "tap 550 373 ladder-offense-formation-tabs"
+    },
+    {
+      "t": "2026-11-01T02:12:37.299428+00:00",
+      "action": "tap 96 933 ladder-offense-remove-strong"
+    },
+    {
+      "t": "2026-11-01T02:12:45.918387+00:00",
+      "action": "tap 318 933 ladder-offense-add-low"
+    },
+    {
+      "t": "2026-11-01T02:12:54.987537+00:00",
+      "action": "tap 315 1164 ladder-offense-save-low"
+    },
+    {
+      "t": "2026-11-01T02:13:05.104808+00:00",
+      "action": "tap 598 286 ladder-offense-close-formation"
+    },
+    {
+      "t": "2026-11-01T02:13:14.044841+00:00",
+      "action": "tap 45 1345 ladder-offense-city"
+    },
+    {
+      "t": "2026-11-01T02:13:24.051647+00:00",
+      "action": "tap 314 445 ladder-low-city-menu"
+    },
+    {
+      "t": "2026-11-01T02:13:33.238605+00:00",
+      "action": "tap 176 433 ladder-low-reopen"
+    },
+    {
+      "t": "2026-11-01T02:13:51.155146+00:00",
+      "action": "tap 568 649 ladder-low-target-preview"
+    },
+    {
+      "t": "2026-11-01T02:14:02.598799+00:00",
+      "action": "tap 481 874 ladder-low-offense-fight"
+    },
+    {
+      "t": "2026-11-01T02:14:57.933266+00:00",
+      "action": "tap 72 1250 ladder-followup-return-menu"
+    },
+    {
+      "t": "2026-11-01T02:15:10.211418+00:00",
+      "action": "tap 308 840 elite-followup-open"
+    },
+    {
+      "t": "2026-11-01T02:15:20.032614+00:00",
+      "action": "tap 489 573 elite-close-item-tooltip"
+    },
+    {
+      "t": "2026-11-01T02:15:29.700503+00:00",
+      "action": "tap 416 811 elite-followup-enter"
+    },
+    {
+      "t": "2026-11-01T02:15:41.384189+00:00",
+      "action": "tap 44 482 elite-followup-adjust"
+    },
+    {
+      "t": "2026-11-01T02:15:51.856206+00:00",
+      "action": "tap 250 770 elite-followup-team2"
+    },
+    {
+      "t": "2026-11-01T02:16:04.715482+00:00",
+      "action": "tap 598 286 elite-followup-adjust-close"
+    },
+    {
+      "t": "2026-11-01T02:16:15.128261+00:00",
+      "action": "tap 315 1208 elite-followup-match"
+    },
+    {
+      "t": "2026-11-01T02:16:25.842771+00:00",
+      "action": "tap 505 1101 elite-followup-find-opponent"
+    },
+    {
+      "t": "2026-11-01T02:16:53.335157+00:00",
+      "action": "tap 142 1102 elite-low-adjust-before-fight"
+    },
+    {
+      "t": "2026-11-01T02:17:03.304879+00:00",
+      "action": "tap 214 402 elite-remove-stage-hero-probe"
+    },
+    {
+      "t": "2026-11-01T02:17:16.577718+00:00",
+      "action": "tap 536 626 elite-sprite-adjust"
+    },
+    {
+      "t": "2026-11-01T02:17:27.759291+00:00",
+      "action": "tap 596 328 elite-sprite-close"
+    },
+    {
+      "t": "2026-11-01T02:22:40.291251+00:00",
+      "action": "tap 466 1020 elite-return"
+    },
+    {
+      "t": "2026-11-01T02:22:48.901693+00:00",
+      "action": "tap 142 1105 elite-adjust"
+    },
+    {
+      "t": "2026-11-01T02:23:02.311045+00:00",
+      "action": "tap 427 122 capture-stop"
+    },
+    {
+      "t": "2026-11-01T02:23:17.522163+00:00",
+      "action": "tap 427 122 capture-stop-retry"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "085515-capture-start.png",
+      "sha256": "354560a43043acc0e6fbfd2c50906d36a9279bc9a1041a54c1af10bc516af719"
+    },
+    {
+      "file": "085531-login-saved.png",
+      "sha256": "733b039f080ea0e55605b8db0ca745275a3793e520068690cb56383500d0c1fe"
+    },
+    {
+      "file": "085537-start-game.png",
+      "sha256": "2061141a33b6e94d9e2032d3e99a47041089357960b3fb5ca46a8c1e1af209f3"
+    },
+    {
+      "file": "085550-open-trials.png",
+      "sha256": "0476a1ec1de82e58feda68aed4fc93b14868dcb2b7f3bee0765e84467d490692"
+    },
+    {
+      "file": "085556-city-for-tower.png",
+      "sha256": "d32427f3a49fad4761c1acdddd58188a3e59876485d3ef3e45150313cb794ea1"
+    },
+    {
+      "file": "085603-city-left.png",
+      "sha256": "5acc89b60582b7d9a638c144df92a7edaa493d31a195303761bfd64244446ef4"
+    },
+    {
+      "file": "085609-voyage-menu.png",
+      "sha256": "e4bf5658dad7eaad494e762e94276c3829834f486e37f7098b4e30e7729143be"
+    },
+    {
+      "file": "085616-voyage-back.png",
+      "sha256": "7101958a10f71585a04b41932e1efc49b1486c3cc2ee41b8b57e26b56416661f"
+    },
+    {
+      "file": "085624-city-far-left.png",
+      "sha256": "3433d87eac39fdf39e9d64ec41a8e96a3a748b56b8c9256287bb8e4061580754"
+    },
+    {
+      "file": "085632-adventure.png",
+      "sha256": "652ebfab143cbb676640c20dfe4e5e5b54d175ce8611b5b539d1a1b42ca3e78b"
+    },
+    {
+      "file": "085645-city-return.png",
+      "sha256": "26a9aac94282bcab3bcb4c27f325602b5e714ccd9693bed3dfb52fc761486b3c"
+    },
+    {
+      "file": "085653-city-right.png",
+      "sha256": "7a584e3c79c53fb07587dd65f4e36b99f1db0a5d3b9fe5d559a44d4838ff70cd"
+    },
+    {
+      "file": "085701-city-far-right.png",
+      "sha256": "a5aadcb51949734f0f32630012624a29120cdfe06dd953b737434fd470ed780e"
+    },
+    {
+      "file": "085708-open-tower.png",
+      "sha256": "da351ccb5b995ebdaaea473deb60e10a1216a014e21bc8a586d7f2f70b80e984"
+    },
+    {
+      "file": "085714-tower36-preview.png",
+      "sha256": "367f4044d1faec7e11ab0c123d86461cb411210bf229214aa0048fde8835b1f6"
+    },
+    {
+      "file": "085722-tower36-formation.png",
+      "sha256": "2688d6fe4673ffb93f8e92fdf81cfa99565ee2f1abc9cab81908a40f0f875ff0"
+    },
+    {
+      "file": "085729-tower-remove-lv165.png",
+      "sha256": "3e2726f4ee21072e2c9f9caf3238aa646c185fb4f16fbaa83f7d242976aaa981"
+    },
+    {
+      "file": "085736-tower-add-lv45.png",
+      "sha256": "ec71bea00927dd32a55dbd9af8453bffcb16bb18a949f7504277147222ec6064"
+    },
+    {
+      "file": "085743-tower-add-lv40-a.png",
+      "sha256": "8ea4d965d3b2e9540635a4be14b5c3be96d284d92c0f058ff54afcb0b33a0705"
+    },
+    {
+      "file": "085752-tower-add-lv40-b.png",
+      "sha256": "fbf623953e18b0d9709d24306164abdb9ea7209cdb033eb63d867c205dd45ae2"
+    },
+    {
+      "file": "085805-tower-add-lv35-a.png",
+      "sha256": "1f421ed231a68ece465f99300482f857d00280905c12379ed5197d4f557d2663"
+    },
+    {
+      "file": "085811-tower-add-lv35-b.png",
+      "sha256": "e4c1a3df6f8561a6e3f7a67fd4a24d2c17dd746c423cf63f0f54a88a9e33fbe5"
+    },
+    {
+      "file": "085818-tower36-fight-lowteam.png",
+      "sha256": "43c68cc64490cec790b830077e2dbec269dfb8197abcf2c3a6f6792cb7d0d5f2"
+    },
+    {
+      "file": "092307-resumed-tower-status.png",
+      "sha256": "3fca26c6e7b88204c0f0b8268ea089c4b175c5f9cad480a260d0629933a2b5dc"
+    },
+    {
+      "file": "092321-tower36-skip-probe-formation.png",
+      "sha256": "ebd523fe6731871ac5ce22a9721e307af7498adefda5e5dab2b6b999ccdf0ab1"
+    },
+    {
+      "file": "092337-tower36-manual-skip-probe.png",
+      "sha256": "11983f7a5cf41b65b02810b7d3fd84431b4974af486c6a27e7715d285c8997e6"
+    },
+    {
+      "file": "092435-tower-rules.png",
+      "sha256": "b1ade0166793dddb2690d96dc54efd73d3d1c110335da2537849b49773d76ce3"
+    },
+    {
+      "file": "092452-tower-close-rules.png",
+      "sha256": "18d22be9fd6e560c17255427cc8a5d818b80fe287d1bd867dad5dfab4a08ff9b"
+    },
+    {
+      "file": "092505-tower36-strong-formation.png",
+      "sha256": "59eb858eb1d0f1ad9c0ab13978b3b8ad711ca2a5c4ce68c636ab94c1675032eb"
+    },
+    {
+      "file": "092524-tower-remove-lv40-for-strong.png",
+      "sha256": "6c1ab563147bacdbc82b1d2d3cde9da9d0835355fcd05b90288004124d81fefc"
+    },
+    {
+      "file": "092538-tower-add-lv165.png",
+      "sha256": "7c49d7d039a9d2c1501d0bfaa88fb819e1ef6deb4ef6a4f2829d72d6da0965f4"
+    },
+    {
+      "file": "092548-tower36-strong-fight.png",
+      "sha256": "74f0c0e56d28f063844507686f32512ea185af84783459da4967884099f95519"
+    },
+    {
+      "file": "092609-tower37-next.png",
+      "sha256": "b4c6b82e527986e0cee020bc39a8aa769b215c3e9da7658e6340de6d95906851"
+    },
+    {
+      "file": "092623-tower37-formation.png",
+      "sha256": "7c805507e1e7cb75e68af372fd871326bf8072a7d35d80fdd0dd8705122d5374"
+    },
+    {
+      "file": "092636-tower37-strong-fight.png",
+      "sha256": "cc16fb6a6f8e97f9cf07a36df6f835a39a47ec1fa1abd2365aefd7a073a2fe23"
+    },
+    {
+      "file": "092700-gear-open-bag.png",
+      "sha256": "4fa6160980706497758e1d622c4e677fb23448e8c6d69953b2ee18c60ec763e6"
+    },
+    {
+      "file": "092711-gear-equipment-tab.png",
+      "sha256": "5a33fbccf7f46b95b03f989685194d89e467605e2c0d95126615e0c55549f3d3"
+    },
+    {
+      "file": "092731-gear-tabs-more.png",
+      "sha256": "98eba939e3c605daebdcd5eb4173cb24243143d52ee9c1e68f8baf76a5216f97"
+    },
+    {
+      "file": "092744-gear-holy-bag.png",
+      "sha256": "e2025739a810b225ffa6a58145c0cc3c66ff55dc28a5324130e7ed410f3748f9"
+    },
+    {
+      "file": "092753-gear-existing-preview-item.png",
+      "sha256": "1edaa3205ac27886343620ed37fc49294315f9b41ecc04b5a06b81884ef9f92f"
+    },
+    {
+      "file": "092803-gear-reopen-wash-preview.png",
+      "sha256": "284f791b9a7ad88c6bf64881bea085ba44d93e5804cec3a754744fc9b9bac5c3"
+    },
+    {
+      "file": "092811-gear-retain-preview-close.png",
+      "sha256": "bec7f4771fb52d02aaac67dab651fbaa36e257e27fe868b68ba134a763713eb9"
+    },
+    {
+      "file": "092821-gear-wear-route.png",
+      "sha256": "32b5d1643c3e7d13096d5caa60d3c05eb78acbb99174fe5ce7aa778369412e1f"
+    },
+    {
+      "file": "092832-gear-max-hero-inspect.png",
+      "sha256": "ec77fa7bb6877cf2b14426f6e57a71a9922ba9ec0bee216d235fc5515a84a46e"
+    },
+    {
+      "file": "092842-longring-adventure-menu.png",
+      "sha256": "7ff6d4af4c74b89f6365424fa0a56d80874d427b23b235875770f784ffcd0ceb"
+    },
+    {
+      "file": "092852-longring-open.png",
+      "sha256": "f0b9db24f0ff84f66b058ced135ba8f6f67862db6e56308d9b63b05ae049db67"
+    },
+    {
+      "file": "092900-longring-first-guard.png",
+      "sha256": "ed0298f7f925f5b4d13d3a9c94f612cb5be357978ff3481e15bf5dbf33921539"
+    },
+    {
+      "file": "092911-longring-defeat-formation.png",
+      "sha256": "96bd94e54f4f07965531ae88ded831c6a9a197ffc23013946b81c9955d190dd9"
+    },
+    {
+      "file": "092921-longring-remove-strong.png",
+      "sha256": "233cbc965c30b2e5e3b596b28d666504ecfab0b17524e54383a4944dada6fe9e"
+    },
+    {
+      "file": "092930-longring-lowhero-add.png",
+      "sha256": "cf9ec41d1393bf5e0421a93dfb3f09e03c7677cf2f38594752e9fbae4e096089"
+    },
+    {
+      "file": "092938-longring-lowteam-save.png",
+      "sha256": "00bbc139fadc6e912e8b2b88098c3740f230d81722e079574245e1f740836430"
+    },
+    {
+      "file": "092947-longring-lowteam-fight.png",
+      "sha256": "d6c4c38d68e9a24d017d7a6362bec636f4ae5ceb6bd66f224f6d7c697a1dfd5a"
+    },
+    {
+      "file": "092957-longring-lowteam-confirm.png",
+      "sha256": "c769c11aff62edb6edb5a4237c8c8b79484760cfd11520bdd2b521ad25b79697"
+    },
+    {
+      "file": "093026-longring-retry-guard.png",
+      "sha256": "e16f847e51608138215e9eb100e9cb99b398c1f7e333fe9bb1195bd7611f4b04"
+    },
+    {
+      "file": "093036-longring-recovery-formation.png",
+      "sha256": "b9f87e9b3c7c357cf4853f7122bddb0d5dba3bbde920fcb160bc9a15eabcfd8f"
+    },
+    {
+      "file": "093049-longring-restore-strong.png",
+      "sha256": "d190d6eb6fb151c9e741ef1ce52d0a1c94c2685d1c05e1c875027a8c59548a79"
+    },
+    {
+      "file": "093102-longring-strong-save.png",
+      "sha256": "bbb64164e0e8f84ebc5b38f9602252149041053acda65b43f3ae7464098d3536"
+    },
+    {
+      "file": "093117-longring-strong-fight.png",
+      "sha256": "ee84903fb5f2c41391acf905efe88218ec021381200d20eeeba3c555cf5d79c4"
+    },
+    {
+      "file": "093127-longring-strong-confirm.png",
+      "sha256": "a3369ef49f91723e666708d2f2f7ccf33cb94787a578d044854b67b516048c03"
+    },
+    {
+      "file": "093136-longring-strong-skip.png",
+      "sha256": "397836c0807e991ddc2bc2b214dbb72e8987ea8b4254a61ad70b42b1b95daa32"
+    },
+    {
+      "file": "093146-longring-close-stats.png",
+      "sha256": "34f6f7f29ee8a7edf4a5eac0e4cbcf4b869639cdacb458476ed79bfa355302f4"
+    },
+    {
+      "file": "093156-longring-success-close.png",
+      "sha256": "e9b00db8fb492188f21735559bbe8c5c7cc902bde46fb6dc91b894f4d10c2497"
+    },
+    {
+      "file": "093205-longring-relic-health.png",
+      "sha256": "76f09c46b7ad8a2c8eec792d8db95a67f2d44f08cffd11f72e22b6b7bd5cdefd"
+    },
+    {
+      "file": "093214-longring-relic-health-confirm.png",
+      "sha256": "27e7c7e0da615c483d6c788489c4f834bd4154aaa4e51bf49ebed59393a3810c"
+    },
+    {
+      "file": "093222-longring-recruit-node.png",
+      "sha256": "e11e6657982173ce6da4ed4aba59043e9cdc35173e4cac6eaec5a08d3c860206"
+    },
+    {
+      "file": "093230-longring-recruit-crane.png",
+      "sha256": "b6311e86c1d03a5c696033ccfd9bda4480e4ad128e7bd4809bafb744e7b30834"
+    },
+    {
+      "file": "093241-longring-recruit-confirm.png",
+      "sha256": "d3283b6bd4a0eef9ebfbf6d4c8a21c1d274d5b65bc42c0360e9f038c8549a115"
+    },
+    {
+      "file": "093251-longring-line4-guard.png",
+      "sha256": "b25087502d273468dd1646364ea7baac0ce2655b5f6b8401eaef2c21e2fc38ce"
+    },
+    {
+      "file": "093300-longring-line4-fight.png",
+      "sha256": "da60758bcbc3ad486330906d15638de6e04766247bac03616e9aefd1958325b9"
+    },
+    {
+      "file": "093310-longring-line4-confirm.png",
+      "sha256": "38073e799fb353cd5d6ef57a337cadd086ce37b7dbf772731bcb4c681b70accc"
+    },
+    {
+      "file": "093331-longring-line4-result-close.png",
+      "sha256": "0f990bf22ffc6addeaf2f63c203b906c2e2589bcafbab3ad404edcaf9c72ad6e"
+    },
+    {
+      "file": "093340-longring-relic-warrior-damage.png",
+      "sha256": "a9d893b8201a22acc1b10025441be0a3adc46895a54db6add1f381becb037703"
+    },
+    {
+      "file": "093350-longring-warrior-relic-confirm.png",
+      "sha256": "d19f5858cf7429397a7d51c4e4ee18b50b67e9e42a05794286c4bdcd7e0bb400"
+    },
+    {
+      "file": "093401-longring-line5-guard.png",
+      "sha256": "2d4284208e98d15ba9654ed78dc0138a16b30e0d6d11726c4d9b49b22293fd40"
+    },
+    {
+      "file": "093410-longring-line5-fight.png",
+      "sha256": "c108eec235243dd712dc3b78026908a2f36970e5c08922b42231c75a4bceb612"
+    },
+    {
+      "file": "093424-longring-line5-confirm.png",
+      "sha256": "a56d5f30c06323a65c0042b1b3a7f5d505ce83b37c90a03abe626ceed55f64d1"
+    },
+    {
+      "file": "093448-longring-line5-close.png",
+      "sha256": "f178425a9ddcc82d415ca245670eb77993dc645c533c3a713247816fc9063236"
+    },
+    {
+      "file": "093459-longring-crystal-relic.png",
+      "sha256": "d2166110ff045b255a0d1fe05991e5c56dd91db68b9f61ed01a519c2cdeecf8a"
+    },
+    {
+      "file": "093508-longring-crystal-relic-confirm.png",
+      "sha256": "b2ecbc53baa71b2c88facb9a7b5efa3a6327aeeb2813b005ffc3336d11cc7c08"
+    },
+    {
+      "file": "093517-longring-spring-node.png",
+      "sha256": "ebe08ba2c7e27d4223d4200f48573cd567ba87566cc72d0f1f8756606558013e"
+    },
+    {
+      "file": "093527-longring-spring-use.png",
+      "sha256": "c2e51720512d6c14cf8795690adad551dd7753352fadf23e6a5b85a2d053226c"
+    },
+    {
+      "file": "093536-longring-line7-guard.png",
+      "sha256": "c544e6e6139221e9ad81be4926d5c8d61c4916ffed36e59d1d74bf335c73dea8"
+    },
+    {
+      "file": "093545-longring-line7-fight.png",
+      "sha256": "2c2a815b9cd937b423cb1ba546c10aa7151002274473e55842d3f65d2890322f"
+    },
+    {
+      "file": "093558-longring-line7-confirm.png",
+      "sha256": "832d2d4bcae269932c51254ed78c40a370f64cadac2f4496f17a037e3f812295"
+    },
+    {
+      "file": "093615-longring-line7-close.png",
+      "sha256": "b954f21f3222bf7da60bbadab0f37fd7e54130c5df50d0aa7921cb0f732cd804"
+    },
+    {
+      "file": "093625-longring-victory-flag-select.png",
+      "sha256": "ed6149f39406d56f19db403d50a5dced459577717e1a0bf9c7c5560fc45cdc3f"
+    },
+    {
+      "file": "093637-longring-victory-flag-confirm.png",
+      "sha256": "cde28e549ce2538e6d60e14ec838c3497f9ba67473b907310679650b923578da"
+    },
+    {
+      "file": "093647-longring-revive-node.png",
+      "sha256": "0c2d9558322e294b54a9a1fda9b04a3d3e102ff0684fd85fb3a237d467d7fc10"
+    },
+    {
+      "file": "093657-longring-revive-use.png",
+      "sha256": "5750cb216606da3388f9b04229c303de788adeffc18bf47e2f3b73099f401787"
+    },
+    {
+      "file": "093709-longring-floor1-boss.png",
+      "sha256": "d70393484aaf7c31fb650c39cdc7e127f07b0f3dc6919cf9d27e92a43b2b9a22"
+    },
+    {
+      "file": "093724-longring-floor1-boss-fight.png",
+      "sha256": "22deb9b005c6c92f59d5cdf350201dd644eccf0412606d041ffd9be90e574f35"
+    },
+    {
+      "file": "093735-longring-floor1-boss-confirm.png",
+      "sha256": "0d5ff0279122c81e7cb4d4a87a069f40b399dce0f276a512ae5586ccc19cec69"
+    },
+    {
+      "file": "093753-longring-floor1-boss-close.png",
+      "sha256": "1b72f8d51097e4b05a66be703007461aa642556fbe9bf69f1ce7b3ea06907e8b"
+    },
+    {
+      "file": "093802-longring-floor1-orange-relic.png",
+      "sha256": "f41baaaacfa48a9ff7b7b65869869df8e326e944325dbc2ce4a5324910ac5fa4"
+    },
+    {
+      "file": "093812-longring-floor1-orange-confirm.png",
+      "sha256": "6a63e9f97909fef94e62e7d00b4744e6394446ce301d700c2028614896745125"
+    },
+    {
+      "file": "093826-longring-floor1-chest.png",
+      "sha256": "4b6cb2cbbe926cb839c742043d0e0df9f1c2d97c43ed875e214f3bcd5d65b1ad"
+    },
+    {
+      "file": "093839-longring-floor1-chest-close.png",
+      "sha256": "84d52897720f88d3b59843b4278980c12c86ce9c4bcfc6d2550e3106f77d466c"
+    },
+    {
+      "file": "093849-longring-floor2-enter.png",
+      "sha256": "0e376a2311f772176fe42829f8562954e38e7c19a0cb81c3b500c02780d9db59"
+    },
+    {
+      "file": "093903-longring-floor2-first-guard.png",
+      "sha256": "48af9f961e9e89584eca82aa10e04a95fb00f136eec14d616d071bc7ba07ec82"
+    },
+    {
+      "file": "093913-longring-floor2-first-fight.png",
+      "sha256": "8cb621083d1b03e3e341f801793917474e7befa18a0e5172fa7df4fd565f7506"
+    },
+    {
+      "file": "093925-longring-floor2-first-confirm.png",
+      "sha256": "6d662cc98e591453607e119edd5b2bb84c767d1a91d8ccc5304696a11e5e2e45"
+    },
+    {
+      "file": "093942-longring-floor2-first-close.png",
+      "sha256": "4455063c58ab8ec5ff36c75db01651009e8c5b7b52e4425e1327270303ba24b8"
+    },
+    {
+      "file": "093953-longring-floor2-relic-speed.png",
+      "sha256": "aa781d21e29c3d8b8d1144c3e2720cd8997a7048c55650b078f1fec5004336bb"
+    },
+    {
+      "file": "094002-longring-floor2-relic-confirm.png",
+      "sha256": "6381e83d2412d87140e22324ffc395f869221b7e76ed8d5538d66b7aec3d9914"
+    },
+    {
+      "file": "094013-longring-floor2-line3-guard.png",
+      "sha256": "891535ca22146565f694ff82ef7bbd4944437d3d0624cd6fec910b69ff9a4199"
+    },
+    {
+      "file": "094024-longring-floor2-line3-fight.png",
+      "sha256": "0510fcf79ec699bdd22383135785be377338d3c2e78faff636135026eff7b85b"
+    },
+    {
+      "file": "094039-longring-floor2-line3-confirm.png",
+      "sha256": "db10b5d4d92327a36db05df0ccfca87896e8f9f197a4f6bc1e100c733541770d"
+    },
+    {
+      "file": "094116-longring-floor2-line3-close.png",
+      "sha256": "4be74b78cf421a3709256b4754ef1ca627e831e70730d37658e4392318687b4a"
+    },
+    {
+      "file": "094126-longring-floor2-vitality-relic.png",
+      "sha256": "cef7d885e1487899420ffca17ae0439a9e9d2a33e7b2e835e6a67fb7706449ef"
+    },
+    {
+      "file": "094136-longring-floor2-vitality-confirm.png",
+      "sha256": "4126db509b313f58a2cf89e55c1767ffa05d353279b811d98dcce527122b3196"
+    },
+    {
+      "file": "094147-longring-floor2-spring.png",
+      "sha256": "5c86bc0dde65e1ce4d5ceea13884d86b46293d7bb4796d8ccc60c7561859d638"
+    },
+    {
+      "file": "094201-longring-floor2-heal-revived.png",
+      "sha256": "e54a7ee592406af6b29e21f81f523c2cf52d589a63ba9277ddeddbccab5ab429"
+    },
+    {
+      "file": "094412-longring-merchant-open.png",
+      "sha256": "5c8f3665d01dc3e7e9df460e6c7ef48af9839ed723590d02ca4630cb8d1692b7"
+    },
+    {
+      "file": "094451-longring-merchant-enter.png",
+      "sha256": "e520cdf625ba3cdafe3ea334b47f92a3e8225bdb0f5d5c8e13c8338257baaea0"
+    },
+    {
+      "file": "095430-longring-merchant-abandon.png",
+      "sha256": "3f82f534cdd8f7e087839210cce28e3d4c6bfc663d7b6de54b11b3a797d07a6a"
+    },
+    {
+      "file": "095508-longring-floor2-line6-guard.png",
+      "sha256": "6d87a15e7e66caef570600fd0bc270812907911bc2161a3a0ad73a8db4f6ed8c"
+    },
+    {
+      "file": "095522-longring-floor2-line6-fight.png",
+      "sha256": "d7b2c4819355d250ec90706ab6867c33f5238ca9601d27c8af430c17a235bc3d"
+    },
+    {
+      "file": "095529-longring-floor2-line6-confirm.png",
+      "sha256": "533ce9f660b17fca3271f5e020106876d5447ec5cc7e7b49519bd7b5612e1c6f"
+    },
+    {
+      "file": "095546-longring-floor2-line6-close.png",
+      "sha256": "6ef6158ad49db1e1a6152257ebfac5c8bf2d4f3cfde639ba4e7ab3d6023fb5d7"
+    },
+    {
+      "file": "095553-longring-floor2-physical-relic.png",
+      "sha256": "d57ea06e840167f6f7e68c5494a41a7b6e410b7280512e450ad83f04238a1e75"
+    },
+    {
+      "file": "095600-longring-floor2-physical-confirm.png",
+      "sha256": "f8d44e6b91dc399e36dfa01a3e1a7c677439381c26a6d0f1825237b8bf1a15b0"
+    },
+    {
+      "file": "095607-longring-floor2-line7-guard.png",
+      "sha256": "b4a831d31ae5d7f9e25758ee869637c3be7969121d9b3eb2373a834205ba7e70"
+    },
+    {
+      "file": "095614-longring-floor2-line7-fight.png",
+      "sha256": "cc8dfb2cefb259340c28cbf3d066875cd45288a43fea9269e9107f6182e74404"
+    },
+    {
+      "file": "095622-longring-floor2-line7-confirm.png",
+      "sha256": "ff9f94fe59a04981ed7c1868417e3cb92cdbd8ccdcc59c8bd00b2518ca9580dd"
+    },
+    {
+      "file": "095636-longring-floor2-line7-close.png",
+      "sha256": "5f99c7b13c64caed9c83f1cd0159696796ebce5405914318515e816ede24ef55"
+    },
+    {
+      "file": "095641-longring-floor2-deepen-relic.png",
+      "sha256": "dc75914c2ca45e1acbe39f8e80a91f22d5b77934f488c780c58faa24484abe25"
+    },
+    {
+      "file": "095647-longring-floor2-deepen-confirm.png",
+      "sha256": "0eea8dfc76d4e063d2211461c4087da83622266f37c78236202e835a90f1d40e"
+    },
+    {
+      "file": "095654-longring-floor2-line8-spring.png",
+      "sha256": "1c44b65ca1aceb4dc11d0f7686b39f9b205202df64d0b12799f7bdf53f879643"
+    },
+    {
+      "file": "095703-longring-floor2-full-spring-close.png",
+      "sha256": "f00d082aa3c7968ff0ff910b5f070d7aa801f8ea71ecc9f70180b592906c2c11"
+    },
+    {
+      "file": "095709-longring-floor2-line8-revive.png",
+      "sha256": "b9a54b04c3e5321af8773cb5341b05a5e4ebbef51580305b3c67b71232085108"
+    },
+    {
+      "file": "095715-longring-floor2-revive-all-full.png",
+      "sha256": "e13a1a1f3d2d358d984b6a9a389a176163bc7d8d71e48c586c6a2cfd57d1fbdf"
+    },
+    {
+      "file": "095723-longring-floor2-revive-full-confirm.png",
+      "sha256": "f201e7af45c03efdf422e5d169f1c997d7e8627628cb5970411f94db5fbcdc40"
+    },
+    {
+      "file": "095729-longring-floor2-boss.png",
+      "sha256": "9ceaaa848f4ab165cf067460d8551042212d9b4ffcecc37e4d02177e890e4b7f"
+    },
+    {
+      "file": "095735-longring-floor2-boss-fight.png",
+      "sha256": "bbf8567d4870554c240e4bf77a168acd8ac142ee3abafbaabc8e41ce876690a6"
+    },
+    {
+      "file": "095746-longring-floor2-boss-confirm.png",
+      "sha256": "c2ccaa8255325dff49f90f402361b4075f37beb299844a09c000fc73a013f1ed"
+    },
+    {
+      "file": "095801-longring-floor2-boss-close.png",
+      "sha256": "01fe1f7c76d14f8f0cf79c4dc8258fbf9c03b50b8b078611107cbb891a281f74"
+    },
+    {
+      "file": "095807-longring-floor2-poison-relic.png",
+      "sha256": "a4bcb96f718a7c5f45d22ade44e701e9fc7b27511921725e980779fa341c90ca"
+    },
+    {
+      "file": "095813-longring-floor2-poison-confirm.png",
+      "sha256": "fe446f3d74665fcd3c5e37a0198c97ac52b2429d2b94f04c912df09cbc3f526c"
+    },
+    {
+      "file": "095819-longring-floor2-chest.png",
+      "sha256": "0a5467c5f3acbd60a14053b9f3b46f0a593dd953bf0be9100711df202c075228"
+    },
+    {
+      "file": "095826-longring-floor2-chest-close.png",
+      "sha256": "2f66020578a78d8beee3bec8331a0ee1a96d26a3a536dd33e17b1a3905d443c1"
+    },
+    {
+      "file": "095835-longring-floor3-enter.png",
+      "sha256": "447e2d0065d2b4a7bea96591d0d25165195b3734d5a9704f66a854c6624210ae"
+    },
+    {
+      "file": "095845-longring-floor3-first-spring.png",
+      "sha256": "4f977b842b0a15f61b8b3c4558889f311d60f24ba0467f5cbcf5c6a53e0802d0"
+    },
+    {
+      "file": "095853-longring-floor3-spring-use.png",
+      "sha256": "414f4d220900cde59f68812a59e7686447e8ae6bfb87be4894683e7c1dc7be54"
+    },
+    {
+      "file": "095902-longring-floor3-spring-full-confirm.png",
+      "sha256": "19e8816bf01d3178f71e76d60fddbc0c6bf83d9f30eaa1cd4a04aae8b0885d68"
+    },
+    {
+      "file": "095909-longring-floor3-line3-guard.png",
+      "sha256": "97a0d78e30a9f03f75ab4bce288555bd52f42f8d6dab1a84eef281e63b5e2e38"
+    },
+    {
+      "file": "095915-longring-floor3-line3-fight.png",
+      "sha256": "7a51031be5250b932239481f5e209dc4c58cfb35829951bed9dfcffc6b64afe7"
+    },
+    {
+      "file": "095923-longring-floor3-line3-confirm.png",
+      "sha256": "0597a0b4deb642f11967b56905a8487567c5a5b3c744ed07d95332724fa2842f"
+    },
+    {
+      "file": "095947-longring-floor3-line3-close.png",
+      "sha256": "c82feb07a9800443673df0b61b3f10402eeeaca2ed8ff30d6bb4c670e6aca1dd"
+    },
+    {
+      "file": "095956-longring-floor3-third-floor-flag.png",
+      "sha256": "63825ece5c88f83d098be4e44e4f349e5449810cdb0c5e43172dad23321258c2"
+    },
+    {
+      "file": "100003-longring-floor3-flag-confirm.png",
+      "sha256": "407d43899101161281b6e9ee548ef0a8ba023015dc3ee4bbec5969177bacc8f3"
+    },
+    {
+      "file": "100011-longring-floor3-line4-spring.png",
+      "sha256": "cb8362a02ae08a8b0ec4a196b9b0bb069dba034ac6319ac216e76b4a3909f494"
+    },
+    {
+      "file": "100020-longring-floor3-line4-spring-use.png",
+      "sha256": "110a06984858b6ed2ab3bac84a62ce4fdb292b84314db1aaafbdde0d5e76b725"
+    },
+    {
+      "file": "100028-longring-floor3-line4-spring-confirm.png",
+      "sha256": "5e69167a2c4c06829b207c23ca68026ac4d43a125799f33a624c375a9a47d78d"
+    },
+    {
+      "file": "100038-longring-floor3-line5-revive.png",
+      "sha256": "619064331972595dff3a7a4239f995b00c1246283af3a868892fca9913eaab91"
+    },
+    {
+      "file": "100050-longring-floor3-line5-revive-use.png",
+      "sha256": "862df774d29532383a9ec8a27fb73b2976efda998433025d2ec138e249e63a66"
+    },
+    {
+      "file": "100103-longring-floor3-line5-revive-confirm.png",
+      "sha256": "593192a7868f39279f360b82f1556257c1b29cc69eced5138d03ea8e39de7282"
+    },
+    {
+      "file": "100113-longring-floor3-line6-hire.png",
+      "sha256": "2b67992c1d88b0444a15f9829f635dc390c5bde67562c4cf0e5be50889fb7f88"
+    },
+    {
+      "file": "100120-longring-floor3-hire-law.png",
+      "sha256": "a13a738070a3e0f65468f6eb0b440db00ea6d8f76e3afb551b7c2a4716c4b7fe"
+    },
+    {
+      "file": "100127-longring-floor3-hire-confirm.png",
+      "sha256": "0f1a4b9d60ec624aa17889019a895ea5c3dcda6295facd94d7e32f6bbce08265"
+    },
+    {
+      "file": "100138-longring-floor3-line7-guard.png",
+      "sha256": "bdcc5b90e1380ce6ea651e448931555d17d66cd4e89c3d913f0f8251c2c64757"
+    },
+    {
+      "file": "100147-longring-floor3-line7-fight.png",
+      "sha256": "725e36486ede139df01efb50b92b55e1978460317810762d23be6a5c85ff5fba"
+    },
+    {
+      "file": "100159-longring-floor3-line7-confirm.png",
+      "sha256": "be264898416fc6567c0c175fbed96cf78c5a287ac2ae9d066e7207740728e624"
+    },
+    {
+      "file": "100223-longring-floor3-line7-close.png",
+      "sha256": "c74451cdc14f8bc3a69c59c769fea82c73e2881c0b32d24b9ae1d3c98fce884b"
+    },
+    {
+      "file": "100233-longring-floor3-vitality-relic.png",
+      "sha256": "4dc5fdceffd6bf7ab1f06a1101605853a4230acba09d97c1db2203e787b21705"
+    },
+    {
+      "file": "100243-longring-floor3-vitality-confirm.png",
+      "sha256": "529d31d219e404e91b170c5e86a7559aaee07adaf2e45b7f9fe02ff9beff3d82"
+    },
+    {
+      "file": "100251-longring-floor3-last-spring.png",
+      "sha256": "26afa7b0a5c8deb14a745abc63d40e452d5fbafc99753468a269e48d7db7a911"
+    },
+    {
+      "file": "100303-longring-floor3-last-spring-use.png",
+      "sha256": "c03f7e919840ca5947932dfc84f897ad6e47ece4d2257ef02464a11ede44a450"
+    },
+    {
+      "file": "100312-longring-floor3-last-spring-confirm.png",
+      "sha256": "e753d2b32581fa45816acb3600c96646afc7ba47f9fe8e0d229b34ec0806a9e6"
+    },
+    {
+      "file": "100324-longring-floor3-boss.png",
+      "sha256": "7e2215ec2eb1f5ddec44172048b0dd53f43e607549a8c5173d235b70c463e83d"
+    },
+    {
+      "file": "100335-longring-floor3-boss-fight.png",
+      "sha256": "6b45eb30875330c08dfcd01a1f02eefa2e9534b54414e08b97dad40b83e89ca4"
+    },
+    {
+      "file": "100344-longring-floor3-boss-confirm.png",
+      "sha256": "3561d19e0b996708e7f6228109120996bef17d030443425353e9cd712ecea933"
+    },
+    {
+      "file": "100404-longring-floor3-boss-close.png",
+      "sha256": "e19791c3c427cb6b2c4453f2b900806237800c2830cb11328013d149f25b8dd5"
+    },
+    {
+      "file": "100412-longring-floor3-chest.png",
+      "sha256": "b03e03624e38f318688196680e323526fcbf42c3cddaeb12354daa76cada3305"
+    },
+    {
+      "file": "100422-longring-floor3-chest-close.png",
+      "sha256": "865369cb30c25bd4a86540948987fcd57837c1d37143c5a43ceaba0cbc4069cd"
+    },
+    {
+      "file": "100434-longring-finish-exploration.png",
+      "sha256": "dcd47850225c73b62d40e6e1beb2a7ef8f27967104b5561aa966e47903b3a6a4"
+    },
+    {
+      "file": "100445-longring-return.png",
+      "sha256": "e45019de9a43aadf0fda96362a33021522616fcbc60c9af110a3cfdccc9c59cc"
+    },
+    {
+      "file": "100456-remaining-city.png",
+      "sha256": "22fdef96156facad5376e0c5423f19290afbd78313d1475ec7663ebc1d90ab1f"
+    },
+    {
+      "file": "100507-remaining-city-left.png",
+      "sha256": "30b76d3fff50b10e90ea008a273964287e3073089c4c172676a23549b0c3da40"
+    },
+    {
+      "file": "100518-remaining-city-far-left.png",
+      "sha256": "e3d59362d5ba34fb65df3871da781994a1b352872ef151f9b6f77e6e7e4e1fa6"
+    },
+    {
+      "file": "100528-remaining-voyage-menu.png",
+      "sha256": "55e6191a293e6fc7c0fbdd38fc7b844cb4a222fac7aee82fc65ae491b062e080"
+    },
+    {
+      "file": "100542-remaining-adventure-map.png",
+      "sha256": "bc3ad9c373941cad3da46b511cece8611792091448a71ea94711049b5d7c6f01"
+    },
+    {
+      "file": "100552-voyage-followup-open.png",
+      "sha256": "a99389ddf46f878e69a99ff2bf4da9fecdb9a7a1d5b30cffc60f9b3d50f78e90"
+    },
+    {
+      "file": "100604-voyage-followup-claim-all.png",
+      "sha256": "e60c5c54b2886abc5aa2618f479a98d39ec7575fb22b5e01e077749d546d70c5"
+    },
+    {
+      "file": "100623-voyage-followup-reward-close.png",
+      "sha256": "924752ddd648bb285ce9694372a50a973f4c8f5cc896ece7e4361b30aa19f884"
+    },
+    {
+      "file": "100638-voyage-followup-close.png",
+      "sha256": "4c64ba2b5e9e6fc797fa727cb91ed33d01d83befea364a302b94f14f5197f050"
+    },
+    {
+      "file": "100651-remaining-trials.png",
+      "sha256": "6764d07941ca3dc2a3a4c0d21cba504ec15e6efefc1b00b14879efad695f058d"
+    },
+    {
+      "file": "100700-endless-followup-open.png",
+      "sha256": "9ca881513722fca41420e64098cef2d35d4342cbb83fb775b39f216576c8d196"
+    },
+    {
+      "file": "100708-endless-followup-formation.png",
+      "sha256": "25b6245c6446e0737f1851c87fa157684cbc650a1bc3afed48b0158091f1da54"
+    },
+    {
+      "file": "100724-endless-remove-strong.png",
+      "sha256": "d98067a5157dd1d11b2aabcd0ac35e01ee6169a2a29b1aadc2de669fd7575db3"
+    },
+    {
+      "file": "100733-endless-add-lowhero.png",
+      "sha256": "d1819558668d3eb7b02efbba51cb4b98a6121f810d85838761986b60566b243a"
+    },
+    {
+      "file": "100741-endless-lowteam-fight.png",
+      "sha256": "7f6f0e3692763422799aa4db1c08657ed1d4ba783eb9c2b2b0328cdc2894d0e3"
+    },
+    {
+      "file": "100750-endless-select-heal-buff.png",
+      "sha256": "cfd7b75242b03130d5221559f3198cf131b948fe7a4a058920f17a54494606da"
+    },
+    {
+      "file": "100820-endless-followup-return.png",
+      "sha256": "61f807f45d53eced578348961097857759b10cf323a2ef4f101d55ad742eb42d"
+    },
+    {
+      "file": "100835-remaining-city-for-pvp.png",
+      "sha256": "a2a945a038d776f2627df312fba8c0a3a9e440b94b365cdb5ce7ed0e381523b0"
+    },
+    {
+      "file": "100843-remaining-city-right.png",
+      "sha256": "87b3a8d82a8399b62f80a3f3d6fa308ef8409d8b1388cd497f4f937f0838999a"
+    },
+    {
+      "file": "100852-remaining-crossbattle-menu.png",
+      "sha256": "3ed322380bb80e787752ce7b6e57cf180008a1f2b07a92d28622b74439350909"
+    },
+    {
+      "file": "100900-ladder-followup-open.png",
+      "sha256": "44e319525b09f7121c795878e73185232762b1320fb0bf64a0aa5c1b2a8cba3b"
+    },
+    {
+      "file": "100910-ladder-followup-opponent.png",
+      "sha256": "14396307cc943aaa9587691954768882b0c52307dba56ce43400d42d8fbf089d"
+    },
+    {
+      "file": "100921-ladder-followup-formation.png",
+      "sha256": "9b297f37e4460db9d5c83aba9a6d024812e322c52e067b89ad00a0160f69225e"
+    },
+    {
+      "file": "100957-ladder-first-result-close.png",
+      "sha256": "5d729d4fff3deefec090b0fe2c091a249d105398544982300e79fb0da63af7bf"
+    },
+    {
+      "file": "101005-ladder-followup-adjust.png",
+      "sha256": "ed22915ac7fb0fe913280fe65a9d30738f74bfaace1d6accb043f488f991d9fa"
+    },
+    {
+      "file": "101014-ladder-remove-strong.png",
+      "sha256": "e457d6ffa0ac1b272e38da19d0ed42c8bd9c28f683b6b8f06775857ce67534d2"
+    },
+    {
+      "file": "101022-ladder-add-lowhero.png",
+      "sha256": "a9ecef293f4ea4d11e6fa428e72a0a44d63aca13223d538b9247ba52d4188857"
+    },
+    {
+      "file": "101034-ladder-save-lowteam.png",
+      "sha256": "a504261974f4b8d8ebf79b708aa12eef3f8021969bc987a48761a6fc3ddfc52c"
+    },
+    {
+      "file": "101047-ladder-lowteam-fight.png",
+      "sha256": "66b5da28c9a72a42fe556c98209b47042c67be32dbe84d7c6ee28ce174ef37de"
+    },
+    {
+      "file": "101125-ladder-restore-opponent-preview.png",
+      "sha256": "4819cb7e2b82135fe124f97f533aff1eb91a98ccfbb509cc0ecd45a838b84440"
+    },
+    {
+      "file": "101134-ladder-restore-formation.png",
+      "sha256": "04afc5dff1b7ae18fe6eeac2119c11d73355bb8ab6a682f70854504a4af70112"
+    },
+    {
+      "file": "101143-ladder-restore-remove-low.png",
+      "sha256": "e1afae89726cee7c6f99aff005e6c7d5b9cf1832fff2a5b442a365bdb055c8e1"
+    },
+    {
+      "file": "101152-ladder-restore-add-strong.png",
+      "sha256": "f66311e24f20e2825299c63a89fe447fe36f8a5c0f4fe21a6a376a4ee9532735"
+    },
+    {
+      "file": "101201-ladder-restore-save.png",
+      "sha256": "95ce42e060df10613b61b9c2be893360b837804b1c4e863310d888c3ed881d64"
+    },
+    {
+      "file": "101211-ladder-offense-hero-menu.png",
+      "sha256": "dc94cb81d59f16ae8ff65617e04d6c70f52d65f09d19deb3a33102ca9c00bf76"
+    },
+    {
+      "file": "101220-ladder-offense-hero-menu-open.png",
+      "sha256": "b97d7d5936be19ac363711ef75cb123db77a7704895b337dd6b38e6587d4979d"
+    },
+    {
+      "file": "101229-ladder-offense-formation-tabs.png",
+      "sha256": "9c1c0ee2bf5788bbcda9847d9c9eed1411d585e8032e503cfa992d341ba4ae0a"
+    },
+    {
+      "file": "101240-ladder-offense-remove-strong.png",
+      "sha256": "4a2e89a665370cd0df67ccb37473ebb8e84dfbe42d86b723f8be9c26c69ce82d"
+    },
+    {
+      "file": "101248-ladder-offense-add-low.png",
+      "sha256": "197f9845e2634156a364f0482f107e4ea64025b6cd3343e2b1b142153191660e"
+    },
+    {
+      "file": "101257-ladder-offense-save-low.png",
+      "sha256": "f1b3fae5b5e60f4453c6c5c6729102d122788c424d4e82f39844a7f3edfa721b"
+    },
+    {
+      "file": "101307-ladder-offense-close-formation.png",
+      "sha256": "774820a2581e21bcded4ddb63acf365c67fe63bc5ddf973c3bcde5519467e49d"
+    },
+    {
+      "file": "101317-ladder-offense-city.png",
+      "sha256": "fc1661742c67e6e6d37af2d6abab526685237c061972fd1b64952ee17e87a1fb"
+    },
+    {
+      "file": "101327-ladder-low-city-menu.png",
+      "sha256": "526fcb8c5802fc0395b184fb97023fec9a734dda6ce0908c62c0af4349b985be"
+    },
+    {
+      "file": "101336-ladder-low-reopen.png",
+      "sha256": "0029389c48b04fd3ffbd9250a203564d8be90847ca09696539869cbec0ff5119"
+    },
+    {
+      "file": "101353-ladder-low-target-preview.png",
+      "sha256": "c9fef799848e858c3f278f653ee8b1fdf00eff397d633d47d7e111aab5e133a6"
+    },
+    {
+      "file": "101405-ladder-low-offense-fight.png",
+      "sha256": "0dc79c3bc7f60cedb83b836d960f1febae4b4743dbe748a1c7964f470e8f851e"
+    },
+    {
+      "file": "101500-ladder-followup-return-menu.png",
+      "sha256": "352f1b8ca2aa5181caf26b308b423a7fa25595adf1581733a2f044b9d8817b73"
+    },
+    {
+      "file": "101512-elite-followup-open.png",
+      "sha256": "34656a3dea2ce880e6c87f7346bf20d1be314afe0ed2fd33c57087f14f8a8685"
+    },
+    {
+      "file": "101522-elite-close-item-tooltip.png",
+      "sha256": "0d35e1fbbae08de42bf213372ea6aaf497a2b9f9db0dacbc53de3ea5864b6757"
+    },
+    {
+      "file": "101532-elite-followup-enter.png",
+      "sha256": "94d08ea9d8b20de9c6d2064351c7d27447bd5c1a3e088c97f929cc8358d39679"
+    },
+    {
+      "file": "101544-elite-followup-adjust.png",
+      "sha256": "917451480296af0b5e21daa229243d8cf33d29f45acd4521a188e4e5daa4a5df"
+    },
+    {
+      "file": "101554-elite-followup-team2.png",
+      "sha256": "9aeedf25d920a2d4815c304591e4544d9ee91e5166259815e77efe3b0c2f9932"
+    },
+    {
+      "file": "101607-elite-followup-adjust-close.png",
+      "sha256": "58916f757429ab22d3c9cec81a7708e274e8de586f0b7b2026dcd2a8014ee1b6"
+    },
+    {
+      "file": "101617-elite-followup-match.png",
+      "sha256": "cc67ed34d601be86decb8ea6d1f58924644b06036ba93d1ee6ba2ec960276a42"
+    },
+    {
+      "file": "101628-elite-followup-find-opponent.png",
+      "sha256": "06104d0d9eb863941807e8bbee6a3841a05dc5b5fb190dcc63f37a627b722346"
+    },
+    {
+      "file": "101655-elite-low-adjust-before-fight.png",
+      "sha256": "37872953a6ffd07b93194a580237e92b6ddbfa79cf7a4885185ad239e24d2464"
+    },
+    {
+      "file": "101705-elite-remove-stage-hero-probe.png",
+      "sha256": "af7adb73004fed1b47470d39607b1655157add1439b29c41bf507019f3dd112f"
+    },
+    {
+      "file": "101718-elite-sprite-adjust.png",
+      "sha256": "d793a8f7af362c26bcb3b7f6ef141d79a705fd15172d2a20e7eac517c298fc32"
+    },
+    {
+      "file": "101730-elite-sprite-close.png",
+      "sha256": "309559e871deebf325988ff195f1879613048adeb5887b9e5419c9ee956d12c7"
+    },
+    {
+      "file": "102242-elite-return.png",
+      "sha256": "fe3140e06fd7ac7f20ff16129ab45b219a578f279050bea55e29cd3f07571b04"
+    },
+    {
+      "file": "102251-elite-adjust.png",
+      "sha256": "9a3006047064c6d1f9c72f14b401681f32fb8fcf13e39e15c43a8977523bff45"
+    },
+    {
+      "file": "102304-capture-stop.png",
+      "sha256": "d2892f1e9bed08b2346c8f0378277bd1fabd9c1b6426c3475c4eb4afde8b33aa"
+    },
+    {
+      "file": "102319-capture-stop-retry.png",
+      "sha256": "0b96a6c28e1297c52aa39635c358d8b601e430ca69dad19880e8e34b7aad7bee"
+    },
+    {
+      "file": "tower36-round3.png",
+      "sha256": "a4b3920f17994b3397e556f25594446ef5f58fce61ff2aa2616101b76e150928"
+    }
+  ]
+}

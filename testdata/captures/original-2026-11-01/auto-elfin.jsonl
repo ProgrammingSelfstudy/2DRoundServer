@@ -1,0 +1,12 @@
+{"t":"2026-10-31T23:49:26.167524Z","dir":"c2s","cmd":26500,"stream":"game-1","source_line":5569}
+{"t":"2026-10-31T23:49:26.210688Z","dir":"s2c","cmd":26500,"stream":"game-1","source_line":9220,"msg":{"info":[],"sprite_hatchs":[{"all_end_time":0,"do_id":0,"id":3,"is_open":0,"state":0},{"all_end_time":0,"do_id":0,"id":2,"is_open":0,"state":0},{"all_end_time":0,"do_id":0,"id":6,"is_open":0,"state":0},{"all_end_time":0,"do_id":0,"id":5,"is_open":0,"state":0},{"all_end_time":0,"do_id":0,"id":4,"is_open":0,"state":0},{"all_end_time":1792678430,"do_id":0,"id":1,"is_open":1,"state":0}]}}
+{"t":"2026-10-31T23:50:31.650258Z","dir":"c2s","cmd":26510,"stream":"game-1","source_line":5585}
+{"t":"2026-10-31T23:50:31.695735Z","dir":"s2c","cmd":26510,"stream":"game-1","source_line":9229,"msg":{"atk":6794,"break_lev":0,"crit_rate":2000,"crit_ratio":1200,"def":300,"def_p":0,"def_s":0,"dodge_magic":0,"dodge_rate":0,"hit_magic":0,"hit_rate":9999,"hp_max":38505,"lev":10,"power":59247,"speed":150,"sprites":[{"item_bid":113009,"pos":1}]}}
+{"t":"2026-10-31T23:50:40.022687Z","dir":"s2c","cmd":16606,"stream":"game-1","source_line":9231,"msg":{"bid":991050,"can_get_num":0}}
+{"t":"2026-10-31T23:50:40.022687Z","dir":"s2c","cmd":21024,"stream":"game-1","source_line":9232,"msg":{"list":[]}}
+{"t":"2026-10-31T23:51:39.302428Z","dir":"c2s","cmd":26550,"stream":"game-1","source_line":5599}
+{"t":"2026-10-31T23:51:39.334296Z","dir":"s2c","cmd":26550,"stream":"game-1","source_line":9238,"msg":{"camp_id":0,"day_count":0,"do_awards":[],"free_time":0,"lucky_ids":[{"lucky_sprites_bid":113005}],"times":14}}
+{"t":"2026-10-31T23:52:14.700848Z","dir":"c2s","cmd":26551,"stream":"game-1","source_line":5609,"msg":{"recruit_type":1,"times":1}}
+{"t":"2026-10-31T23:52:14.748892Z","dir":"s2c","cmd":10512,"stream":"game-1","source_line":9243,"msg":{"item_list":[{"all_score":0,"attr":[],"base_id":10040,"bind":1,"enchant":0,"expire_time":0,"expire_type":0,"extra":[{"extra_k":11,"extra_v":0}],"extra_attr":[],"gemstones":[],"holy_eqm_attr":[],"id":53,"main_attr":[],"pos":45,"quantity":73,"score":0,"storage":1}]}}
+{"t":"2026-10-31T23:52:14.748892Z","dir":"s2c","cmd":26553,"stream":"game-1","source_line":9244,"msg":{"group_id":110,"rewards":[{"base_id":10040,"num":3}],"sprite_bids":[],"times":1}}
+{"t":"2026-10-31T23:52:14.748892Z","dir":"s2c","cmd":26550,"stream":"game-1","source_line":9245,"msg":{"camp_id":0,"day_count":0,"do_awards":[],"free_time":1793548800,"lucky_ids":[{"lucky_sprites_bid":113005}],"times":15}}

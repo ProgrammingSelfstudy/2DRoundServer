@@ -1,0 +1,14 @@
+{"t":"2026-10-31T17:25:28.679765Z","dir":"c2s","cmd":20060,"stream":"game-1","source_line":739,"msg":{"combat_type":28}}
+{"t":"2026-10-31T17:25:28.724676Z","dir":"s2c","cmd":20060,"stream":"game-1","source_line":6334,"msg":{"combat_type":28,"type":0}}
+{"t":"2026-10-31T17:25:28.844701Z","dir":"c2s","cmd":25614,"stream":"game-1","source_line":741}
+{"t":"2026-10-31T17:25:28.891138Z","dir":"s2c","cmd":25614,"stream":"game-1","source_line":6335,"msg":{"rank_list":[{"gname":"label-109","lookid":140516,"name":"label-97","rank":1,"rid":900061,"srv_id":"label-96","worship":2029,"worship_status":0},{"gname":"label-67","lookid":140516,"name":"label-67","rank":2,"rid":900045,"srv_id":"label-66","worship":430,"worship_status":0},{"gname":"label-110","lookid":140519,"name":"label-111","rank":3,"rid":900068,"srv_id":"server-112","worship":935,"worship_status":0}]}}
+{"t":"2026-10-31T17:25:39.798235Z","dir":"s2c","cmd":16606,"stream":"game-1","source_line":6339,"msg":{"bid":991050,"can_get_num":0}}
+{"t":"2026-10-31T17:25:39.798235Z","dir":"s2c","cmd":21024,"stream":"game-1","source_line":6340,"msg":{"list":[{"id":4}]}}
+{"t":"2026-10-31T17:25:47.731529Z","dir":"c2s","cmd":25610,"stream":"game-1","source_line":747}
+{"t":"2026-10-31T17:25:47.732038Z","dir":"c2s","cmd":25600,"stream":"game-1","source_line":749}
+{"t":"2026-10-31T17:25:47.732038Z","dir":"c2s","cmd":25601,"stream":"game-1","source_line":751}
+{"t":"2026-10-31T17:25:47.732038Z","dir":"c2s","cmd":25607,"stream":"game-1","source_line":753}
+{"t":"2026-10-31T17:25:47.774943Z","dir":"s2c","cmd":25610,"stream":"game-1","source_line":6341,"msg":{"code":0}}
+{"t":"2026-10-31T17:25:47.886721Z","dir":"s2c","cmd":25600,"stream":"game-1","source_line":6342,"msg":{"buy_combat_num":0,"can_combat_num":0,"end_time":1794063600,"is_auto":0,"max_rank":0,"rank":0,"ref_time":0,"score":1000,"season_combat_num":0,"start_time":1793635200}}
+{"t":"2026-10-31T17:25:47.886721Z","dir":"s2c","cmd":25601,"stream":"game-1","source_line":6343,"msg":{"f_list":[{"face":0,"face_update_time":0,"idx":3,"lev":0,"look":150506,"name":"label-113","power":588458,"rid":0,"score":1000,"sex":0,"srv_id":""},{"face":0,"face_update_time":0,"idx":2,"lev":0,"look":120506,"name":"label-114","power":581386,"rid":0,"score":1000,"sex":0,"srv_id":""},{"face":0,"face_update_time":0,"idx":1,"lev":0,"look":120505,"name":"label-115","power":792378,"rid":0,"score":1000,"sex":0,"srv_id":""}],"type":0}}
+{"t":"2026-10-31T17:25:47.886721Z","dir":"s2c","cmd":25607,"stream":"game-1","source_line":6344,"msg":{"had_combat_num":0,"num_list":[]}}

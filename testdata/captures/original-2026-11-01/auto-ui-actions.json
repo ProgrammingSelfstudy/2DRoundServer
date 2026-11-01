@@ -1,0 +1,4331 @@
+{
+  "source": "autocapture-ui.log",
+  "sha256": "d146d4026e8a7011499b854554475efabb35000cd4908f9029e9b018c45378c5",
+  "note": "Screenshots remain outside the repository; final UI exit events occurred after capture ended. Labels describe intended UI actions, not verified protocol outcomes.",
+  "events": [
+    {
+      "t": "2026-10-31T17:09:15.552699+00:00",
+      "action": "tap",
+      "label": "login-saved",
+      "coordinates": [
+        176,
+        829
+      ]
+    },
+    {
+      "t": "2026-10-31T17:09:30.670743+00:00",
+      "action": "tap",
+      "label": "login-center",
+      "coordinates": [
+        316,
+        827
+      ]
+    },
+    {
+      "t": "2026-10-31T17:10:02.083821+00:00",
+      "action": "back",
+      "label": "login-check"
+    },
+    {
+      "t": "2026-10-31T17:10:29.593959+00:00",
+      "action": "tap",
+      "label": "login-after-restart",
+      "coordinates": [
+        175,
+        828
+      ]
+    },
+    {
+      "t": "2026-10-31T17:10:39.114226+00:00",
+      "action": "tap",
+      "label": "start-game",
+      "coordinates": [
+        315,
+        1250
+      ]
+    },
+    {
+      "t": "2026-10-31T17:10:48.173749+00:00",
+      "action": "tap",
+      "label": "arena-open",
+      "coordinates": [
+        202,
+        628
+      ],
+      "screenshots": [
+        {
+          "file": "012127-team-arena-open.png",
+          "sha256": "b0d7a3ed33f51a2c282e7b2825d91450b82be9e2d246b7120a6d1b98f0c22977"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:10:55.689760+00:00",
+      "action": "tap",
+      "label": "dismiss-afk",
+      "coordinates": [
+        169,
+        838
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:03.726623+00:00",
+      "action": "tap",
+      "label": "arena-open",
+      "coordinates": [
+        201,
+        631
+      ],
+      "screenshots": [
+        {
+          "file": "012127-team-arena-open.png",
+          "sha256": "b0d7a3ed33f51a2c282e7b2825d91450b82be9e2d246b7120a6d1b98f0c22977"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:11.104933+00:00",
+      "action": "tap",
+      "label": "arena33",
+      "coordinates": [
+        502,
+        512
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:17.278305+00:00",
+      "action": "tap",
+      "label": "arena33-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:23.861219+00:00",
+      "action": "tap",
+      "label": "arena34",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:30.044882+00:00",
+      "action": "tap",
+      "label": "arena34-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:36.352978+00:00",
+      "action": "tap",
+      "label": "arena35",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:43.070197+00:00",
+      "action": "tap",
+      "label": "arena35-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:11:59.787758+00:00",
+      "action": "tap",
+      "label": "arena-claim35",
+      "coordinates": [
+        269,
+        1031
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:06.400261+00:00",
+      "action": "tap",
+      "label": "dismiss-reward35",
+      "coordinates": [
+        315,
+        1095
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:14.023180+00:00",
+      "action": "tap",
+      "label": "arena36",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:24.030141+00:00",
+      "action": "tap",
+      "label": "arena36-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:26.508509+00:00",
+      "action": "tap",
+      "label": "arena37",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:29.024936+00:00",
+      "action": "tap",
+      "label": "arena37-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:31.508958+00:00",
+      "action": "tap",
+      "label": "arena38",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:34.027291+00:00",
+      "action": "tap",
+      "label": "arena38-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:36.543626+00:00",
+      "action": "tap",
+      "label": "arena39",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:39.068369+00:00",
+      "action": "tap",
+      "label": "arena39-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:41.515424+00:00",
+      "action": "tap",
+      "label": "arena40",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:44.026067+00:00",
+      "action": "tap",
+      "label": "arena40-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:46.482099+00:00",
+      "action": "tap",
+      "label": "arena41",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:49.051371+00:00",
+      "action": "tap",
+      "label": "arena41-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:51.647632+00:00",
+      "action": "tap",
+      "label": "arena42",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:54.202164+00:00",
+      "action": "tap",
+      "label": "arena42-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:56.702271+00:00",
+      "action": "tap",
+      "label": "arena43",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:12:59.237592+00:00",
+      "action": "tap",
+      "label": "arena43-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:01.690210+00:00",
+      "action": "tap",
+      "label": "arena44",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:04.280812+00:00",
+      "action": "tap",
+      "label": "arena44-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:06.724639+00:00",
+      "action": "tap",
+      "label": "arena45",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:09.267552+00:00",
+      "action": "tap",
+      "label": "arena45-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:11.775711+00:00",
+      "action": "tap",
+      "label": "arena46",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:14.313723+00:00",
+      "action": "tap",
+      "label": "arena46-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:16.800124+00:00",
+      "action": "tap",
+      "label": "arena47",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:19.343077+00:00",
+      "action": "tap",
+      "label": "arena47-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:21.893919+00:00",
+      "action": "tap",
+      "label": "arena48",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:24.400330+00:00",
+      "action": "tap",
+      "label": "arena48-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:26.866572+00:00",
+      "action": "tap",
+      "label": "arena49",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:29.395936+00:00",
+      "action": "tap",
+      "label": "arena49-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:31.880117+00:00",
+      "action": "tap",
+      "label": "arena50",
+      "coordinates": [
+        503,
+        511
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:34.372346+00:00",
+      "action": "tap",
+      "label": "arena50-return",
+      "coordinates": [
+        451,
+        962
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:49.701250+00:00",
+      "action": "tap",
+      "label": "arena-claim50",
+      "coordinates": [
+        349,
+        1030
+      ]
+    },
+    {
+      "t": "2026-10-31T17:13:57.248103+00:00",
+      "action": "tap",
+      "label": "dismiss-reward50",
+      "coordinates": [
+        315,
+        1095
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:04.974279+00:00",
+      "action": "tap",
+      "label": "arena-preview70",
+      "coordinates": [
+        423,
+        1030
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:13.591387+00:00",
+      "action": "tap",
+      "label": "arena-preview90",
+      "coordinates": [
+        497,
+        1030
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:21.584387+00:00",
+      "action": "tap",
+      "label": "maincity-after-arena",
+      "coordinates": [
+        42,
+        1347
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:29.797043+00:00",
+      "action": "tap",
+      "label": "resonate-open",
+      "coordinates": [
+        390,
+        570
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:36.685117+00:00",
+      "action": "tap",
+      "label": "resonate-amplify",
+      "coordinates": [
+        318,
+        177
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:45.385896+00:00",
+      "action": "tap",
+      "label": "resonate-empower",
+      "coordinates": [
+        456,
+        177
+      ]
+    },
+    {
+      "t": "2026-10-31T17:14:54.685598+00:00",
+      "action": "tap",
+      "label": "resonate-empty-slot",
+      "coordinates": [
+        523,
+        926
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:01.337490+00:00",
+      "action": "tap",
+      "label": "resonate-select-zoro",
+      "coordinates": [
+        126,
+        563
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:07.816709+00:00",
+      "action": "tap",
+      "label": "resonate-insert",
+      "coordinates": [
+        471,
+        965
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:14.557686+00:00",
+      "action": "tap",
+      "label": "resonate-dismiss-level",
+      "coordinates": [
+        308,
+        1084
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:22.665216+00:00",
+      "action": "tap",
+      "label": "resonate-remove-dialog",
+      "coordinates": [
+        521,
+        927
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:31.805648+00:00",
+      "action": "tap",
+      "label": "resonate-remove-confirm",
+      "coordinates": [
+        478,
+        874
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:40.528733+00:00",
+      "action": "tap",
+      "label": "resonate-cooldown-dialog",
+      "coordinates": [
+        522,
+        925
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:47.281489+00:00",
+      "action": "tap",
+      "label": "resonate-cooldown-clear300",
+      "coordinates": [
+        462,
+        838
+      ]
+    },
+    {
+      "t": "2026-10-31T17:15:54.829685+00:00",
+      "action": "tap",
+      "label": "experience-open",
+      "coordinates": [
+        416,
+        1345
+      ]
+    },
+    {
+      "t": "2026-10-31T17:16:04.080772+00:00",
+      "action": "swipe",
+      "label": "experience-scroll",
+      "coordinates": [
+        320,
+        1102,
+        320,
+        438
+      ]
+    },
+    {
+      "t": "2026-10-31T17:16:12.900713+00:00",
+      "action": "tap",
+      "label": "primus-open",
+      "coordinates": [
+        321,
+        1012
+      ]
+    },
+    {
+      "t": "2026-10-31T17:16:21.126648+00:00",
+      "action": "tap",
+      "label": "primus-empty-seat",
+      "coordinates": [
+        502,
+        895
+      ]
+    },
+    {
+      "t": "2026-10-31T17:16:28.732922+00:00",
+      "action": "tap",
+      "label": "primus-history",
+      "coordinates": [
+        531,
+        451
+      ]
+    },
+    {
+      "t": "2026-10-31T17:16:35.315445+00:00",
+      "action": "tap",
+      "label": "primus-history-close",
+      "coordinates": [
+        590,
+        349
+      ],
+      "screenshots": [
+        {
+          "file": "011753-primus-history-close.png",
+          "sha256": "dd01712b36b6eda1a426e3b118125aa5a35d1994e24066b8f1692a8e65f1eaa1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:16:43.196332+00:00",
+      "action": "tap",
+      "label": "primus-challenge",
+      "coordinates": [
+        315,
+        1095
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:05.326104+00:00",
+      "action": "tap",
+      "label": "primus-own-seat",
+      "coordinates": [
+        504,
+        896
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:13.196388+00:00",
+      "action": "tap",
+      "label": "primus-own-open",
+      "coordinates": [
+        504,
+        896
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:20.719731+00:00",
+      "action": "tap",
+      "label": "primus-history-after",
+      "coordinates": [
+        532,
+        451
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:30.583369+00:00",
+      "action": "tap",
+      "label": "primus-replay",
+      "coordinates": [
+        535,
+        551
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:50.995408+00:00",
+      "action": "tap",
+      "label": "primus-history-close",
+      "coordinates": [
+        590,
+        349
+      ],
+      "screenshots": [
+        {
+          "file": "011753-primus-history-close.png",
+          "sha256": "dd01712b36b6eda1a426e3b118125aa5a35d1994e24066b8f1692a8e65f1eaa1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:53.405531+00:00",
+      "action": "tap",
+      "label": "primus-dialog-close",
+      "coordinates": [
+        590,
+        333
+      ],
+      "screenshots": [
+        {
+          "file": "011756-primus-dialog-close.png",
+          "sha256": "4e79410b79bd62393571879b94b7c38f1e0f8f136e7c4270b7c04d1a4f76da0e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:17:56.316321+00:00",
+      "action": "tap",
+      "label": "primus-return",
+      "coordinates": [
+        569,
+        1064
+      ],
+      "screenshots": [
+        {
+          "file": "011759-primus-return.png",
+          "sha256": "40c2f65fd5e7aed00ddee0f5c8ae45447d3fe8a03dcd7472c82b6f43da1a3d93"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:18:08.274433+00:00",
+      "action": "swipe",
+      "label": "experience-scroll-bottom",
+      "coordinates": [
+        314,
+        1098,
+        314,
+        450
+      ],
+      "screenshots": [
+        {
+          "file": "011811-experience-scroll-bottom.png",
+          "sha256": "f5962bcd3dfca6abef26e655b88d1792d0814b98e1255907858b376bf5af3408"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:18:19.676098+00:00",
+      "action": "tap",
+      "label": "endless-open",
+      "coordinates": [
+        330,
+        434
+      ],
+      "screenshots": [
+        {
+          "file": "011822-endless-open.png",
+          "sha256": "f5310dec7ea2fb29b160a9561ff4afe9812477d01796790d51110a513388b048"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:18:30.424453+00:00",
+      "action": "tap",
+      "label": "endless-friend-help",
+      "coordinates": [
+        548,
+        1183
+      ],
+      "screenshots": [
+        {
+          "file": "011832-endless-friend-help.png",
+          "sha256": "07bf692fcdf82bc304dbf91e416885473a6ecde79d7977e702fe3c2f605ac722"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:18:38.014676+00:00",
+      "action": "tap",
+      "label": "endless-help-close",
+      "coordinates": [
+        598,
+        363
+      ],
+      "screenshots": [
+        {
+          "file": "011840-endless-help-close.png",
+          "sha256": "356b93f762dfa81679f880ae9d81c39dca64d381357c9ede10559d1e8110d8aa"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:18:41.026592+00:00",
+      "action": "tap",
+      "label": "endless-new-trial",
+      "coordinates": [
+        424,
+        185
+      ],
+      "screenshots": [
+        {
+          "file": "011843-endless-new-trial.png",
+          "sha256": "b6f5fd8cf2b390cc3cee2d6fcdf7ccc93d0b4413aaa286d7de633ea629a58808"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:18:50.114488+00:00",
+      "action": "tap",
+      "label": "endless-new-start-block",
+      "coordinates": [
+        315,
+        1190
+      ],
+      "screenshots": [
+        {
+          "file": "011853-endless-new-start-block.png",
+          "sha256": "c128c51ccfecb9187a5f38c100cf96912688c9319b2e5635981ca208a9793418"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:19:03.302497+00:00",
+      "action": "tap",
+      "label": "maincity-after-trials",
+      "coordinates": [
+        42,
+        1345
+      ],
+      "screenshots": [
+        {
+          "file": "011906-maincity-after-trials.png",
+          "sha256": "7728856377f92466d941df6c0b59703ac51c7241b7aad2fb46e6f3df8079e914"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:19:12.926334+00:00",
+      "action": "tap",
+      "label": "crossbattle-open",
+      "coordinates": [
+        328,
+        453
+      ],
+      "screenshots": [
+        {
+          "file": "011915-crossbattle-open.png",
+          "sha256": "27e016549fc835cfcea8fb33572a71d4ab73b89aa3c2f00cdd7543758a142441"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:19:24.685363+00:00",
+      "action": "tap",
+      "label": "ladder-open",
+      "coordinates": [
+        174,
+        432
+      ],
+      "screenshots": [
+        {
+          "file": "011927-ladder-open.png",
+          "sha256": "02346742beb4f45d15a3e464c33ec22ef41ab29c5e340469f454e9ff27989740"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:19:34.181840+00:00",
+      "action": "tap",
+      "label": "ladder-challenge",
+      "coordinates": [
+        558,
+        936
+      ],
+      "screenshots": [
+        {
+          "file": "011936-ladder-challenge.png",
+          "sha256": "8f1d00149d8e2ccd24167c7ce8a7ff381ea8010d2b680c33f2c2ccc333e59650"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:19:42.728039+00:00",
+      "action": "tap",
+      "label": "ladder-confirm",
+      "coordinates": [
+        483,
+        874
+      ],
+      "screenshots": [
+        {
+          "file": "011945-ladder-confirm.png",
+          "sha256": "0352ec67a45a5ad1eb132322a645c93126b8660ef32ec1dc288328e8b9c77ddd"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:20:25.900379+00:00",
+      "action": "tap",
+      "label": "ladder-history",
+      "coordinates": [
+        189,
+        285
+      ],
+      "screenshots": [
+        {
+          "file": "012028-ladder-history.png",
+          "sha256": "0c6b993fba961a2ff915fff8fb74b975c1b199ff2acc05477600869f21156b9d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:20:34.411911+00:00",
+      "action": "tap",
+      "label": "ladder-history-close",
+      "coordinates": [
+        591,
+        349
+      ],
+      "screenshots": [
+        {
+          "file": "012037-ladder-history-close.png",
+          "sha256": "35ef40455712fe36de46438ff1ae1224510dd2af5a515f86f58ccba3df0469b8"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:20:37.540382+00:00",
+      "action": "tap",
+      "label": "ladder-rewards",
+      "coordinates": [
+        315,
+        285
+      ],
+      "screenshots": [
+        {
+          "file": "012039-ladder-rewards.png",
+          "sha256": "179ec8c455e0a6b8b5c98be45336728a627cb8fa557269d2759cda35753b4e21"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:20:46.605584+00:00",
+      "action": "tap",
+      "label": "ladder-rewards-close",
+      "coordinates": [
+        591,
+        349
+      ],
+      "screenshots": [
+        {
+          "file": "012049-ladder-rewards-close.png",
+          "sha256": "4a94d507f59512e64d7c429ebff5b0ea5d0e99c957bdf8e9ba3762918ba2f4b8"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:20:49.667919+00:00",
+      "action": "tap",
+      "label": "ladder-return",
+      "coordinates": [
+        70,
+        1245
+      ],
+      "screenshots": [
+        {
+          "file": "012052-ladder-return.png",
+          "sha256": "3527daddab695fc6966dc0697f4431f8e49b23d6b305d1046c4a5e4192ba4abd"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:01.886479+00:00",
+      "action": "tap",
+      "label": "weekly-champion-open",
+      "coordinates": [
+        437,
+        417
+      ],
+      "screenshots": [
+        {
+          "file": "012104-weekly-champion-open.png",
+          "sha256": "a27c8bd89370341d9888c47c52798d2639f521c1bd3c2e6663ecf89fd5211fba"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:13.040679+00:00",
+      "action": "tap",
+      "label": "weekly-champion-enter",
+      "coordinates": [
+        321,
+        1250
+      ],
+      "screenshots": [
+        {
+          "file": "012115-weekly-champion-enter.png",
+          "sha256": "1920adf2cad3cb65ee04211b0401eb7f4e0454b05761515181ae76c3bcf17c66"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:22.489815+00:00",
+      "action": "tap",
+      "label": "weekly-champion-return",
+      "coordinates": [
+        70,
+        1251
+      ],
+      "screenshots": [
+        {
+          "file": "012125-weekly-champion-return.png",
+          "sha256": "6fdabe79d7bb8a221690d2518a8e45b26b82ecee1bf497770472704f00a0bec0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:25.585615+00:00",
+      "action": "tap",
+      "label": "team-arena-open",
+      "coordinates": [
+        315,
+        628
+      ],
+      "screenshots": [
+        {
+          "file": "012127-team-arena-open.png",
+          "sha256": "b0d7a3ed33f51a2c282e7b2825d91450b82be9e2d246b7120a6d1b98f0c22977"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:38.629101+00:00",
+      "action": "tap",
+      "label": "team-lobby-open",
+      "coordinates": [
+        316,
+        1196
+      ],
+      "screenshots": [
+        {
+          "file": "012140-team-lobby-open.png",
+          "sha256": "919829281ce0673b8c29eb68f583356796c48a665d4a4f6dc55df9aaa9f6dbfd"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:47.810240+00:00",
+      "action": "tap",
+      "label": "team-lobby-close",
+      "coordinates": [
+        590,
+        312
+      ],
+      "screenshots": [
+        {
+          "file": "012150-team-lobby-close.png",
+          "sha256": "83e4034b3da5071414956cd94580ff11366811353fa4470b368e241a79c5ded6"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:50.361989+00:00",
+      "action": "tap",
+      "label": "team-return",
+      "coordinates": [
+        72,
+        1268
+      ],
+      "screenshots": [
+        {
+          "file": "012153-team-return.png",
+          "sha256": "d8d1d899f7f858d0df901e5de78eb2a153d6ffd061c017d61c9992180fa52ac0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:21:53.364022+00:00",
+      "action": "tap",
+      "label": "elite-open",
+      "coordinates": [
+        321,
+        813
+      ],
+      "screenshots": [
+        {
+          "file": "012156-elite-open.png",
+          "sha256": "3acabaf898bce0782a46a974d61446b0f8001f1eabfcc2f8a4ff29336dd3e50d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:22:03.470850+00:00",
+      "action": "tap",
+      "label": "elite-match",
+      "coordinates": [
+        312,
+        1212
+      ],
+      "screenshots": [
+        {
+          "file": "012205-elite-match.png",
+          "sha256": "68e8b3fa90c9c8cf8259941c9a25ce103a2c9bcfa93851b8458c52252782bfc9"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:22:14.616097+00:00",
+      "action": "tap",
+      "label": "elite-match-opponent",
+      "coordinates": [
+        499,
+        1103
+      ],
+      "screenshots": [
+        {
+          "file": "012217-elite-match-opponent.png",
+          "sha256": "191a9518fc8027b2200c593b07195c0f163653d0a7bca9ad7383c588369a72f2"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:22:31.401410+00:00",
+      "action": "tap",
+      "label": "elite-fight-now",
+      "coordinates": [
+        504,
+        1102
+      ],
+      "screenshots": [
+        {
+          "file": "012234-elite-fight-now.png",
+          "sha256": "20c9761437d80626a0d16fdb1a33a408ae20f1d9dfb26e35d2d536247163247f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:22:57.320035+00:00",
+      "action": "tap",
+      "label": "elite-return-result",
+      "coordinates": [
+        464,
+        1020
+      ],
+      "screenshots": [
+        {
+          "file": "012259-elite-return-result.png",
+          "sha256": "90c9d5db3e20cbae5f1221d9b1815252f8dcfb94abd2d8e7737efcfa5c2428e4"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:23:07.414911+00:00",
+      "action": "tap",
+      "label": "elite-promotion-match",
+      "coordinates": [
+        499,
+        1103
+      ],
+      "screenshots": [
+        {
+          "file": "012309-elite-promotion-match.png",
+          "sha256": "ec09122a18037ef33ff489684d6ecc7071c267863e88aef20f12c65487222625"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:23:29.960369+00:00",
+      "action": "tap",
+      "label": "elite-promotion-now",
+      "coordinates": [
+        504,
+        1102
+      ],
+      "screenshots": [
+        {
+          "file": "012332-elite-promotion-now.png",
+          "sha256": "f042b78b702a6a6c0eebd350bf79c1a32d2f2717055a1782be5789210152c6df"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:04.934299+00:00",
+      "action": "tap",
+      "label": "elite-promoted-return",
+      "coordinates": [
+        464,
+        1020
+      ],
+      "screenshots": [
+        {
+          "file": "012407-elite-promoted-return.png",
+          "sha256": "f62fae20210950ba634293c26d8a5396ae1032a091399bb5bcd10be411625dd3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:07.683573+00:00",
+      "action": "tap",
+      "label": "elite-match-return",
+      "coordinates": [
+        71,
+        1260
+      ],
+      "screenshots": [
+        {
+          "file": "012410-elite-match-return.png",
+          "sha256": "72ea81a265a6841b3597f101d0fc4dfc69c9a322ff072713c31c95c1430e650d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:17.891749+00:00",
+      "action": "tap",
+      "label": "elite-claim-promotion",
+      "coordinates": [
+        524,
+        1112
+      ],
+      "screenshots": [
+        {
+          "file": "012420-elite-claim-promotion.png",
+          "sha256": "289a96f8190e533769c1c413168d15ed850eb78ec286c9b880129538b3365e15"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:27.959516+00:00",
+      "action": "tap",
+      "label": "elite-reward-close",
+      "coordinates": [
+        316,
+        1002
+      ],
+      "screenshots": [
+        {
+          "file": "012430-elite-reward-close.png",
+          "sha256": "70ac213f1bd47ebb56a48ce7bf2c2c17978358ec563afa0adfa27ade00c6d2aa"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:30.693196+00:00",
+      "action": "tap",
+      "label": "elite-pass-open",
+      "coordinates": [
+        585,
+        751
+      ],
+      "screenshots": [
+        {
+          "file": "012433-elite-pass-open.png",
+          "sha256": "2f6aed6f108b0b40fcdf020c84c7b82f81a1bce835bddca395fe6683c9f1e516"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:44.323096+00:00",
+      "action": "tap",
+      "label": "elite-pass-claim1",
+      "coordinates": [
+        540,
+        551
+      ],
+      "screenshots": [
+        {
+          "file": "012446-elite-pass-claim1.png",
+          "sha256": "a9fd9d7a432b157f2cd2924f7cda6eafc199fac67b53b40b42166076490d5cea"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:56.370334+00:00",
+      "action": "tap",
+      "label": "elite-pass-reward-close",
+      "coordinates": [
+        315,
+        1000
+      ],
+      "screenshots": [
+        {
+          "file": "012458-elite-pass-reward-close.png",
+          "sha256": "1e0d5370b8f44a7bbc17305ae71b1b7a40d79ff6bc7d8238987cad35cc11509f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:24:58.968222+00:00",
+      "action": "tap",
+      "label": "elite-pass-upgrade-preview",
+      "coordinates": [
+        171,
+        391
+      ],
+      "screenshots": [
+        {
+          "file": "012501-elite-pass-upgrade-preview.png",
+          "sha256": "1852be9742948221fa2f03a20670e6663ad62e65aacbd7318bd59350c66c63d0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:25:09.592182+00:00",
+      "action": "tap",
+      "label": "elite-pass-preview-close",
+      "coordinates": [
+        314,
+        1200
+      ],
+      "screenshots": [
+        {
+          "file": "012512-elite-pass-preview-close.png",
+          "sha256": "0d4eb602267cd13032c7748c03ac9bd105636fc9b0c84d3b82828bd4f51d285c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:25:12.180216+00:00",
+      "action": "tap",
+      "label": "elite-pass-return",
+      "coordinates": [
+        70,
+        1168
+      ],
+      "screenshots": [
+        {
+          "file": "012514-elite-pass-return.png",
+          "sha256": "3417fcb496ea881e5dbf7d749d83295893437a27ff925208e63b8b23b7ad1a5f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:25:14.934958+00:00",
+      "action": "tap",
+      "label": "elite-return",
+      "coordinates": [
+        70,
+        1264
+      ],
+      "screenshots": [
+        {
+          "file": "012517-elite-return.png",
+          "sha256": "f703be9d76fc50466d1499a81c9984d04a2bf7398e91c0ba72870b86bca8dd61"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:25:28.905138+00:00",
+      "action": "tap",
+      "label": "crossarena-open",
+      "coordinates": [
+        182,
+        1002
+      ],
+      "screenshots": [
+        {
+          "file": "012531-crossarena-open.png",
+          "sha256": "d3d714a8503b30d4568c326511436a2582237a4dea62deb9ede4ed4b0390973d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:25:47.918619+00:00",
+      "action": "tap",
+      "label": "crossarena-challenge-tab",
+      "coordinates": [
+        219,
+        205
+      ],
+      "screenshots": [
+        {
+          "file": "012550-crossarena-challenge-tab.png",
+          "sha256": "7ecf021a87778cc280dafce8e01f3ecaf6eb6648dca64258f2b54cbbe590104a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:26:05.692033+00:00",
+      "action": "tap",
+      "label": "crossarena-challenge",
+      "coordinates": [
+        315,
+        900
+      ],
+      "screenshots": [
+        {
+          "file": "012608-crossarena-challenge.png",
+          "sha256": "e2cdf9d4926c9532c87babd51d98c9975519203e4b9d71466393f5d9f71b94ab"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:26:25.028426+00:00",
+      "action": "tap",
+      "label": "crossarena-return",
+      "coordinates": [
+        70,
+        1264
+      ],
+      "screenshots": [
+        {
+          "file": "012627-crossarena-return.png",
+          "sha256": "a051c56b0aba605a27095efee1e5df7d6773c7e9e4a527e848f05a987dbe8b0f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:26:28.121302+00:00",
+      "action": "tap",
+      "label": "peak-open",
+      "coordinates": [
+        439,
+        1002
+      ],
+      "screenshots": [
+        {
+          "file": "012630-peak-open.png",
+          "sha256": "bd937b2bac31435781eb0922d6e11ae785825f5c6a699f753b8f4dbe79d329a2"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:26:39.598041+00:00",
+      "action": "tap",
+      "label": "peak-enter",
+      "coordinates": [
+        318,
+        1247
+      ],
+      "screenshots": [
+        {
+          "file": "012642-peak-enter.png",
+          "sha256": "29ba2451db3d680c451f56f32c5eba53efe72991c89cb0ee9045e1d44095eb5d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:26:50.045790+00:00",
+      "action": "tap",
+      "label": "peak-bet-closed",
+      "coordinates": [
+        62,
+        979
+      ],
+      "screenshots": [
+        {
+          "file": "012652-peak-bet-closed.png",
+          "sha256": "df9f49388442855381c61c456cc7d028591eda5c33cc8f2ca25cbc267853f91c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:27:00.588370+00:00",
+      "action": "tap",
+      "label": "peak-tree",
+      "coordinates": [
+        508,
+        1151
+      ],
+      "screenshots": [
+        {
+          "file": "012703-peak-tree.png",
+          "sha256": "b459add58d14a37a3c4c081319f8e31055677a5fc8e15ddb54d564794e7a0f17"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:27:13.852021+00:00",
+      "action": "tap",
+      "label": "peak-top8-tree",
+      "coordinates": [
+        580,
+        707
+      ],
+      "screenshots": [
+        {
+          "file": "012716-peak-top8-tree.png",
+          "sha256": "2155b0f466893313901c684aa09d87dd56fe347df39f51d15cd95875de7c8f0d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:27:25.472843+00:00",
+      "action": "tap",
+      "label": "maincity-after-ranks",
+      "coordinates": [
+        42,
+        1345
+      ],
+      "screenshots": [
+        {
+          "file": "012728-maincity-after-ranks.png",
+          "sha256": "920954370cf7a32703d2ab8d04fe04ceac55eb81c3e66c0b279e275d3a936b75"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:27:28.575138+00:00",
+      "action": "swipe",
+      "label": "maincity-pan-left",
+      "coordinates": [
+        126,
+        984,
+        510,
+        984
+      ],
+      "screenshots": [
+        {
+          "file": "012732-maincity-pan-left.png",
+          "sha256": "c6a687f52d1bdc45c81a6117b751e76e33ff5819813a78b6ed1312579eb8900d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:27:41.976164+00:00",
+      "action": "tap",
+      "label": "voyage-open-natural",
+      "coordinates": [
+        163,
+        438
+      ],
+      "screenshots": [
+        {
+          "file": "012744-voyage-open-natural.png",
+          "sha256": "704c2d7546fc2a413ce53521dacf35d6dad419f6b17ed071fd1102a882183d17"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:27:54.562916+00:00",
+      "action": "tap",
+      "label": "heaven-open",
+      "coordinates": [
+        327,
+        857
+      ],
+      "screenshots": [
+        {
+          "file": "012757-heaven-open.png",
+          "sha256": "dae9746b2142dffae5244294488eb9870592a74c4a25a0ca6032f769692a8929"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:28:04.876340+00:00",
+      "action": "tap",
+      "label": "heaven-chapter1",
+      "coordinates": [
+        143,
+        1044
+      ],
+      "screenshots": [
+        {
+          "file": "012807-heaven-chapter1.png",
+          "sha256": "4b631f50074985a1e538f5c8d805b40069e835c46eb127552279ce6e49842bce"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:28:15.625326+00:00",
+      "action": "tap",
+      "label": "heaven-challenge",
+      "coordinates": [
+        554,
+        1198
+      ],
+      "screenshots": [
+        {
+          "file": "012818-heaven-challenge.png",
+          "sha256": "fdaadde59d19b260397f5711ecd2a26600dd4cb2809f0d0b3142672abaabbf9d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:28:27.648810+00:00",
+      "action": "tap",
+      "label": "heaven-fight-start",
+      "coordinates": [
+        315,
+        1165
+      ],
+      "screenshots": [
+        {
+          "file": "012830-heaven-fight-start.png",
+          "sha256": "e07236ed4e735a306352d3cb3e18c50ecfd45ae23fadf51129cc6236fa86a657"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:29:31.512697+00:00",
+      "action": "tap",
+      "label": "heaven-result-close",
+      "coordinates": [
+        464,
+        1020
+      ],
+      "screenshots": [
+        {
+          "file": "012934-heaven-result-close.png",
+          "sha256": "61f8074dd890eedd8b283b77877fe45a2eff7f66921600e84dec7c46b51fd692"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:29:34.280254+00:00",
+      "action": "tap",
+      "label": "heaven-cleared-stage",
+      "coordinates": [
+        83,
+        821
+      ],
+      "screenshots": [
+        {
+          "file": "012936-heaven-cleared-stage.png",
+          "sha256": "1c600b60dda938ec4dd6ccc2c7e2c9ac97f21c01a32fc381d8cb0f618981f3b4"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:29:44.716872+00:00",
+      "action": "tap",
+      "label": "heaven-sweep",
+      "coordinates": [
+        554,
+        1198
+      ],
+      "screenshots": [
+        {
+          "file": "012947-heaven-sweep.png",
+          "sha256": "23e85ba67e2100bd2dbb858843fdc1257a20c986ce242c7edaaf23e0d4a2dc6a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:29:56.130029+00:00",
+      "action": "tap",
+      "label": "heaven-sweep-close",
+      "coordinates": [
+        315,
+        1000
+      ],
+      "screenshots": [
+        {
+          "file": "012958-heaven-sweep-close.png",
+          "sha256": "a091e3f1c226f68950e94633b6d8540f31bd1dc24482e9e294ba7f4f98d862c5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:29:58.899906+00:00",
+      "action": "tap",
+      "label": "heaven-chapter-return",
+      "coordinates": [
+        71,
+        1264
+      ],
+      "screenshots": [
+        {
+          "file": "013001-heaven-chapter-return.png",
+          "sha256": "c6b641c97c3b2dc0023e3b6b019907ec6233cf82a8303679bc4e935450c00124"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:01.799240+00:00",
+      "action": "tap",
+      "label": "heaven-maintenance-open",
+      "coordinates": [
+        382,
+        199
+      ],
+      "screenshots": [
+        {
+          "file": "013004-heaven-maintenance-open.png",
+          "sha256": "3e30d327fdab10684b889559eb01119d507b61e96272f932874c260449f0dd64"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:13.770587+00:00",
+      "action": "tap",
+      "label": "heaven-maintenance-free",
+      "coordinates": [
+        184,
+        1207
+      ],
+      "screenshots": [
+        {
+          "file": "013016-heaven-maintenance-free.png",
+          "sha256": "bb1790415afec8b96e55dd0d4f9ecd6f5b68b59abbb71b9f0a27a9c9a2012b25"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:26.641932+00:00",
+      "action": "tap",
+      "label": "heaven-maintenance-again",
+      "coordinates": [
+        474,
+        975
+      ],
+      "screenshots": [
+        {
+          "file": "013029-heaven-maintenance-again.png",
+          "sha256": "9e854eb8f332398a48639386dd9457c42de21fb8c54306cfba4cae8a262c2cc3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:38.490310+00:00",
+      "action": "tap",
+      "label": "heaven-maintenance-result-close",
+      "coordinates": [
+        159,
+        976
+      ],
+      "screenshots": [
+        {
+          "file": "013041-heaven-maintenance-result-close.png",
+          "sha256": "1a26e9c60a293ced46a8126632473d6f794c9d95be3e983c0f4b6eb1d1827598"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:41.479076+00:00",
+      "action": "tap",
+      "label": "heaven-return",
+      "coordinates": [
+        70,
+        1264
+      ],
+      "screenshots": [
+        {
+          "file": "013044-heaven-return.png",
+          "sha256": "ccda3cf19ab4650a065a45f03b2a8b248e708be79fdc8a4ffec823a13625b5d8"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:44.409815+00:00",
+      "action": "tap",
+      "label": "territory-open",
+      "coordinates": [
+        318,
+        650
+      ],
+      "screenshots": [
+        {
+          "file": "013047-territory-open.png",
+          "sha256": "337eb92b671204738bb9084871beb3d4e394617c121563404136de4bc6948e86"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:30:58.409339+00:00",
+      "action": "tap",
+      "label": "territory-five-emperors",
+      "coordinates": [
+        143,
+        720
+      ],
+      "screenshots": [
+        {
+          "file": "013101-territory-five-emperors.png",
+          "sha256": "8475e0a243debfa38b4d79295e3015312c507a474c15d7321c1e746b6185e6f1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:31:10.661950+00:00",
+      "action": "tap",
+      "label": "territory-challenge",
+      "coordinates": [
+        556,
+        560
+      ],
+      "screenshots": [
+        {
+          "file": "013113-territory-challenge.png",
+          "sha256": "ff6bd1d7ba3aaa3ea8ad83652525af62e755fbaeb2c798342845fcb5c5f56e73"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:31:25.102661+00:00",
+      "action": "tap",
+      "label": "territory-marine-filter",
+      "coordinates": [
+        383,
+        842
+      ],
+      "screenshots": [
+        {
+          "file": "013127-territory-marine-filter.png",
+          "sha256": "b823ba9387f4cf01a6d2ceb51c25f1d92e275e263a7d2901d44b790d07195234"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:31:36.178251+00:00",
+      "action": "tap",
+      "label": "territory-add-marine",
+      "coordinates": [
+        98,
+        933
+      ],
+      "screenshots": [
+        {
+          "file": "013138-territory-add-marine.png",
+          "sha256": "90d9e549d0be974b4708eb94d3e9e82134668d92898c9c2b5a4442e20dfef1eb"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:31:47.830686+00:00",
+      "action": "tap",
+      "label": "territory-fight-start",
+      "coordinates": [
+        315,
+        1165
+      ],
+      "screenshots": [
+        {
+          "file": "013150-territory-fight-start.png",
+          "sha256": "91b70d029fc9948a31ebe5e56262c2dc01afe08939d95384a44581e772af55dc"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:04.819760+00:00",
+      "action": "tap",
+      "label": "territory-restore-open",
+      "coordinates": [
+        556,
+        560
+      ],
+      "screenshots": [
+        {
+          "file": "013307-territory-restore-open.png",
+          "sha256": "12f2e685194ed8ed534942e8c0b245ffad9cc77769e866bc475edce607449f70"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:16.897461+00:00",
+      "action": "tap",
+      "label": "territory-remove-helper",
+      "coordinates": [
+        97,
+        1045
+      ],
+      "screenshots": [
+        {
+          "file": "013319-territory-remove-helper.png",
+          "sha256": "54353bf93541681ba08afb3220295d3d8e45ef0bf7a1f64ccdd88345cc99f568"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:19.868713+00:00",
+      "action": "tap",
+      "label": "territory-formation-close",
+      "coordinates": [
+        598,
+        286
+      ],
+      "screenshots": [
+        {
+          "file": "013322-territory-formation-close.png",
+          "sha256": "fc9486177bffc5b089e02aa9bcc091992ae8257fa57bffb23471526f4bf3e89f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:22.796732+00:00",
+      "action": "tap",
+      "label": "territory-return",
+      "coordinates": [
+        70,
+        1168
+      ],
+      "screenshots": [
+        {
+          "file": "013325-territory-return.png",
+          "sha256": "410bc1b50c2fc9c08d2207bb5c7c8bcb623e80c4650444fd5dfab4078dbea400"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:34.576528+00:00",
+      "action": "tap",
+      "label": "territory-map-return",
+      "coordinates": [
+        70,
+        1264
+      ],
+      "screenshots": [
+        {
+          "file": "013337-territory-map-return.png",
+          "sha256": "018fdc5d14bdccdc1e7e08f79d4dcae217d0f56b3fc5b2b81b4abc92aa2c307c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:37.501278+00:00",
+      "action": "tap",
+      "label": "sky-open",
+      "coordinates": [
+        315,
+        450
+      ],
+      "screenshots": [
+        {
+          "file": "013339-sky-open.png",
+          "sha256": "ae31a9696c7b4879f79ea0f2d6dc52f32a7f3f3ed3dd95d8eb525f4cd2c40739"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:53.086115+00:00",
+      "action": "tap",
+      "label": "sky-select-main",
+      "coordinates": [
+        94,
+        470
+      ],
+      "screenshots": [
+        {
+          "file": "013355-sky-select-main.png",
+          "sha256": "732ee9840931b5dc709462b402509f9463539a292e8cc87ad44f020d30a55b18"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:33:55.521441+00:00",
+      "action": "tap",
+      "label": "sky-enter-reset",
+      "coordinates": [
+        316,
+        1047
+      ],
+      "screenshots": [
+        {
+          "file": "013357-sky-enter-reset.png",
+          "sha256": "6557b6090c0104fd0e65d6911589defdb78046743506035cc4c0f7cbce8275fe"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:05.280103+00:00",
+      "action": "tap",
+      "label": "sky-confirm-lineup",
+      "coordinates": [
+        464,
+        837
+      ],
+      "screenshots": [
+        {
+          "file": "013408-sky-confirm-lineup.png",
+          "sha256": "7fe86ae1ebc15e312f4b4e323996e0f1c70d4a654698195b518005f5ca957256"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:18.505923+00:00",
+      "action": "tap",
+      "label": "maincity-after-sky",
+      "coordinates": [
+        42,
+        1345
+      ],
+      "screenshots": [
+        {
+          "file": "013421-maincity-after-sky.png",
+          "sha256": "73b0ca720b0c1bc1e131bc1f4f5218b205ce46c72d71752a4338c810fd91eef5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:21.220865+00:00",
+      "action": "swipe",
+      "label": "maincity-far-left",
+      "coordinates": [
+        113,
+        988,
+        518,
+        988
+      ],
+      "screenshots": [
+        {
+          "file": "013424-maincity-far-left.png",
+          "sha256": "d9e52e235c3878d0684a8bf49e48fbaf868cfce66679a98875d95d48f4682d23"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:34.823939+00:00",
+      "action": "tap",
+      "label": "sky-buff-confirm",
+      "coordinates": [
+        313,
+        838
+      ],
+      "screenshots": [
+        {
+          "file": "013437-sky-buff-confirm.png",
+          "sha256": "7bea38db267c865bff5d5bd96712fc7800aaf4cd420bb99857414ed274cbd561"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:37.888229+00:00",
+      "action": "tap",
+      "label": "sky-leave-confirmed",
+      "coordinates": [
+        42,
+        1345
+      ],
+      "screenshots": [
+        {
+          "file": "013440-sky-leave-confirmed.png",
+          "sha256": "06b57441760448a7ccf5c5d1ef2dec898ec5b60e32d0c5ecf100ec753a833dc9"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:40.916257+00:00",
+      "action": "swipe",
+      "label": "maincity-far-left-again",
+      "coordinates": [
+        113,
+        988,
+        518,
+        988
+      ],
+      "screenshots": [
+        {
+          "file": "013444-maincity-far-left-again.png",
+          "sha256": "b8eaae792bd52e3026dadead6ed692c6ba12dd02d62316674d27f156db2ef7d3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:34:53.626812+00:00",
+      "action": "swipe",
+      "label": "maincity-left-boundary",
+      "coordinates": [
+        113,
+        988,
+        518,
+        988
+      ],
+      "screenshots": [
+        {
+          "file": "013457-maincity-left-boundary.png",
+          "sha256": "047ade39d7d3483585b9195f98405b5f55c29f0a77e0cdde0acb8ecfc944847a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:35:06.345697+00:00",
+      "action": "swipe",
+      "label": "maincity-pan-right1",
+      "coordinates": [
+        518,
+        988,
+        113,
+        988
+      ],
+      "screenshots": [
+        {
+          "file": "013509-maincity-pan-right1.png",
+          "sha256": "2feea7cb28ddfc6351d861ee7d575dcd9d71487aa7496435e85fa2d8cf9b543f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:35:10.043301+00:00",
+      "action": "swipe",
+      "label": "maincity-pan-right2",
+      "coordinates": [
+        518,
+        988,
+        113,
+        988
+      ],
+      "screenshots": [
+        {
+          "file": "013513-maincity-pan-right2.png",
+          "sha256": "f11c1e46851cf77ec1efb4857346986addd529805d3c908fae83415a58f886de"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:35:22.969074+00:00",
+      "action": "tap",
+      "label": "maincity-more",
+      "coordinates": [
+        591,
+        1253
+      ],
+      "screenshots": [
+        {
+          "file": "013525-maincity-more.png",
+          "sha256": "62430aad8b08672ced66f35fbc77781f7dd02324f3abeb55e70ec4c1f370ba53"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T17:35:35.819370+00:00",
+      "action": "tap",
+      "label": "fruit-open",
+      "coordinates": [
+        374,
+        851
+      ],
+      "screenshots": [
+        {
+          "file": "013538-fruit-open.png",
+          "sha256": "4ddfe44ea8dceaed31aac4c01c387e4c901e89c6639f402e3f73df4717876b80"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T18:04:37.054798+00:00",
+      "action": "tap",
+      "label": "fruit-ice-detail",
+      "coordinates": [
+        319,
+        450
+      ],
+      "screenshots": [
+        {
+          "file": "020439-fruit-ice-detail.png",
+          "sha256": "0a6ebb779f0a37bc6f7103f40c77a30004daaf3d58f1a14e17ff04d16786e3d9"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T18:05:35.634286+00:00",
+      "action": "tap",
+      "label": "fruit-detail-close",
+      "coordinates": [
+        462,
+        460
+      ],
+      "screenshots": [
+        {
+          "file": "020538-fruit-detail-close.png",
+          "sha256": "25fb2daba913982b456c714f905b227db60d202a849b5ae321d28a95aa50ded1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T18:05:38.867672+00:00",
+      "action": "tap",
+      "label": "fruit-treasure-open",
+      "coordinates": [
+        410,
+        272
+      ],
+      "screenshots": [
+        {
+          "file": "020541-fruit-treasure-open.png",
+          "sha256": "3764bb361138cdce0ee43f1bf13502e0eb8d76bb3ab954469eaa108d02889449"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T18:08:38.192005+00:00",
+      "action": "tap",
+      "label": "fruit-draw-once300",
+      "coordinates": [
+        217,
+        1124
+      ],
+      "screenshots": [
+        {
+          "file": "020840-fruit-draw-once300.png",
+          "sha256": "84813e1c814461ff14c8ff63620996da5f8fba935d6aca4dc39f77c40f8fcc38"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:56:34.257321+00:00",
+      "action": "tap",
+      "label": "fruit-reward-close",
+      "coordinates": [
+        316,
+        1020
+      ],
+      "screenshots": [
+        {
+          "file": "065637-fruit-reward-close.png",
+          "sha256": "94c8bdaa653e4ad7f1238c7e5308152e4c7a942364449319b385e9bfa8e870f3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:56:37.262174+00:00",
+      "action": "tap",
+      "label": "fruit-shop",
+      "coordinates": [
+        54,
+        495
+      ],
+      "screenshots": [
+        {
+          "file": "065639-fruit-shop.png",
+          "sha256": "5b22c8db6b8336e92e8a35a7f32691ba7c2257a178ddd9b52559720477a54098"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:57:21.181961+00:00",
+      "action": "tap",
+      "label": "fruit-shop-close",
+      "coordinates": [
+        584,
+        407
+      ],
+      "screenshots": [
+        {
+          "file": "065723-fruit-shop-close.png",
+          "sha256": "66651254c1557962f20e7adaa1d984a83004540446fe3ab2360da8a82f1bc512"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:57:24.035735+00:00",
+      "action": "tap",
+      "label": "fruit-codex",
+      "coordinates": [
+        54,
+        872
+      ],
+      "screenshots": [
+        {
+          "file": "065726-fruit-codex.png",
+          "sha256": "b5bf55c11d583570d4239693bea2ae4b73b041920b5ed3429651e09167526d58"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:58:13.113394+00:00",
+      "action": "tap",
+      "label": "fruit-codex-close",
+      "coordinates": [
+        584,
+        407
+      ],
+      "screenshots": [
+        {
+          "file": "065815-fruit-codex-close.png",
+          "sha256": "6c117aecd507d4bd705dea65a4a64106b79adb0dd7bf07f4cb74c2e6362988b5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:58:15.947144+00:00",
+      "action": "tap",
+      "label": "hallows-open",
+      "coordinates": [
+        591,
+        1344
+      ],
+      "screenshots": [
+        {
+          "file": "065818-hallows-open.png",
+          "sha256": "f447c3b315c53ba3e4832a099710cd9551dd486c72120682f9dded0b040f14b3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:59:10.477736+00:00",
+      "action": "tap",
+      "label": "hallows-previous",
+      "coordinates": [
+        118,
+        474
+      ],
+      "screenshots": [
+        {
+          "file": "065913-hallows-previous.png",
+          "sha256": "ad782a5a2fb483395cc632bd84b57d43847cc4ce93fd6698fd3e16c2af6c8c75"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T22:59:56.056726+00:00",
+      "action": "tap",
+      "label": "hallows-upgrade-view",
+      "coordinates": [
+        547,
+        674
+      ],
+      "screenshots": [
+        {
+          "file": "065958-hallows-upgrade-view.png",
+          "sha256": "791d94e50b4bb2919c97ae102fd1b9a55e0d85fe3cbeb41c8ed1b4b6d5f7dcc7"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:02:01.388692+00:00",
+      "action": "tap",
+      "label": "hallows-thunder-detail",
+      "coordinates": [
+        147,
+        568
+      ],
+      "screenshots": [
+        {
+          "file": "070203-hallows-thunder-detail.png",
+          "sha256": "545abeda4a9d05a758a61f57fd12f4c9803f80998cb9e9f3bc7b4ff8725b7505"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:02:48.266940+00:00",
+      "action": "tap",
+      "label": "hallows-ace",
+      "coordinates": [
+        510,
+        473
+      ],
+      "screenshots": [
+        {
+          "file": "070250-hallows-ace.png",
+          "sha256": "1ce68a31d57fe032b78ee9ffb7cb43136728574e3b13ee7d9934b68dae6ca65d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:02:50.700363+00:00",
+      "action": "tap",
+      "label": "hallows-quick-combat-go",
+      "coordinates": [
+        235,
+        1115
+      ],
+      "screenshots": [
+        {
+          "file": "070252-hallows-quick-combat-go.png",
+          "sha256": "e09f65b2694db5ff1407e7e6f346e905ebe2ec39e1fd652175e2b825e44d78a0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:06:58.158733+00:00",
+      "action": "tap",
+      "label": "hallows-quick-combat-free",
+      "coordinates": [
+        313,
+        927
+      ],
+      "screenshots": [
+        {
+          "file": "070700-hallows-quick-combat-free.png",
+          "sha256": "ff373659a589f554f165a8770e5d3b1b60fc881a7a7126a7ce67faf1df4181fe"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:05.639592+00:00",
+      "action": "tap",
+      "label": "hallows-quick-reward-close",
+      "coordinates": [
+        311,
+        1041
+      ],
+      "screenshots": [
+        {
+          "file": "070707-hallows-quick-reward-close.png",
+          "sha256": "847afbc27ea8b497d835d82d481a1cb24176d93f472a522f59c0e292966f24d0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:12.697812+00:00",
+      "action": "tap",
+      "label": "hallows-quick-close",
+      "coordinates": [
+        590,
+        500
+      ],
+      "screenshots": [
+        {
+          "file": "070715-hallows-quick-close.png",
+          "sha256": "42a294d2e4639afe9b9c6ca3a15895be46a95c4bff38ac6cf1d73893c36673f4"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:15.212093+00:00",
+      "action": "tap",
+      "label": "hallows-quest-claim",
+      "coordinates": [
+        238,
+        1114
+      ],
+      "screenshots": [
+        {
+          "file": "070717-hallows-quest-claim.png",
+          "sha256": "ddc1ff07460236f93a28e322cb6c44475af108091bbde933d5794a54013df1b3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:21.130419+00:00",
+      "action": "tap",
+      "label": "hallows-quest-reward-close",
+      "coordinates": [
+        315,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070723-hallows-quest-reward-close.png",
+          "sha256": "76232d1c7c469d511be9f84d53d6e1e909dce251ea5cf5d3983d420fbc0e10f1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:23.612079+00:00",
+      "action": "tap",
+      "label": "hallows-shop-go",
+      "coordinates": [
+        534,
+        1115
+      ],
+      "screenshots": [
+        {
+          "file": "070726-hallows-shop-go.png",
+          "sha256": "ef821632745a503ae8fb3732a8e9a82a37c29f6616664f3d8244911c9e38d7c4"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:32.172890+00:00",
+      "action": "tap",
+      "label": "hallows-shop-buy-coins",
+      "coordinates": [
+        488,
+        1001
+      ],
+      "screenshots": [
+        {
+          "file": "070734-hallows-shop-buy-coins.png",
+          "sha256": "4596f8f3139aa3e757ac81889e48fb648c28c6f36973a7eba29eab8bd0d1996a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:38.425740+00:00",
+      "action": "tap",
+      "label": "hallows-shop-buy-confirm",
+      "coordinates": [
+        458,
+        837
+      ],
+      "screenshots": [
+        {
+          "file": "070740-hallows-shop-buy-confirm.png",
+          "sha256": "5524dd6fbf17da306becdeea2237857a65a52eca8be507f3a0e3a79ec771fa86"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:07:58.969930+00:00",
+      "action": "tap",
+      "label": "hallows-ace-return",
+      "coordinates": [
+        587,
+        1341
+      ],
+      "screenshots": [
+        {
+          "file": "070801-hallows-ace-return.png",
+          "sha256": "29de522be1323f1d848953b55c785301561fa19c49a9739a2ff25ee87aad1d5b"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:01.679780+00:00",
+      "action": "tap",
+      "label": "hallows-shop-quest-claim",
+      "coordinates": [
+        534,
+        1115
+      ],
+      "screenshots": [
+        {
+          "file": "070804-hallows-shop-quest-claim.png",
+          "sha256": "f2da5b8b3b3faa276188464222e4e580a707fae0a6cb0ded4a26754a29092b17"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:21.429035+00:00",
+      "action": "tap",
+      "label": "hallows-shop-return",
+      "coordinates": [
+        80,
+        1265
+      ],
+      "screenshots": [
+        {
+          "file": "070823-hallows-shop-return.png",
+          "sha256": "604fa085ec50133f819ffea2686c22bd8d8a4d44732e608c602271c77fd26362"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:28.712441+00:00",
+      "action": "tap",
+      "label": "hallows-final-quest-claim",
+      "coordinates": [
+        530,
+        1115
+      ],
+      "screenshots": [
+        {
+          "file": "070830-hallows-final-quest-claim.png",
+          "sha256": "52456b8c08d079e851d0fe237f4989422997dcfe323c446120f7414bdf20bc9c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:31.115671+00:00",
+      "action": "tap",
+      "label": "hallows-final-reward-close",
+      "coordinates": [
+        310,
+        1050
+      ],
+      "screenshots": [
+        {
+          "file": "070833-hallows-final-reward-close.png",
+          "sha256": "990ffe5946ed72b8b7826c10722f67f6f4403525fa979426d7373c82af078b6e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:41.638699+00:00",
+      "action": "tap",
+      "label": "hallows-black-quest1",
+      "coordinates": [
+        235,
+        990
+      ],
+      "screenshots": [
+        {
+          "file": "070843-hallows-black-quest1.png",
+          "sha256": "87215dfae14620e75770f4c49dde681e2a61fd700d77dd434cbc5a6a90d6bee5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:44.037309+00:00",
+      "action": "tap",
+      "label": "hallows-black-reward1-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070846-hallows-black-reward1-close.png",
+          "sha256": "0677aa489abcc3bc00aa769e832ecd861300791c2c3471d39fa02f8be9010d33"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:46.504263+00:00",
+      "action": "tap",
+      "label": "hallows-black-quest2",
+      "coordinates": [
+        532,
+        990
+      ],
+      "screenshots": [
+        {
+          "file": "070848-hallows-black-quest2.png",
+          "sha256": "d02e17ad9367e6f520cec17ee2bd05107004dd974ab37022313c6613258f2e33"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:48.923422+00:00",
+      "action": "tap",
+      "label": "hallows-black-reward2-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070851-hallows-black-reward2-close.png",
+          "sha256": "189493b5c3695e6abfdf34628eb230fc1a057a43c8ff27ce76a67a721a82d408"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:56.939614+00:00",
+      "action": "tap",
+      "label": "hallows-black-quest3",
+      "coordinates": [
+        235,
+        1114
+      ],
+      "screenshots": [
+        {
+          "file": "070859-hallows-black-quest3.png",
+          "sha256": "545ee1e4d8354ab9f146fbcf54eada6a95740aee0b6dda109f2e181c03deea2f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:08:59.311193+00:00",
+      "action": "tap",
+      "label": "hallows-black-reward3-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070901-hallows-black-reward3-close.png",
+          "sha256": "236055668bf9850ae6280f2a67a8c3b5a081592ea12292f7bf866b930981b250"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:01.740684+00:00",
+      "action": "tap",
+      "label": "hallows-black-quest4",
+      "coordinates": [
+        532,
+        1114
+      ],
+      "screenshots": [
+        {
+          "file": "070903-hallows-black-quest4.png",
+          "sha256": "e183ddf992a706d347378c41dd635bc777a6d02b32f3a340acd0206b5717720c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:04.161344+00:00",
+      "action": "tap",
+      "label": "hallows-black-reward4-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070906-hallows-black-reward4-close.png",
+          "sha256": "47b2988e470ec65e9dcca9d8e9d1803865d9364e6f169abcb3f9657d1bd69bde"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:12.194853+00:00",
+      "action": "tap",
+      "label": "hallows-ice-quest1",
+      "coordinates": [
+        235,
+        990
+      ],
+      "screenshots": [
+        {
+          "file": "070914-hallows-ice-quest1.png",
+          "sha256": "fd4e3f4c215d19ab05d6b998e54f28d4c9f166e377c1389b89c642f97b6820ab"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:14.600687+00:00",
+      "action": "tap",
+      "label": "hallows-ice-reward1-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070916-hallows-ice-reward1-close.png",
+          "sha256": "611d7e5db8c55541fae7e7341f19af41daa4963e6acd42c274acd7739a015e24"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:17.075105+00:00",
+      "action": "tap",
+      "label": "hallows-ice-quest2",
+      "coordinates": [
+        532,
+        990
+      ],
+      "screenshots": [
+        {
+          "file": "070919-hallows-ice-quest2.png",
+          "sha256": "8788b9b3fc184dc6e585255ee24bb093354e6563761c6b62d3e3762b8593e2f0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:19.471705+00:00",
+      "action": "tap",
+      "label": "hallows-ice-reward2-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070921-hallows-ice-reward2-close.png",
+          "sha256": "61baca55eec903c801b9bc5fc288a83b1a1ef5b9db3ec4e47330e96a36a00f22"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:22.037537+00:00",
+      "action": "tap",
+      "label": "hallows-ice-quest3",
+      "coordinates": [
+        235,
+        1114
+      ],
+      "screenshots": [
+        {
+          "file": "070924-hallows-ice-quest3.png",
+          "sha256": "9a1a9e42f8b2f6037715b384a5c0324f7b55d90cd373c5cffbc17b615b6a33d8"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:24.443365+00:00",
+      "action": "tap",
+      "label": "hallows-ice-reward3-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070926-hallows-ice-reward3-close.png",
+          "sha256": "a4cba2c0c866f435055691774bb9a60ed682f94cc883e86db4027ba8b49ddfed"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:26.952292+00:00",
+      "action": "tap",
+      "label": "hallows-ice-quest4",
+      "coordinates": [
+        532,
+        1114
+      ],
+      "screenshots": [
+        {
+          "file": "070929-hallows-ice-quest4.png",
+          "sha256": "3cb38c0c2f6a644e8007567713a65d3ddecb5d664a4eb0fc906bca43e1024723"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:29.656101+00:00",
+      "action": "tap",
+      "label": "hallows-ice-reward4-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "070932-hallows-ice-reward4-close.png",
+          "sha256": "6dff1fdcd018b68fcc0a1abbcb3c15ad25b8c2862fc93284fb9d0ef9b5ce4a0e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:42.741542+00:00",
+      "action": "tap",
+      "label": "hallows-upgrade-once",
+      "coordinates": [
+        171,
+        1107
+      ],
+      "screenshots": [
+        {
+          "file": "070945-hallows-upgrade-once.png",
+          "sha256": "f5f8a0b540bb6d0023af98da2a0fb6a87092d36b5a49198560bc751bada63e9b"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:45.380036+00:00",
+      "action": "tap",
+      "label": "hallows-skill-tab",
+      "coordinates": [
+        204,
+        817
+      ],
+      "screenshots": [
+        {
+          "file": "070947-hallows-skill-tab.png",
+          "sha256": "5137557e9a8d50df09eb443e08138ff349d4b0d44ca2a48270221f9a766c16d0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:09:58.647903+00:00",
+      "action": "tap",
+      "label": "hallows-penetration-tab",
+      "coordinates": [
+        326,
+        815
+      ],
+      "screenshots": [
+        {
+          "file": "071001-hallows-penetration-tab.png",
+          "sha256": "18a3197659dff26c6b91463950e3a42440d3e3f9b1418114f4a6eaa4eaedd0a5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:10:09.114125+00:00",
+      "action": "tap",
+      "label": "hallows-penetrate-once",
+      "coordinates": [
+        313,
+        1107
+      ],
+      "screenshots": [
+        {
+          "file": "071011-hallows-penetrate-once.png",
+          "sha256": "d2a39b4d299e2166cec4d5818004f7d9567050f970a3ce4094a51ef36e655690"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:10:33.523663+00:00",
+      "action": "tap",
+      "label": "hallows-wash-open",
+      "coordinates": [
+        439,
+        795
+      ],
+      "screenshots": [
+        {
+          "file": "071035-hallows-wash-open.png",
+          "sha256": "87eb1201feedf40fd4fb48b82afa0368d22c9f2e4f2d9125d9ce429d400ff1c1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:10:50.439969+00:00",
+      "action": "tap",
+      "label": "hallows-wash-confirm",
+      "coordinates": [
+        464,
+        838
+      ],
+      "screenshots": [
+        {
+          "file": "071052-hallows-wash-confirm.png",
+          "sha256": "b29c7ef6cc2395f06d172f920ae65694dd4f2543d939310e706dfb5540c5b46d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:11:00.165525+00:00",
+      "action": "tap",
+      "label": "hallows-wash-reward-close",
+      "coordinates": [
+        312,
+        1043
+      ],
+      "screenshots": [
+        {
+          "file": "071102-hallows-wash-reward-close.png",
+          "sha256": "0d6cfed31873b33886205008ad65441cc854dea5e33d619c117f513adcb650b0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:11:02.823694+00:00",
+      "action": "tap",
+      "label": "guild-open",
+      "coordinates": [
+        504,
+        1346
+      ],
+      "screenshots": [
+        {
+          "file": "071105-guild-open.png",
+          "sha256": "08225459dc7eef23fa205dd6a1cb1fe8bf6cb0edc66022f9d83ff9b62f421a97"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:11:13.819405+00:00",
+      "action": "tap",
+      "label": "guild-secret-open",
+      "coordinates": [
+        568,
+        217
+      ],
+      "screenshots": [
+        {
+          "file": "071116-guild-secret-open.png",
+          "sha256": "5414579d9f236811bc97671e48484cd2c83a9231a02326d66e41c44916d03aaa"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:11:41.812102+00:00",
+      "action": "tap",
+      "label": "guild-secret-start",
+      "coordinates": [
+        315,
+        1188
+      ],
+      "screenshots": [
+        {
+          "file": "071144-guild-secret-start.png",
+          "sha256": "5af38d79488e10c670d661017cd2e9adb31f7bc2c99533388d09d27b62bfac4c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:11:56.882928+00:00",
+      "action": "tap",
+      "label": "guild-secret-return",
+      "coordinates": [
+        75,
+        1271
+      ],
+      "screenshots": [
+        {
+          "file": "071159-guild-secret-return.png",
+          "sha256": "4cb7f9f09c1f893f4e30f8ec88a5d85e2304ad83726c4cf142dd023f07dc6327"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:11:59.801918+00:00",
+      "action": "tap",
+      "label": "guild-treasury-open",
+      "coordinates": [
+        181,
+        988
+      ],
+      "screenshots": [
+        {
+          "file": "071201-guild-treasury-open.png",
+          "sha256": "ab66bbb9529e15e6f5cca49f39d0b7aec1260f929e9d6048c7547233f2615a6d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:12:35.211064+00:00",
+      "action": "tap",
+      "label": "guild-treasury-deposit-window",
+      "coordinates": [
+        461,
+        1196
+      ],
+      "screenshots": [
+        {
+          "file": "071237-guild-treasury-deposit-window.png",
+          "sha256": "4fb479f715d7713a21ade613bb196f1266ebb9a19061963614c417ac42a50c4a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:12:47.425257+00:00",
+      "action": "tap",
+      "label": "guild-treasury-item",
+      "coordinates": [
+        96,
+        596
+      ],
+      "screenshots": [
+        {
+          "file": "071249-guild-treasury-item.png",
+          "sha256": "f5b94c3ab7794d57277c6a90bbfdb65ed111e8b327487f1a7b916548611d6015"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:13:00.936262+00:00",
+      "action": "tap",
+      "label": "guild-treasury-deposit-one",
+      "coordinates": [
+        425,
+        881
+      ],
+      "screenshots": [
+        {
+          "file": "071303-guild-treasury-deposit-one.png",
+          "sha256": "afeccc0e70fe05c92d2398b0c928a438c25ee2d44cecba740d51ddbaf5be30f3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:13:03.357400+00:00",
+      "action": "tap",
+      "label": "guild-treasury-deposit-return",
+      "coordinates": [
+        74,
+        1271
+      ],
+      "screenshots": [
+        {
+          "file": "071305-guild-treasury-deposit-return.png",
+          "sha256": "9be7ec212eeda296a0edcd76cf7fde7f9108885aeae544daa7db5199c9481b98"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:13:19.094080+00:00",
+      "action": "tap",
+      "label": "guild-treasury-list-return",
+      "coordinates": [
+        74,
+        1271
+      ],
+      "screenshots": [
+        {
+          "file": "071321-guild-treasury-list-return.png",
+          "sha256": "c9ba69e3f5e0b987c355c3c6ca8203dba92f05cd47278b120878bebc283dab95"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:13:21.484186+00:00",
+      "action": "tap",
+      "label": "guild-treasury-item-tab",
+      "coordinates": [
+        535,
+        417
+      ],
+      "screenshots": [
+        {
+          "file": "071323-guild-treasury-item-tab.png",
+          "sha256": "ab5870f450230658963dd3f9e2d25d54895e2c731a24049e128b656394f1aa72"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:13:36.208180+00:00",
+      "action": "tap",
+      "label": "guild-treasury-exchange",
+      "coordinates": [
+        117,
+        573
+      ],
+      "screenshots": [
+        {
+          "file": "071338-guild-treasury-exchange.png",
+          "sha256": "adf8250a1d008d70acbb43dbc203f7b5ec303f14c5feef3bcefd8a166f149c04"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:13:48.953224+00:00",
+      "action": "tap",
+      "label": "guild-treasury-buy-insufficient",
+      "coordinates": [
+        423,
+        881
+      ],
+      "screenshots": [
+        {
+          "file": "071351-guild-treasury-buy-insufficient.png",
+          "sha256": "57d56e1dde8d8e3e0c17b3e8fe62f5e4946abeba89c283d58065e2e93ce25a1c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:14:03.606526+00:00",
+      "action": "tap",
+      "label": "guild-treasury-insufficient-close",
+      "coordinates": [
+        571,
+        499
+      ],
+      "screenshots": [
+        {
+          "file": "071405-guild-treasury-insufficient-close.png",
+          "sha256": "239f2a18e0bc3c35d9d9987e771dd61455d7139eb03ec62bfe0dac37cf595e52"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:14:05.994594+00:00",
+      "action": "tap",
+      "label": "guild-treasury-return",
+      "coordinates": [
+        74,
+        1271
+      ],
+      "screenshots": [
+        {
+          "file": "071408-guild-treasury-return.png",
+          "sha256": "08cbdc2734170ac5a6807ac223496b2f28d5226a59d61c6795902145dddb0149"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:14:08.855549+00:00",
+      "action": "tap",
+      "label": "guild-shop-open",
+      "coordinates": [
+        488,
+        866
+      ],
+      "screenshots": [
+        {
+          "file": "071411-guild-shop-open.png",
+          "sha256": "36d2d6aad9973a8fe5ed9e1c5a276349d5862c22fd81af2534287841176f6fd2"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:14:25.058489+00:00",
+      "action": "swipe",
+      "label": "guild-shop-bottom",
+      "coordinates": [
+        460,
+        967,
+        459,
+        503
+      ],
+      "screenshots": [
+        {
+          "file": "071427-guild-shop-bottom.png",
+          "sha256": "77cf7db9b76284305d0ae4e10af7e163c38433975966cbcb4d4ad63fa091a188"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:14:42.068305+00:00",
+      "action": "tap",
+      "label": "guild-shop-buy-ticket",
+      "coordinates": [
+        492,
+        972
+      ],
+      "screenshots": [
+        {
+          "file": "071444-guild-shop-buy-ticket.png",
+          "sha256": "c9272df836a27b2fbc6ea7630123b31c853124a11ea4ffa7a66258def79fdbd0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:15:09.370122+00:00",
+      "action": "tap",
+      "label": "guild-shop-buy-confirm",
+      "coordinates": [
+        425,
+        881
+      ],
+      "screenshots": [
+        {
+          "file": "071511-guild-shop-buy-confirm.png",
+          "sha256": "4abba729e6a445413f16536607ec040f21e5fca33ff0edd3a6ba63f021be00f5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:15:11.767797+00:00",
+      "action": "tap",
+      "label": "guild-shop-reward-close",
+      "coordinates": [
+        309,
+        1150
+      ],
+      "screenshots": [
+        {
+          "file": "071513-guild-shop-reward-close.png",
+          "sha256": "3aa547d6f7414892d22f5028b462cb59e3cc84c9e20562c1ebb81d5d8ca8c475"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:15:27.902746+00:00",
+      "action": "tap",
+      "label": "guild-shop-return",
+      "coordinates": [
+        92,
+        1154
+      ],
+      "screenshots": [
+        {
+          "file": "071530-guild-shop-return.png",
+          "sha256": "af7ba5ef57731222dec2ae746064ad9e1c36598e2d913ab73d90a113a0ea0d75"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:15:30.765060+00:00",
+      "action": "swipe",
+      "label": "guild-pan-left",
+      "coordinates": [
+        122,
+        971,
+        525,
+        971
+      ],
+      "screenshots": [
+        {
+          "file": "071533-guild-pan-left.png",
+          "sha256": "164974dcf1e0f29764aa106bb16d1087ada2894a5750312c09411c19067523c8"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:15:44.542018+00:00",
+      "action": "tap",
+      "label": "guild-war-open",
+      "coordinates": [
+        310,
+        354
+      ],
+      "screenshots": [
+        {
+          "file": "071546-guild-war-open.png",
+          "sha256": "fe5479050c342ec53beca3c27fd1442eb68af22d7eec3c30244dc9b5fa42b2b9"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:16:01.248123+00:00",
+      "action": "tap",
+      "label": "guild-war-exit",
+      "coordinates": [
+        583,
+        225
+      ],
+      "screenshots": [
+        {
+          "file": "071603-guild-war-exit.png",
+          "sha256": "0599356f13a8e81bf6c99e79446fb25555a309adab592c068d2e127ada1e0714"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:16:04.102529+00:00",
+      "action": "tap",
+      "label": "maincity-after-guild",
+      "coordinates": [
+        43,
+        1345
+      ],
+      "screenshots": [
+        {
+          "file": "071606-maincity-after-guild.png",
+          "sha256": "64b78fc6570ca08814221115ba20b4acfc5e2716dd486f97ce3721067ee95db3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:16:06.790940+00:00",
+      "action": "swipe",
+      "label": "city-to-crossspace",
+      "coordinates": [
+        102,
+        1000,
+        535,
+        1000
+      ],
+      "screenshots": [
+        {
+          "file": "071609-city-to-crossspace.png",
+          "sha256": "d3baa00edf89c88a0af0573cfa06bfbdd9d8f228a9cfcd4811ab7c5f5cd967f3"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:16:23.182761+00:00",
+      "action": "tap",
+      "label": "crossspace-open",
+      "coordinates": [
+        294,
+        420
+      ],
+      "screenshots": [
+        {
+          "file": "071625-crossspace-open.png",
+          "sha256": "dcf9b27f62dc2d018726d22538b909b16d553c336d535855856becc0e785d3bf"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:16:44.238302+00:00",
+      "action": "tap",
+      "label": "crossspace-return",
+      "coordinates": [
+        74,
+        1271
+      ],
+      "screenshots": [
+        {
+          "file": "071646-crossspace-return.png",
+          "sha256": "49e563aed4f5cf7143b9b318e27ac4e36b2ddd21d831f741ec09bf6f149d8219"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:16:46.947124+00:00",
+      "action": "tap",
+      "label": "limited-activities-open",
+      "coordinates": [
+        421,
+        184
+      ],
+      "screenshots": [
+        {
+          "file": "071649-limited-activities-open.png",
+          "sha256": "82ad0d451f4817c9d598a0d263b77ec7ecc220c5a892cf556a446b995f5d1b6a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:17:04.360210+00:00",
+      "action": "tap",
+      "label": "limited-quickbattle-tab",
+      "coordinates": [
+        208,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "071706-limited-quickbattle-tab.png",
+          "sha256": "c28fb1bf1f0716fd09395692486fc73edbb5ad09fe734063b708c9730f58a445"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:17:06.871406+00:00",
+      "action": "tap",
+      "label": "limited-gift-tab",
+      "coordinates": [
+        321,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "071709-limited-gift-tab.png",
+          "sha256": "3db20c14cdb64dd46feed1a65d68358fa8072beb88c3c979ae713bc4a0bdedd5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:17:25.502270+00:00",
+      "action": "tap",
+      "label": "limited-quickbattle-return",
+      "coordinates": [
+        208,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "071727-limited-quickbattle-return.png",
+          "sha256": "e31e35fc564ad35084641087da44b405e6e0188ff5b608f0084dc947d825f15f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:17:28.009968+00:00",
+      "action": "tap",
+      "label": "limited-quickbattle-claim1",
+      "coordinates": [
+        532,
+        529
+      ],
+      "screenshots": [
+        {
+          "file": "071730-limited-quickbattle-claim1.png",
+          "sha256": "451b9222f2d397d35611900b22306ec75098b6fd25cb9c5614b23c5ebd734d1d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:18:00.596170+00:00",
+      "action": "tap",
+      "label": "limited-reward-close",
+      "coordinates": [
+        310,
+        1040
+      ],
+      "screenshots": [
+        {
+          "file": "071802-limited-reward-close.png",
+          "sha256": "5eb38b10bd173a18ccc9497e22c49bac12089da7f4bd6751e087dde6ebaa8300"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:18:03.109201+00:00",
+      "action": "tap",
+      "label": "limited-return",
+      "coordinates": [
+        77,
+        1268
+      ],
+      "screenshots": [
+        {
+          "file": "071805-limited-return.png",
+          "sha256": "2b22a13a52cc271e6ea5eef2654fe3d6fe286315938f4f1b386e40f5ea2479db"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:18:05.803797+00:00",
+      "action": "tap",
+      "label": "theme-open",
+      "coordinates": [
+        344,
+        184
+      ],
+      "screenshots": [
+        {
+          "file": "071808-theme-open.png",
+          "sha256": "a5960cba5578d138785644c6be2fa66a9ff2527f764b0cd323a8aabedbd04af1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:19:02.687586+00:00",
+      "action": "tap",
+      "label": "theme-special-gift",
+      "coordinates": [
+        209,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "071905-theme-special-gift.png",
+          "sha256": "c6135d75dd0ffcb72d40bd87c6bd034d449b6cffc746f8e5e045c3d26abaf70e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:19:05.400820+00:00",
+      "action": "tap",
+      "label": "theme-luckywheel",
+      "coordinates": [
+        323,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "071907-theme-luckywheel.png",
+          "sha256": "8c8181a43c169957b8473a6909bc8fb27abc72df01b48ab7cc4884f3241b39a1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:19:21.917926+00:00",
+      "action": "tap",
+      "label": "theme-wheel-free",
+      "coordinates": [
+        160,
+        914
+      ],
+      "screenshots": [
+        {
+          "file": "071924-theme-wheel-free.png",
+          "sha256": "6f97bffcc324bc3763603ebc277440e2298c3e3ca46aae997cb2869ce4042e03"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:19:57.840761+00:00",
+      "action": "tap",
+      "label": "theme-wheel-reward-close",
+      "coordinates": [
+        311,
+        1070
+      ],
+      "screenshots": [
+        {
+          "file": "072000-theme-wheel-reward-close.png",
+          "sha256": "fb30cbd0eefb61aa81e8ce3155e400d9dc085fea4a2e7119245104593f070871"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:20:00.416910+00:00",
+      "action": "tap",
+      "label": "theme-limited-shop",
+      "coordinates": [
+        435,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072002-theme-limited-shop.png",
+          "sha256": "76d995a929fb712ca53169ef335b54f29df8b6d1b7decfc417e713e3a23bba7e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:20:02.946384+00:00",
+      "action": "tap",
+      "label": "theme-weekcard",
+      "coordinates": [
+        545,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072005-theme-weekcard.png",
+          "sha256": "488ffb84500ba5faf87d2b88d0e3b1c5fd3351fc41a824966fb6b985a9f833f5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:21:27.921077+00:00",
+      "action": "swipe",
+      "label": "theme-tabs-more",
+      "coordinates": [
+        548,
+        224,
+        107,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072130-theme-tabs-more.png",
+          "sha256": "a9295051ece6f5510c697b500651bc81ea87a4a0fa778395464edebec23b3424"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:22:40.408822+00:00",
+      "action": "tap",
+      "label": "theme-artifact-synthesis",
+      "coordinates": [
+        80,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072243-theme-artifact-synthesis.png",
+          "sha256": "faaf424d2f47c47e247fc37afff91cfaa6e7d6cb821821491db8668cd6740b3c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:22:43.182525+00:00",
+      "action": "tap",
+      "label": "theme-summon-reward",
+      "coordinates": [
+        193,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072245-theme-summon-reward.png",
+          "sha256": "74ca0e124b2fecc2330f3130c388e12de66748e9e6829ae9638d8ad27adbd2a5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:22:45.633298+00:00",
+      "action": "tap",
+      "label": "theme-star-reward",
+      "coordinates": [
+        305,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072247-theme-star-reward.png",
+          "sha256": "a437791403e5fbec1d696b16089542a17fd408b94ab81089838138ada3545ae6"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:22:48.082262+00:00",
+      "action": "tap",
+      "label": "theme-great-reward",
+      "coordinates": [
+        416,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072250-theme-great-reward.png",
+          "sha256": "ddcf66afc2c4ef7b01f88014e2f294e7076fd2b417019880c5c97dc7ddf2a986"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:22:50.528359+00:00",
+      "action": "tap",
+      "label": "theme-may-sign",
+      "coordinates": [
+        528,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072252-theme-may-sign.png",
+          "sha256": "a583ceb220e7f370d9a2cbb74accdfb7fe75b86155a4e7702c813e7eefe4644c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:24:13.136499+00:00",
+      "action": "swipe",
+      "label": "theme-tabs-end",
+      "coordinates": [
+        548,
+        224,
+        107,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072416-theme-tabs-end.png",
+          "sha256": "524aca6c18fbe874a8a875d282a10e4dfc2a61126c691beb3c576319d55d9e1b"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:24:32.251297+00:00",
+      "action": "tap",
+      "label": "theme-return",
+      "coordinates": [
+        77,
+        1268
+      ],
+      "screenshots": [
+        {
+          "file": "072434-theme-return.png",
+          "sha256": "a2642f4baafae17c4d57dc3006b7422f003de733815b83b31db5d3e4284325bf"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:24:35.012261+00:00",
+      "action": "tap",
+      "label": "warorder-open",
+      "coordinates": [
+        185,
+        184
+      ],
+      "screenshots": [
+        {
+          "file": "072437-warorder-open.png",
+          "sha256": "a7fc169228118e4ae95823f642d57106f31354ee44c474a2c4a5e96150226b88"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:24:55.744524+00:00",
+      "action": "tap",
+      "label": "warorder-advanced-preview",
+      "coordinates": [
+        170,
+        389
+      ],
+      "screenshots": [
+        {
+          "file": "072458-warorder-advanced-preview.png",
+          "sha256": "037069f8ae35e610e952bd3229dda83c2ae7d32a6eb453e4fe1e66f4b6e15530"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:25:18.550576+00:00",
+      "action": "tap",
+      "label": "warorder-preview-close",
+      "coordinates": [
+        545,
+        489
+      ],
+      "screenshots": [
+        {
+          "file": "072521-warorder-preview-close.png",
+          "sha256": "4af3f38c96429b9d17bd2213942d828f035d578b5bc525535557603ff14b3fad"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:25:21.205726+00:00",
+      "action": "tap",
+      "label": "warorder-return",
+      "coordinates": [
+        74,
+        1164
+      ],
+      "screenshots": [
+        {
+          "file": "072523-warorder-return.png",
+          "sha256": "d79e928178845cc50a4ca314add368bc6c9d1dd45015149825577e874530f6dd"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:25:23.968767+00:00",
+      "action": "tap",
+      "label": "firstcharge-open",
+      "coordinates": [
+        588,
+        465
+      ],
+      "screenshots": [
+        {
+          "file": "072553-daily-firstcharge-open.png",
+          "sha256": "b2ed297107cc999be8515936105541866a9d755dea18372616338a4d4fba41bf"
+        },
+        {
+          "file": "072526-firstcharge-open.png",
+          "sha256": "ce853e922e93af892a7117e4bd2ede17cd0f755aa69656a38e87720689258eb9"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:25:45.350389+00:00",
+      "action": "tap",
+      "label": "firstcharge-10-tab",
+      "coordinates": [
+        542,
+        817
+      ],
+      "screenshots": [
+        {
+          "file": "072547-firstcharge-10-tab.png",
+          "sha256": "3315a5ce68e9046e69ec23841facbd7fdf5f593c5565c7792624cff8510104dc"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:25:48.176267+00:00",
+      "action": "tap",
+      "label": "firstcharge-close",
+      "coordinates": [
+        558,
+        289
+      ],
+      "screenshots": [
+        {
+          "file": "072550-firstcharge-close.png",
+          "sha256": "5ec76bcba7a4ef8d31a8a4f060d3a77e57c03f75c5d85fc50fafd7f26b9a320a"
+        },
+        {
+          "file": "072615-daily-firstcharge-close.png",
+          "sha256": "4d9f697ecf9cb649f0b36f640dc2abdbfc2bce4130b6d246a35f0f7e2692e394"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:25:50.879483+00:00",
+      "action": "tap",
+      "label": "daily-firstcharge-open",
+      "coordinates": [
+        588,
+        380
+      ],
+      "screenshots": [
+        {
+          "file": "072553-daily-firstcharge-open.png",
+          "sha256": "b2ed297107cc999be8515936105541866a9d755dea18372616338a4d4fba41bf"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:26:12.492689+00:00",
+      "action": "tap",
+      "label": "daily-firstcharge-close",
+      "coordinates": [
+        312,
+        1154
+      ],
+      "screenshots": [
+        {
+          "file": "072615-daily-firstcharge-close.png",
+          "sha256": "4d9f697ecf9cb649f0b36f640dc2abdbfc2bce4130b6d246a35f0f7e2692e394"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:26:15.268690+00:00",
+      "action": "tap",
+      "label": "recharge-open",
+      "coordinates": [
+        588,
+        214
+      ],
+      "screenshots": [
+        {
+          "file": "072617-recharge-open.png",
+          "sha256": "e2bcd9ea917d726c8a7303950c2b0f0d0080c765caf007b30ea9b49baaafa286"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:27:10.492596+00:00",
+      "action": "tap",
+      "label": "recharge-daily-gifts",
+      "coordinates": [
+        375,
+        316
+      ],
+      "screenshots": [
+        {
+          "file": "072712-recharge-daily-gifts.png",
+          "sha256": "93db5926493c2b6b85e13693485aa07f5b201805b9b0e05024187634021fb1b5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:27:13.146604+00:00",
+      "action": "tap",
+      "label": "recharge-privilege-shop",
+      "coordinates": [
+        516,
+        316
+      ],
+      "screenshots": [
+        {
+          "file": "072715-recharge-privilege-shop.png",
+          "sha256": "5d4aa5dc6820d9ec8cb3bcf90762d40a95629facdc9138c59e7c7faa9c0c5c27"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:28:28.629262+00:00",
+      "action": "tap",
+      "label": "recharge-return",
+      "coordinates": [
+        77,
+        1155
+      ],
+      "screenshots": [
+        {
+          "file": "072831-recharge-return.png",
+          "sha256": "3766b5804ddbb62221bbe2e440e930eb81a948d00a777d77475ebc990389bfc0"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:28:31.388432+00:00",
+      "action": "tap",
+      "label": "welfare-open",
+      "coordinates": [
+        501,
+        184
+      ],
+      "screenshots": [
+        {
+          "file": "072833-welfare-open.png",
+          "sha256": "8ea608773f7ec0737a829cdc91d02af2a00b434f65bd06dd4ea72cab8f962dd2"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:29:24.285251+00:00",
+      "action": "tap",
+      "label": "welfare-monthcard",
+      "coordinates": [
+        207,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072926-welfare-monthcard.png",
+          "sha256": "b236617f3164c68ab971f0c94b07a8d0ae8a154e179aae893b35f129b31116f7"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:29:26.922552+00:00",
+      "action": "tap",
+      "label": "welfare-bounty-shop",
+      "coordinates": [
+        321,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072929-welfare-bounty-shop.png",
+          "sha256": "e05723f50ed8d66a8d19da78b2272301c8179ca76d81b3df2a8c1aef32197a9f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:29:50.721883+00:00",
+      "action": "tap",
+      "label": "welfare-week-gift",
+      "coordinates": [
+        430,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072953-welfare-week-gift.png",
+          "sha256": "be154ca496cd9b8ee961085a3b0ee10f79404b66b3061cabfbee7ac47fc05c42"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:29:53.376849+00:00",
+      "action": "tap",
+      "label": "welfare-month-gift",
+      "coordinates": [
+        545,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072955-welfare-month-gift.png",
+          "sha256": "3a9dd18c88c8bc476ed7a613390cf41887465d2ca525a117b1e6ef9387a26f7a"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:29:55.999173+00:00",
+      "action": "swipe",
+      "label": "welfare-tabs-more",
+      "coordinates": [
+        547,
+        224,
+        108,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "072959-welfare-tabs-more.png",
+          "sha256": "3bab9cd5a8dd653dda8989d94a6d7c05dd98b64efc9cfd14dec47054945a73d1"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:30:21.536457+00:00",
+      "action": "tap",
+      "label": "welfare-growth-fund",
+      "coordinates": [
+        461,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "073023-welfare-growth-fund.png",
+          "sha256": "21cd7d44813e32af702e02bec3d94b7b7170306aaf5dc469edda43c02ac3f923"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:30:24.069522+00:00",
+      "action": "tap",
+      "label": "welfare-exclusive",
+      "coordinates": [
+        573,
+        224
+      ],
+      "screenshots": [
+        {
+          "file": "073026-welfare-exclusive.png",
+          "sha256": "70d640f939c4e85a7b8784bded6c71c7ac608f5eb0ea0de62cec259cfa97c46d"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:30:52.867509+00:00",
+      "action": "tap",
+      "label": "welfare-return",
+      "coordinates": [
+        77,
+        1268
+      ],
+      "screenshots": [
+        {
+          "file": "073055-welfare-return.png",
+          "sha256": "f820de962833fa1105f3587b9d07f31bd1820eb160dc9ad3dedb5cf6fdc97fe6"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:30:55.602310+00:00",
+      "action": "tap",
+      "label": "gear-bag-open",
+      "coordinates": [
+        220,
+        1343
+      ],
+      "screenshots": [
+        {
+          "file": "073058-gear-bag-open.png",
+          "sha256": "c4de092fd7a3d905fa07fc04e14472c6bb0893afa2a46b9ea99792e63b89d48e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:42:09.321668+00:00",
+      "action": "tap",
+      "label": "gear-ghost-bag",
+      "coordinates": [
+        557,
+        494
+      ],
+      "screenshots": [
+        {
+          "file": "074211-gear-ghost-bag.png",
+          "sha256": "35583a7117a494573595a34f6576287702f03ad07089eeb17c65eef00ee31e8f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:42:12.105057+00:00",
+      "action": "swipe",
+      "label": "gear-bag-tabs-more",
+      "coordinates": [
+        553,
+        495,
+        119,
+        495
+      ],
+      "screenshots": [
+        {
+          "file": "074215-gear-bag-tabs-more.png",
+          "sha256": "452a6c48a7a8a4b12d92e72a7bbd903c151ab62aefabd7b03836d346b6fb6830"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:42:46.954375+00:00",
+      "action": "tap",
+      "label": "gear-holy-tab",
+      "coordinates": [
+        537,
+        494
+      ],
+      "screenshots": [
+        {
+          "file": "074249-gear-holy-tab.png",
+          "sha256": "fc005ba29df8fb972e2d73e40f52c2919f25ecf4a74ef692908d4a3a810c02cc"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:43:37.980667+00:00",
+      "action": "tap",
+      "label": "gear-holy-premium-detail",
+      "coordinates": [
+        204,
+        841
+      ],
+      "screenshots": [
+        {
+          "file": "074340-gear-holy-premium-detail.png",
+          "sha256": "04be8a559d2d240bbf8fdf458c0a714e0d55830ed9b6d9317b61a7cf62af910f"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:44:07.105174+00:00",
+      "action": "tap",
+      "label": "gear-holy-wash-open",
+      "coordinates": [
+        315,
+        981
+      ],
+      "screenshots": [
+        {
+          "file": "074409-gear-holy-wash-open.png",
+          "sha256": "46d865a48767ff9e2c1c3c5a78a7c45fab3e0ee0c7ac61884e08f4207751842c"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:44:31.646378+00:00",
+      "action": "tap",
+      "label": "gear-holy-lock-hp",
+      "coordinates": [
+        460,
+        722
+      ],
+      "screenshots": [
+        {
+          "file": "074433-gear-holy-lock-hp.png",
+          "sha256": "1aeeb4f3853ecf78b588272087d3c67d3e596c0cdaf904d6508a1c50af6e50eb"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:45:50.431198+00:00",
+      "action": "tap",
+      "label": "gear-holy-wash-locked",
+      "coordinates": [
+        315,
+        1048
+      ],
+      "screenshots": [
+        {
+          "file": "074552-gear-holy-wash-locked.png",
+          "sha256": "65e4406f988f8a136f3d444c36ec867d799fca5220681f9a17daa3a5a9945fcf"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:46:16.351075+00:00",
+      "action": "tap",
+      "label": "gear-holy-wash-close",
+      "coordinates": [
+        593,
+        366
+      ],
+      "screenshots": [
+        {
+          "file": "074618-gear-holy-wash-close.png",
+          "sha256": "2e6ec1af0beb119bf049bdb80bb387f741ce21ce9d604e92482478e549eef748"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:46:43.017833+00:00",
+      "action": "tap",
+      "label": "gear-holy-wear",
+      "coordinates": [
+        437,
+        981
+      ],
+      "screenshots": [
+        {
+          "file": "074645-gear-holy-wear.png",
+          "sha256": "64662fa0d0ac5b82b0811f12398abaee977998759eb3e9ba28c7740f4b07e7b9"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:47:15.457293+00:00",
+      "action": "tap",
+      "label": "gear-roger-detail",
+      "coordinates": [
+        140,
+        581
+      ],
+      "screenshots": [
+        {
+          "file": "074718-gear-roger-detail.png",
+          "sha256": "de5d255b5786c22aab050c6b8614bc5d896b42d1ab716eff79074ff5ea0175a5"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:47:43.076851+00:00",
+      "action": "tap",
+      "label": "gear-hero-extra-page",
+      "coordinates": [
+        602,
+        716
+      ],
+      "screenshots": [
+        {
+          "file": "074745-gear-hero-extra-page.png",
+          "sha256": "c5c826863c6361436c12b867c51ec0d8f5e1c9e02542f7e5df8891c58abe49c4"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:49:23.716961+00:00",
+      "action": "tap",
+      "label": "gear-hero-return",
+      "coordinates": [
+        51,
+        1161
+      ],
+      "screenshots": [
+        {
+          "file": "074926-gear-hero-return.png",
+          "sha256": "736dd92f66f04de3a3af56e3744e6d84b7af4d5aff87c2acf70ec9773e849f12"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:49:26.248788+00:00",
+      "action": "tap",
+      "label": "elfin-open",
+      "coordinates": [
+        325,
+        385
+      ],
+      "screenshots": [
+        {
+          "file": "074928-elfin-open.png",
+          "sha256": "24c45fbe0ac8b4d4bb7ee37ca95551e5cacce2219e8af631d5887abecb7f7407"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:49:56.727389+00:00",
+      "action": "tap",
+      "label": "elfin-incubate-open",
+      "coordinates": [
+        203,
+        623
+      ],
+      "screenshots": [
+        {
+          "file": "074958-elfin-incubate-open.png",
+          "sha256": "9e90d3d9d0e03ac493aa8f72bb6b3f0b3b354f54cd77d340a97ec7b78b20a2f6"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:50:29.031754+00:00",
+      "action": "tap",
+      "label": "elfin-incubate-close",
+      "coordinates": [
+        314,
+        1024
+      ],
+      "screenshots": [
+        {
+          "file": "075031-elfin-incubate-close.png",
+          "sha256": "c941e5b1fc158a43f2def82136d939e34ef02c147aa8bd653b152c135d8bdb4e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:50:31.768124+00:00",
+      "action": "tap",
+      "label": "elfin-awaken-tab",
+      "coordinates": [
+        253,
+        474
+      ],
+      "screenshots": [
+        {
+          "file": "075034-elfin-awaken-tab.png",
+          "sha256": "33c4c19271a7e1eec592e374e52ea62504d64ef29b5771fe91bd2eec14786dcf"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:51:04.953431+00:00",
+      "action": "tap",
+      "label": "elfin-awaken-open",
+      "coordinates": [
+        524,
+        1151
+      ],
+      "screenshots": [
+        {
+          "file": "075107-elfin-awaken-open.png",
+          "sha256": "93aaf0330e7fe691bea7803a01d9d1c15a641e837a6d9791901ce2e93b5067ab"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:51:36.808678+00:00",
+      "action": "tap",
+      "label": "elfin-awaken-close",
+      "coordinates": [
+        315,
+        1031
+      ],
+      "screenshots": [
+        {
+          "file": "075139-elfin-awaken-close.png",
+          "sha256": "dd194bfa019412c73a7cf63eb673afa778d9b06875de073f83a09456bb0d2e5e"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:51:39.347072+00:00",
+      "action": "tap",
+      "label": "elfin-summon-tab",
+      "coordinates": [
+        366,
+        475
+      ],
+      "screenshots": [
+        {
+          "file": "075141-elfin-summon-tab.png",
+          "sha256": "ea3db1aa8cde59e061fc0e234580dedb7eb25dd6488ab4a73951114766141935"
+        }
+      ]
+    },
+    {
+      "t": "2026-10-31T23:52:14.833964+00:00",
+      "action": "tap",
+      "label": "elfin-free-summon",
+      "coordinates": [
+        180,
+        1081
+      ],
+      "screenshots": [
+        {
+          "file": "075217-elfin-free-summon.png",
+          "sha256": "65e12f6588f9abcad784427712d213370d8ad7e80a83882e845871b5256c4d5a"
+        }
+      ]
+    },
+    {
+      "t": "2026-11-01T00:24:39.075712+00:00",
+      "action": "tap",
+      "label": "elfin-summon-confirm",
+      "coordinates": [
+        490,
+        979
+      ],
+      "screenshots": [
+        {
+          "file": "082443-elfin-summon-confirm.png",
+          "sha256": "7ecd7a2bd8c022b027bf1aedfc31de6067958c2d2c37ad981030999eed875d83"
+        }
+      ]
+    },
+    {
+      "t": "2026-11-01T00:24:43.256685+00:00",
+      "action": "tap",
+      "label": "autocapture-ui-end",
+      "coordinates": [
+        45,
+        1347
+      ],
+      "screenshots": [
+        {
+          "file": "082445-autocapture-ui-end.png",
+          "sha256": "8b5ed1d90144613a2574d42a6e85d43de01ae8715436b4e898f8f84face11d6f"
+        }
+      ]
+    }
+  ]
+}

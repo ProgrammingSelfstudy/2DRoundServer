@@ -1,0 +1,182 @@
+{
+  "batch": "followup-tower-expedition",
+  "source": "cap-20261101-085514-5ff187b7.pcap",
+  "snapshot": "check12-snapshot.pcap",
+  "snapshot_bytes": 866340,
+  "snapshot_sha256": "d69dafbac848c370b9b1b6f8f9e99b1a7abd4019790ecaca1ce4fd842af46bd7",
+  "source_still_receiving": true,
+  "decoded_frames": 3321,
+  "decode_errors": 0,
+  "last_frame_utc": "2026-11-01T02:15:09.120579Z",
+  "selection": "Disjoint UI-time scopes and command allowlist; source_line refers to this snapshot JSONL; no raw payload or network endpoint exported.",
+  "scopes": [
+    {
+      "name": "tower",
+      "file": "followup-tower.jsonl",
+      "frames": 118,
+      "commands": {
+        "11211": 8,
+        "11212": 8,
+        "11322": 8,
+        "11323": 4,
+        "11325": 12,
+        "11327": 4,
+        "11329": 2,
+        "20000": 4,
+        "20001": 8,
+        "20002": 10,
+        "20004": 10,
+        "20005": 10,
+        "20006": 4,
+        "20019": 10,
+        "20027": 4,
+        "20060": 4,
+        "20063": 8
+      }
+    },
+    {
+      "name": "gear",
+      "file": "followup-gear.jsonl",
+      "frames": 0,
+      "commands": {}
+    },
+    {
+      "name": "longring",
+      "file": "followup-longring.jsonl",
+      "frames": 589,
+      "commands": {
+        "12741": 10,
+        "12742": 3,
+        "16401": 14,
+        "20000": 14,
+        "20001": 28,
+        "20002": 14,
+        "20004": 14,
+        "20005": 14,
+        "20006": 14,
+        "20019": 14,
+        "20027": 14,
+        "20060": 6,
+        "20063": 28,
+        "28600": 134,
+        "28601": 2,
+        "28602": 2,
+        "28603": 9,
+        "28604": 4,
+        "28605": 6,
+        "28606": 54,
+        "28607": 14,
+        "28608": 14,
+        "28609": 22,
+        "28610": 32,
+        "28611": 4,
+        "28612": 32,
+        "28613": 32,
+        "28614": 12,
+        "28616": 3,
+        "28621": 2,
+        "28622": 2,
+        "28624": 3,
+        "28625": 18,
+        "28626": 1
+      }
+    },
+    {
+      "name": "voyage-baseline",
+      "file": "followup-voyage-baseline.jsonl",
+      "frames": 4,
+      "commands": {
+        "23800": 2,
+        "23805": 2
+      }
+    },
+    {
+      "name": "voyage",
+      "file": "followup-voyage.jsonl",
+      "frames": 5,
+      "commands": {
+        "10302": 1,
+        "10512": 1,
+        "12742": 1,
+        "23806": 2
+      }
+    },
+    {
+      "name": "endless",
+      "file": "followup-endless.jsonl",
+      "frames": 35,
+      "commands": {
+        "20000": 1,
+        "20001": 2,
+        "20002": 1,
+        "20004": 1,
+        "20005": 1,
+        "20006": 2,
+        "20019": 1,
+        "20027": 1,
+        "20060": 4,
+        "20063": 2,
+        "23900": 3,
+        "23901": 2,
+        "23902": 3,
+        "23903": 3,
+        "23906": 1,
+        "23910": 1,
+        "23911": 2,
+        "23913": 4
+      }
+    },
+    {
+      "name": "ladder",
+      "file": "followup-ladder.jsonl",
+      "frames": 99,
+      "commands": {
+        "10302": 3,
+        "11211": 4,
+        "11212": 6,
+        "16401": 3,
+        "20000": 3,
+        "20001": 6,
+        "20002": 5,
+        "20004": 5,
+        "20005": 5,
+        "20006": 3,
+        "20019": 5,
+        "20027": 3,
+        "20060": 8,
+        "20063": 6,
+        "24300": 7,
+        "24301": 7,
+        "24302": 8,
+        "24303": 6,
+        "24307": 3,
+        "24317": 3
+      }
+    }
+  ],
+  "exported_rows": 850,
+  "unique_exported_source_lines": 850,
+  "battles": {
+    "tower": {
+      "count": 4,
+      "results": {
+        "2": 2,
+        "1": 2
+      }
+    },
+    "longring": {
+      "count": 14,
+      "results": {
+        "2": 1,
+        "1": 13
+      }
+    },
+    "ladder": {
+      "count": 3,
+      "results": {
+        "1": 2,
+        "2": 1
+      }
+    }
+  }
+}

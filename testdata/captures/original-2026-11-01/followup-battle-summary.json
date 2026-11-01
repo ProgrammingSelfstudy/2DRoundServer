@@ -1,0 +1,380 @@
+{
+  "batch": "followup-tower-expedition",
+  "source_snapshot": "final-snapshot.pcap",
+  "source_decoded": "final-decoded.jsonl",
+  "deduplication": "One battle per s2c 20000 in the five selected followup scopes. Two 20006 messages in endless are one battle. Excludes earlier auto 20 groups/24 battles and archived checkpoints.",
+  "total_battles": 23,
+  "wins": 18,
+  "losses": 5,
+  "by_scope": {
+    "tower": {
+      "loss": 2,
+      "win": 2
+    },
+    "longring": {
+      "loss": 1,
+      "win": 13
+    },
+    "endless": {
+      "loss": 1
+    },
+    "ladder": {
+      "win": 2,
+      "loss": 1
+    },
+    "elite": {
+      "win": 1
+    }
+  },
+  "battles": [
+    {
+      "id": "followup-tower-1",
+      "scope": "tower",
+      "started_utc": "2026-11-01T00:58:16.194753Z",
+      "combat_type": 7,
+      "start_source_line": 2193,
+      "max_action_count": 4,
+      "outcome": "loss",
+      "result_basis": "11323.result",
+      "evidence_source_lines": [
+        2209
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-tower-2",
+      "scope": "tower",
+      "started_utc": "2026-11-01T01:23:35.139006Z",
+      "combat_type": 7,
+      "start_source_line": 2418,
+      "max_action_count": 4,
+      "outcome": "loss",
+      "result_basis": "11323.result",
+      "evidence_source_lines": [
+        2433
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-tower-3",
+      "scope": "tower",
+      "started_utc": "2026-11-01T01:25:45.548525Z",
+      "combat_type": 7,
+      "start_source_line": 2457,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "11323.result",
+      "evidence_source_lines": [
+        2465
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-tower-4",
+      "scope": "tower",
+      "started_utc": "2026-11-01T01:26:33.858693Z",
+      "combat_type": 7,
+      "start_source_line": 2486,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "11323.result",
+      "evidence_source_lines": [
+        2494
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-1",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:29:55.149352Z",
+      "combat_type": 40,
+      "start_source_line": 2551,
+      "max_action_count": 1,
+      "outcome": "loss",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2558
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-2",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:31:24.408455Z",
+      "combat_type": 40,
+      "start_source_line": 2585,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2593
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-3",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:33:07.39679Z",
+      "combat_type": 40,
+      "start_source_line": 2631,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2639
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-4",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:34:21.314341Z",
+      "combat_type": 40,
+      "start_source_line": 2666,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2674
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-5",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:35:56.316519Z",
+      "combat_type": 40,
+      "start_source_line": 2710,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2718
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-6",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:37:32.037071Z",
+      "combat_type": 40,
+      "start_source_line": 2751,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2762
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-7",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:39:22.630336Z",
+      "combat_type": 40,
+      "start_source_line": 2802,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2810
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-8",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:40:37.098651Z",
+      "combat_type": 40,
+      "start_source_line": 2838,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2848
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-9",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:55:27.171127Z",
+      "combat_type": 40,
+      "start_source_line": 2990,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        2997
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-10",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:56:20.043333Z",
+      "combat_type": 40,
+      "start_source_line": 3025,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        3032
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-11",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:57:43.157273Z",
+      "combat_type": 40,
+      "start_source_line": 3066,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        3077
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-12",
+      "scope": "longring",
+      "started_utc": "2026-11-01T01:59:20.455653Z",
+      "combat_type": 40,
+      "start_source_line": 3120,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        3127
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-13",
+      "scope": "longring",
+      "started_utc": "2026-11-01T02:01:57.207271Z",
+      "combat_type": 40,
+      "start_source_line": 3183,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        3190
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-longring-14",
+      "scope": "longring",
+      "started_utc": "2026-11-01T02:03:41.769299Z",
+      "combat_type": 40,
+      "start_source_line": 3225,
+      "max_action_count": 1,
+      "outcome": "win",
+      "result_basis": "28608.result",
+      "evidence_source_lines": [
+        3236
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-endless-1",
+      "scope": "endless",
+      "started_utc": "2026-11-01T02:07:38.824604Z",
+      "combat_type": 11,
+      "start_source_line": 3295,
+      "max_action_count": 1,
+      "outcome": "loss",
+      "result_basis": "offline classification: actor death script + day_pass_round=0 + no rewards; generic 20006.result=1 is not a win",
+      "evidence_source_lines": [
+        3307,
+        3308,
+        3310,
+        3311,
+        3314
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-ladder-1",
+      "scope": "ladder",
+      "started_utc": "2026-11-01T02:09:19.074325Z",
+      "combat_type": 18,
+      "start_source_line": 3335,
+      "max_action_count": 2,
+      "outcome": "win",
+      "result_basis": "24307.result",
+      "evidence_source_lines": [
+        3347
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-ladder-2",
+      "scope": "ladder",
+      "started_utc": "2026-11-01T02:10:44.615188Z",
+      "combat_type": 18,
+      "start_source_line": 3371,
+      "max_action_count": 2,
+      "outcome": "win",
+      "result_basis": "24307.result",
+      "evidence_source_lines": [
+        3382
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-ladder-3",
+      "scope": "ladder",
+      "started_utc": "2026-11-01T02:14:02.625547Z",
+      "combat_type": 18,
+      "start_source_line": 3430,
+      "max_action_count": 1,
+      "outcome": "loss",
+      "result_basis": "24307.result",
+      "evidence_source_lines": [
+        3438
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    },
+    {
+      "id": "followup-elite-1",
+      "scope": "elite",
+      "started_utc": "2026-11-01T02:17:30.294093Z",
+      "combat_type": 23,
+      "start_source_line": 3484,
+      "max_action_count": 2,
+      "outcome": "win",
+      "result_basis": "24906.result",
+      "evidence_source_lines": [
+        3497
+      ],
+      "source_snapshot": "final-snapshot.pcap",
+      "source_decoded": "final-decoded.jsonl"
+    }
+  ]
+}

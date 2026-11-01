@@ -1,0 +1,348 @@
+{
+  "kind": "ordinary local static inspection of decompiler output, not REA Evidence or runtime proof",
+  "sources": [
+    {
+      "source": "0zWHhlnBORyiROK6lvI6VBn6vAbJRQqS/heroexpedit/heroexpedit_controller.lua",
+      "sha256": "a7e66ca989310785956d2c33a218c14dbeded81ccc02b5250243f7170395c7fd",
+      "matches": [
+        {
+          "line": 22,
+          "text": "\t\t\targ_1_0:openHeroExpeditView(false)"
+        },
+        {
+          "line": 23,
+          "text": "\t\t\targ_1_0:openHeroExpeditLevelView(false)"
+        },
+        {
+          "line": 31,
+          "text": "\t\t\tif arg_2_0 == BattleConst.Fight_Type.ExpeditFight and arg_1_0.need_reset_event == true then"
+        },
+        {
+          "line": 75,
+          "text": "\t\tMainuiController:getInstance():requestOpenBattleRelevanceWindow(BattleConst.Fight_Type.ExpeditFight)"
+        },
+        {
+          "line": 122,
+          "text": "\t\targ_1_0:openHeroExpeditLevelView(true)"
+        },
+        {
+          "line": 249,
+          "text": "\t\tMainuiController:getInstance():requestOpenBattleRelevanceWindow(BattleConst.Fight_Type.ExpeditFight)"
+        },
+        {
+          "line": 310,
+          "text": "function HeroExpeditController.openHeroExpeditView(arg_1_0, arg_1_1)"
+        },
+        {
+          "line": 314,
+          "text": "function HeroExpeditController.openHeroExpeditLevelView(arg_1_0, arg_1_1)"
+        }
+      ]
+    },
+    {
+      "source": "0zWHhlnBORyiROK6lvI6VBn6vAbJRQqS/mainui/mainui_controller.lua",
+      "sha256": "c367ef895db1a563793749ede64b116eafdc6f28dfdb1a1290a99531f3292915",
+      "matches": [
+        {
+          "line": 968,
+          "text": "\telseif arg_1_1 == BattleConst.Fight_Type.ExpeditFight then"
+        }
+      ]
+    },
+    {
+      "source": "0zWHhlnBORyiROK6lvI6VBn6vAbJRQqS/battle/new_view/battle_scene_view.lua",
+      "sha256": "ea6713717bd19c9896932dde2ebd694e87147660f37614f4b9314f35388b8715",
+      "matches": [
+        {
+          "line": 520,
+          "text": "\t\tif var_1_1 and var_1_1.is_skip == \"true\" then"
+        },
+        {
+          "line": 528,
+          "text": "\t\t\telseif arg_1_0.battle_type == BattleConst.Fight_Type.ExpeditFight then"
+        },
+        {
+          "line": 547,
+          "text": "\t\tif not BattleController:getInstance():getWatchReplayStatus() and var_1_1 and var_1_1.is_skip == \"true\" and not arg_1_0.skip_btn then"
+        }
+      ]
+    },
+    {
+      "source": "ePoCrKQkWA3vpiOwu2oNfOh02MOeNheW/combat_type_data.lua",
+      "sha256": "a31b3fd058c583aacb69a9825d5fd73426447053c2949ce391f478afe9002085",
+      "matches": [
+        {
+          "line": 19,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 38,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 61,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 80,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 99,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 118,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 137,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 146,
+          "text": "\t\ttype = 7,"
+        },
+        {
+          "line": 156,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 175,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 194,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 217,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 236,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 255,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 274,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 293,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 312,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 331,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 350,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 373,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 392,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 411,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 430,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 449,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 472,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 495,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 514,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 533,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 552,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 576,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 595,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 614,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 637,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 656,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 675,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 694,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 717,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 736,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 759,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 778,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 797,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 816,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 835,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 858,
+          "text": "\t\tis_skip = 0,"
+        },
+        {
+          "line": 877,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 896,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 915,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 934,
+          "text": "\t\tis_skip = \"true\","
+        },
+        {
+          "line": 953,
+          "text": "\t\tis_skip = \"true\","
+        }
+      ]
+    },
+    {
+      "source": "0zWHhlnBORyiROK6lvI6VBn6vAbJRQqS/hero/view/holyequipment/holyequipment_refresh_att_panel.lua",
+      "sha256": "bdda82b087f853560997f3a69ddef645298d3e438072c7af0ab771e88a4a3024",
+      "evidence_kind": "ordinary shell static inspection; decompiler output, not runtime proof"
+    },
+    {
+      "source": "0zWHhlnBORyiROK6lvI6VBn6vAbJRQqS/hero/hero_model.lua",
+      "sha256": "4bcd9de19eb5fbc87f2cb6e77984d04e7b39c78bd3450a6140210b1fc0fdea30",
+      "evidence_kind": "ordinary shell static inspection; decompiler output, not runtime proof"
+    },
+    {
+      "source": "ePoCrKQkWA3vpiOwu2oNfOh02MOeNheW/partner_holy_eqm_data.lua",
+      "sha256": "e2ea7c7262963971b2b00ad031500cd4e09b7046737a69acd9dd0166435a01d4",
+      "evidence_kind": "ordinary shell static inspection; decompiler output, not runtime proof"
+    },
+    {
+      "source": "0zWHhlnBORyiROK6lvI6VBn6vAbJRQqS/planesafk/view/planesafk_main_window.lua",
+      "sha256": "5abbca218137492a29ff49173e89aacef1fe2e667ba7dbffdd715677fb56c445",
+      "matches": [
+        {
+          "line": 43,
+          "text": "\tlocal var_1_1 = Config.PlanesData.data_const.planes_difficult_limit_lev"
+        },
+        {
+          "line": 49,
+          "text": "\targ_1_0.planes_difficult_max_power = 300000"
+        },
+        {
+          "line": 51,
+          "text": "\tlocal var_1_2 = Config.PlanesData.data_const.planes_difficult_max_power"
+        },
+        {
+          "line": 475,
+          "text": "\tlocal var_1_0 = StartowerController:getInstance():getModel():getNowTowerId()"
+        },
+        {
+          "line": 478,
+          "text": "\tif arg_1_0.map_data.floor and arg_1_0.map_data.floor > 1 and var_1_1 and var_1_1.power >= arg_1_0.planes_difficult_max_power and var_1_0 >= arg_1_0.difficult_limit_lev then"
+        },
+        {
+          "line": 483,
+          "text": "\t\tvar_0_0:sender28604(arg_1_0.map_data.floor + 1, 1)"
+        }
+      ]
+    },
+    {
+      "source": "ePoCrKQkWA3vpiOwu2oNfOh02MOeNheW/planes_data.lua",
+      "sha256": "95e214bb23135b82cd38d9daae7d8d082c0814c2225c3e3036a2308eb0fb941a",
+      "matches": [
+        {
+          "line": 104,
+          "text": "\tplanes_difficult_max_power = {"
+        },
+        {
+          "line": 105,
+          "text": "\t\tdesc = \"开启选择难度的最小战力\","
+        },
+        {
+          "line": 106,
+          "text": "\t\tval = 300000,"
+        },
+        {
+          "line": 128,
+          "text": "\tplanes_difficult_limit_lev = {"
+        },
+        {
+          "line": 129,
+          "text": "\t\tdesc = \"困难难度开启的解锁条件：试练塔n层\","
+        },
+        {
+          "line": 130,
+          "text": "\t\tval = 300,"
+        }
+      ]
+    }
+  ]
+}

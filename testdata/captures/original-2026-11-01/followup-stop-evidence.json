@@ -1,0 +1,18 @@
+{
+  "capture_stopped": true,
+  "method": "PCAPdroid normal Stop control; UI then showed ready/play",
+  "stop_ui_intent_utc": "2026-11-01T02:23:17.522163+00:00",
+  "stop_ui_intent_local": "2026-11-01 10:23:17 Asia/Shanghai",
+  "receiver_log_entry": "CLOSED cap-20261101-085514-5ff187b7.pcap bytes=889781",
+  "stable_size_observations_bytes": [
+    889781,
+    889781
+  ],
+  "stable_observation_interval_seconds": 3,
+  "source": "cap-20261101-085514-5ff187b7.pcap",
+  "source_bytes": 889781,
+  "source_sha256": "874a352e4d7faa495c4f17a9e34f3c8dda2d518f09695158a75ee4bcb9fdaad5",
+  "stop_screen_sha256": "0b96a6c28e1297c52aa39635c358d8b601e430ca69dad19880e8e34b7aad7bee",
+  "raw_files_and_screenshots_retained_outside_repository": true,
+  "first_stop_attempt": "Foreground interrupted by another app; no CLOSED record then. Only retry confirmed stopped."
+}

@@ -1,0 +1,714 @@
+[
+  {
+    "fight": 1,
+    "started": "2026-10-31T16:23:23.617171Z",
+    "request_source_line": 253,
+    "result_source_line": 715,
+    "opponent_has_server_id": false,
+    "opponent_id": 1001,
+    "result": 1,
+    "get_score": 22,
+    "lose_score": -17,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 10
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 2,
+    "started": "2026-10-31T16:23:31.734515Z",
+    "request_source_line": 262,
+    "result_source_line": 739,
+    "opponent_has_server_id": false,
+    "opponent_id": 1002,
+    "result": 1,
+    "get_score": 21,
+    "lose_score": -16,
+    "items": [
+      {
+        "bid": 22,
+        "num": 8000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 3,
+    "started": "2026-10-31T16:23:39.390786Z",
+    "request_source_line": 269,
+    "result_source_line": 763,
+    "opponent_has_server_id": false,
+    "opponent_id": 1002,
+    "result": 1,
+    "get_score": 21,
+    "lose_score": -16,
+    "items": [
+      {
+        "bid": 22,
+        "num": 8000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 4,
+    "started": "2026-10-31T16:23:47.205516Z",
+    "request_source_line": 278,
+    "result_source_line": 787,
+    "opponent_has_server_id": false,
+    "opponent_id": 1002,
+    "result": 1,
+    "get_score": 21,
+    "lose_score": -16,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 10
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 5,
+    "started": "2026-10-31T16:23:56.472929Z",
+    "request_source_line": 287,
+    "result_source_line": 809,
+    "opponent_has_server_id": true,
+    "opponent_id": 1006,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 22,
+        "num": 4800
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 6,
+    "started": "2026-10-31T16:24:08.128947Z",
+    "request_source_line": 296,
+    "result_source_line": 829,
+    "opponent_has_server_id": false,
+    "opponent_id": 1002,
+    "result": 1,
+    "get_score": 20,
+    "lose_score": -15,
+    "items": [
+      {
+        "bid": 22,
+        "num": 8000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 7,
+    "started": "2026-10-31T16:24:17.162057Z",
+    "request_source_line": 305,
+    "result_source_line": 853,
+    "opponent_has_server_id": true,
+    "opponent_id": 1007,
+    "result": 1,
+    "get_score": 20,
+    "lose_score": -15,
+    "items": [
+      {
+        "bid": 1,
+        "num": 20000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 8,
+    "started": "2026-10-31T16:24:31.841577Z",
+    "request_source_line": 314,
+    "result_source_line": 875,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 9,
+    "started": "2026-10-31T16:24:43.06877Z",
+    "request_source_line": 323,
+    "result_source_line": 893,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 10,
+    "started": "2026-10-31T16:24:54.744426Z",
+    "request_source_line": 334,
+    "result_source_line": 912,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 22,
+        "num": 4800
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 11,
+    "started": "2026-10-31T16:25:05.26282Z",
+    "request_source_line": 343,
+    "result_source_line": 930,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 12,
+    "started": "2026-10-31T16:25:20.294887Z",
+    "request_source_line": 352,
+    "result_source_line": 949,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 13,
+    "started": "2026-10-31T16:25:38.160818Z",
+    "request_source_line": 365,
+    "result_source_line": 974,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 14,
+    "started": "2026-10-31T16:25:47.992962Z",
+    "request_source_line": 374,
+    "result_source_line": 992,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 15,
+    "started": "2026-10-31T16:25:58.143531Z",
+    "request_source_line": 383,
+    "result_source_line": 1009,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 8,
+        "num": 9
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 16,
+    "started": "2026-10-31T16:26:08.735737Z",
+    "request_source_line": 392,
+    "result_source_line": 1027,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 17,
+    "started": "2026-10-31T16:26:19.191318Z",
+    "request_source_line": 401,
+    "result_source_line": 1047,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 8,
+        "num": 9
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 18,
+    "started": "2026-10-31T16:26:30.76914Z",
+    "request_source_line": 410,
+    "result_source_line": 1065,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 19,
+    "started": "2026-10-31T16:26:42.912475Z",
+    "request_source_line": 419,
+    "result_source_line": 1083,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 8,
+        "num": 9
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 20,
+    "started": "2026-10-31T16:26:58.193842Z",
+    "request_source_line": 428,
+    "result_source_line": 1102,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 21,
+    "started": "2026-10-31T16:27:09.816674Z",
+    "request_source_line": 439,
+    "result_source_line": 1120,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 22,
+        "num": 4800
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 22,
+    "started": "2026-10-31T16:27:23.843453Z",
+    "request_source_line": 450,
+    "result_source_line": 1143,
+    "opponent_has_server_id": true,
+    "opponent_id": 1008,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 23,
+    "started": "2026-10-31T16:27:38.726839Z",
+    "request_source_line": 459,
+    "result_source_line": 1161,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 24,
+    "started": "2026-10-31T16:27:52.394422Z",
+    "request_source_line": 470,
+    "result_source_line": 1180,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 8,
+        "num": 9
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 25,
+    "started": "2026-10-31T16:28:03.283294Z",
+    "request_source_line": 479,
+    "result_source_line": 1198,
+    "opponent_has_server_id": true,
+    "opponent_id": 1008,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 22,
+        "num": 4800
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 26,
+    "started": "2026-10-31T16:28:13.594255Z",
+    "request_source_line": 488,
+    "result_source_line": 1216,
+    "opponent_has_server_id": true,
+    "opponent_id": 1008,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 8,
+        "num": 9
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 27,
+    "started": "2026-10-31T16:28:23.928879Z",
+    "request_source_line": 497,
+    "result_source_line": 1234,
+    "opponent_has_server_id": true,
+    "opponent_id": 1006,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 1,
+        "num": 12000
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 28,
+    "started": "2026-10-31T16:28:40.304332Z",
+    "request_source_line": 506,
+    "result_source_line": 1252,
+    "opponent_has_server_id": true,
+    "opponent_id": 1005,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 29,
+    "started": "2026-10-31T16:28:51.471013Z",
+    "request_source_line": 515,
+    "result_source_line": 1270,
+    "opponent_has_server_id": true,
+    "opponent_id": 1006,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 8,
+        "num": 9
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 30,
+    "started": "2026-10-31T16:29:05.599384Z",
+    "request_source_line": 526,
+    "result_source_line": 1289,
+    "opponent_has_server_id": true,
+    "opponent_id": 1006,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 10001,
+        "num": 6
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": false,
+    "skip_replies": []
+  },
+  {
+    "fight": 31,
+    "started": "2026-10-31T16:29:20.017572Z",
+    "request_source_line": 535,
+    "result_source_line": 1305,
+    "opponent_has_server_id": true,
+    "opponent_id": 1008,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 22,
+        "num": 4800
+      }
+    ],
+    "round_actions": [],
+    "skip_requested": true,
+    "skip_replies": [
+      {
+        "code": 1,
+        "msg": ""
+      }
+    ]
+  },
+  {
+    "fight": 32,
+    "started": "2026-10-31T16:29:25.256964Z",
+    "request_source_line": 543,
+    "result_source_line": 1324,
+    "opponent_has_server_id": true,
+    "opponent_id": 1008,
+    "result": 2,
+    "get_score": 0,
+    "lose_score": 0,
+    "items": [
+      {
+        "bid": 22,
+        "num": 4800
+      }
+    ],
+    "round_actions": [
+      1
+    ],
+    "skip_requested": true,
+    "skip_replies": [
+      {
+        "code": 1,
+        "msg": ""
+      }
+    ]
+  }
+]

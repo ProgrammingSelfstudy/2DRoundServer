@@ -1,0 +1,11 @@
+{"t":"2026-10-31T17:21:01.652356Z","dir":"c2s","cmd":20060,"stream":"game-1","source_line":615,"msg":{"combat_type":31}}
+{"t":"2026-10-31T17:21:01.69474Z","dir":"s2c","cmd":20060,"stream":"game-1","source_line":6233,"msg":{"combat_type":31,"type":0}}
+{"t":"2026-10-31T17:21:01.837653Z","dir":"c2s","cmd":26200,"stream":"game-1","source_line":617}
+{"t":"2026-10-31T17:21:01.837653Z","dir":"c2s","cmd":26206,"stream":"game-1","source_line":619}
+{"t":"2026-10-31T17:21:01.837653Z","dir":"c2s","cmd":26201,"stream":"game-1","source_line":621}
+{"t":"2026-10-31T17:21:01.837653Z","dir":"c2s","cmd":26213,"stream":"game-1","source_line":623}
+{"t":"2026-10-31T17:21:01.88129Z","dir":"s2c","cmd":26200,"stream":"game-1","source_line":6234,"msg":{"end_time":0,"flag":0,"is_open":2,"round":0,"round_status":0,"round_status_time":0,"srv_id":"","start_time":0,"step":0,"step_status":0,"step_status_time":0}}
+{"t":"2026-10-31T17:21:01.908305Z","dir":"c2s","cmd":26201,"stream":"game-1","source_line":627}
+{"t":"2026-10-31T17:21:01.911471Z","dir":"s2c","cmd":26201,"stream":"game-1","source_line":6235,"msg":{"best_rank":0,"can_bet":60,"group":0,"rank":0}}
+{"t":"2026-10-31T17:21:01.911471Z","dir":"s2c","cmd":26213,"stream":"game-1","source_line":6236,"msg":{"rank_list":[]}}
+{"t":"2026-10-31T17:21:02.000101Z","dir":"s2c","cmd":26201,"stream":"game-1","source_line":6238,"msg":{"best_rank":0,"can_bet":60,"group":0,"rank":0}}

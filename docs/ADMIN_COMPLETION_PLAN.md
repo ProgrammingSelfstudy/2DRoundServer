@@ -38,7 +38,20 @@
 
 ## 最新进度与交接（2026-11-01）
 
-**阶段 0–3 已通过审核；阶段 4 已授权，进行中；阶段 5–6 尚未开始。** 下面是各阶段交付时的记录，其中“等待审阅”“不push”“不进入阶段N”之类措辞只对当时有效，已过期；以最上面“当前任务”为准。阶段 4 完成后停下，不要自动进入阶段 5。
+**阶段4已完整实现、通过验收并完成本地提交，停下等待审阅；不push、不进入阶段5。**
+
+- 基线：`f9bac3cb5f8f76fa04c86131daba9406cd16cff0`（origin/main），已包含阶段3全部实现及阶段4授权。实际工作树 `/Users/mountainwalkeralliance/.codex/worktrees/0cfc/2DRoundServer`，分支 `codex/admin-stage4`。主项目只读核对：main当时落后远端2个提交、无本地改动或必需的未推送前置；未写入主项目或历史工作树。
+- 本阶段提交标题：`Add whitelisted read-only admin table views`。本段随实现同一提交；完整号用 `git log -1 --format='%H %s' -- internal/store/admin_tables.go` 查询。
+- 新增82项静态表视图注册及10项专用页/安全排除决定，覆盖清单92张表全部对齐。注册包含中文名、分组、role/guild/server归属、列白名单和完整主键稳定排序；所有值绑定参数，调用方不能提供列、排序或SQL条件。GET表目录、角色COUNT摘要、角色/公会/区服分页明细均levRead，没有新增写接口。
+- 英雄装备/天赋联partners按角色归属筛选；角色邮件联主题，直接读取已保存收件状态、不补投广播；阵容、职位/捐献、好友/申请/黑名单、任务/成就、竞技场、签到/邀请/共鸣/副本等均有后端数据。角色订单继续复用charge，不重复实现。
+- 聊天正文与录像脚本从SQL投影白名单排除；chat_offline.len实为内容类型，新增SQL计算的message_bytes表示长度。凭据、审计、迁移账本和模块容器不进入通用注册表；所有文本含JSON限制为4KB UTF-8预览并列出truncated字段。API、归属及分页约定见ADMIN_TABLE_API.md。
+- 验证：82项查询逐项在迁移生成的真实schema执行；92表文档与注册/排除双向门禁；整体敏感列检查；真实英雄/邮件联表、角色/区服隔离、稳定分页、不漏不重、UTF-8截断；未登录401、三档可读、分页422、未注册/归属不匹配/缺失ID404、写方法405。隔离HTTP测试覆盖所有注册表路径，并比较读取前后全库数据（包括module_state/global_state）完全不变；store测试同时比较全表行数及数据投影。
+- 完整验收通过：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`（game183.148s/admin36.368s/store12.183s/admincoverage2.053s）。最后补强模块状态快照断言后，HTTP专项race再次通过（5.355s）。指定Node22.23.4、Corepack pnpm10.11.0下前端typecheck、原28项测试、`make build`通过；仅既有Browserslist数据年龄和Vite大包提示。新工作树用frozen锁文件安装依赖，锁文件及生产UI快照无差异。
+- 边界：只使用临时SQLite、httptest和测试账号，未操作生产玩家/库、真实付款或现有抓包进程。没有改游戏规则或testdata/captures，没有前端源码/依赖变更；前端页签留阶段5。分页在单次请求内为一致快照，多次offset请求遇到游戏并发增删不提供跨请求快照；截断JSON是预览字符串。无阶段4前置阻碍，无push或PR。
+
+以下为阶段0–3历史交接；其中当时停止条件不代表本轮授权范围。
+
+**阶段 0–3 已通过审核；阶段 4 已完成待审阅；阶段 5–6 尚未开始。** 下面是各阶段交付时的记录，其中“等待审阅”“不push”“不进入阶段N”之类措辞只对当时有效，已过期；以最上面“当前任务”为准。阶段 4 完成后停下，不要自动进入阶段 5。
 
 Phase 3 implementation and full validation passed. Baseline:
 `c140a39`. Stay on main, local commits only; no push or phase 4. Phase 0-2 have

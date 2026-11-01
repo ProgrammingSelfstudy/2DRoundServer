@@ -1,6 +1,8 @@
-# 后台数据覆盖注册表（更新至阶段 3）
+# 后台数据覆盖注册表（更新至阶段 4）
 
 执行计划见 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md)。阶段3拉取基线为 `c140a39`；当前108项运行时注册（77玩家、31全服）。阶段2的六类充值视图/重置保持不变；阶段3已接全服状态、16项现有排名、赛季及区服概览、8个审定赛季状态项的自然到期补结算和世界等级覆盖。全服操作只经网关，在真实服务锁内执行；补结算和世界等级修改与审计同事务。全部 `Editable=false`，不提供全局JSON编辑；前端仍待阶段5。
+
+阶段4新增82项静态表视图注册，10项明确保留专用页或不提供通用查询；每张表均在下表注明。API及归属/截断约定见 [ADMIN_TABLE_API.md](ADMIN_TABLE_API.md)。表接口只有GET，不改变任何既有写权限；前端仍待阶段5。
 
 ## 口径与生成
 
@@ -163,98 +165,98 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 | 范围 | 表名 | 中文名/对应窗口 | 当前后台能力 | 后续拟提供 | 缺口或限制原因 | 源码依据 |
 | --- | --- | --- | --- | --- | --- | --- |
-| table | `accounts` | 游戏账号/账号页 | 账号页查看、封禁/解封（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `activities` | 活动配置/活动页 | 活动页查看、新建/编辑/复制/删除（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [048_activities.sql](../internal/store/migrations/048_activities.sql) |
-| table | `admins` | 管理员账号/管理员页 | 管理员页查看、创建、角色/启停/改密（manage） | 沿用专用管理页；不提供原始密码哈希/通用SQL编辑 | 账号凭据必须脱敏，只通过既有改密/启停流程维护 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `arena_claims` | 竞技场周宝箱领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
-| table | `arena_logs` | 竞技场比赛记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
-| table | `arena_players` | 竞技场积分/次数/赛季 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
-| table | `arena_slots` | 竞技场对手列表 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
-| table | `audit_logs` | 后台审计/审计页 | 审计页只读（manage） | 沿用专用审计只读；不提供编辑/删除 | 审计是证据，不能被通用数据编辑改写 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `chat_offline` | 离线聊天消息 | 未提供该表管理视图 | 按角色查看（脱敏）；不提供改写聊天历史 | 私聊内容应限权脱敏；不把历史文本当可编辑玩法配置 | [007_chat.sql](../internal/store/migrations/007_chat.sql) |
-| table | `checkin` | 签到及补签 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [009_checkin.sql](../internal/store/migrations/009_checkin.sql) |
-| table | `counters` | 成就累计计数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
-| table | `daily_quests` | 日常任务进度/领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [015_daily_quests.sql](../internal/store/migrations/015_daily_quests.sql) |
-| table | `drama_daily` | 推图每日扫荡 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
-| table | `drama_hook` | 挂机收益状态 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
-| table | `drama_milestones` | 推图里程碑领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [018_drama_milestones.sql](../internal/store/migrations/018_drama_milestones.sql) |
-| table | `elite_summon` | 精英召唤保底/积分 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [027_elite_summon.sql](../internal/store/migrations/027_elite_summon.sql) |
-| table | `feats_claimed` | 成就领取记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
-| table | `forge_logs` | 锻造屋合成记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [044_forge_logs.sql](../internal/store/migrations/044_forge_logs.sql) |
-| table | `formation_slots` | 各玩法阵容槽位 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [020_formations.sql](../internal/store/migrations/020_formations.sql) |
-| table | `formations` | 各玩法阵容主记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [020_formations.sql](../internal/store/migrations/020_formations.sql) |
-| table | `friend_blacklist` | 好友黑名单 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [047_friend_blacklist.sql](../internal/store/migrations/047_friend_blacklist.sql) |
-| table | `friend_gifts` | 好友赠礼/领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [011_friend_gifts.sql](../internal/store/migrations/011_friend_gifts.sql) |
-| table | `friend_requests` | 好友申请 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [006_friends.sql](../internal/store/migrations/006_friends.sql) |
-| table | `friends` | 好友关系 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [006_friends.sql](../internal/store/migrations/006_friends.sql) |
-| table | `global_state` | 全服模块JSON容器 | 未提供该表管理视图 | 按全服模块注册表查看；不提供后台直接编辑 | 容器不是单一业务对象；必须转发网关，不能绕服务锁写库 | [045_module_state.sql](../internal/store/migrations/045_module_state.sql) |
-| table | `guild_applies` | 公会申请 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
-| table | `guild_boss_dmg` | 公会Boss伤害记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
-| table | `guild_boss_kills` | 公会Boss击杀记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
-| table | `guild_boss_roles` | 公会Boss个人次数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
-| table | `guild_boss_state` | 公会Boss共享血量/进度 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
-| table | `guild_box_claims` | 公会捐献宝箱领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
-| table | `guild_cooldowns` | 退会/会长冷却 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
-| table | `guild_logs` | 公会日志 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
-| table | `guild_members` | 公会成员/职位/捐献 | 公会列表仅人数/会长，未逐成员展示（read） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
-| table | `guild_secret` | 公会秘境共享进度 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
-| table | `guild_secret_claims` | 公会秘境奖励领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
-| table | `guild_secret_dmg` | 公会秘境伤害记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
-| table | `guild_secret_roles` | 公会秘境个人次数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
-| table | `guild_skill_flags` | 公会技能标记 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
-| table | `guild_skill_pve` | 公会PvE技能 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
-| table | `guild_skill_pvp` | 公会PvP技能 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
-| table | `guilds` | 公会/公会页 | 公会列表/详情及解散（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
-| table | `hero_equips` | 英雄普通装备槽位 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [019_hero_equips.sql](../internal/store/migrations/019_hero_equips.sql) |
-| table | `invite_binds` | 邀请绑定 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
-| table | `invite_claims` | 邀请奖励领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
-| table | `invite_codes` | 邀请码 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
-| table | `login_tokens` | 玩家登录凭据 | 未提供该表管理视图 | 不提供凭据列表/原文；沿用账号封禁撤销 | 玩家登录凭据，公开token会造成会话冒用，不属玩法状态浏览 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `mail_attachments` | 邮件附件/邮件页 | 全局发件历史附件及领取汇总（read） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `mails` | 邮件主记录/邮件页 | 发件历史、详情及发送（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `module_state` | 玩家模块JSON容器 | 已有状态列表/原始JSON查看（read）；生产重置白名单为空 | 按玩家模块注册表查看；白名单重置/编辑后续审定 | 容器需按真实state类型校验，不能裸SQL/任意JSON更新 | [045_module_state.sql](../internal/store/migrations/045_module_state.sql) |
-| table | `notices` | 公告/公告页 | 公告页查看及增改删（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `online_gift_claims` | 在线奖励领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [008_online_gift.sql](../internal/store/migrations/008_online_gift.sql) |
-| table | `online_time` | 累计在线时长 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [008_online_gift.sql](../internal/store/migrations/008_online_gift.sql) |
-| table | `partner_changes` | 英雄置换预览 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [025_partner_changes.sql](../internal/store/migrations/025_partner_changes.sql) |
-| table | `partner_talents` | 英雄天赋 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [029_partner_talents.sql](../internal/store/migrations/029_partner_talents.sql) |
-| table | `partners` | 英雄实例/属性/培养 | 仅发放新英雄（write），无拥有列表/属性视图 | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [012_partners.sql](../internal/store/migrations/012_partners.sql) |
-| table | `pay_config` | 支付收款配置/充值页 | 收款码/说明查看、修改（read/manage） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
-| table | `pay_orders` | 充值订单/充值页 | 全局订单及角色充值汇总的真实分页订单（read）；创建/确认/取消（manage） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
-| table | `redeem_codes` | 兑换码配置/兑换码页 | 列表/创建/删除及已用次数（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
-| table | `redeem_uses` | 兑换码领取明细 | 仅兑换码已用次数汇总，无逐角色明细（read） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
-| table | `replay_collects` | 录像收藏关系 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
-| table | `replays` | 战斗录像元数据/脚本 | 未提供该表管理视图 | 查看录像元数据；不提供任意脚本编辑 | 脚本/参战信息需脱敏，编辑会伪造战斗证据 | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
-| table | `resonance_extract` | 共鸣炼金批次/领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [034_resonance_stone.sql](../internal/store/migrations/034_resonance_stone.sql) |
-| table | `resonance_slots` | 共鸣槽位/冷却 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [033_resonance.sql](../internal/store/migrations/033_resonance.sql) |
-| table | `role_assets` | 货币账本/角色详情 | 角色详情账本查看、发放（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
-| table | `role_badge_use` | 当前徽章 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
-| table | `role_badges` | 徽章获得记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
-| table | `role_charge` | 累计实付金额/VIP经验/商品购买计数 | 角色充值汇总只读（read） | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；实付记录不能改写，月卡Base另存于monthcard模块 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
-| table | `role_drama` | 主线推图进度 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [002_role_drama.sql](../internal/store/migrations/002_role_drama.sql) |
-| table | `role_follows` | 空间关注关系 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
-| table | `role_items` | 物品账本/角色详情 | 角色详情账本查看、发放（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
-| table | `role_looks` | 外观拥有记录 | 仅发放外观（write），无拥有列表 | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [032_role_looks.sql](../internal/store/migrations/032_role_looks.sql) |
-| table | `role_mails` | 角色收件/阅读/领取 | 仅发件历史收件/领取汇总，无角色收件列表（read） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `role_notice_reads` | 角色公告已读 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [004_notice_reads.sql](../internal/store/migrations/004_notice_reads.sql) |
-| table | `role_reports` | 玩家举报/举报页 | 举报页只读（read） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
-| table | `role_resonance` | 共鸣核心/石碑等级 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [033_resonance.sql](../internal/store/migrations/033_resonance.sql) |
-| table | `role_settings` | 角色设置/当前外观 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [032_role_looks.sql](../internal/store/migrations/032_role_looks.sql) |
-| table | `role_skins` | 英雄皮肤拥有记录 | 仅发放皮肤（write），无拥有列表 | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [031_skins.sql](../internal/store/migrations/031_skins.sql) |
-| table | `roles` | 角色基本资料/角色页 | 角色列表/详情、封禁/等级/VIP及踢线（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `room_bbs` | 个人空间留言板 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
-| table | `schema_migrations` | 数据库迁移账本 | 未提供该表管理视图 | 不提供在线编辑；沿用部署迁移/备份流程 | 数据库基础设施元数据，任意编辑会破坏迁移一致性 | [store.go](../internal/store/store.go) |
-| table | `servers` | 区服配置/区服页 | 区服查看、增改删（read/manage），含开服时间 | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [001_init.sql](../internal/store/migrations/001_init.sql) |
-| table | `shop_buys` | 商城购买次数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [016_shop_buys.sql](../internal/store/migrations/016_shop_buys.sql) |
-| table | `star_tower` | 海底监狱进度/次数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [042_star_tower.sql](../internal/store/migrations/042_star_tower.sql) |
-| table | `star_tower_claims` | 海底监狱里程碑领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [042_star_tower.sql](../internal/store/migrations/042_star_tower.sql) |
-| table | `stone_dungeon_clears` | 材料副本首通 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [043_stone_dungeon.sql](../internal/store/migrations/043_stone_dungeon.sql) |
-| table | `stone_dungeon_state` | 材料副本每日次数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [043_stone_dungeon.sql](../internal/store/migrations/043_stone_dungeon.sql) |
-| table | `summon_free` | 普通/高级召唤免费次数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [014_summon_free.sql](../internal/store/migrations/014_summon_free.sql) |
-| table | `ticket_msgs` | 工单追问/回复 | 工单详情追问/历史回复及回复（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [049_tickets.sql](../internal/store/migrations/049_tickets.sql) |
-| table | `tickets` | 客服工单/工单页 | 工单列表/详情及回复（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [049_tickets.sql](../internal/store/migrations/049_tickets.sql) |
-| table | `variety_shop` | 随机商店货架/刷新 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [026_variety_shop.sql](../internal/store/migrations/026_variety_shop.sql) |
-| table | `vip_gifts` | VIP礼包领取 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [024_vip_gifts.sql](../internal/store/migrations/024_vip_gifts.sql) |
+| table | `accounts` | 游戏账号/账号页 | 账号页查看、封禁/解封（read/write）；有专用页：账号管理，避免暴露密码及第三方身份凭据 | 保留专用入口/不提供通用表视图 | 有专用页：账号管理，避免暴露密码及第三方身份凭据 | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `activities` | 活动配置/活动页 | 活动页查看、新建/编辑/复制/删除（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [048_activities.sql](../internal/store/migrations/048_activities.sql) |
+| table | `admins` | 管理员账号/管理员页 | 管理员页查看、创建、角色/启停/改密（manage）；不提供：管理员凭据；沿用manage专用页 | 保留专用入口/不提供通用表视图 | 不提供：管理员凭据；沿用manage专用页 | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `arena_claims` | 竞技场周宝箱领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
+| table | `arena_logs` | 竞技场比赛记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
+| table | `arena_players` | 竞技场积分/次数/赛季 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
+| table | `arena_slots` | 竞技场对手列表 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [038_arena.sql](../internal/store/migrations/038_arena.sql) |
+| table | `audit_logs` | 后台审计/审计页 | 审计页只读（manage）；有专用页：manage审计查询 | 保留专用入口/不提供通用表视图 | 有专用页：manage审计查询 | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `chat_offline` | 离线聊天消息 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated；不返回正文 | [007_chat.sql](../internal/store/migrations/007_chat.sql) |
+| table | `checkin` | 签到及补签 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [009_checkin.sql](../internal/store/migrations/009_checkin.sql) |
+| table | `counters` | 成就累计计数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
+| table | `daily_quests` | 日常任务进度/领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [015_daily_quests.sql](../internal/store/migrations/015_daily_quests.sql) |
+| table | `drama_daily` | 推图每日扫荡 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
+| table | `drama_hook` | 挂机收益状态 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
+| table | `drama_milestones` | 推图里程碑领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [018_drama_milestones.sql](../internal/store/migrations/018_drama_milestones.sql) |
+| table | `elite_summon` | 精英召唤保底/积分 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [027_elite_summon.sql](../internal/store/migrations/027_elite_summon.sql) |
+| table | `feats_claimed` | 成就领取记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
+| table | `forge_logs` | 锻造屋合成记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [044_forge_logs.sql](../internal/store/migrations/044_forge_logs.sql) |
+| table | `formation_slots` | 各玩法阵容槽位 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [020_formations.sql](../internal/store/migrations/020_formations.sql) |
+| table | `formations` | 各玩法阵容主记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [020_formations.sql](../internal/store/migrations/020_formations.sql) |
+| table | `friend_blacklist` | 好友黑名单 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [047_friend_blacklist.sql](../internal/store/migrations/047_friend_blacklist.sql) |
+| table | `friend_gifts` | 好友赠礼/领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [011_friend_gifts.sql](../internal/store/migrations/011_friend_gifts.sql) |
+| table | `friend_requests` | 好友申请 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [006_friends.sql](../internal/store/migrations/006_friends.sql) |
+| table | `friends` | 好友关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [006_friends.sql](../internal/store/migrations/006_friends.sql) |
+| table | `global_state` | 全服模块JSON容器 | 有专用页：网关全服模块API | 保留专用入口/不提供通用表视图 | 有专用页：网关全服模块API | [045_module_state.sql](../internal/store/migrations/045_module_state.sql) |
+| table | `guild_applies` | 公会申请 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `guild_boss_dmg` | 公会Boss伤害记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
+| table | `guild_boss_kills` | 公会Boss击杀记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
+| table | `guild_boss_roles` | 公会Boss个人次数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
+| table | `guild_boss_state` | 公会Boss共享血量/进度 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [039_guild_boss.sql](../internal/store/migrations/039_guild_boss.sql) |
+| table | `guild_box_claims` | 公会捐献宝箱领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `guild_cooldowns` | 退会/会长冷却 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `guild_logs` | 公会日志 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `guild_members` | 公会成员/职位/捐献 | 公会列表仅人数/会长，未逐成员展示（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `guild_secret` | 公会秘境共享进度 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
+| table | `guild_secret_claims` | 公会秘境奖励领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
+| table | `guild_secret_dmg` | 公会秘境伤害记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
+| table | `guild_secret_roles` | 公会秘境个人次数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [041_guild_secret.sql](../internal/store/migrations/041_guild_secret.sql) |
+| table | `guild_skill_flags` | 公会技能标记 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
+| table | `guild_skill_pve` | 公会PvE技能 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
+| table | `guild_skill_pvp` | 公会PvP技能 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
+| table | `guilds` | 公会/公会页 | 公会列表/详情及解散（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `hero_equips` | 英雄普通装备槽位 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [019_hero_equips.sql](../internal/store/migrations/019_hero_equips.sql) |
+| table | `invite_binds` | 邀请绑定 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
+| table | `invite_claims` | 邀请奖励领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
+| table | `invite_codes` | 邀请码 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
+| table | `login_tokens` | 玩家登录凭据 | 不提供：登录凭据 | 保留专用入口/不提供通用表视图 | 不提供：登录凭据 | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `mail_attachments` | 邮件附件/邮件页 | 全局发件历史附件及领取汇总（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `mails` | 邮件主记录/邮件页 | 发件历史、详情及发送（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `module_state` | 玩家模块JSON容器 | 已有状态列表/原始JSON查看（read）；生产重置白名单为空；有专用页：玩家模块API | 保留专用入口/不提供通用表视图 | 有专用页：玩家模块API | [045_module_state.sql](../internal/store/migrations/045_module_state.sql) |
+| table | `notices` | 公告/公告页 | 公告页查看及增改删（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `online_gift_claims` | 在线奖励领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [008_online_gift.sql](../internal/store/migrations/008_online_gift.sql) |
+| table | `online_time` | 累计在线时长 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [008_online_gift.sql](../internal/store/migrations/008_online_gift.sql) |
+| table | `partner_changes` | 英雄置换预览 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [025_partner_changes.sql](../internal/store/migrations/025_partner_changes.sql) |
+| table | `partner_talents` | 英雄天赋 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [029_partner_talents.sql](../internal/store/migrations/029_partner_talents.sql) |
+| table | `partners` | 英雄实例/属性/培养 | 仅发放新英雄（write），无拥有列表/属性视图；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [012_partners.sql](../internal/store/migrations/012_partners.sql) |
+| table | `pay_config` | 支付收款配置/充值页 | 收款码/说明查看、修改（read/manage）；有专用页：支付配置 | 保留专用入口/不提供通用表视图 | 有专用页：支付配置 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
+| table | `pay_orders` | 充值订单/充值页 | 全局订单及角色充值汇总的真实分页订单（read）；创建/确认/取消（manage）；有专用页：角色charge接口真实分页订单及全局支付页 | 保留专用入口/不提供通用表视图 | 有专用页：角色charge接口真实分页订单及全局支付页 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
+| table | `redeem_codes` | 兑换码配置/兑换码页 | 列表/创建/删除及已用次数（read/write）；有专用页：兑换码管理 | 保留专用入口/不提供通用表视图 | 有专用页：兑换码管理 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
+| table | `redeem_uses` | 兑换码领取明细 | 仅兑换码已用次数汇总，无逐角色明细（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
+| table | `replay_collects` | 录像收藏关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
+| table | `replays` | 战斗录像元数据/脚本 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated；不返回战斗脚本 | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
+| table | `resonance_extract` | 共鸣炼金批次/领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [034_resonance_stone.sql](../internal/store/migrations/034_resonance_stone.sql) |
+| table | `resonance_slots` | 共鸣槽位/冷却 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [033_resonance.sql](../internal/store/migrations/033_resonance.sql) |
+| table | `role_assets` | 货币账本/角色详情 | 角色详情账本查看、发放（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
+| table | `role_badge_use` | 当前徽章 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [040_space.sql](../internal/store/migrations/040_space.sql) |
+| table | `role_badges` | 徽章获得记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [040_space.sql](../internal/store/migrations/040_space.sql) |
+| table | `role_charge` | 累计实付金额/VIP经验/商品购买计数 | 角色充值汇总只读（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
+| table | `role_drama` | 主线推图进度 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [002_role_drama.sql](../internal/store/migrations/002_role_drama.sql) |
+| table | `role_follows` | 空间关注关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [040_space.sql](../internal/store/migrations/040_space.sql) |
+| table | `role_items` | 物品账本/角色详情 | 角色详情账本查看、发放（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
+| table | `role_looks` | 外观拥有记录 | 仅发放外观（write），无拥有列表；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [032_role_looks.sql](../internal/store/migrations/032_role_looks.sql) |
+| table | `role_mails` | 角色收件/阅读/领取 | 仅发件历史收件/领取汇总，无角色收件列表（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `role_notice_reads` | 角色公告已读 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [004_notice_reads.sql](../internal/store/migrations/004_notice_reads.sql) |
+| table | `role_reports` | 玩家举报/举报页 | 举报页只读（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
+| table | `role_resonance` | 共鸣核心/石碑等级 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [033_resonance.sql](../internal/store/migrations/033_resonance.sql) |
+| table | `role_settings` | 角色设置/当前外观 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [032_role_looks.sql](../internal/store/migrations/032_role_looks.sql) |
+| table | `role_skins` | 英雄皮肤拥有记录 | 仅发放皮肤（write），无拥有列表；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [031_skins.sql](../internal/store/migrations/031_skins.sql) |
+| table | `roles` | 角色基本资料/角色页 | 角色列表/详情、封禁/等级/VIP及踢线（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `room_bbs` | 个人空间留言板 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [040_space.sql](../internal/store/migrations/040_space.sql) |
+| table | `schema_migrations` | 数据库迁移账本 | 不提供：迁移基础设施 | 保留专用入口/不提供通用表视图 | 不提供：迁移基础设施 | [store.go](../internal/store/store.go) |
+| table | `servers` | 区服配置/区服页 | 区服查看、增改删（read/manage），含开服时间；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `shop_buys` | 商城购买次数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [016_shop_buys.sql](../internal/store/migrations/016_shop_buys.sql) |
+| table | `star_tower` | 海底监狱进度/次数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [042_star_tower.sql](../internal/store/migrations/042_star_tower.sql) |
+| table | `star_tower_claims` | 海底监狱里程碑领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [042_star_tower.sql](../internal/store/migrations/042_star_tower.sql) |
+| table | `stone_dungeon_clears` | 材料副本首通 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [043_stone_dungeon.sql](../internal/store/migrations/043_stone_dungeon.sql) |
+| table | `stone_dungeon_state` | 材料副本每日次数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [043_stone_dungeon.sql](../internal/store/migrations/043_stone_dungeon.sql) |
+| table | `summon_free` | 普通/高级召唤免费次数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [014_summon_free.sql](../internal/store/migrations/014_summon_free.sql) |
+| table | `ticket_msgs` | 工单追问/回复 | 工单详情追问/历史回复及回复（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [049_tickets.sql](../internal/store/migrations/049_tickets.sql) |
+| table | `tickets` | 客服工单/工单页 | 工单列表/详情及回复（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [049_tickets.sql](../internal/store/migrations/049_tickets.sql) |
+| table | `variety_shop` | 随机商店货架/刷新 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [026_variety_shop.sql](../internal/store/migrations/026_variety_shop.sql) |
+| table | `vip_gifts` | VIP礼包领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接后端；前端留阶段5，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [024_vip_gifts.sql](../internal/store/migrations/024_vip_gifts.sql) |
 
 ## 供后续阶段审阅的缺口
 
@@ -262,7 +264,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 2. **阶段2已接充值状态汇总和白名单重置**：六组模块覆盖9个具体key；汇总附真实role_charge和仅该角色的订单分页。累计实付、VIP经验、历史购买次数和其他模块不可编辑。月卡Base策略已注明并登记OPEN_QUESTIONS；View中的协议字段来自现有游戏逻辑，状态投影不写回。
 3. **阶段3全服入口已接入**：31项经真实服务锁读取，16项Rank复用现有排序；赛季/区服概览只读。8个审定赛季状态项已验证自然到期补结算、重复与原生滚动/实际冠军赛tick并发；其他23项无结算入口（405），不提前结束或取消进行中的赛季。
 4. **阶段3c已接世界等级覆盖**：新增并登记 `worldlev`，专用GET/PUT经网关。0表示不覆盖，until=0长期生效，过期按游戏时钟自动恢复原前10名平均等级；读取不清理存档。登录10192、请求10905、PUT后的10905推送均使用相同有效值。后台不直接改全服状态，PUT与带原因的审计同事务；返回计算值、配置值及有效值。
-5. **专用表不止八类（阶段4）**：英雄/装备、阵容、公会职位、好友、任务、竞技场、角色邮件、角色订单是优先只读页签；签到、邀请、商店、召唤、共鸣、推图/副本、领奖流水等其余表同样在本表逐项验收。表缺视图是待补缺口，不是“16页已迁移”就算完成。
+5. **阶段4专用表后端已接**：82项列白名单、归属分页与role COUNT摘要；英雄装备/天赋按英雄归属联接、角色收件联主题，签到/邀请/商店/召唤/共鸣/推图等均逐表登记。10项使用专用页或安全排除；覆盖门禁核对所有92张表。聊天正文、录像脚本及登录凭据不返回，文本上限4KB并标记truncated。角色订单复用charge接口；前端页签留阶段5。
 6. **前端和阶段6收口仍待做**：没有模块总表、玩法状态、充值状态及上述角色页签；本文不将ROADMAP标完成，不改前端权限或依赖，不更新UI快照，不进入后续阶段。
 
 ## 阶段0–2验收边界

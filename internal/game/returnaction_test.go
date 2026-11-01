@@ -64,6 +64,10 @@ func TestReturnActionWhoComesBack(t *testing.T) {
 	if r := c.waitFor(27902); r.Int("is_open") != 0 {
 		t.Fatalf("over: %v", r)
 	}
+	// 27902 answers before retWith saves its state, so a late save could overwrite the reset below; 10905 writes
+	// nothing, and the session runs requests in order, so its answer means the 27902 handler has finished
+	c.send(10905, proto.Message{})
+	c.waitFor(10905)
 	// too short away, too low a level
 	short := *role
 	short.Lev, short.LastLogoutAt = 50, actNow.Unix()-10*86400

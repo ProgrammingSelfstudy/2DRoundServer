@@ -1,8 +1,29 @@
 # 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
 
+## 当前任务：阶段 1（审核方已授权，2026-11-01）
+
+**阶段 0 已通过审核。现在只做阶段 1，做完单独 commit 并停下，不要继续阶段 2。** 拉到本段说明后直接按下面执行。
+
+审核方的决定：
+- `ADMIN_COVERAGE.md` 里标了"不提供自由编辑/强制结算"的 **23 项**（`sweet`、`termbegins`、`sandybeach`、`petard`、`snatch`、`treasure`、`yearmonster` 等活动和排行榜），这一轮**只做查看**，不做结算和编辑。原因：它们的结算规则大多没抓包确认，强行结算可能发错奖。
+- 阶段 1 里 `Editable` 全部为 `false`，**不开放整份 JSON 编辑**，`PUT /api/roles/{id}/modules/{key}` 不做。
+- `Resets` 只给阶段 2 点名的充值类模块。阶段 1 只把重置的机制和白名单校验做好，先不接具体模块。
+
+阶段 1 要求：
+1. 新增 `internal/game/adminreg.go`，定义 `AdminModule` 和 `AdminModules()`，每个模块文件在 `init()` 里注册。覆盖 `ADMIN_COVERAGE.md` 的全部 107 项，包括三个前缀族 `firstcharge_*`、`guildmarket:*`、`monopoly_g*`。
+2. 把阶段 0 的完整性门禁升级为：`ADMIN_COVERAGE.md` 的每一项都必须在 `AdminModules()` 里有注册，反之亦然，不一致就让测试失败。
+3. 新增 `internal/admin/modules.go`，只做玩家侧接口：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`。
+   - reset 的顺序固定：先查网关在线（在线 409，网关不可达 502，两种情况都不写库）→ 读 before → 写入 → 带原因写审计。原因必填，1–200 字。
+   - 全服侧 `/api/servers/...` 留给阶段 3，前端留给阶段 5。
+4. 所有 GET 不得写库。视图必须复用模块已有的 `view()`/`roll()`，不要另写规则。
+5. 测试：三档权限、在线 409、网关不可达 502 且库未变、读接口不写库、未知 key 返回 404、reset 的 item 不在白名单返回 422。
+6. 约束：不改游戏规则，不碰 `testdata/captures`，不加前端依赖，**不 push**。
+
+验证：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、`make build` 全部通过。完成后在下面的进度段更新阶段 1 的提交号和验证结果，并如实写出没验证的部分。
+
 ## 最新进度与交接（2026-11-01）
 
-**阶段 0 已完成，等待审阅；阶段 1–6 尚未开始。** 本段是进度备注，不代表后续业务功能已经接通，也不代表阶段 0 已经审核通过。
+**阶段 0 已完成并通过审核；阶段 1 进行中，阶段 2–6 尚未开始。** 本段是进度备注，不代表后续业务功能已经接通。
 
 - 实现提交：`b1f0dc3d11e15bebecd7d9a6f4a859f588980b48`（`Inventory admin data coverage and enforce registry completeness`），基线为计划提交 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。
 - 审阅入口：[ADMIN_COVERAGE.md](ADMIN_COVERAGE.md)。按源码登记 **77 个玩家模块项、30 个全服模块项、92 张表**，覆盖 **343 处持久化调用及 85 个模块常量**。数量含动态前缀族，不是后台功能完成率。
@@ -10,7 +31,7 @@
 - 完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。未提前实现阶段 1 的运行时注册表、模块 API 或写库入口。
 - 已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
 - 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作：先审阶段 0 清单与测试，再按本计划另行授权推进阶段 1；不要根据本段备注自动继续阶段 1–6。
+- 后续动作：阶段 0 已通过审核，阶段 1 已授权（见上面"当前任务"）。阶段 2–6 仍须审核方逐阶段另行授权，不要自动继续。
 
 拉取后可复核：
 

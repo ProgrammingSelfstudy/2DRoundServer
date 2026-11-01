@@ -1,6 +1,6 @@
-# 后台数据覆盖注册表（更新至阶段 1）
+# 后台数据覆盖注册表（更新至阶段 2）
 
-本清单以仓库内 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md) 为执行计划，审查基线为 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。阶段0建立清单与完整性门禁；阶段1实现了107项运行时注册、玩家侧只读模块API及未启用白名单的重置机制，审查基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。所有模块 `Editable=false`、`Resets=[]`，没有PUT编辑、全服数据接口、前端页签或结算入口。
+本清单以仓库内 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md) 为执行计划，审查基线为 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。阶段0建立清单与完整性门禁；阶段1实现了107项运行时注册、玩家侧只读模块API及未启用白名单的重置机制，审查基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。阶段2基线为 `e222311`，六类充值模块已接专用只读视图和配置白名单重置（见下表）；其他模块保持只读，所有 `Editable=false`。没有PUT编辑、全服数据接口、前端页签或结算入口。
 
 ## 口径与生成
 
@@ -30,14 +30,14 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 核对来源：[实际路由](../internal/admin/server.go)、[角色详情](../internal/admin/handlers.go)、[支付接口](../internal/admin/pay.go)、[新前端路由](../web/admin/src/routers/index.ts)、[角色详情界面](../web/admin/src/views/roles/RoleDialog.vue)。
 
 - 现有 `read/write/manage` 对应 viewer/operator/superadmin；管理员、审计、备份读取仅 manage，支付写入及区服/管理员维护也仅 manage。原有业务权限不在本阶段改变。
-- **阶段1已提供77项玩家模块的通用只读API，107项均可查询注册元数据；30项全服模块的数据读取仍留待阶段3。** 活动配置 `/api/activities` 不是角色 `activity` JSON；充值确认按规则更新状态，也不等于能查看/重置首充、月卡或限购。角色已有状态列表会标注未知遗留key；未知key详情返回404，已注册但尚无状态的key返回exists=false/data=null，不创建行。所有专用View/Rank暂未绑定。
+- **阶段1已提供77项玩家模块的通用只读API，107项均可查询注册元数据；30项全服模块的数据读取仍留待阶段3。** 活动配置 `/api/activities` 不是角色 `activity` JSON；充值确认按规则更新状态，也不等于能查看/重置首充、月卡或限购。角色已有状态列表会标注未知遗留key；未知key详情返回404，已注册但尚无状态的key返回exists=false/data=null，不创建行。阶段2仅六类充值模块绑定View和Resets，Rank仍全部未绑定；`GET /api/roles/{id}/charge`汇总9个具体充值模块与该角色订单。
 - 当前角色详情仅基本资料、在线/封禁、资产和物品账本；已有发英雄、皮肤、外观按钮，但没有拥有列表、英雄属性/装备/阵容、任务/好友、收件及角色订单汇总。全局订单和发件历史也不能当作这些角色页签。
 - 现有写操作并非全部执行新计划的“先查离线、不可达不写”；本阶段不更改旧接口或规则。后续新增玩家数据写必须先网关在线校验（在线409、未知502），再读before、写入、审计。不能用当前踢线选项代替这一前置条件。
 - 全服数据后续必须经网关，在所属服务的锁/定时器边界内读取/修改；禁止后台直接调用 `SaveGlobal`。专用表若同样受网关服务锁保护，也不能因其是SQL表就绕开该边界。
 
 ## 玩家模块（77项）
 
-当前阶段1已开放原始JSON只读，GET不调用可能写库的游戏load/view/roll。重置路由仅superadmin可调用；先校验原因和网关在线状态，再查显式白名单。当前全部白名单为空，item=all没有特殊越权含义；没有任何生产模块可实际重置或编辑。
+原始JSON和充值专用视图均只读。专用视图在新解码的内存副本中复用现有activate/view/roll；不调用会保存或发奖的游戏loader。重置仅superadmin，先核对网关离线状态，再持同一角色付款锁检查白名单/读before，最后比较before并将写入与审计同事务提交。`all`只在首充窗口显式开放；不提供JSON编辑。
 
 | 范围 | 模块键 | 中文名/对应窗口 | 当前后台能力 | 后续拟提供 | 缺口或限制原因 | 源码依据 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -51,8 +51,8 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `artifact` | 战技实例/重铸/穿戴（11030–11036） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [artifact.go](../internal/store/artifact.go) |
 | role | `chargeacc` | 累计充值奖励（16700、16712/16713） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图；不提供任意编辑累计/领取 | 缺独立管理入口；累计充值和已发奖事实不能靠JSON编辑改写 | [charge_proto.go](../internal/game/charge_proto.go)、[chargeacc.go](../internal/game/chargeacc.go) |
 | role | `crosschamp` | 跨服冠军赛（26200–26215） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
-| role | `cyclegift` | 每周福利/月度礼包限购（21007） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图、白名单重置（阶段1/2/5） | 缺首充/卡/限购状态视图；重置须保留已付基数并防止重复发奖 | [cyclegift.go](../internal/game/cyclegift.go) |
-| role | `daycharge` | 每日首充（21010/21011） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图、白名单重置（阶段1/2/5） | 缺首充/卡/限购状态视图；重置须保留已付基数并防止重复发奖 | [daycharge.go](../internal/game/daycharge.go) |
+| role | `cyclegift` | 每周福利/月度礼包限购（21007） | 原始JSON、周/月礼包视图（read）；配置内charge ID重置（manage） | 已接查看/专用视图/单商品计数重置 | 白名单从12项配置生成；roll仅在查看副本中执行，重置只删指定Count键 | [cyclegift.go](../internal/game/cyclegift.go) |
+| role | `daycharge` | 每日首充（21010/21011） | 原始JSON、每日首充视图（read）；today重置（manage） | 已接查看/专用视图/当日重置 | 仅清当日Num/Taken并对齐Day；既有实付历史不变，须新充值达标 | [daycharge.go](../internal/game/daycharge.go) |
 | role | `daysrank` | 七天排行（22700–22704） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go) |
 | role | `dial` | 转盘抽奖/记录（16670–16676） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [dial.go](../internal/game/dial.go) |
 | role | `element` | 元素圣殿/领地挑战（25000–25006） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [element.go](../internal/game/element.go) |
@@ -64,7 +64,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `encounter` | 英雄物语（27100–27104） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [encounter.go](../internal/game/encounter.go) |
 | role | `endless_trail` | 无尽试炼个人进度（23900–23913） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go)、[endless.go](../internal/game/endless.go)、[endless_run.go](../internal/game/endless_run.go) |
 | role | `escort` | 护送个人状态（24000–24020） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [escort.go](../internal/game/escort.go) |
-| role | `firstcharge_*` | 四组首充窗口（21000/21001、21012–21014、21030–21033） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图、白名单重置（阶段1/2/5） | 缺首充/卡/限购状态视图；重置须保留已付基数并防止重复发奖 | [firstcharge.go](../internal/game/firstcharge.go) |
+| role | `firstcharge_*` | 四组首充窗口（21000/21001、21012–21014、21030–21033） | 原始JSON、逐窗口首充视图（read）；整窗重置（manage） | 已接查看/专用视图/白名单all重置 | 四个真实窗口后缀；重置删除该行且不发奖，后续领取仍受原规则约束 | [firstcharge.go](../internal/game/firstcharge.go) |
 | role | `fortunebag` | 福袋翻牌（28300–28308） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [fortunebag.go](../internal/game/fortunebag.go) |
 | role | `growway` | 成长之路（25830/25832） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [growway.go](../internal/game/growway.go) |
 | role | `guildmarket` | 公会宝库个人凭证（26900–26903） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [guildmarket.go](../internal/game/guildmarket.go) |
@@ -80,13 +80,13 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `ladder` | 天梯（24300–24318） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [ladder.go](../internal/game/ladder.go) |
 | role | `levgift` | 升级礼包/全服限量（21200/21201） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [levgift.go](../internal/game/levgift.go) |
 | role | `limitexercise` | 试炼之境（25410–25414） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [limitexercise.go](../internal/game/limitexercise.go) |
-| role | `limitgift` | 养成/等级限时礼包（21210/21211） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图、白名单重置（阶段1/2/5） | 缺首充/卡/限购状态视图；重置须保留已付基数并防止重复发奖 | [limitgift.go](../internal/game/limitgift.go) |
+| role | `limitgift` | 养成/等级限时礼包（21210/21211） | 原始JSON、23项礼包状态视图（read）；配置内ID重置（manage） | 已接查看/专用视图/单礼包重置 | 白名单从23项配置生成；4项Kind3仍不发售，清记录不解锁原本未实现的玩法 | [limitgift.go](../internal/game/limitgift.go) |
 | role | `loginday` | 登录天数/登录奖励（10922–10925、21100/21101） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [loginday.go](../internal/game/loginday.go) |
 | role | `luckydog` | 幸运锦鲤（28400–28403） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [luckydog.go](../internal/game/luckydog.go) |
 | role | `mergegoal` | 合服目标（27300/27301） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [mergegoal.go](../internal/game/mergegoal.go) |
 | role | `monopoly` | 和之国火祭个人状态（27400–27506） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [monopoly.go](../internal/game/monopoly.go) |
-| role | `monthcard` | 两档月卡（16705–16708） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图、白名单重置（阶段1/2/5） | 缺首充/卡/限购状态视图；重置须保留已付基数并防止重复发奖 | [monthcard.go](../internal/game/monthcard.go)、[recruithero.go](../internal/game/recruithero.go) |
-| role | `monthfund` | 两档月基金（24700–24702） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图、白名单重置（阶段1/2/5） | 缺首充/卡/限购状态视图；重置须保留已付基数并防止重复发奖 | [charge_proto.go](../internal/game/charge_proto.go)、[monthfund.go](../internal/game/monthfund.go) |
+| role | `monthcard` | 两档月卡（16705–16708） | 原始JSON、两档月卡视图（read）；0/1单卡重置（manage） | 已接查看/专用视图/单卡重置 | 只清指定卡Start/Last/Days，Base=当前实付分；这是未获原服确认的管理策略 | [monthcard.go](../internal/game/monthcard.go)、[recruithero.go](../internal/game/recruithero.go) |
+| role | `monthfund` | 两档月基金（24700–24702） | 原始JSON、两档基金视图（read）；0/1单基金重置（manage） | 已接查看/专用视图/单基金重置 | 只清指定基金Start/Last；不改实付和订单，需要新付款激活 | [charge_proto.go](../internal/game/charge_proto.go)、[monthfund.go](../internal/game/monthfund.go) |
 | role | `newwarorder` | 海贼夺宝（28700–28708） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [newwarorder.go](../internal/game/newwarorder.go) |
 | role | `onecentgift` | 一元/一分钱礼包（16651/16652） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 缺模块API；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [onecentgift.go](../internal/game/onecentgift.go) |
 | role | `peakformations` | 巅峰冠军赛三队阵容（27725/27726） | 原始JSON查看（read）；无可用重置/编辑 | 查看（阶段1/5）；重置/编辑待白名单审定 | 存在独立保存状态，赛事关闭不等于无数据；不启用未实现赛程 | [cross_closed.go](../internal/game/cross_closed.go) |
@@ -219,7 +219,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `partner_talents` | 英雄天赋 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [029_partner_talents.sql](../internal/store/migrations/029_partner_talents.sql) |
 | table | `partners` | 英雄实例/属性/培养 | 仅发放新英雄（write），无拥有列表/属性视图 | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [012_partners.sql](../internal/store/migrations/012_partners.sql) |
 | table | `pay_config` | 支付收款配置/充值页 | 收款码/说明查看、修改（read/manage） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
-| table | `pay_orders` | 充值订单/充值页 | 全局最近订单/状态查看、创建/确认/取消（read/manage） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
+| table | `pay_orders` | 充值订单/充值页 | 全局订单及角色充值汇总的真实分页订单（read）；创建/确认/取消（manage） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
 | table | `redeem_codes` | 兑换码配置/兑换码页 | 列表/创建/删除及已用次数（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `redeem_uses` | 兑换码领取明细 | 仅兑换码已用次数汇总，无逐角色明细（read） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `replay_collects` | 录像收藏关系 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
@@ -229,7 +229,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `role_assets` | 货币账本/角色详情 | 角色详情账本查看、发放（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
 | table | `role_badge_use` | 当前徽章 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
 | table | `role_badges` | 徽章获得记录 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
-| table | `role_charge` | 累计实付金额/VIP经验/商品购买计数 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；实付记录不能改写，月卡Base另存于monthcard模块 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
+| table | `role_charge` | 累计实付金额/VIP经验/商品购买计数 | 角色充值汇总只读（read） | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；实付记录不能改写，月卡Base另存于monthcard模块 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
 | table | `role_drama` | 主线推图进度 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [002_role_drama.sql](../internal/store/migrations/002_role_drama.sql) |
 | table | `role_follows` | 空间关注关系 | 未提供该表管理视图 | 查看（按角色/区服）；不提供任意逐表编辑/清空 | 需补只读视图；跨表约束/领奖记录不可绕业务函数修改 | [040_space.sql](../internal/store/migrations/040_space.sql) |
 | table | `role_items` | 物品账本/角色详情 | 角色详情账本查看、发放（read/write） | 保留现有专用入口；补未展示的只读明细 | 现有能力仅限当前列；不得把写入副作用或聚合数当全量数据覆盖 | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
@@ -257,13 +257,17 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 ## 供后续阶段审阅的缺口
 
-1. **阶段1已实现运行时注册与玩家原始数据查看**：107项有真实state构造器，77项玩家模块可查原始JSON，三个前缀族验证窗口key或正数公会GID。所有GET不写库。具体只读专用视图、排名和充值重置白名单尚未实现；107项登记不等于后续业务功能全部完成。重置基础机制使用before值比较，数据变更与审计同一事务提交，审计失败回滚。
-2. **充值状态汇总和安全重置（阶段2）**：六组优先模块为首充、每日首充、月卡、月基金、限时礼包、周/月礼包；`chargeacc`、`role_charge`应纳入只读汇总，不能混同可任意重置的已付金额。Base/roll规则仍按计划留待该阶段审定，本阶段未新定规则。
+1. **阶段1已实现运行时注册与玩家原始数据查看**：107项有真实state构造器，77项玩家模块可查原始JSON，三个前缀族验证窗口key或正数公会GID。所有GET不写库。阶段2六类充值专用视图及白名单重置已实现；其余专用视图/排名尚未实现，107项登记不等于后续业务功能全部完成。重置基础机制使用before值比较，数据变更与审计同一事务提交，审计失败回滚。
+2. **阶段2已接充值状态汇总和白名单重置**：六组模块覆盖9个具体key；汇总附真实role_charge和仅该角色的订单分页。累计实付、VIP经验、历史购买次数和其他模块不可编辑。月卡Base策略已注明并登记OPEN_QUESTIONS；View中的协议字段来自现有游戏逻辑，状态投影不写回。
 3. **全服与赛季入口缺失（阶段3）**：全服30项都没有管理代理；排名需绑定现有查询。计划指定的现有结算函数由服务锁保护，必须补幂等验收后才能开放。其余模块不提供强制结算，避免推导未知规则。
 4. **世界等级是计算结果，不是现存模块**：`store.WorldLevel`及`openday.go`已有计算；区服的开服时间已能编辑。计划中的global键 `worldlev`、覆盖值/过期时间和 `/ops/worldlev` 均尚不存在，故不伪装成当前扫描项；阶段3新增后必须补注册行。现有 `global_state` 不能预先直接写入此键。
 5. **专用表不止八类（阶段4）**：英雄/装备、阵容、公会职位、好友、任务、竞技场、角色邮件、角色订单是优先只读页签；签到、邀请、商店、召唤、共鸣、推图/副本、领奖流水等其余表同样在本表逐项验收。表缺视图是待补缺口，不是“16页已迁移”就算完成。
 6. **前端和阶段6收口仍待做**：没有模块总表、玩法状态、充值状态及上述角色页签；本文不将ROADMAP标完成，不改前端权限或依赖，不更新UI快照，不进入后续阶段。
 
-## 阶段0及阶段1验收边界
+## 阶段0–2验收边界
 
-本地只读扫描与覆盖门禁通过，才代表“登记未遗漏”；不代表游戏规则、原服证据或后续写操作已验收。注册表外新模块/表必须先补人工说明，再通过测试。阶段1实现提交为 `98965e830663083448fdf55cdbc3a44bcd772055`；已通过vet、game/admin/store/admincoverage的race测试、前端类型检查、原28项测试及完整构建，详细结果见执行计划的最新交接段。生产白名单保持空，没有验证或启用阶段2的具体充值重置；全服网关ops、前端及真实玩家写入未涉及。玩法、抓包、依赖锁文件和生产UI快照未变。用户后续仅授权将阶段1实现和备注同步到现有main，不新建分支；同步后停于阶段1等待审阅，不开展阶段2。
+覆盖门禁仅证明登记完整，不代表阶段3–6已完成。阶段2新增六类只读View和显式充值重置，所有Editable仍为false；View的state是内存投影，data才是原始已保存JSON。限时礼包仅展示已存报价，不调用CheckLimitGifts触发新报价；神装Kind3仍保持游戏原有不发售行为。重置本身不发奖，重新达成/领取与新订单继续受原规则和幂等约束控制。
+
+阶段2在e222311隔离基线上复现了两个既有补单缺陷：旧已付订单重放仍执行可写钩子，以及并发确认同一待付订单执行两次钩子。最小修复为同Store实例的角色付款/重置共享锁、锁内重读订单并提前拒绝非待付状态；保留原有SQL原子状态检查、before比较及事务审计，不改奖励/限购规则。此进程内锁不是分布式锁，不声称覆盖多admin实例/多Store跨进程并发确认。
+
+本阶段测试使用临时SQLite、httptest和本机真实TCP游戏handler；未操作真实玩家或外部付款，也未验证多进程部署。全服网关ops、结算和前端留到后续阶段；抓包、前端依赖/锁文件和生产UI快照不改。仅本地提交，停于阶段2等待审阅，不推送。

@@ -187,6 +187,20 @@ func ConfirmChargeOrder(st *store.Store, no, operator, note string) (*store.PayO
 	if err != nil {
 		return nil, err
 	}
+	unlock := st.LockRoleCharge(o.RID)
+	defer unlock()
+	// Another confirmation may have committed while this request waited.
+	o, err = st.PayOrderByNo(no)
+	if err != nil {
+		return nil, err
+	}
+	// Reject a completed/cancelled order before hooks can mutate module state.
+	// This matters after an authorized reset: replaying an old paid order must
+	// not reactivate a fund or increment a gift counter before the SQL conflict.
+	// The store keeps its atomic status check as well; rewards/rules are unchanged.
+	if o.Status != store.PayWaiting {
+		return nil, store.ErrConflict
+	}
 	p, ok := chargeTable[o.ChargeID]
 	if !ok {
 		return nil, ErrNoProduct

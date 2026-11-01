@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"time"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -191,5 +192,28 @@ func RegisterMonthFund(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: monthFundModule, Title: "两档月基金", Window: "24700–24702", Scope: "role", New: adminState[monthFundState]})
+	resets := []AdminReset{}
+	for i := range monthFunds {
+		i := i
+		resets = append(resets, AdminReset{Item: itoa64(int64(i)), Title: "重置月基金" + itoa64(int64(i+1)), Apply: func(_ *store.Store, _ int64, state any, _ time.Time) error {
+			d := state.(*monthFundState)
+			d.Start[i], d.Last[i] = 0, 0
+			return nil
+		}})
+	}
+	registerAdminModule(AdminModule{Key: monthFundModule, Title: "两档月基金", Window: "24700–24702", Scope: "role", New: adminState[monthFundState], View: adminMonthFundView, Resets: resets})
+}
+
+func adminMonthFundView(st *store.Store, id, _ string, now time.Time) (any, error) {
+	_, d, err := adminChargeState[monthFundState](st, id, monthFundModule)
+	if err != nil {
+		return nil, err
+	}
+	ids, funds := []proto.Message{}, []proto.Message{}
+	for i, f := range monthFunds {
+		status, _ := d.view(i, dayNo(now))
+		ids = append(ids, proto.Message{"id": f.ID, "status": status, "show": 1})
+		funds = append(funds, monthFundMessage(d, i, dayNo(now)))
+	}
+	return AdminChargeView{Protocols: map[string]any{"24700": proto.Message{"ids": ids}, "24701": funds}, State: d}, nil
 }

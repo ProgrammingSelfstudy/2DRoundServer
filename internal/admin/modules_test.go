@@ -53,8 +53,9 @@ func TestModuleAPIReadPermissionsAndNoWrites(t *testing.T) {
 		t.Fatal("catalog incomplete")
 	}
 	for _, m := range catalog.Items {
-		if m.Editable || m.HasView || m.HasRank || m.Resets == nil || len(m.Resets) != 0 {
-			t.Fatalf("unexpected phase-1 capabilities: %+v", m)
+		charge := m.Scope == "role" && (m.Key == "firstcharge_*" || m.Key == "daycharge" || m.Key == "monthcard" || m.Key == "monthfund" || m.Key == "limitgift" || m.Key == "cyclegift")
+		if m.Editable || m.HasRank || m.Resets == nil || m.HasView != charge || (len(m.Resets) > 0) != charge {
+			t.Fatalf("unexpected phase-2 capabilities: %+v", m)
 		}
 	}
 	got := e.do(viewer, "GET", base+"/monthcard", nil)

@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -26,8 +27,18 @@ var (
 )
 
 type Store struct {
-	db  *sql.DB
-	now func() time.Time
+	db          *sql.DB
+	now         func() time.Time
+	chargeLocks [64]sync.Mutex // bounded per-Store stripes, shared by confirms and admin resets
+}
+
+// LockRoleCharge serializes payment hooks and admin charge resets for a role in
+// the owning admin process. The order status must be re-read after locking.
+// SQL status/CAS checks remain necessary; this is not a cross-process lock.
+func (s *Store) LockRoleCharge(rid int64) func() {
+	mu := &s.chargeLocks[uint64(rid)%uint64(len(s.chargeLocks))]
+	mu.Lock()
+	return mu.Unlock
 }
 
 // Open opens (creating if needed) the database at path and applies migrations.

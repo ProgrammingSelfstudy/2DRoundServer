@@ -170,18 +170,38 @@ func RegisterCycleGifts(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		d.roll(now)
-		list := []proto.Message{}
-		for _, c := range cycleInfos {
-			if c.Type == typ {
-				list = append(list, proto.Message{"id": c.ChargeID, "count": d.Count[c.ChargeID]})
-			}
-		}
-		return s.Send(21007, proto.Message{"type": typ, "ref_time": cycleEnd(typ, now),
-			"reg_day": (now.Unix()-role.CreatedAt)/86400 + 1, "first_gift": list})
+		return s.Send(21007, cycleGiftMessage(d, role, typ, now))
 	})
+}
+
+func cycleGiftMessage(d *cycleGiftState, role *store.Role, typ int64, now time.Time) proto.Message {
+	list := []proto.Message{}
+	for _, c := range cycleInfos {
+		if c.Type == typ {
+			list = append(list, proto.Message{"id": c.ChargeID, "count": d.Count[c.ChargeID]})
+		}
+	}
+	return proto.Message{"type": typ, "ref_time": cycleEnd(typ, now), "reg_day": (now.Unix()-role.CreatedAt)/86400 + 1, "first_gift": list}
 }
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: cycleGiftModule, Title: "每周福利/月度礼包限购", Window: "21007", Scope: "role", New: adminState[cycleGiftState]})
+	resets := []AdminReset{}
+	for _, c := range cycleInfos {
+		c := c
+		resets = append(resets, AdminReset{Item: itoa64(c.ChargeID), Title: "清空商品" + itoa64(c.ChargeID) + "购买计数", Apply: func(_ *store.Store, _ int64, state any, _ time.Time) error {
+			delete(state.(*cycleGiftState).Count, c.ChargeID)
+			return nil
+		}})
+	}
+	registerAdminModule(AdminModule{Key: cycleGiftModule, Title: "每周福利/月度礼包限购", Window: "21007", Scope: "role", New: adminState[cycleGiftState], View: adminCycleGiftView, Resets: resets})
+}
+
+func adminCycleGiftView(st *store.Store, id, _ string, now time.Time) (any, error) {
+	role, d, err := adminChargeState[cycleGiftState](st, id, cycleGiftModule)
+	if err != nil {
+		return nil, err
+	}
+	d.roll(now) // Effective current counts, never persisted by this read-only view.
+	return AdminChargeView{Protocols: map[string]any{"21007": []proto.Message{cycleGiftMessage(d, role, 1, now), cycleGiftMessage(d, role, 2, now)}}, State: d}, nil
 }

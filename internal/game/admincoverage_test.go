@@ -27,14 +27,16 @@ func TestAdminCoverageRegistryComplete(t *testing.T) {
 		t.Fatal(err)
 	}
 	live := map[string]AdminModule{}
+	charge := map[string]bool{"firstcharge_*": true, "daycharge": true, "monthcard": true, "monthfund": true, "limitgift": true, "cyclegift": true}
 	for _, m := range AdminModules() {
 		id := m.Scope + ":" + m.Key
 		if _, duplicate := live[id]; duplicate {
 			t.Fatalf("duplicate runtime registration %s", id)
 		}
 		live[id] = m
-		if m.New == nil || reflect.ValueOf(m.New()).Kind() != reflect.Pointer || m.Editable || len(m.Resets) != 0 {
-			t.Fatalf("invalid constructor or phase-1 write capability on %s", id)
+		allowed := m.Scope == "role" && charge[m.Key]
+		if m.New == nil || reflect.ValueOf(m.New()).Kind() != reflect.Pointer || m.Editable || m.Rank != nil || (len(m.Resets) > 0) != allowed || (m.View != nil) != allowed {
+			t.Fatalf("invalid constructor or unauthorized phase-2 capability on %s", id)
 		}
 		if m.Title == "" || m.Window == "" {
 			t.Fatalf("missing runtime metadata for %s", id)

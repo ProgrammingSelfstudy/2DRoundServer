@@ -114,8 +114,8 @@ func (s *Server) roleModule(w http.ResponseWriter, r *http.Request, p *principal
 		return
 	}
 	out := map[string]any{"key": key, "module": describeModule(m), "exists": exists, "data": data}
-	if exists && m.View != nil {
-		view, err := m.View(s.Store, strconv.FormatInt(role.RID, 10), s.Now())
+	if m.View != nil {
+		view, err := m.View(s.Store, strconv.FormatInt(role.RID, 10), key, s.Now())
 		if err != nil {
 			internalErr(w, s, err)
 			return
@@ -162,6 +162,10 @@ func (s *Server) resetModule(w http.ResponseWriter, r *http.Request, p *principa
 		fail(w, 409, "role is online; kick it offline first")
 		return
 	}
+	// Share the payment-hook lock before reading before or the current paid base.
+	// The gateway check stays first; compare-before/audit transaction stays last.
+	unlock := s.Store.LockRoleCharge(role.RID)
+	defer unlock()
 	var allowed *game.AdminReset
 	for i := range m.Resets {
 		if m.Resets[i].Item == body.Item {

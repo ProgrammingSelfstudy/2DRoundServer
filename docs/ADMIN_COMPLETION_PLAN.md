@@ -26,7 +26,20 @@
 
 ## 最新进度与交接（2026-11-01）
 
-**阶段 0、阶段 1 已通过审核；阶段 2 已授权，进行中；阶段 3–6 尚未开始。** 下面是阶段 0、1 交付时的记录，其中“等待审阅”类措辞已过期，以本段和“当前任务”为准。
+**阶段 0、阶段 1 已通过审核；阶段 2 已完成实现和验证，等待审阅；阶段 3–6 尚未开始。** 本轮仅本地提交，不推送，不自动进入阶段3。
+
+- 阶段2实现提交标题：`Add charge views and whitelisted reset workflows`。本段与实现一起提交；完整提交号用 `git log -1 --format='%H %s' -- internal/game/admincharge.go` 查询。拉取基线为 `e222311`，包含 `7e969b8` 的ReturnAction测试同步修复。
+- 已为六类模块绑定专用View：四个首充窗口、每日首充、两张月卡、两张月基金、限时礼包、周/月礼包。View复用现有activate/view/roll及消息构造器，`protocols`存协议消息、`state`为新解码的内存投影，绝不写回；限时礼包只查看已保存报价，不触发新报价。
+- 白名单仅限首充`all`、每日首充`today`、月卡/基金`0`或`1`、23项配置内限时礼包ID、12项周/月商品charge ID。配置表直接枚举为静态白名单，不接收任意ID或别名。4项神装Kind3配置仍保持游戏原有“不发售”，清遗留记录不解锁玩法。其余模块无重置，全部Editable仍false。
+- 新增 `GET /api/roles/{id}/charge`（read）：汇总9个具体模块的原始已保存JSON、专用视图、role_charge实付汇总，以及先按角色筛选再limit/offset的真实订单分页；不从全局最近订单截取后再过滤，不写默认状态。
+- 月卡重置只清指定卡Start/Last/Days并令Base=当前实付分，另一张卡、role_charge、已付订单及资产不变。此管理策略未从原服确认，已在代码注释和OPEN_QUESTIONS登记；旧钱不能自动重激活同卡，新付款达标后仍按原规则领取。
+- 基线缺陷核实：在隔离的e222311源码上分别复现“已付订单重放先改基金再返回冲突”和“两个并发确认都先读到waiting，单订单写了两次礼包计数”。最小修复为同Store角色付款锁、锁内重读订单并先拒绝非waiting状态；重置在在线检查后也持此锁，再读before/实付基数。保留原SQL原子确认、before比较和事务审计，不改奖励、价格、限购或资格公式。
+- 专项测试已通过：六类View对真实TCP游戏handler协议回包；四个首充窗口、两张月卡、两张基金、每日首充重置后重新达成/领取且重复拒绝；23个限时配置和12个周/月商品逐项清理及原有资格/重复确认验证；全部44个具体HTTP重置项的权限/审计/无奖励副作用；非法配置ID422、在线409、网关故障/未知502；汇总GET不写库及角色订单分页隔离。
+- 并发验证：暂停首个确认的可写钩子、同时发起第二确认，验证只运行一次钩子、只成功一次，计数与实付一致；HTTP重置等待付款锁后才读当前Base。进程内锁不代表分布式锁，未验证多admin进程/多Store跨进程并发部署。
+- 完整验收已通过：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`（game169.237秒，admin37.152秒，store11.756秒）；`make admin-ui-check`、原28项前端测试、`make build`。使用指定Node22.23.4和Corepack pnpm10.11.0；生产UI快照和依赖锁文件无变化。
+- 验证边界：仅用临时SQLite、httptest及本机TCP测试账号，没有真实付款、生产库或真实玩家操作；未进行跨进程锁/多实例确认验证，也不声称完成阶段3的全服ops、结算或阶段5前端。抓包未改；完成后停在阶段2等待审阅，不推送。
+
+以下为阶段0、1的历史交付记录；旧的空白名单/无专用View等描述仅对应阶段1，当前能力以本段阶段2说明为准。
 
 - 阶段1实现提交：`98965e830663083448fdf55cdbc3a44bcd772055`（`Register admin modules and add read-only role state APIs`）。该提交包含90个文件，其中79个模块文件追加注册声明；阶段1拉取基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。
 - 已完成107项运行时注册（77个玩家模块项、30个全服模块项），各模块文件init注册真实state构造器，三个前缀族验证真实窗口key/正数公会GID。覆盖门禁现在同时比对源码、`ADMIN_COVERAGE.md` 与 `AdminModules()`。
@@ -42,13 +55,14 @@
 - 阶段0完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。阶段0当时未实现运行时注册表、模块API或写库入口；阶段1增量见上。
 - 阶段0已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
 - 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作：阶段 1 已通过审核，阶段 2 已授权（见上面"当前任务"）。阶段 3–6 仍须审核方逐阶段另行授权，不要自动继续。
+- 后续动作：阶段2实现完成，等待审核；阶段3–6仍须逐阶段另行授权，不要自动继续，不推送。
 
 拉取后可复核：
 
 ```sh
 git show --stat b1f0dc3d11e15bebecd7d9a6f4a859f588980b48
 git show --stat 98965e830663083448fdf55cdbc3a44bcd772055
+git log -1 --format='%H %s' -- internal/game/admincharge.go
 go run ./tools/admincoverage
 go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|Registry)' -v
 ```

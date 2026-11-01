@@ -42,6 +42,30 @@ func (d *monthCardState) view(i int, rc *store.RoleCharge, today int64) (acc, st
 // dayNo counts the days since 1970 in China time, so that days can be added.
 func dayNo(t time.Time) int64 { return (t.Unix() + 8*3600) / 86400 }
 
+// activate is the existing per-card loader transition, shared by the game and a
+// read-only admin projection. The caller decides whether to save the transition.
+func (d *monthCardState) activate(i int, rc *store.RoleCharge, today int64) bool {
+	run := d.Start[i] != 0 && today < d.Start[i]+monthCardDays
+	if !run && (rc.TotalCents-d.Base[i])/100 >= monthCards[i].Sun {
+		d.Base[i], d.Start[i], d.Last[i], d.Days[i] = rc.TotalCents, today, 0, 0
+		return true
+	}
+	return false
+}
+
+func monthCardMessage(d *monthCardState, rc *store.RoleCharge, today int64) proto.Message {
+	m := proto.Message{}
+	for i := range monthCards {
+		acc, state, days, end := d.view(i, rc, today)
+		if end != 0 {
+			end = end*86400 - 8*3600
+		}
+		n := "card" + itoa64(int64(i+1))
+		m[n+"_acc"], m[n+"_is_reward"], m[n+"_days"], m[n+"_end_time"] = acc, state, days, end
+	}
+	return m
+}
+
 // RegisterMonthCard registers the month cards: 16705 the window, 16706 take a card's day, 16707 whether anything waits (the VIP
 // window's red dot) and 16708 take every card's day.
 func RegisterMonthCard(r *gateway.Router, st *store.Store) {
@@ -67,9 +91,7 @@ func RegisterMonthCard(r *gateway.Router, st *store.Store) {
 		c := &ctx{role: role, rc: rc, d: d, today: dayNo(s.Now())}
 		// a card is active from the moment the paid money reaches its sum; the run starts that day
 		for i := range monthCards {
-			run := d.Start[i] != 0 && c.today < d.Start[i]+monthCardDays
-			if !run && (rc.TotalCents-d.Base[i])/100 >= monthCards[i].Sun {
-				d.Base[i], d.Start[i], d.Last[i], d.Days[i] = rc.TotalCents, c.today, 0, 0
+			if d.activate(i, rc, c.today) {
 				if err := st.SaveState(role.RID, monthCardModule, d); err != nil {
 					return nil, err
 				}
@@ -77,20 +99,8 @@ func RegisterMonthCard(r *gateway.Router, st *store.Store) {
 		}
 		return c, nil
 	}
-	endTime := func(day int64) int64 {
-		if day == 0 {
-			return 0
-		}
-		return day*86400 - 8*3600 // midnight of that day, China time
-	}
 	window := func(c *ctx) proto.Message {
-		m := proto.Message{}
-		for i := range monthCards {
-			acc, state, days, end := c.d.view(i, c.rc, c.today)
-			n := "card" + itoa64(int64(i+1))
-			m[n+"_acc"], m[n+"_is_reward"], m[n+"_days"], m[n+"_end_time"] = acc, state, days, endTime(end)
-		}
-		return m
+		return monthCardMessage(c.d, c.rc, c.today)
 	}
 	take := func(s *gateway.Session, c *ctx, i int) (string, error) {
 		_, state, _, _ := c.d.view(i, c.rc, c.today)
@@ -183,5 +193,42 @@ func RegisterMonthCard(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: monthCardModule, Title: "两档月卡", Window: "16705–16708", Scope: "role", New: adminState[monthCardState]})
+	resets := []AdminReset{}
+	for i := range monthCards {
+		i := i
+		resets = append(resets, AdminReset{Item: itoa64(int64(i)), Title: "重置月卡" + itoa64(int64(i+1)), Apply: func(st *store.Store, rid int64, state any, _ time.Time) error {
+			rc, err := st.RoleCharge(rid)
+			if err != nil {
+				return err
+			}
+			d := state.(*monthCardState)
+			// Admin policy, not confirmed from the original server: advance Base to
+			// current paid cents so historical payments cannot reactivate a reset card.
+			// Never alter role_charge, paid orders, currencies or the sibling card.
+			d.Base[i], d.Start[i], d.Last[i], d.Days[i] = rc.TotalCents, 0, 0, 0
+			return nil
+		}})
+	}
+	registerAdminModule(AdminModule{Key: monthCardModule, Title: "两档月卡", Window: "16705–16708", Scope: "role", New: adminState[monthCardState], View: adminMonthCardView, Resets: resets})
+}
+
+func adminMonthCardView(st *store.Store, id, _ string, now time.Time) (any, error) {
+	role, d, err := adminChargeState[monthCardState](st, id, monthCardModule)
+	if err != nil {
+		return nil, err
+	}
+	rc, err := st.RoleCharge(role.RID)
+	if err != nil {
+		return nil, err
+	}
+	today := dayNo(now)
+	for i := range monthCards {
+		d.activate(i, rc, today)
+	}
+	cards := []proto.Message{}
+	for i := range monthCards {
+		_, status, _, end := d.view(i, rc, today)
+		cards = append(cards, proto.Message{"index": i, "active": status != 0, "remaining_days": max(int64(0), end-today)})
+	}
+	return AdminChargeView{Protocols: map[string]any{"16705": monthCardMessage(d, rc, today)}, State: d, Details: proto.Message{"cards": cards, "paid_total_cents": rc.TotalCents}}, nil
 }

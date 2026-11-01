@@ -13,12 +13,12 @@ import (
 )
 
 // AdminModule describes persisted data, not a gameplay registration or a new rule.
-// All phase-1 registrations are read-only: no View, Rank, Resets or Editable yet.
+// Only explicitly registered charge resets are enabled; JSON editing stays off.
 type AdminModule struct {
 	Key, Title, Window string
 	Scope              string
 	New                func() any
-	View               func(*store.Store, string, time.Time) (any, error)
+	View               func(*store.Store, string, string, time.Time) (any, error) // role/server id, validated concrete module key
 	Resets             []AdminReset
 	Rank               func(*store.Store, string, int) ([]AdminRankRow, error)
 	Editable           bool
@@ -32,7 +32,8 @@ type AdminRankRow struct {
 
 // Apply only changes the freshly decoded state in memory. Persistence and audit
 // are owned by the admin handler. "all" must be explicitly whitelisted and have
-// no Apply function; it requests deletion. No live module registers resets yet.
+// no Apply function; it requests deletion. Items are enumerated from each module's
+// configuration, never accepted as arbitrary strings by the admin handler.
 type AdminReset struct {
 	Item, Title string
 	Apply       func(*store.Store, int64, any, time.Time) error

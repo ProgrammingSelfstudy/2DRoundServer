@@ -116,6 +116,7 @@ func (s *Server) Handler() http.Handler {
 	route("GET /api/roles/{id}", levRead, s.roleDetail)
 	route("GET /api/modules", levRead, s.listModules)
 	route("GET /api/roles/{id}/modules", levRead, s.listRoleModules)
+	route("GET /api/roles/{id}/charge", levRead, s.roleCharge)
 	route("GET /api/roles/{id}/modules/{key}", levRead, s.roleModule)
 	route("POST /api/roles/{id}/modules/{key}/reset", levManage, s.resetRoleModule)
 	route("POST /api/roles/{id}/kick", levWrite, s.kickRole)

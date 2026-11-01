@@ -54,14 +54,29 @@ func (s *Store) PayOrderByNo(no string) (*PayOrder, error) {
 
 // PayOrders lists orders newest first; status -1 = all.
 func (s *Store) PayOrders(status, limit int) ([]PayOrder, error) {
-	q := `SELECT ` + payCols + ` FROM pay_orders`
 	var args []any
+	where := ""
 	if status >= 0 {
-		q += ` WHERE status=?`
+		where = ` WHERE status=?`
 		args = append(args, status)
 	}
-	q += ` ORDER BY id DESC LIMIT ?`
-	args = append(args, limit)
+	return s.payOrders(where, args, limit, 0)
+}
+
+// RolePayOrders shares the existing pay scanner/query, filtering before paging
+// so another role's recent orders cannot hide this role's older orders.
+func (s *Store) RolePayOrders(rid int64, limit, offset int) ([]PayOrder, int, error) {
+	var total int
+	if err := s.db.QueryRow(`SELECT COUNT(*) FROM pay_orders WHERE rid=?`, rid).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+	items, err := s.payOrders(` WHERE rid=?`, []any{rid}, limit, offset)
+	return items, total, err
+}
+
+func (s *Store) payOrders(where string, args []any, limit, offset int) ([]PayOrder, error) {
+	q := `SELECT ` + payCols + ` FROM pay_orders` + where + ` ORDER BY id DESC LIMIT ? OFFSET ?`
+	args = append(args, limit, offset)
 	rows, err := s.db.Query(q, args...)
 	if err != nil {
 		return nil, err

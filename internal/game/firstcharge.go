@@ -2,7 +2,9 @@ package game
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
+	"time"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -218,7 +220,7 @@ func RegisterFirstCharge(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: "firstcharge_*", Title: "四组首充窗口", Window: "21000/21001、21012–21014、21030–21033", Scope: "role", New: adminState[firstChargeState], Match: func(key string) bool {
+	registerAdminModule(AdminModule{Key: "firstcharge_*", Title: "四组首充窗口", Window: "21000/21001、21012–21014、21030–21033", Scope: "role", New: adminState[firstChargeState], View: adminFirstChargeView, Resets: []AdminReset{{Item: "all", Title: "重置该首充窗口"}}, Match: func(key string) bool {
 		for _, fs := range firstSets {
 			if key == "firstcharge_"+fs.key {
 				return true
@@ -226,4 +228,24 @@ func init() {
 		}
 		return false
 	}})
+}
+
+func adminFirstChargeView(st *store.Store, id, key string, now time.Time) (any, error) {
+	for _, fs := range firstSets {
+		if key != "firstcharge_"+fs.key {
+			continue
+		}
+		role, d, err := adminChargeState[firstChargeState](st, id, key)
+		if err != nil {
+			return nil, err
+		}
+		rc, err := st.RoleCharge(role.RID)
+		if err != nil {
+			return nil, err
+		}
+		today := dayNo(now)
+		fs.activate(d, rc, today) // Same activation, on a freshly decoded copy only.
+		return AdminChargeView{Protocols: map[string]any{itoa64(int64(fs.show)): fs.window(d, today)}, State: d}, nil
+	}
+	return nil, fmt.Errorf("no such first-charge window")
 }

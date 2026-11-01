@@ -144,5 +144,19 @@ func RegisterDayCharge(r *gateway.Router, st *store.Store) {
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: dayChargeModule, Title: "每日首充", Window: "21010/21011", Scope: "role", New: adminState[dayChargeState]})
+	registerAdminModule(AdminModule{Key: dayChargeModule, Title: "每日首充", Window: "21010/21011", Scope: "role", New: adminState[dayChargeState], View: adminDayChargeView, Resets: []AdminReset{{Item: "today", Title: "清空当日累计与领取状态", Apply: func(_ *store.Store, _ int64, state any, now time.Time) error {
+		d := state.(*dayChargeState)
+		d.roll(dayNo(now))
+		d.Num, d.Taken = 0, false
+		return nil
+	}}}})
+}
+
+func adminDayChargeView(st *store.Store, id, _ string, now time.Time) (any, error) {
+	_, d, err := adminChargeState[dayChargeState](st, id, dayChargeModule)
+	if err != nil {
+		return nil, err
+	}
+	d.roll(dayNo(now))
+	return AdminChargeView{Protocols: map[string]any{"21010": proto.Message{"status": d.status(), "num": d.Num}}, State: d}, nil
 }

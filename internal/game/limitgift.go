@@ -194,17 +194,50 @@ func RegisterLimitGift(r *gateway.Router, st *store.Store) {
 		if _, err := st.LoadState(role.RID, limitGiftModule, d); err != nil {
 			return err
 		}
-		list := []proto.Message{}
-		for _, g := range limitGifts {
-			if g.Kind != 3 && d.open(g, now.Unix()) {
-				list = append(list, proto.Message{"id": g.ID, "num": 1, "end_time": d.Gifts[g.ID].Start + g.Secs})
-			}
-		}
-		return s.Send(21210, proto.Message{"gifts": list})
+		return s.Send(21210, limitGiftMessage(d, now))
 	})
+}
+
+func limitGiftMessage(d *limitGiftState, now time.Time) proto.Message {
+	list := []proto.Message{}
+	for _, g := range limitGifts {
+		if g.Kind != 3 && d.open(g, now.Unix()) {
+			list = append(list, proto.Message{"id": g.ID, "num": 1, "end_time": d.Gifts[g.ID].Start + g.Secs})
+		}
+	}
+	return proto.Message{"gifts": list}
 }
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
-	registerAdminModule(AdminModule{Key: limitGiftModule, Title: "养成/等级限时礼包", Window: "21210/21211", Scope: "role", New: adminState[limitGiftState]})
+	resets := []AdminReset{}
+	for _, g := range limitGifts {
+		g := g
+		resets = append(resets, AdminReset{Item: itoa64(g.ID), Title: "重置礼包" + itoa64(g.ID) + "：" + g.Name, Apply: func(_ *store.Store, _ int64, state any, _ time.Time) error {
+			delete(state.(*limitGiftState).Gifts, g.ID)
+			return nil
+		}})
+	}
+	registerAdminModule(AdminModule{Key: limitGiftModule, Title: "养成/等级限时礼包", Window: "21210/21211", Scope: "role", New: adminState[limitGiftState], View: adminLimitGiftView, Resets: resets})
+}
+
+func adminLimitGiftView(st *store.Store, id, _ string, now time.Time) (any, error) {
+	_, d, err := adminChargeState[limitGiftState](st, id, limitGiftModule)
+	if err != nil {
+		return nil, err
+	}
+	entries := []proto.Message{}
+	for _, g := range limitGifts {
+		entry := proto.Message{"id": g.ID, "name": g.Name, "charge_id": g.ChargeID, "kind": g.Kind, "supported": g.Kind != 3, "offered": false, "bought": false, "expired": false, "open": g.Kind != 3 && d.open(g, now.Unix()), "start_at": int64(0), "end_at": int64(0), "passed": false}
+		if saved := d.Gifts[g.ID]; saved != nil {
+			entry["start_at"], entry["bought"], entry["passed"] = saved.Start, saved.Bought, saved.Start < 0
+			if saved.Start > 0 {
+				entry["offered"], entry["end_at"], entry["expired"] = true, saved.Start+g.Secs, now.Unix() >= saved.Start+g.Secs
+			}
+		}
+		entries = append(entries, entry)
+	}
+	// Inspect saved offers only. Do not trigger new offers or restart their expiry
+	// timers as a side effect of an admin read; the game still owns CheckLimitGifts.
+	return AdminChargeView{Protocols: map[string]any{"21210": limitGiftMessage(d, now)}, State: d, Details: proto.Message{"entries": entries}}, nil
 }

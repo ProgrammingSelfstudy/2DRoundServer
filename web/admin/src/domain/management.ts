@@ -12,11 +12,15 @@ export const managementPages = [
   ["admins", "管理员", "manage", "manage"],
   ["account", "我的账号", "read", "read"]
 ] as const;
+export const gameAdminPages = [
+  ["game-status", "玩法状态", "read", "manage"],
+  ["modules", "模块总表", "read", null]
+] as const;
 export function pageCapability(page: string): Capability | undefined {
-  return managementPages.find(p => p[0] === page)?.[2];
+  return [...managementPages, ...gameAdminPages].find(p => p[0] === page)?.[2];
 }
 export function actionAllowed(role: unknown, page: string) {
-  const p = managementPages.find(p => p[0] === page);
+  const p = [...managementPages, ...gameAdminPages].find(p => p[0] === page);
   return !!p?.[3] && can(role, p[3]);
 }
 export const bytes = (s: string) => new TextEncoder().encode(s).length;

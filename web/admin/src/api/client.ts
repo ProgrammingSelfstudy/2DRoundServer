@@ -52,6 +52,13 @@ const messages: Record<string, string> = {
   "title is required, at most 100 characters": "公告标题必填，最多 100 字",
   "content is required, at most 2000 characters": "公告内容必填，最多 2000 字",
   "backups are not configured": "没有配置备份目录（admin.backup_dir），暂不可备份",
+  "role is online; kick it offline first": "玩家在线，请先踢下线",
+  "gateway unavailable or online status unknown; no data changed": "网关不可用，未修改",
+  "gateway unavailable": "网关不可用，请刷新状态并核对审计确认写入结果",
+  "invalid gateway response": "网关响应无效，请刷新并核对审计后确认写入结果",
+  "module changed concurrently; refresh before retrying": "数据已变化，请刷新后核对",
+  "reset item is not in the module whitelist": "重置项目不在白名单内",
+  "role has no saved module state": "该角色没有保存此模块状态",
   "internal error": "服务器暂时无法处理请求，请稍后重试"
 };
 export class ApiError extends Error {

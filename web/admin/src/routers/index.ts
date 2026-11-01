@@ -9,7 +9,9 @@ import {
   payMenu,
   activitiesMenu,
   managementMenus,
-  environmentMenu
+  environmentMenu,
+  gameStatusMenu,
+  modulesMenu
 } from "./menu";
 
 const router = createRouter({
@@ -51,6 +53,18 @@ const router = createRouter({
           name: activitiesMenu.name,
           meta: { ...activitiesMenu.meta },
           component: () => import("@/views/activities/index.vue")
+        },
+        {
+          path: gameStatusMenu.path,
+          name: gameStatusMenu.name,
+          meta: { ...gameStatusMenu.meta },
+          component: () => import("@/views/game-status/index.vue")
+        },
+        {
+          path: modulesMenu.path,
+          name: modulesMenu.name,
+          meta: { ...modulesMenu.meta },
+          component: () => import("@/views/modules/index.vue")
         },
         ...managementMenus.map(menu => ({
           path: menu.path,

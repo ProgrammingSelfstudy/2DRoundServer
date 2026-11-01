@@ -6,7 +6,7 @@ import { SubmissionGate, ambiguousStatus } from "@/domain/operations";
 import type { Capability } from "@/auth/permissions";
 import { confirmAction } from "./useMutation";
 import { errorMessage } from "@/utils/admin";
-export function useCommand(need: Capability, nonIdempotent = false) {
+export function useCommand(need: Capability, nonIdempotent = false, knownUnchanged?: (error: ApiError) => boolean) {
   const gate = new SubmissionGate();
   const busy = ref(false);
   const uncertain = ref(false);
@@ -25,7 +25,7 @@ export function useCommand(need: Capability, nonIdempotent = false) {
       return await action();
     } catch (e) {
       error.value = errorMessage(e);
-      uncertain.value = nonIdempotent && attempted && e instanceof ApiError && ambiguousStatus(e.status);
+      uncertain.value = nonIdempotent && attempted && e instanceof ApiError && ambiguousStatus(e.status) && !knownUnchanged?.(e);
       if (!(e instanceof StaleSessionError)) ElMessage.error(error.value);
     } finally {
       gate.finish(uncertain.value);

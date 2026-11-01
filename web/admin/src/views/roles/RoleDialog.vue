@@ -10,6 +10,9 @@
     <div v-loading="loading" style="min-height: 160px">
       <el-alert v-if="error" :title="error" type="error" :closable="false" />
       <template v-if="detail">
+        <el-tabs v-model="detailTab" :before-leave="() => !busy && !gameLocked"><el-tab-pane label="基本资料与发放" name="base" /><el-tab-pane label="玩法与只读数据" name="game" /></el-tabs>
+        <RoleGameData v-if="detailTab === 'game'" :rid="rid" @locked="gameLocked = $event" />
+        <template v-else>
         <el-descriptions :column="3" border>
           <el-descriptions-item label="账号">{{ detail.account }}</el-descriptions-item
           ><el-descriptions-item label="区服">{{ detail.role.srv_id }}</el-descriptions-item>
@@ -158,12 +161,13 @@
             ><template #default="{ row }">{{ row.listed ? "显示" : "不显示" }}</template></el-table-column
           ></el-table
         >
+        </template>
       </template>
     </div>
     <template #footer
-      ><el-button :disabled="busy || loading" @click="reload">刷新详情</el-button
-      ><el-button v-if="detail && auth.hasPermission('write')" type="danger" :loading="busy" @click="kick">踢下线</el-button
-      ><el-button :disabled="busy" @click="emit('close')">关闭</el-button></template
+      ><el-button :disabled="busy || loading || gameLocked" @click="reload">刷新详情</el-button
+      ><el-button v-if="detail && auth.hasPermission('write')" type="danger" :disabled="gameLocked" :loading="busy" @click="kick">踢下线</el-button
+      ><el-button :disabled="busy || gameLocked" @click="emit('close')">关闭</el-button></template
     >
   </el-dialog>
 </template>
@@ -176,6 +180,8 @@ import { useAuthStore } from "@/stores/modules/auth";
 import { confirmAction, useMutation } from "@/composables/useMutation";
 import { errorMessage, integer, pushFeedback } from "@/utils/admin";
 import ItemPicker from "./ItemPicker.vue";
+import RoleGameData from "./RoleGameData.vue";
+const detailTab = ref("base"), gameLocked = ref(false);
 const props = defineProps<{ rid: number }>();
 const emit = defineEmits<{ close: []; changed: [] }>();
 const auth = useAuthStore();
@@ -251,7 +257,7 @@ async function reload() {
   }
 }
 function close(done: () => void) {
-  if (!busy.value) {
+  if (!busy.value && !gameLocked.value) {
     done();
     emit("close");
   }

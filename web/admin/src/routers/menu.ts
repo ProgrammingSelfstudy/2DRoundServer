@@ -1,4 +1,4 @@
-import { managementPages } from "@/domain/management";
+import { managementPages, gameAdminPages } from "@/domain/management";
 import { can, type Role } from "@/auth/permissions";
 
 export const dashboardMenu: Menu.MenuOptions = {
@@ -55,12 +55,23 @@ function sectionMenu(path: string, title: string, icon: string): Menu.MenuOption
 export const mailMenu = sectionMenu("mail", "邮件管理", "Message");
 export const payMenu = sectionMenu("pay", "充值管理", "Wallet");
 export const activitiesMenu = sectionMenu("activities", "活动管理", "Calendar");
+export const gameStatusMenu = sectionMenu(gameAdminPages[0][0], gameAdminPages[0][1], "DataAnalysis");
+export const modulesMenu = sectionMenu(gameAdminPages[1][0], gameAdminPages[1][1], "Grid");
 export const managementMenus = managementPages.map(([path, title, permission]) => ({
   ...sectionMenu(path, title, "Menu"),
   meta: { ...sectionMenu(path, title, "Menu").meta, permission }
 }));
 export function menusForRole(role: Role | undefined) {
-  return [dashboardMenu, serversMenu, rolesMenu, mailMenu, payMenu, activitiesMenu, ...managementMenus, environmentMenu].filter(
-    menu => can(role, menu.meta.permission)
-  );
+  return [
+    dashboardMenu,
+    serversMenu,
+    rolesMenu,
+    mailMenu,
+    payMenu,
+    activitiesMenu,
+    ...managementMenus,
+    gameStatusMenu,
+    modulesMenu,
+    environmentMenu
+  ].filter(menu => can(role, menu.meta.permission));
 }

@@ -29,13 +29,21 @@ func ChargeTierList(st *store.Store, rid int64) ([]proto.Message, error) {
 	return list, nil
 }
 
-// SendChargeState pushes what a confirmed order changed: the diamonds and the backpack, the VIP experience and level (10301) and
+// SendChargeState pushes what a confirmed order changed: the diamonds, the 快乐币 and the backpack, the VIP experience and level (10301) and
 // the top-up page (16700).
 func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 	if err := sendAssets(s, st, rid); err != nil {
 		return err
 	}
 	if err := sendBackpack(s, st); err != nil {
+		return err
+	}
+	// the client reads the 快乐币 amount (10303) once when it enters the game, so a paid 快乐币 product has to push it
+	ledger, err := st.RoleAssets(rid)
+	if err != nil {
+		return err
+	}
+	if err := s.Send(10303, proto.Message{"klb": klbWire(ledger)}); err != nil {
 		return err
 	}
 	role, err := st.RoleByID(rid)

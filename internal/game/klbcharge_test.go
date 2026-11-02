@@ -77,3 +77,15 @@ func TestKlbProducts(t *testing.T) {
 		t.Fatalf("a gift gives no diamonds: %v", a)
 	}
 }
+
+// 10303's klb is a uint32: a bigger ledger value must not fail to encode.
+func TestKlbWire(t *testing.T) {
+	for _, c := range []struct{ in, want int64 }{{0, 0}, {-5, 0}, {2_000_000_000, 2_000_000_000}, {4_000_000_000, 4_000_000_000}, {6_000_000_000, 4_294_967_295}} {
+		if got := klbWire(map[int64]int64{klbLabel: c.in}); got != c.want {
+			t.Fatalf("klbWire(%d) = %d, want %d", c.in, got, c.want)
+		}
+	}
+	if klbWire(nil) != 0 {
+		t.Fatal("no ledger is 0")
+	}
+}

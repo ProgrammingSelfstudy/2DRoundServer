@@ -84,6 +84,9 @@ func TestChargeTiersAndOrders(t *testing.T) {
 	if err := SendChargeState(e.gw.Hub.Online(role.RID), e.st, role.RID); err != nil {
 		t.Fatal(err)
 	}
+	if k := c.waitFor(10303); k.Int("klb") != 0 {
+		t.Fatalf("10303 after a payment: %v", k)
+	}
 	if b := c.waitFor(10301); b.Int("vip_exp") != 600 {
 		t.Fatalf("10301: %v", b)
 	}

@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"math"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -13,6 +14,19 @@ import (
 
 // klbLabel is the asset label of "klb" (10303); the ledger holds it like any currency.
 const klbLabel = 41
+
+// klbWire is what 10303 carries for a ledger: the field is a uint32, and a value it cannot hold would fail to encode and drop the
+// connection, so the client sees the most it can show.
+func klbWire(ledger map[int64]int64) int64 {
+	v := ledger[klbLabel]
+	if v < 0 {
+		return 0
+	}
+	if v > math.MaxUint32 {
+		return math.MaxUint32
+	}
+	return v
+}
 
 // worshipKey is the counter of one worship of a role by a role on a day, per kind.
 func worshipKey(day, kind, rid int64) string {
@@ -45,7 +59,7 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		return s.Send(10303, proto.Message{"klb": ledger[klbLabel]})
+		return s.Send(10303, proto.Message{"klb": klbWire(ledger)})
 	})
 	r.Handle(10380, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()

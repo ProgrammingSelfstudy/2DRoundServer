@@ -131,7 +131,10 @@ export function createApi(session: AdminSession, fetcher: typeof fetch = fetch) 
       const retry = Number(response.headers.get("Retry-After"));
       throw new ApiError(
         response.status,
-        response.status === 502
+        // A 502 from a push (mail, notice, kick) means the push was not delivered. The module, season and world level
+        // endpoints say exactly what happened, so their messages in the table above must reach the user as they are.
+        response.status === 502 &&
+          !(typeof data?.error === "string" && Object.prototype.hasOwnProperty.call(messages, data.error))
           ? "无法连接游戏网关，本次推送未完成；请检查网关后重试"
           : typeof data?.error === "string"
             ? data.error

@@ -98,6 +98,33 @@ test("API uses local /api, bearer, raw Go response, no cookies or login bearer",
   await assert.rejects(api("https://example.com"));
   await assert.rejects(api("//example.com"));
 });
+test("502 keeps the exact gateway message of the module endpoints and words a failed push generically", async () => {
+  const session = active();
+  const gateway = (error: string) =>
+    createApi(session, (async () => Response.json({ error }, { status: 502 })) as typeof fetch);
+  // a reset states that nothing was written; the read and settle/world level paths must not claim that
+  await assert.rejects(
+    gateway("gateway unavailable or online status unknown; no data changed")("/roles/1/modules/monthcard/reset"),
+    (error: unknown) => error instanceof ApiError && error.status === 502 && error.message === "网关不可用，未修改"
+  );
+  await assert.rejects(
+    gateway("gateway unavailable")("/servers/s1/worldlev"),
+    (error: unknown) => error instanceof ApiError && error.message.includes("核对审计") && !error.message.includes("未修改")
+  );
+  await assert.rejects(
+    gateway("invalid gateway response")("/servers/s1/overview"),
+    (error: unknown) => error instanceof ApiError && error.message.includes("网关响应无效")
+  );
+  // a push (mail, notice, kick) keeps the wording about a push that did not go out, whatever the Go text is
+  await assert.rejects(
+    gateway("the gateway could not be reached: dial tcp: refused")("/roles/1/kick"),
+    (error: unknown) => error instanceof ApiError && error.message === "无法连接游戏网关，本次推送未完成；请检查网关后重试"
+  );
+  await assert.rejects(
+    createApi(session, (async () => new Response("<html>", { status: 502 })) as typeof fetch)("/online"),
+    (error: unknown) => error instanceof ApiError && error.message.includes("本次推送未完成")
+  );
+});
 test("401 clears current session; 403 keeps session and conveys Go error; 429 preserves retry", async () => {
   const session = active();
   const forbidden = createApi(session, (async () =>

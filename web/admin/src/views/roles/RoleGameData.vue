@@ -209,6 +209,7 @@ async function reset() {
   const key = state.value.key,
     rid = props.rid;
   onlineConflict.value = false;
+  error.value = ""; // a validation error from an earlier attempt must not stay beside a valid one
   const r = await execute(async () => {
     try {
       return await api(`/roles/${rid}/modules/${encodeURIComponent(key)}/reset`, { method: "POST", body });

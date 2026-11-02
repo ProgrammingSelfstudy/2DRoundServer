@@ -254,6 +254,7 @@ async function saveWorld() {
     error.value = errorMessage(e);
     return;
   }
+  error.value = ""; // a validation error from an earlier attempt must not stay beside a valid one
   const server = srv.value;
   const r = await execute(
     () =>
@@ -279,6 +280,7 @@ async function settle() {
     error.value = errorMessage(e);
     return;
   }
+  error.value = "";
   const server = srv.value,
     key = settleTarget.value;
   const r = await execute(

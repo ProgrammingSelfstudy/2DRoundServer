@@ -89,3 +89,89 @@ func TestElementTemple(t *testing.T) {
 		t.Fatalf("buy when full: %v", r)
 	}
 }
+
+// The territory challenge privilege: two free challenges once a day and six more purchases after the two normal ones.
+func TestElementPrivilege(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("el2", "元素人二")
+	c2, plain := e.enter("el3", "元素人三")
+	p := &privilegeState{}
+	p.set(elementPrivilege, privilegeForever)
+	if err := e.st.SaveState(role.RID, privilegeModule, p); err != nil {
+		t.Fatal(err)
+	}
+	give := func(rid, gems int64) {
+		if err := e.st.Exchange(rid, map[int64]int64{}, map[int64]int64{}, map[int64]int64{3: gems}, map[int64]int64{}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	diamonds := func(rid int64) int64 { a, _ := e.st.RoleAssets(rid); return a[3] }
+	empty := func(rid int64) {
+		if err := e.st.SaveState(rid, elementModule, &elementState{Count: 0, CountAt: actNow.Unix(), BuyDay: dayNo(actNow)}); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// the free challenges come once a day, on top of the ten
+	c.send(25000, proto.Message{})
+	if r := c.waitFor(25000); r.Int("num") != 12 {
+		t.Fatalf("with the privilege: %v", r)
+	}
+	c.send(25000, proto.Message{})
+	if r := c.waitFor(25000); r.Int("num") != 12 || r.Int("pr_buy_num") != 0 {
+		t.Fatalf("a second look the same day: %v", r)
+	}
+	c2.send(25000, proto.Message{})
+	if r := c2.waitFor(25000); r.Int("num") != 10 {
+		t.Fatalf("without it: %v", r)
+	}
+	e.setNow(actNow.Add(24 * time.Hour))
+	c.send(25000, proto.Message{})
+	if r := c.waitFor(25000); r.Int("num") != 14 { // the next day's two, the old ones kept
+		t.Fatalf("the next day: %v", r)
+	}
+	e.setNow(actNow)
+
+	// purchases: 50 and 100 as before, then the privilege's 100 100 100 100 150 150, and then no more
+	if err := e.st.SaveState(role.RID, elementModule, &elementState{Count: 0, CountAt: actNow.Unix(), BuyDay: dayNo(actNow), GiftDay: dayNo(actNow)}); err != nil {
+		t.Fatal(err)
+	}
+	give(role.RID, 2000)
+	start := diamonds(role.RID)
+	buy := func(cl *client) proto.Message {
+		cl.send(25003, proto.Message{})
+		r := cl.waitFor(25003)
+		if r.Int("code") == 1 {
+			cl.waitFor(25004)
+		}
+		return r
+	}
+	for i := 0; i < 8; i++ {
+		if r := buy(c); r.Int("code") != 1 {
+			t.Fatalf("purchase %d: %v", i+1, r)
+		}
+	}
+	if spent := start - diamonds(role.RID); spent != 50+100+100*4+150*2 {
+		t.Fatalf("spent %d", spent)
+	}
+	if r := buy(c); r.Int("code") != 0 {
+		t.Fatalf("the ninth: %v", r)
+	}
+	c.send(25000, proto.Message{})
+	if r := c.waitFor(25000); r.Int("buy_num") != 2 || r.Int("pr_buy_num") != 6 || r.Int("num") != 8 {
+		t.Fatalf("counts: %v", r)
+	}
+
+	// without the privilege the two normal buys are all there are
+	empty(plain.RID)
+	give(plain.RID, 1000)
+	for i := 0; i < 2; i++ {
+		if r := buy(c2); r.Int("code") != 1 {
+			t.Fatalf("plain purchase %d: %v", i+1, r)
+		}
+	}
+	if r := buy(c2); r.Int("code") != 0 {
+		t.Fatalf("a third without the privilege: %v", r)
+	}
+}

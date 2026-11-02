@@ -14,7 +14,7 @@ from unitdata import load_units, monsters_of
 
 lua_dir, unit_dir, out_json = sys.argv[1:4]
 K = "Config.ElementTempleData."
-m = dump(lua_dir, "element_temple_data.lua", [K + n for n in ("data_const", "data_base", "data_customs", "data_buy_count", "data_award", "data_monster")])
+m = dump(lua_dir, "element_temple_data.lua", [K + n for n in ("data_const", "data_base", "data_customs", "data_buy_count", "data_privilege", "data_award", "data_monster")])
 groups, monsters = load_units(unit_dir)
 customs = []
 for g in m[K + "data_customs"]:
@@ -27,6 +27,8 @@ out = {"source": "restored client element_temple_data.lua + unit_data*.lua",
        "bases": [{"type": b["type"], "name": b["name"], "open_day": b["open_day"], "groups": b["group"]} for b in m[K + "data_base"]],
        "customs": customs,
        "buy": [{"cost": b["cost"], "num": b["num"]} for b in m[K + "data_buy_count"]],
+       # what the territory challenge privilege lets a role buy on top of the buys above: the diamonds of each, in order
+       "privilege": list(m[K + "data_privilege"]),
        "award": [{"min": a["min"], "max": a["max"], "items": a["items"]} for a in m[K + "data_award"]],
        "boss": {str(b["group"]): {"name": b["name"], "head": b["head_id"]} for b in m[K + "data_monster"]}}
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))

@@ -40,7 +40,9 @@ type elementConf struct {
 	Bases   []elementBase
 	Customs []elementCustoms
 	Buy     []struct{ Cost, Num int64 }
-	Boss    map[string]struct {
+	// Privilege is the diamonds of each purchase the territory challenge privilege (105) allows after the normal ones.
+	Privilege []int64
+	Boss      map[string]struct {
 		Name string
 		Head int64
 	}
@@ -61,12 +63,18 @@ var elementCfg = func() *elementConf {
 
 const elementCustomsPerGroup = 12
 
+// elementPrivilege is the territory challenge privilege (privilege.go): two more free challenges a day (data_const challenge_free) and
+// more purchases at the prices of data_privilege, after the two normal ones. The client's text and its count; not captured.
+const elementPrivilege = 105
+
 type elementState struct {
-	Count   int64           // challenges kept
-	CountAt int64           // when the count was last brought up to date (unix)
-	BuyDay  int64           // the day the buys below belong to
-	Bought  int64           // challenges bought that day
-	Cleared map[int64]int64 // group -> the highest customs cleared
+	Count    int64           // challenges kept
+	CountAt  int64           // when the count was last brought up to date (unix)
+	BuyDay   int64           // the day the buys below belong to
+	Bought   int64           // challenges bought that day
+	PrBought int64           // of them the ones bought with the privilege, after the normal buys
+	GiftDay  int64           // the day the privilege's free challenges were last given
+	Cleared  map[int64]int64 // group -> the highest customs cleared
 }
 
 // settle brings the challenges up to the time: one comes every refresh_time seconds up to the limit.
@@ -94,7 +102,7 @@ func (d *elementState) settle(now int64) {
 
 func (d *elementState) day(today int64) {
 	if d.BuyDay != today {
-		d.BuyDay, d.Bought = today, 0
+		d.BuyDay, d.Bought, d.PrBought = today, 0, 0
 	}
 }
 
@@ -150,6 +158,18 @@ func RegisterElement(r *gateway.Router, st *store.Store) {
 		}
 		d.settle(s.Now().Unix())
 		d.day(dayNo(s.Now()))
+		// the privilege gives its free challenges the first time the role looks at the temple that day
+		p, err := loadPrivileges(st, role.RID)
+		if err != nil {
+			return nil, nil, err
+		}
+		if today := dayNo(s.Now()); p.active(elementPrivilege, s.Now()) && d.GiftDay != today {
+			d.Count += elementCfg.Const["challenge_free"]
+			d.GiftDay = today
+			if err := st.SaveState(role.RID, elementModule, d); err != nil {
+				return nil, nil, err
+			}
+		}
 		return role, d, nil
 	}
 	save := func(role *store.Role, d *elementState) error { return st.SaveState(role.RID, elementModule, d) }
@@ -158,7 +178,7 @@ func RegisterElement(r *gateway.Router, st *store.Store) {
 		if d.Count < elementCfg.Const["refresh_number"] {
 			next = d.CountAt + elementCfg.Const["refresh_time"]
 		}
-		return proto.Message{"num": d.Count, "buy_num": d.Bought, "pr_buy_num": 0, "refresh_time": next}
+		return proto.Message{"num": d.Count, "buy_num": d.Bought, "pr_buy_num": d.PrBought, "refresh_time": next}
 	}
 	info := func(d *elementState, now time.Time) proto.Message {
 		list := []proto.Message{}
@@ -187,10 +207,23 @@ func RegisterElement(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		refuse := func(msg string) error { return s.Send(25003, proto.Message{"code": 0, "msg": msg}) }
-		buy := elementCfg.Buy
-		cost := buy[min(int(d.Bought), len(buy)-1)].Cost
 		if d.Count >= elementCfg.Const["refresh_number"] {
 			return refuse("挑战次数已满")
+		}
+		// two buys a day at the client's prices; with the privilege more, at the privilege's prices
+		var cost int64
+		privileged := false
+		if int(d.Bought) < len(elementCfg.Buy) {
+			cost = elementCfg.Buy[d.Bought].Cost
+		} else {
+			p, err := loadPrivileges(st, role.RID)
+			if err != nil {
+				return err
+			}
+			if !p.active(elementPrivilege, s.Now()) || int(d.PrBought) >= len(elementCfg.Privilege) {
+				return refuse("今日购买次数已用完")
+			}
+			cost, privileged = elementCfg.Privilege[d.PrBought], true
 		}
 		if err := st.Exchange(role.RID, map[int64]int64{3: cost}, map[int64]int64{}, map[int64]int64{}, map[int64]int64{}); err != nil {
 			if errors.Is(err, store.ErrConflict) {
@@ -199,7 +232,11 @@ func RegisterElement(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		d.Count++
-		d.Bought++
+		if privileged {
+			d.PrBought++
+		} else {
+			d.Bought++
+		}
 		if err := save(role, d); err != nil {
 			return err
 		}

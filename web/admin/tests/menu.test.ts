@@ -76,6 +76,7 @@ const registry = [
   "planes",
   "planesafk",
   "practisetower",
+  "privilege",
   "practisetower_rank",
   "presage",
   "primus",

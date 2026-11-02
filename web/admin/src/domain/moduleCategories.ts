@@ -24,6 +24,7 @@ export const moduleCategories: readonly ModuleCategory[] = [
       "monthcard",
       "monthfund",
       "onecentgift",
+      "privilege",
       "stoneshop",
       "warorder",
       "newwarorder",

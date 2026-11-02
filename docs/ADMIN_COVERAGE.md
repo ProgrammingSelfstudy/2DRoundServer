@@ -94,6 +94,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `onecentgift` | 一元/一分钱礼包（16651/16652） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [onecentgift.go](../internal/game/onecentgift.go) |
 | role | `peakformations` | 巅峰冠军赛三队阵容（27725/27726） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 存在独立保存状态，赛事关闭不等于无数据；不启用未实现赛程 | [cross_closed.go](../internal/game/cross_closed.go) |
 | role | `petard` | 花火大会（27000–27008） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [petard.go](../internal/game/petard.go) |
+| role | `privilege` | 特权（24500/24501/24502） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；改到期时间会让已发奖励和有效期对不上，不默认开放 | [privilege.go](../internal/game/privilege.go) |
 | role | `planes` | 秘境（23100–23123） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [planes.go](../internal/game/planes.go) |
 | role | `planesafk` | 长环岛冒险（28600–28626） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [planesafk.go](../internal/game/planesafk.go) |
 | role | `practisetower` | 兔丼监狱个人进度（29100–29107） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [practisetower.go](../internal/game/practisetower.go) |

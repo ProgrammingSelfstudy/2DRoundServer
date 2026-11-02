@@ -71,6 +71,10 @@ func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 	if err := s.Send(16712, proto.Message{"charge_sum": accSum(rc), "list": chargeAccList(rc, d)}); err != nil {
 		return err
 	}
+	// the privilege page and the windows the privileges switch on
+	if err := sendPrivileges(s, st, rid); err != nil {
+		return err
+	}
 	// the 每日礼包 tab shows how many of each gift were bought today
 	gifts, err := dailyGiftList(st, rid, s.Now())
 	if err != nil {
@@ -98,6 +102,7 @@ func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 // confirms it there.
 func RegisterCharge(r *gateway.Router, st *store.Store, payBase string) {
 	registerDailyGift(r, st)
+	RegisterPrivilege(r, st)
 	r.Handle(16700, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

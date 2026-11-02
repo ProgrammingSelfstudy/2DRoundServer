@@ -122,7 +122,7 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 	if err := s.Send(10304, proto.Message{"play_video": 0}); err != nil {
 		return err
 	}
-	if err := pushEnterState(s, fresh); err != nil {
+	if err := pushEnterState(s, l.Store, fresh); err != nil {
 		return err
 	}
 	if l.router != nil {
@@ -143,12 +143,13 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 // depend on what the role has done (capture original-2026-10-27, nothing else was sent in the
 // five minutes after it): the server list the client keeps (10995), the client version list
 // (10996), the recharge count (21002), the double-reward flag (21322) and the five 24500
-// entries, all of them in their "nothing yet" state for the account of the capture.
-func pushEnterState(s *gateway.Session, role *store.Role) error {
-	entries := make([]proto.Message, 0, 5)
-	for id := 1; id <= 5; id++ {
-		entries = append(entries, proto.Message{"id": id, "status": 0, "expire_time": 0})
+// entries (the privileges the role owns; all "nothing yet" in the capture).
+func pushEnterState(s *gateway.Session, st *store.Store, role *store.Role) error {
+	p, err := loadPrivileges(st, role.RID)
+	if err != nil {
+		return err
 	}
+	entries := privilegeList24500(p, s.Now())
 	for _, p := range []struct {
 		cmd uint16
 		msg proto.Message

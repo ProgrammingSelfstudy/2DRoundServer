@@ -24,6 +24,7 @@
     ><RecordTable :rows="rows" :columns="columns" :loading="loading"
       ><template #actions="{ row }"
         ><el-button @click="detail = row">详情</el-button
+        ><el-button @click="router.push(statusLocation(row.srv_id, row.gid))">数据表</el-button
         ><el-button v-if="auth.hasPermission('write')" type="danger" :disabled="busy" @click="disband(row)"
           >解散</el-button
         ></template
@@ -39,6 +40,7 @@
 </template>
 <script setup lang="ts" name="guilds">
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { api } from "@/auth/runtime";
 import { getServers, type ServerRow } from "@/api/admin";
@@ -46,10 +48,12 @@ import { useAuthStore } from "@/stores/modules/auth";
 import { useCollection } from "@/composables/useCollection";
 import { useCommand } from "@/composables/useCommand";
 import type { Guild } from "@/domain/management";
+import { statusLocation } from "@/domain/gameAdmin";
 import { errorMessage, formatTime } from "@/utils/admin";
 import CollectionPage from "@/components/Admin/CollectionPage.vue";
 import RecordTable, { type Column } from "@/components/Admin/RecordTable.vue";
-const auth = useAuthStore(),
+const router = useRouter(),
+  auth = useAuthStore(),
   srv = ref(""),
   q = ref(""),
   filter = ref({ srv_id: "", q: "" }),

@@ -206,3 +206,19 @@ export function chargePresentation(m: ModuleState): ChargePresentation | undefin
     );
   return undefined;
 }
+
+// Links from the server and guild pages open the game status page with the server, and for a guild its tables, preselected.
+// The page reads them back with statusSelection, which accepts only what it can show: a listed server and a positive GID.
+export function statusLocation(srvID: string, guildID?: number | string) {
+  const query: Record<string, string> = { srv: srvID };
+  if (guildID !== undefined) query.gid = String(guildID);
+  return { path: "/game-status", query };
+}
+export function statusSelection(query: Record<string, unknown>, serverIDs: string[]) {
+  const srv = typeof query.srv === "string" && serverIDs.includes(query.srv) ? query.srv : "";
+  const gid =
+    typeof query.gid === "string" && /^[1-9][0-9]*$/.test(query.gid) && Number.isSafeInteger(Number(query.gid))
+      ? query.gid
+      : "";
+  return { srv, gid };
+}

@@ -136,7 +136,8 @@
   </div>
 </template>
 <script setup lang="ts" name="game-status">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { api } from "@/auth/runtime";
 import { ApiError } from "@/api/client";
@@ -150,6 +151,7 @@ import {
   worldPayload,
   settleFeedback,
   gameError,
+  statusSelection,
   type ModuleInfo,
   type ModuleState,
   type Season
@@ -157,7 +159,8 @@ import {
 import { formatTime, errorMessage } from "@/utils/admin";
 import JsonView from "@/components/Admin/JsonView.vue";
 import TableBrowser from "@/components/Admin/TableBrowser.vue";
-const auth = useAuthStore(),
+const route = useRoute(),
+  auth = useAuthStore(),
   { busy, uncertain, error: commandError, execute, reviewed } = useCommand("manage", true);
 const catalog = useCollection<ModuleInfo>("/modules", 200, false);
 const servers = ref<ServerRow[]>([]),
@@ -313,13 +316,31 @@ watch([srv, tab], () => {
   guildID.value = "";
   void load();
 });
+// The server and guild pages link here with ?srv= and, for a guild, &gid=. Only a listed server and a positive GID are taken.
+async function applyRouteQuery() {
+  const want = statusSelection(route.query, servers.value.map(s => s.srv_id));
+  srv.value = want.srv || srv.value || servers.value[0]?.srv_id || "";
+  if (!want.gid) return;
+  tab.value = "tables";
+  await nextTick(); // the [srv, tab] watcher above has cleared the guild selection by now
+  if (!active) return;
+  tableScope.value = "guild";
+  guildInput.value = want.gid;
+  guildID.value = want.gid;
+}
+watch(
+  () => route.query,
+  () => {
+    if (route.path === "/game-status" && servers.value.length) void applyRouteQuery();
+  }
+);
 onMounted(async () => {
   try {
     const [r, ok] = await Promise.all([getServers(), catalog.load()]);
     if (!active) return;
     if (!ok) throw Error(catalog.error.value);
     servers.value = r.items;
-    srv.value = r.items[0]?.srv_id || "";
+    await applyRouteQuery();
   } catch (e) {
     if (active) error.value = errorMessage(e);
   }

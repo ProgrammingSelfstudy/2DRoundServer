@@ -9,6 +9,8 @@ import {
   settleFeedback,
   gameError,
   tablePath,
+  statusLocation,
+  statusSelection,
   type ModuleInfo
 } from "../src/domain/gameAdmin.js";
 import { actionAllowed, pageCapability } from "../src/domain/management.js";
@@ -65,6 +67,7 @@ test("online conflict offers offline guidance; concurrent conflict not mistaken 
   assert.equal(gameError(502, "upstream failed", true), "网关不可用，未修改");
   assert.match(gameError(502, "invalid gateway response"), /只读请求失败/);
   assert.match(new ApiError(502, "gateway unavailable").message, /核对审计/);
+  assert.match(new ApiError(404, "server is not owned by this gateway").message, /不由当前网关负责/);
 });
 test("registered table owner scope and paging paths keep identifiers encoded", () => {
   const t = { name: "role_mails", title: "收件", group: "邮件", scope: "role" as const, owner: "rid", columns: ["id"] };
@@ -110,4 +113,19 @@ test("charge views display backend projection values without deriving eligibilit
   })!;
   assert.equal(cycle.rows[0].cycle, "月礼包");
   assert.equal(cycle.rows[0].count, 3);
+});
+
+test("links to the game status page carry only a listed server and a positive guild GID", () => {
+  assert.deepEqual(statusLocation("s1"), { path: "/game-status", query: { srv: "s1" } });
+  assert.deepEqual(statusLocation("s1", 42), { path: "/game-status", query: { srv: "s1", gid: "42" } });
+  const servers = ["s1", "s2"];
+  assert.deepEqual(statusSelection({ srv: "s2", gid: "42" }, servers), { srv: "s2", gid: "42" });
+  assert.deepEqual(statusSelection({}, servers), { srv: "", gid: "" });
+  // a server that is not listed, and anything but a plain positive integer, is dropped instead of reaching a request
+  assert.deepEqual(statusSelection({ srv: "nope", gid: "7" }, servers), { srv: "", gid: "7" });
+  for (const gid of ["0", "-1", "01", "1.5", "1e3", "abc", "", "9007199254740993", "../1"])
+    assert.equal(statusSelection({ srv: "s1", gid }, servers).gid, "", gid);
+  // route queries can be arrays or missing; only a single string is taken
+  assert.deepEqual(statusSelection({ srv: ["s1", "s2"], gid: ["1"] }, servers), { srv: "", gid: "" });
+  assert.deepEqual(statusSelection({ srv: null, gid: undefined }, servers), { srv: "", gid: "" });
 });

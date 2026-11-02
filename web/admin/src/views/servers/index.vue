@@ -31,6 +31,11 @@
         ><template #default="{ row }">{{ formatTime(row.open_time) }}</template></el-table-column
       >
       <el-table-column prop="main_srv_id" label="合服到" min-width="110" />
+      <el-table-column label="玩法" width="100" fixed="right"
+        ><template #default="{ row }"
+          ><el-button link type="primary" @click="router.push(statusLocation(row.srv_id))">玩法状态</el-button></template
+        ></el-table-column
+      >
       <el-table-column v-if="auth.hasPermission('manage')" label="操作" width="245" fixed="right"
         ><template #default="{ row }">
           <el-button link type="primary" :disabled="busy" @click="edit(row)">编辑</el-button>
@@ -106,13 +111,16 @@
 </template>
 <script setup lang="ts" name="servers">
 import { onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { api } from "@/auth/runtime";
 import { getServers, type ServerRow } from "@/api/admin";
 import { useAuthStore } from "@/stores/modules/auth";
 import { confirmAction, useMutation } from "@/composables/useMutation";
+import { statusLocation } from "@/domain/gameAdmin";
 import { errorMessage, formatTime, validateServer } from "@/utils/admin";
-const auth = useAuthStore();
+const auth = useAuthStore(),
+  router = useRouter();
 const { busy, run } = useMutation("manage");
 const rows = ref<ServerRow[]>([]);
 const loading = ref(false);

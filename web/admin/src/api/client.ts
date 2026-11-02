@@ -55,6 +55,7 @@ const messages: Record<string, string> = {
   "role is online; kick it offline first": "玩家在线，请先踢下线",
   "gateway unavailable or online status unknown; no data changed": "网关不可用，未修改",
   "gateway unavailable": "网关不可用，请刷新状态并核对审计确认写入结果",
+  "server is not owned by this gateway": "该区服不由当前网关负责，无法读取或修改它的全服数据",
   "invalid gateway response": "网关响应无效，请刷新并核对审计后确认写入结果",
   "module changed concurrently; refresh before retrying": "数据已变化，请刷新后核对",
   "reset item is not in the module whitelist": "重置项目不在白名单内",

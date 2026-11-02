@@ -283,6 +283,8 @@ func TestPlanesafkLeaseShopAndFloors(t *testing.T) {
 	if r := c.waitFor(28600); r.Int("code") != 1 || r.Str("msg") != "" {
 		t.Fatalf("hire answer: %v", r)
 	}
+	// the hire answers before it saves; a late save would overwrite the tile set below, so the shop never opens
+	c.settle()
 	// the merchant
 	e.setTile(t, role, 3, 3, pfEvtID(1, 1, 3, 6))
 	c.send(28600, proto.Message{"line": 3, "index": 3, "action": 0})

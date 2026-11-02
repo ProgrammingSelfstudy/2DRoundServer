@@ -13,6 +13,7 @@ import { LayoutType } from "@/stores/interface";
 import { useGlobalStore } from "@/stores/modules/global";
 
 import { useAuthStore } from "@/stores/modules/auth";
+import { usePendingPay } from "@/composables/usePendingPay";
 
 import ThemeDrawer from "./components/ThemeDrawer/index.vue";
 import LayoutClassic from "./LayoutClassic/index.vue";
@@ -28,6 +29,7 @@ const LayoutComponents: Record<LayoutType, Component> = {
 };
 
 const auth = useAuthStore();
+usePendingPay();
 const globalStore = useGlobalStore();
 
 const isDark = computed(() => globalStore.isDark);

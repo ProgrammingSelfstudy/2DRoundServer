@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"html/template"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -32,6 +33,7 @@ h1{font-size:20px;margin:0 0 8px}.amount{font-size:34px;font-weight:700;color:#c
 .no{font-family:monospace;word-break:break-all;background:#f0ece2;padding:4px 8px;border-radius:6px}
 .state{padding:10px 12px;border-radius:8px;margin-top:8px}.wait{background:#fff6dd}.done{background:#e3f6e3}.cancel{background:#eee}
 small{color:#777}
+.proof button{margin-top:8px;padding:8px 14px;font-size:15px}.proof .msg{margin-top:6px}
 </style></head><body><main>
 <div class="card"><h1>{{.Name}}</h1>
 <div class="amount">¥{{.Yuan}}</div>
@@ -44,7 +46,24 @@ small{color:#777}
 {{else}}<p>收款码还没有配置，请联系客服。</p>{{end}}
 {{if .Notice}}<p>{{.Notice}}</p>{{end}}
 <small>付款后请保持本页打开，到账后会自动显示。客服确认后到账，通常需要几分钟。</small></div>
+<div class="card proof"><b>上传付款截图（可加快核对）</b>
+<p><input id="pf" type="file" accept="image/*"></p>
+<button id="pb" type="button">{{if .Proof}}重新上传{{else}}上传截图{{end}}</button>
+<div id="pm" class="msg">{{if .Proof}}已上传，等待客服核对{{end}}</div></div>
 <script>
+(function(){var pf=document.getElementById('pf'),pb=document.getElementById('pb'),pm=document.getElementById('pm');
+function shrink(f){return new Promise(function(ok){var im=new Image();im.onload=function(){var k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');
+c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+c.toBlob(function(b){ok(b||f)},'image/jpeg',0.8)};im.onerror=function(){ok(f)};im.src=URL.createObjectURL(f)})}
+pb.onclick=function(){var f=pf.files[0];if(!f){pm.textContent='请先选择截图';return}
+pb.disabled=true;pm.textContent='上传中…';
+shrink(f).then(function(b){return fetch('/pay/proof/{{.No}}',{method:'POST',body:b})}).then(function(r){
+if(r.ok){pm.textContent='已上传，等待客服核对';pb.textContent='重新上传'}
+else if(r.status==413){pm.textContent='图片太大，请换一张'}
+else if(r.status==415){pm.textContent='只支持 png、jpg、webp 图片'}
+else if(r.status==409){pm.textContent='订单已处理，无需上传'}
+else{pm.textContent='上传失败，请重试'}}).catch(function(){pm.textContent='上传失败，请重试'}).then(function(){pb.disabled=false})};
+})();
 (function(){var el=document.getElementById('state');
 function tick(){fetch('/pay/status/{{.No}}').then(function(r){return r.json()}).then(function(d){
 if(d.status==1){el.className='state done';el.textContent='已到账，请回到游戏查看';return}
@@ -82,9 +101,9 @@ func (s *Server) payOrderPage(w http.ResponseWriter, r *http.Request, no string)
 	data := struct {
 		Name, Yuan, Role, No, Class, Text, Notice string
 		RID                                       int64
-		Waiting                                   bool
+		Waiting, Proof                            bool
 		QRs                                       []payQR
-	}{Name: p.Name, Yuan: strconv.FormatFloat(float64(o.AmountCents)/100, 'f', -1, 64), No: o.OrderNo, RID: o.RID, Notice: cfg["notice"]}
+	}{Name: p.Name, Yuan: strconv.FormatFloat(float64(o.AmountCents)/100, 'f', -1, 64), No: o.OrderNo, RID: o.RID, Notice: cfg["notice"], Proof: o.ProofAt > 0}
 	if role != nil {
 		data.Role = role.Name
 	}
@@ -117,6 +136,38 @@ func (s *Server) payStatus(w http.ResponseWriter, r *http.Request, no string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
 	json.NewEncoder(w).Encode(map[string]int{"status": o.Status})
+}
+
+// maxProofBytes caps a payment screenshot; the page shrinks phone screenshots below it before it sends them.
+const maxProofBytes = 2 << 20
+
+// payProof keeps the screenshot a player sends for a waiting order. The type comes from the bytes, not from the request.
+func (s *Server) payProof(w http.ResponseWriter, r *http.Request, no string) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "post only", http.StatusMethodNotAllowed)
+		return
+	}
+	data, err := io.ReadAll(http.MaxBytesReader(w, r.Body, maxProofBytes))
+	if err != nil {
+		http.Error(w, "image too large", http.StatusRequestEntityTooLarge)
+		return
+	}
+	mime := http.DetectContentType(data)
+	if mime != "image/png" && mime != "image/jpeg" && mime != "image/webp" {
+		http.Error(w, "png, jpeg or webp only", http.StatusUnsupportedMediaType)
+		return
+	}
+	switch err := s.Store.SetPayProof(no, mime, data); {
+	case errors.Is(err, store.ErrNotFound):
+		http.NotFound(w, r)
+	case errors.Is(err, store.ErrConflict):
+		http.Error(w, "the order is not waiting for payment", http.StatusConflict)
+	case err != nil:
+		http.Error(w, "proof", http.StatusInternalServerError)
+	default:
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"ok":true}`))
+	}
 }
 
 // payStart opens an order from the call the client's pay function makes (the JSON of sdkOnPay: roleId, productId, price, ...)
@@ -165,6 +216,8 @@ func (s *Server) payStart(w http.ResponseWriter, r *http.Request) {
 func (s *Server) payRoute(w http.ResponseWriter, r *http.Request) bool {
 	p := r.URL.Path
 	switch {
+	case strings.HasPrefix(p, "/pay/proof/"):
+		s.payProof(w, r, strings.TrimPrefix(p, "/pay/proof/"))
 	case p == "/pay/start":
 		s.payStart(w, r)
 	case strings.HasPrefix(p, "/pay/order/"):

@@ -1,6 +1,7 @@
 package login
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"net/url"
@@ -60,6 +61,35 @@ func TestPayPages(t *testing.T) {
 			t.Fatalf("%s: %d", bad, r2.StatusCode)
 		}
 	}
+	// a payment screenshot: only images, size capped, kept for the operator, and refused once the order is done
+	pngBytes := []byte("\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR")
+	post := func(body []byte) int {
+		resp, err := http.Post(ts.URL+"/pay/proof/"+no, "application/octet-stream", bytes.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+		return resp.StatusCode
+	}
+	if c := post([]byte("<html>not an image</html>")); c != http.StatusUnsupportedMediaType {
+		t.Fatalf("junk proof: %d", c)
+	}
+	if c := post(append(pngBytes, make([]byte, maxProofBytes)...)); c != http.StatusRequestEntityTooLarge {
+		t.Fatalf("big proof: %d", c)
+	}
+	if c := post(pngBytes); c != 200 {
+		t.Fatalf("proof: %d", c)
+	}
+	if mime, data, err := s.Store.PayProof(no); err != nil || mime != "image/png" || !bytes.Equal(data, pngBytes) {
+		t.Fatalf("stored proof: %q %v", mime, err)
+	}
+	if o, _ := s.Store.PayOrderByNo(no); o.ProofAt == 0 {
+		t.Fatal("proof_at not set")
+	}
+	if _, body := get(t, "GET", ts.URL+loc); !strings.Contains(body, "已上传，等待客服核对") {
+		t.Fatalf("page does not show the proof: %s", body)
+	}
 	// once confirmed the page and the status say so, and the QR codes are gone
 	if _, err := game.ConfirmChargeOrder(s.Store, no, "t", ""); err != nil {
 		t.Fatal(err)
@@ -69,6 +99,9 @@ func TestPayPages(t *testing.T) {
 	}
 	if _, body := get(t, "GET", ts.URL+loc); !strings.Contains(body, "已到账") || strings.Contains(body, png) {
 		t.Fatalf("page after: %s", body)
+	}
+	if c := post(pngBytes); c != http.StatusConflict {
+		t.Fatalf("proof after confirm: %d", c)
 	}
 	if code, _ := get(t, "GET", ts.URL+"/pay/order/nope"); code != 404 {
 		t.Fatalf("unknown order: %d", code)

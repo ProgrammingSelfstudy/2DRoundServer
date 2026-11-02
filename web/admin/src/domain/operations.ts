@@ -67,6 +67,7 @@ export interface Order {
   paid_at: number;
   operator: string;
   note: string;
+  proof_at?: number;
   product?: string;
   role?: string;
 }

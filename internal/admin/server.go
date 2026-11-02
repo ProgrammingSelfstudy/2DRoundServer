@@ -169,6 +169,7 @@ func (s *Server) Handler() http.Handler {
 	route("PUT /api/pay/config", levManage, s.setPayConfig)
 	route("GET /api/pay/products", levRead, s.payProducts)
 	route("GET /api/pay/orders", levRead, s.listPayOrders)
+	route("GET /api/pay/orders/{no}/proof", levRead, s.payProof)
 	route("POST /api/pay/orders", levManage, s.createPayOrder)
 	route("POST /api/pay/orders/{no}/confirm", levManage, s.confirmPayOrder)
 	route("POST /api/pay/orders/{no}/cancel", levManage, s.cancelPayOrder)

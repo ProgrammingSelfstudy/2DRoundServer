@@ -56,6 +56,19 @@ func TestAdminPay(t *testing.T) {
 	if list.Status != 200 || !strings.Contains(string(list.Body), no) || !strings.Contains(string(list.Body), "普通充值30") || !strings.Contains(string(list.Body), "付款人") {
 		t.Fatalf("list: %d %s", list.Status, list.Body)
 	}
+	// the screenshot a player uploaded: none yet, then readable by a viewer as a data URL, flagged in the list
+	if res := e.do(viewer, "GET", "/api/pay/orders/"+no+"/proof", nil); res.Status != 404 {
+		t.Fatalf("proof before upload: %d", res.Status)
+	}
+	if err := e.st.SetPayProof(no, "image/png", []byte("\x89PNG\r\n\x1a\n")); err != nil {
+		t.Fatal(err)
+	}
+	if res := e.do(viewer, "GET", "/api/pay/orders/"+no+"/proof", nil); res.Status != 200 || !strings.Contains(string(res.Body), "data:image/png;base64,") {
+		t.Fatalf("proof: %d %s", res.Status, res.Body)
+	}
+	if res := e.do(viewer, "GET", "/api/pay/orders?status=0", nil); strings.Contains(string(res.Body), `"proof_at":0`) {
+		t.Fatalf("proof_at not listed: %s", res.Body)
+	}
 	// confirming is the manager's
 	if res := e.do(operator, "POST", "/api/pay/orders/"+no+"/confirm", map[string]any{}); res.Status != 403 {
 		t.Fatalf("operator confirms: %d", res.Status)

@@ -15,6 +15,7 @@
       </el-icon>
       <template #title>
         <span class="sle">{{ subItem.meta.title }}</span>
+        <el-badge v-if="subItem.path === '/pay' && pendingPay" :value="pendingPay" :max="99" class="pay-badge" />
       </template>
     </el-menu-item>
   </template>
@@ -22,6 +23,7 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import { pendingPay } from "@/composables/usePendingPay";
 
 defineProps<{ menuList: Menu.MenuOptions[] }>();
 
@@ -33,6 +35,9 @@ const handleClickMenu = (subItem: Menu.MenuOptions) => {
 </script>
 
 <style lang="scss">
+.pay-badge {
+  margin-left: 8px;
+}
 .el-sub-menu .el-sub-menu__title:hover {
   color: var(--el-menu-hover-text-color) !important;
   background-color: transparent !important;

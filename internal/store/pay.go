@@ -25,13 +25,14 @@ type PayOrder struct {
 	PaidAt      int64  `json:"paid_at"`
 	Operator    string `json:"operator"`
 	Note        string `json:"note"`
+	ProofAt     int64  `json:"proof_at"`
 }
 
-const payCols = `id,order_no,rid,srv_id,charge_id,amount_cents,status,created_at,paid_at,operator,note`
+const payCols = `id,order_no,rid,srv_id,charge_id,amount_cents,status,created_at,paid_at,operator,note,proof_at`
 
 func scanPay(sc interface{ Scan(...any) error }) (*PayOrder, error) {
 	var o PayOrder
-	err := sc.Scan(&o.ID, &o.OrderNo, &o.RID, &o.SrvID, &o.ChargeID, &o.AmountCents, &o.Status, &o.CreatedAt, &o.PaidAt, &o.Operator, &o.Note)
+	err := sc.Scan(&o.ID, &o.OrderNo, &o.RID, &o.SrvID, &o.ChargeID, &o.AmountCents, &o.Status, &o.CreatedAt, &o.PaidAt, &o.Operator, &o.Note, &o.ProofAt)
 	return &o, wrapNoRows(err)
 }
 
@@ -224,4 +225,34 @@ func (s *Store) SetPayConfig(key, value string) error {
 func itoa(n int64) string {
 	b, _ := json.Marshal(n)
 	return string(b)
+}
+
+// SetPayProof keeps the payment screenshot of a waiting order (a new one replaces the old). ErrConflict when the order is not
+// waiting, ErrNotFound when there is no such order.
+func (s *Store) SetPayProof(no, mime string, data []byte) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	o, err := scanPay(tx.QueryRow(`SELECT `+payCols+` FROM pay_orders WHERE order_no=?`, no))
+	if err != nil {
+		return err
+	}
+	if o.Status != PayWaiting {
+		return ErrConflict
+	}
+	if _, err := tx.Exec(`INSERT INTO pay_proofs(order_no,mime,data) VALUES(?,?,?) ON CONFLICT(order_no) DO UPDATE SET mime=excluded.mime,data=excluded.data`, no, mime, data); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(`UPDATE pay_orders SET proof_at=? WHERE order_no=?`, s.unix(), no); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// PayProof returns the screenshot of an order; ErrNotFound when none was uploaded.
+func (s *Store) PayProof(no string) (mime string, data []byte, err error) {
+	err = s.db.QueryRow(`SELECT mime,data FROM pay_proofs WHERE order_no=?`, no).Scan(&mime, &data)
+	return mime, data, wrapNoRows(err)
 }

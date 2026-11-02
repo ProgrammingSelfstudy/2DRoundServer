@@ -109,6 +109,12 @@
       <el-table-column label="处理人 / 备注" min-width="155"
         ><template #default="{ row }">{{ row.operator || "—" }}<br />{{ row.note || "—" }}</template></el-table-column
       >
+      <el-table-column label="付款截图" width="110"
+        ><template #default="{ row }"
+          ><el-button v-if="row.proof_at" link type="primary" @click="showProof(row)">查看截图</el-button
+          ><span v-else class="hint">未上传</span></template
+        ></el-table-column
+      >
       <el-table-column v-if="manage" label="操作" width="190" fixed="right"
         ><template #default="{ row }"
           ><template v-if="row.status === 0"
@@ -126,6 +132,15 @@
       >
       <template #empty>暂无所选状态的订单</template>
     </el-table>
+    <el-dialog v-model="proofOpen" :title="`付款截图 ${proofOrder?.order_no || ''}`" width="min(520px, 92vw)">
+      <p v-if="proofOrder" class="hint">
+        {{ proofOrder.role || proofOrder.rid }}（{{ proofOrder.rid }}）· {{ proofOrder.product }} · {{ money(proofOrder.amount_cents) }} ·
+        上传于 {{ formatTime(proofOrder.proof_at || 0) }}。截图由玩家自行上传，请以实际收款记录为准。
+      </p>
+      <el-alert v-if="proofError" :title="proofError" type="error" :closable="false" />
+      <img v-if="proofImage" :src="proofImage" alt="付款截图" class="proof-image" />
+      <p v-else-if="!proofError" class="hint">加载中…</p>
+    </el-dialog>
     <el-card v-if="manage" shadow="never" class="manual">
       <template #header>手工补单（玩家已线下付款）</template>
       <el-form label-position="top" :disabled="manualBusy || manualUncertain" @submit.prevent="createOrder">
@@ -173,7 +188,7 @@
 </template>
 <script setup lang="ts" name="pay">
 import IntegerInput from "@/components/Admin/IntegerInput.vue";
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { api } from "@/auth/runtime";
 import { query, type RoleRow } from "@/api/admin";
@@ -181,6 +196,7 @@ import { useAuthStore } from "@/stores/modules/auth";
 import { useCommand } from "@/composables/useCommand";
 import { manualOrder, paymentFeedback, validateQr, type Order, type OrderReply, type Product } from "@/domain/operations";
 import { errorMessage, formatTime } from "@/utils/admin";
+import { pendingPay, refreshPendingPay } from "@/composables/usePendingPay";
 import RoleLookup from "@/components/Admin/RoleLookup.vue";
 const auth = useAuthStore();
 const manage = computed(() => auth.hasPermission("manage"));
@@ -214,6 +230,10 @@ const note = ref("");
 const confirmNow = ref(true);
 const roleLabel = ref("");
 const formError = ref("");
+const proofOpen = ref(false);
+const proofOrder = ref<Order>();
+const proofImage = ref("");
+const proofError = ref("");
 const result = ref<{ type: "success" | "warning"; message: string }>();
 const statuses: Record<number, string> = { 0: "等待付款", 1: "已到账", 2: "已取消" };
 let active = true;
@@ -327,6 +347,21 @@ async function act(order: Order, action: "confirm" | "cancel") {
     result.value =
       action === "confirm" ? paymentFeedback(saved) : { type: "success", message: `订单 ${order.order_no} 已取消，未发货` };
     void loadOrders();
+    void refreshPendingPay();
+  }
+}
+async function showProof(order: Order) {
+  proofOrder.value = order;
+  proofImage.value = "";
+  proofError.value = "";
+  proofOpen.value = true;
+  try {
+    const data = await api<{ image: string }>(`/pay/orders/${encodeURIComponent(order.order_no)}/proof`);
+    // Only image data URLs are rendered, the same rule the QR codes follow.
+    if (!safeImage(data.image)) throw Error("截图格式不受支持");
+    if (active && proofOrder.value === order) proofImage.value = data.image;
+  } catch (e) {
+    if (active && proofOrder.value === order) proofError.value = errorMessage(e);
   }
 }
 function selectRole(role: RoleRow) {
@@ -353,6 +388,7 @@ async function createOrder() {
     roleLabel.value = "";
     note.value = "";
     void loadOrders();
+    void refreshPendingPay();
   }
 }
 async function reviewOrder() {
@@ -368,6 +404,8 @@ async function reviewManual() {
     roleLabel.value = "";
   }
 }
+// A new order was found by the background poll: show it without a manual refresh.
+watch(pendingPay, () => void loadOrders());
 onMounted(refreshAll);
 onBeforeUnmount(() => {
   active = false;
@@ -400,6 +438,12 @@ label {
 }
 .filters .el-select {
   width: 170px;
+}
+.proof-image {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0 auto;
 }
 .manual {
   margin: 24px 0;

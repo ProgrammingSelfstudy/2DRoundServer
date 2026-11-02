@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -70,6 +71,20 @@ func (s *Server) setPayConfig(w http.ResponseWriter, r *http.Request, p *princip
 	}
 	s.audit(r, p, "pay.config", q.Key, map[string]any{"set": q.Value != ""})
 	writeJSON(w, 200, map[string]bool{"ok": true})
+}
+
+// payProof sends the screenshot of an order as a data URL, the way the QR codes travel.
+func (s *Server) payProof(w http.ResponseWriter, r *http.Request, p *principal) {
+	mime, data, err := s.Store.PayProof(r.PathValue("no"))
+	if errors.Is(err, store.ErrNotFound) {
+		fail(w, 404, "no screenshot for this order")
+		return
+	}
+	if err != nil {
+		internalErr(w, s, err)
+		return
+	}
+	writeJSON(w, 200, map[string]string{"image": "data:" + mime + ";base64," + base64.StdEncoding.EncodeToString(data)})
 }
 
 func (s *Server) rows(orders []store.PayOrder) []payOrderRow {

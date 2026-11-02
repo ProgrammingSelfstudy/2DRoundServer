@@ -25,8 +25,9 @@ const privilegeModule = "privilege"
 // type 1~5 (the five entries the original sends, capture original-2026-10-27), which is the id minus 101 for 102~106: 1 the quick
 // battle, 2 and 3 the voyage, 4 the territory challenge, 5 the ghost training.
 //
-// Not done: what a privilege does. The client switches its windows on from 24500, but the quick battle, the voyage orders and the
-// other systems of the server do not look at it yet, so owning one pays only its reward.
+// What a privilege does: the quick battle one (102) changes the daily quick battles (drama_extras.go) and the two of the voyage (103,
+// 104) the refresh of the orders (voyage.go). Not done: the territory challenge privilege (105: two more free challenges a day and
+// more purchases, element.go) and the ghost training one (106, no system of that name on the server); owning those pays only the reward.
 type privilegeDef struct {
 	ID        int64 `json:"id"`
 	Name      string

@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"time"
 
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
@@ -24,6 +25,29 @@ const (
 	questFastCombat = "evt_dungeon_fast_combat"
 	autoNumMax      = 10 // auto_num_max in 13000 and 13006 (original capture 2026-10-20); the client keeps the last one it got
 )
+
+// The quick battle privilege (102, privilege.go) changes the day (the client's own text, vip/view/ and battle_drama_quick_battle_window.lua:
+// "每天免费3次，额外购买11次", and its count "今日剩余 (max - num) + (8 - p_num)"): the first three are free, then up to eight more
+// cost 200 gems each (data_fast_combat_cost), eleven in all. 13006 then reports the first three as fast_combat_num and the paid ones
+// as fast_combat_p_num. Our reading of the text; the original's counts are not captured.
+const (
+	quickPrivilege     = 102
+	quickPrivilegeFree = 3
+	quickPrivilegeMore = 8
+	quickPrivilegeCost = 200
+)
+
+// quickLimit is how many quick battles the role may do today.
+func quickLimit(st *store.Store, rid int64, now time.Time) (int64, error) {
+	p, err := loadPrivileges(st, rid)
+	if err != nil {
+		return 0, err
+	}
+	if p.active(quickPrivilege, now) {
+		return quickPrivilegeFree + quickPrivilegeMore, nil
+	}
+	return quickMaxPerDay, nil
+}
 
 // quickGemCost is data_drama_quick_cost: the gems of the n-th (1-based) quick battle of a day.
 var quickGemCost = [...]int64{50, 100, 200}
@@ -141,13 +165,22 @@ func RegisterDramaExtras(r *gateway.Router, st *store.Store) {
 
 	quickState := func(s *gateway.Session, rid int64) (proto.Message, store.DramaDaily, error) {
 		dd, err := st.DramaDaily(rid, dayKey(s.Now()))
-		free := int64(0)
-		if dd.Quick == 0 {
+		if err != nil {
+			return nil, dd, err
+		}
+		limit, err := quickLimit(st, rid, s.Now())
+		if err != nil {
+			return nil, dd, err
+		}
+		num, paid, free := dd.Quick, int64(0), int64(0)
+		if limit > quickMaxPerDay { // the privilege: three free, then the paid ones counted apart
+			num, paid, free = min(dd.Quick, quickPrivilegeFree), max(dd.Quick-quickPrivilegeFree, 0), max(quickPrivilegeFree-dd.Quick, 0)
+		} else if dd.Quick == 0 {
 			free = 1
 		}
-		return proto.Message{"fast_combat_num": dd.Quick, "fast_combat_max": quickMaxPerDay, "auto_num": dd.Sweep, "auto_num_max": autoNumMax,
-			"is_auto_combat": 0, "fast_combat_add_time": 0, "fast_combat_w_num": 0, "fast_combat_p_num": 0,
-			"fast_combat_free_num": free, "is_holiday": 0}, dd, err
+		return proto.Message{"fast_combat_num": num, "fast_combat_max": quickMaxPerDay, "auto_num": dd.Sweep, "auto_num_max": autoNumMax,
+			"is_auto_combat": 0, "fast_combat_add_time": 0, "fast_combat_w_num": 0, "fast_combat_p_num": paid,
+			"fast_combat_free_num": free, "is_holiday": 0}, dd, nil
 	}
 	r.Handle(13006, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
@@ -177,16 +210,27 @@ func RegisterDramaExtras(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if dd.Quick >= quickMaxPerDay {
+		limit, err := quickLimit(st, role.RID, s.Now())
+		if err != nil {
+			return err
+		}
+		if dd.Quick >= limit {
 			return fail("今日快速作战次数已用完")
 		}
 		spendA, spendI := map[int64]int64{}, map[int64]int64{}
-		if dd.Quick > 0 { // the first one of the day is free; then a quick ticket if there is one, else gems
+		// the first one of the day is free (three with the privilege); then a quick ticket if there is one, else gems
+		freeUses := int64(1)
+		if limit > quickMaxPerDay {
+			freeUses = quickPrivilegeFree
+		}
+		if dd.Quick >= freeUses {
 			items, _ := st.RoleItems(role.RID)
 			if items[quickTicketItem] > 0 {
 				spendI[quickTicketItem] = 1
+			} else if limit > quickMaxPerDay {
+				spendA[3] = quickPrivilegeCost // asset 3: gems
 			} else {
-				spendA[3] = quickGemCost[dd.Quick] // asset 3: gems
+				spendA[3] = quickGemCost[dd.Quick]
 			}
 		}
 		gain := minutesOf(hookRate(d), quickMinutes)
@@ -196,7 +240,7 @@ func RegisterDramaExtras(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if err := st.DramaAction(role.RID, dayKey(s.Now()), 1, 0, quickMaxPerDay, 0, spendA, spendI, gainA, gainI); err != nil {
+		if err := st.DramaAction(role.RID, dayKey(s.Now()), 1, 0, limit, 0, spendA, spendI, gainA, gainI); err != nil {
 			if errors.Is(err, store.ErrConflict) {
 				return fail("钻石不足或次数已用完")
 			}

@@ -184,3 +184,65 @@ func TestSweep(t *testing.T) {
 		t.Fatalf("sweep count: %v", q)
 	}
 }
+
+// The quick battle privilege: three free, then eight more at 200 gems, eleven in all; 13006 counts the first three apart from the paid ones.
+func TestQuickBattlePrivilege(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	now := time.Date(2026, 10, 19, 10, 0, 0, 0, dayZone)
+	e.setNow(now)
+	c, role := e.enter("u2", "乙")
+	atDungeon(t, e, role.RID, 10030, false)
+	p := &privilegeState{}
+	p.set(quickPrivilege, now.Unix()+30*86400)
+	if err := e.st.SaveState(role.RID, privilegeModule, p); err != nil {
+		t.Fatal(err)
+	}
+	quick := func() proto.Message {
+		c.send(13004, proto.Message{})
+		r := c.recv(13004)
+		if r.Int("code") == 1 {
+			c.recv(13007)
+			c.recv(13006)
+			c.recv(10302)
+			c.recv(10500)
+		}
+		return r
+	}
+	state := func() proto.Message { c.send(13006, proto.Message{}); return c.recv(13006) }
+	if s := state(); s.Int("fast_combat_free_num") != 3 || s.Int("fast_combat_num") != 0 || s.Int("fast_combat_p_num") != 0 || s.Int("fast_combat_max") != 3 {
+		t.Fatalf("13006: %v", s)
+	}
+	for i := 0; i < 3; i++ { // free, no gems needed
+		if r := quick(); r.Int("code") != 1 {
+			t.Fatalf("free %d: %v", i+1, r)
+		}
+	}
+	if s := state(); s.Int("fast_combat_free_num") != 0 || s.Int("fast_combat_num") != 3 || s.Int("fast_combat_p_num") != 0 {
+		t.Fatalf("after three: %v", s)
+	}
+	if r := quick(); r.Int("code") != 0 { // the fourth costs 200 gems
+		t.Fatalf("no gems: %v", r)
+	}
+	mailTo(t, e, c, role.RID, store.Attachment{Kind: "asset", ItemID: 3, Num: 1700})
+	before, _ := e.st.RoleAssets(role.RID)
+	for i := 0; i < 8; i++ {
+		if r := quick(); r.Int("code") != 1 {
+			t.Fatalf("paid %d: %v", i+1, r)
+		}
+	}
+	after, _ := e.st.RoleAssets(role.RID)
+	// 1600 gems were taken; the levels the exp gained paid some back
+	if spent := before[3] - after[3]; spent > 1600 || spent < 1600-5000 {
+		t.Fatalf("gems %d -> %d", before[3], after[3])
+	}
+	if s := state(); s.Int("fast_combat_num") != 3 || s.Int("fast_combat_p_num") != 8 {
+		t.Fatalf("after eleven: %v", s)
+	}
+	if r := quick(); r.Int("code") != 0 { // the twelfth
+		t.Fatalf("twelfth: %v", r)
+	}
+	// without the privilege nothing changed: the limit is three
+	if lim, _ := quickLimit(e.st, role.RID, now.Add(40*24*time.Hour)); lim != quickMaxPerDay {
+		t.Fatalf("limit after the privilege ended: %d", lim)
+	}
+}

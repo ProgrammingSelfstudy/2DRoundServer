@@ -81,12 +81,14 @@ type voyageOrder struct {
 }
 
 type voyageState struct {
-	Day    int64
-	Free   int64 // free refreshes used today
-	Coin   int64 // refreshes for diamonds used today
-	NextID int64
-	Fresh  bool // the first refresh of the role is done
-	Orders []voyageOrder
+	Day  int64
+	Free int64 // free refreshes used today
+	Coin int64 // refreshes for diamonds used today
+	// Refreshes counts the refreshes of the day whatever they were paid with: the voyage privileges name the first and the third.
+	Refreshes int64
+	NextID    int64
+	Fresh     bool // the first refresh of the role is done
+	Orders    []voyageOrder
 }
 
 type voyageSvc struct{ st *store.Store }
@@ -133,6 +135,41 @@ func (st *voyageState) deal(n func(int) int, max int, first bool) {
 	}
 }
 
+const (
+	voyagePrivilegePurple = 103 // 远航高级特权: the first refresh of the day brings a purple order
+	voyagePrivilegeOrange = 104 // 远航豪华特权: the third refresh of the day brings an orange one
+	voyageOrangeRefresh   = 3
+)
+
+// ensureQuality makes sure an order of that quality or better is among the ones still to be taken: when there is none, the last of
+// them is swapped for one that is, not one the list has already. Nothing changes when every order is taken or started.
+func (st *voyageState) ensureQuality(quality int, n func(int) int) {
+	have := map[int64]bool{}
+	last := -1
+	for i, o := range st.Orders {
+		have[o.Bid] = true
+		if o.Status != voyageUnget {
+			continue
+		}
+		if i, ok := voyageCfg.order(o.Bid); ok && voyageCfg.Orders[i].Quality >= quality {
+			return
+		}
+		last = i
+	}
+	if last < 0 {
+		return
+	}
+	var pool []int64
+	for _, c := range voyageCfg.Orders {
+		if c.Quality >= quality && !have[c.ID] {
+			pool = append(pool, c.ID)
+		}
+	}
+	if len(pool) > 0 {
+		st.Orders[last].Bid = pool[n(len(pool))]
+	}
+}
+
 // settle turns the orders whose time is up into finished ones.
 func (st *voyageState) settle(now int64) {
 	for i := range st.Orders {
@@ -164,7 +201,7 @@ func (v *voyageSvc) with(s *gateway.Session, fn func(role *store.Role, st *voyag
 		return err
 	}
 	if day := dayKey(s.Now()); st.Day != day {
-		st.Day, st.Free, st.Coin = day, 0, 0
+		st.Day, st.Free, st.Coin, st.Refreshes = day, 0, 0, 0
 		st.deal(newRng().Intn, int(voyageCfg.num("max_quest")), !st.Fresh)
 		st.Fresh = true
 	}
@@ -425,7 +462,21 @@ func (v *voyageSvc) refresh(s *gateway.Session, _ proto.Message) error {
 			}
 		}
 		st.Orders = keep
-		st.deal(newRng().Intn, int(voyageCfg.num("max_quest")), false)
+		st.Refreshes++
+		rng := newRng()
+		st.deal(rng.Intn, int(voyageCfg.num("max_quest")), false)
+		// The voyage privileges (103 and 104, privilege.go): the first refresh of the day brings a purple order for sure, the third an
+		// orange one. The client's text only; which of the dealt orders is changed is our choice.
+		p, err := loadPrivileges(v.st, role.RID)
+		if err != nil {
+			return err
+		}
+		switch {
+		case p.active(voyagePrivilegeOrange, s.Now()) && st.Refreshes == voyageOrangeRefresh:
+			st.ensureQuality(voyageOrange, rng.Intn)
+		case p.active(voyagePrivilegePurple, s.Now()) && st.Refreshes == 1:
+			st.ensureQuality(voyagePurple, rng.Intn)
+		}
 		if err := sendAssets(s, v.st, role.RID); err != nil {
 			return err
 		}

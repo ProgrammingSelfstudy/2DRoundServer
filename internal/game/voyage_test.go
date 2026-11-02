@@ -101,3 +101,106 @@ func TestVoyageRefresh(t *testing.T) {
 		t.Fatalf("23805: %v", r)
 	}
 }
+
+// The voyage privileges: a refresh brings an order of the promised quality when the deal had none.
+func TestVoyageEnsureQuality(t *testing.T) {
+	var low []int64
+	counts := map[int]int{}
+	for _, c := range voyageCfg.Orders {
+		counts[c.Quality]++
+		if c.Quality < voyagePurple {
+			low = append(low, c.ID)
+		}
+	}
+	if len(low) < 3 || counts[voyagePurple] == 0 || counts[voyageOrange] == 0 {
+		t.Fatalf("orders by quality: %v", counts)
+	}
+	qualityOf := func(bid int64) int { i, _ := voyageCfg.order(bid); return voyageCfg.Orders[i].Quality }
+	zero := func(int) int { return 0 }
+	mk := func() *voyageState {
+		st := &voyageState{}
+		for i, bid := range low[:3] {
+			st.Orders = append(st.Orders, voyageOrder{ID: int64(i + 1), Bid: bid, Status: voyageUnget})
+		}
+		return st
+	}
+	for _, q := range []int{voyagePurple, voyageOrange} {
+		st := mk()
+		st.ensureQuality(q, zero)
+		got := 0
+		for _, o := range st.Orders {
+			if qualityOf(o.Bid) >= q {
+				got++
+			}
+		}
+		if got != 1 || len(st.Orders) != 3 || st.Orders[2].ID != 3 || qualityOf(st.Orders[2].Bid) < q {
+			t.Fatalf("quality %d: %+v", q, st.Orders)
+		}
+		seen := map[int64]bool{}
+		for _, o := range st.Orders {
+			if seen[o.Bid] {
+				t.Fatalf("an order twice: %+v", st.Orders)
+			}
+			seen[o.Bid] = true
+		}
+		st.ensureQuality(q, zero) // one is there now: nothing changes
+		if st2 := st; qualityOf(st2.Orders[2].Bid) < q {
+			t.Fatalf("changed again: %+v", st.Orders)
+		}
+	}
+	// orders already taken are not touched, and with none left to take nothing happens
+	st := mk()
+	for i := range st.Orders {
+		st.Orders[i].Status = voyageUnderway
+	}
+	before := append([]voyageOrder(nil), st.Orders...)
+	st.ensureQuality(voyageOrange, zero)
+	for i := range before {
+		if st.Orders[i].Bid != before[i].Bid {
+			t.Fatalf("a taken order was swapped: %+v", st.Orders)
+		}
+	}
+}
+
+// A refresh with the purple privilege (103) always brings a purple order, however the deal fell; the count of the day follows.
+func TestVoyagePrivilegeRefresh(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	c, role := e.enter("vp", "刷新人二")
+	p := &privilegeState{}
+	p.set(voyagePrivilegePurple, privilegeForever)
+	if err := e.st.SaveState(role.RID, privilegeModule, p); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 12; i++ {
+		st := &voyageState{}
+		if _, err := e.st.LoadState(role.RID, voyageModule, st); err != nil {
+			t.Fatal(err)
+		}
+		st.Day = 0 // a new day: the free refresh and the count start again
+		if err := e.st.SaveState(role.RID, voyageModule, st); err != nil {
+			t.Fatal(err)
+		}
+		c.send(23800, proto.Message{})
+		c.waitFor(23800)
+		c.send(23804, proto.Message{})
+		if r := c.waitFor(23804); r.Int("flag") != 1 {
+			t.Fatalf("refresh %d: %v", i, r)
+		}
+		c.waitFor(23800)
+		c.send(23800, proto.Message{}) // the refresh answers before it saves: this one is handled after the save
+		c.waitFor(23800)
+		saved := &voyageState{}
+		if _, err := e.st.LoadState(role.RID, voyageModule, saved); err != nil {
+			t.Fatal(err)
+		}
+		purple := false
+		for _, o := range saved.Orders {
+			if ci, ok := voyageCfg.order(o.Bid); ok && o.Status == voyageUnget && voyageCfg.Orders[ci].Quality >= voyagePurple {
+				purple = true
+			}
+		}
+		if !purple || saved.Refreshes != 1 {
+			t.Fatalf("round %d: purple %v, refreshes %d", i, purple, saved.Refreshes)
+		}
+	}
+}

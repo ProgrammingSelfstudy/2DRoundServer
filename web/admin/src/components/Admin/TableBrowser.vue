@@ -52,7 +52,8 @@ let seq = 0,
 async function load() {
   const token = ++seq;
   rows.value = [];
-  total.value = 0;
+  // total stays while a page loads: with total 0 the pager has one page and answers the current page 2 with
+  // current-change(1), which would load page 1 again and make every page after the first unreachable
   error.value = "";
   loading.value = true;
   try {
@@ -74,6 +75,7 @@ function changePage(n: number) {
 }
 function changeTable() {
   page.value = 1;
+  total.value = 0;
   void load();
 }
 watch(
@@ -83,6 +85,7 @@ watch(
     options.value = [];
     rows.value = [];
     total.value = 0;
+    page.value = 1; // the same instance serves every group tab, and a page left over from another table is out of range here
     counts.value = {};
     selected.value = "";
     error.value = "";

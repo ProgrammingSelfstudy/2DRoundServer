@@ -102,10 +102,9 @@ func (s *warState) newReached(p *warPeriod) int64 {
 	return lev
 }
 
-// RegisterNewWarOrder registers the new war order (28700-28708): the same as the war order, but it opens a week after the
-// role was created, runs cycles of 30 days that go round three periods, has day and week tasks only, and the tasks and
-// rewards are in bands of the role level (the level the cycle began with). The paid track needs payments, which we have none of.
-func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
+// The guard and the hook of the advance card are registered at start, not by the gateway's Register function: the login service opens
+// the order and the admin page confirms it, and neither runs the gateway's registrations.
+func init() {
 	// the advance card (product 911), once a cycle; it is the cycle the confirmation falls in
 	RegisterChargeGuard(newWarAdvanceCharge, func(st *store.Store, role *store.Role) error {
 		state, p, _, _, err := loadNewWar(st, role, time.Now())
@@ -127,6 +126,12 @@ func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 		state.Premium = true
 		return nil, nil, st.SaveState(role.RID, newWarOrderModule, state)
 	})
+}
+
+// RegisterNewWarOrder registers the new war order (28700-28708): the same as the war order, but it opens a week after the
+// role was created, runs cycles of 30 days that go round three periods, has day and week tasks only, and the tasks and
+// rewards are in bands of the role level (the level the cycle began with). The paid track needs payments, which we have none of.
+func RegisterNewWarOrder(r *gateway.Router, st *store.Store) {
 	r.Handle(28700, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

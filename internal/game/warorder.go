@@ -234,11 +234,9 @@ func loadWar(st *store.Store, role *store.Role, now time.Time) (*warState, *warP
 	return state, warOrderCfg[period], day, end, nil
 }
 
-// RegisterWarOrder registers the war order (25300-25309): a month of day, week and month tasks that pay the period's
-// experience item, whose total raises the level; each level has a free reward. The tasks are counted by the game events
-// that exist, the others stay open. The advance card (paid track, the extra experience pack) needs payments, which we
-// have none of, so its track stays locked. The months of the periods, the window and the price of a level are our rules.
-func RegisterWarOrder(r *gateway.Router, st *store.Store) {
+// The guard and the hook of the advance card are registered at start, not by the gateway's Register function: the login service opens
+// the order and the admin page confirms it, and neither runs the gateway's registrations.
+func init() {
 	// Payment confirmations use the real confirmation month in production. The
 	// operation takes its clock explicitly so tests never mix it with a session's clock.
 	RegisterChargeGuard(warAdvanceCharge, func(st *store.Store, role *store.Role) error {
@@ -247,6 +245,13 @@ func RegisterWarOrder(r *gateway.Router, st *store.Store) {
 	RegisterChargeHook(warAdvanceCharge, func(st *store.Store, role *store.Role, _ ChargeProduct, _ int64) (map[int64]int64, map[int64]int64, error) {
 		return nil, nil, warAdvanceGrantAt(st, role, time.Now())
 	})
+}
+
+// RegisterWarOrder registers the war order (25300-25309): a month of day, week and month tasks that pay the period's
+// experience item, whose total raises the level; each level has a free reward. The tasks are counted by the game events
+// that exist, the others stay open. The advance card (paid track, the extra experience pack) needs payments, which we
+// have none of, so its track stays locked. The months of the periods, the window and the price of a level are our rules.
+func RegisterWarOrder(r *gateway.Router, st *store.Store) {
 	r.Handle(25300, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

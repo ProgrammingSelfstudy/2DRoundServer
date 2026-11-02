@@ -106,10 +106,9 @@ func elitePassWin(st *store.Store, rid int64, now time.Time) error {
 	return st.SaveState(rid, elitePassModule, state)
 }
 
-// RegisterElitePass registers the pass of the elite match (24952-24955): the wins of the month raise the level and each
-// level has a free reward. The paid track (the advance card) needs payments, which we have none of. The period of a month
-// and the window are our rules.
-func RegisterElitePass(r *gateway.Router, st *store.Store) {
+// The guard and the hook of the advance card are registered at start, not by the gateway's Register function: the login service opens
+// the order and the admin page confirms it, and neither runs the gateway's registrations.
+func init() {
 	// the advance card (product 909), once a period; it is the period the confirmation falls in
 	RegisterChargeGuard(elitePassAdvanceCharge, func(st *store.Store, role *store.Role) error {
 		state, err := loadElitePass(st, role.RID, time.Now())
@@ -129,6 +128,12 @@ func RegisterElitePass(r *gateway.Router, st *store.Store) {
 		state.Premium = true
 		return nil, nil, st.SaveState(role.RID, elitePassModule, state)
 	})
+}
+
+// RegisterElitePass registers the pass of the elite match (24952-24955): the wins of the month raise the level and each
+// level has a free reward. The paid track (the advance card) needs payments, which we have none of. The period of a month
+// and the window are our rules.
+func RegisterElitePass(r *gateway.Router, st *store.Store) {
 	r.Handle(24952, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

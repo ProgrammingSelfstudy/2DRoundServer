@@ -30,6 +30,9 @@ type Store struct {
 	db          sqlStoreDB
 	now         func() time.Time
 	chargeLocks [64]sync.Mutex // bounded per-Store stripes, shared by confirms and admin resets
+
+	cmdMu sync.Mutex // guards cmds, the command counts not yet written (analytics.go)
+	cmds  map[cmdKey]int64
 }
 
 // LockRoleCharge serializes payment hooks and admin charge resets for a role in

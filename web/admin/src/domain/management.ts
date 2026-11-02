@@ -5,6 +5,7 @@ export const managementPages = [
   ["tickets", "客服工单", "read", "write"],
   ["redeem", "兑换码", "read", "write"],
   ["reports", "举报记录", "read", null],
+  ["analytics", "运营数据", "read", null],
   ["guilds", "公会管理", "read", "write"],
   ["notices", "公告管理", "read", "write"],
   ["audit", "审计日志", "manage", null],

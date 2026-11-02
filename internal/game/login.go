@@ -98,6 +98,7 @@ func (l *Login) roleList(s *gateway.Session, req proto.Message) error {
 	}
 	s.SetAccount(acc)
 	l.Store.TouchAccountLogin(acc.ID)
+	l.Store.RecordEvent("login", 0, acc.ID, 0)
 	roles, err := l.Store.RolesByAccount(acc.ID, l.SrvID)
 	if err != nil {
 		return err
@@ -192,6 +193,7 @@ func (l *Login) enter(s *gateway.Session, req proto.Message, cmd uint16) error {
 	}
 	s.SetRole(role)
 	l.Store.TouchRoleLogin(role.RID)
+	l.Store.RecordEvent("enter", role.RID, acc.ID, 0)
 	ReturnEntered(l.Store, role, s.Now())
 	if l.Friends != nil {
 		l.Friends.Entered(role)

@@ -78,7 +78,8 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	(&GuildService{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: lg}).Register(gw.Router)
 	inv := &InviteService{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: lg}
 	inv.Register(gw.Router)
-	gw.OnDisconnect = func(s *gateway.Session) { fs.Disconnected(s); og.Disconnected(s) }
+	gw.OnDisconnect = func(s *gateway.Session) { fs.Disconnected(s); og.Disconnected(s); RecordLogout(st, s) }
+	gw.OnCommand = RecordCommand(st)
 	cs := &ChatService{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: lg}
 	cs.Register(gw.Router)
 	l := &Login{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: lg, MaxRoles: 2, Friends: fs, OnlineGift: og, Chat: cs}
@@ -1010,6 +1011,64 @@ func TestEnterPushes(t *testing.T) {
 	for _, cmd := range []uint16{10995, 10996, 21002, 21322, 24500, 10403, 13330, 10350} {
 		if !got[cmd] {
 			t.Errorf("%d was not pushed after 10304", cmd)
+		}
+	}
+}
+
+func TestLoginRecordsOperatingData(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	acc, tok := e.account("80566038")
+	c := e.dial(true)
+	c.send(1164, loginArgs("80566038", tok))
+	c.recv(1164)
+	c.send(10191, proto.Message{"sex": 1, "name": "索隆", "career": 2, "playform": "symlf"})
+	rid := c.recv(10191).Int("rid")
+	c2 := e.dial(true)
+	c2.send(1164, loginArgs("80566038", tok))
+	c2.recv(1164)
+	c2.send(10192, proto.Message{"rid": rid, "srv_id": "symlf_1"})
+	c2.recv(10192)
+	c2.send(10300, proto.Message{})
+	c2.recv(10301)
+	c2.recv(10302)
+	c2.recv(13000)
+	c2.recv(10304)
+	c2.send(1169, proto.Message{}) // a heartbeat is not counted
+	c2.recv(1169)
+
+	rep, err := e.st.Analytics(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	today := rep.Days[0]
+	if today.Active != 1 || today.LoginAccounts != 1 || today.NewRoles != 1 || today.NewAccounts != 1 {
+		t.Fatalf("today: %+v (account %d)", today, acc.ID)
+	}
+	if err := e.st.FlushCmds(); err != nil {
+		t.Fatal(err)
+	}
+	if rep, err = e.st.Analytics(1); err != nil {
+		t.Fatal(err)
+	}
+	counted := map[int]int64{}
+	for _, x := range rep.Cmds {
+		counted[x.Cmd] = x.Hits
+	}
+	if counted[10300] != 1 || counted[1169] != 0 {
+		t.Fatalf("counted commands: %v", counted)
+	}
+
+	// the end of the connection is the end of a play session, written once the gateway has seen the close
+	c2.c.Close()
+	for deadline := time.Now().Add(3 * time.Second); ; time.Sleep(10 * time.Millisecond) {
+		if rep, err = e.st.Analytics(1); err != nil {
+			t.Fatal(err)
+		}
+		if rep.Days[0].Sessions == 1 {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("no play session was recorded: %+v", rep.Days[0])
 		}
 	}
 }

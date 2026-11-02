@@ -19,6 +19,8 @@ type Session struct {
 	srv    *Server
 	conn   net.Conn
 	Remote string
+	// Connected is when the connection was accepted.
+	Connected time.Time
 
 	wmu sync.Mutex // serialises writes (handlers and Hub pushes run concurrently)
 

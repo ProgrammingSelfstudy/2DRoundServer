@@ -175,12 +175,14 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `audit_logs` | 后台审计/审计页 | 审计页只读（manage）；有专用页：manage审计查询 | 保留专用入口/不提供通用表视图 | 有专用页：manage审计查询 | [001_init.sql](../internal/store/migrations/001_init.sql) |
 | table | `chat_offline` | 离线聊天消息 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated；不返回正文 | [007_chat.sql](../internal/store/migrations/007_chat.sql) |
 | table | `checkin` | 签到及补签 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [009_checkin.sql](../internal/store/migrations/009_checkin.sql) |
+| table | `cmd_daily` | 每日协议使用次数 | 汇总为最常用的前 50 个协议（read）；有专用页：运营数据 | 保留专用入口/不提供通用表视图 | 有专用页：运营数据；只统计汇总，不逐角色展示 | [052_analytics.sql](../internal/store/migrations/052_analytics.sql) |
 | table | `counters` | 成就累计计数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
 | table | `daily_quests` | 日常任务进度/领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [015_daily_quests.sql](../internal/store/migrations/015_daily_quests.sql) |
 | table | `drama_daily` | 推图每日扫荡 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
 | table | `drama_hook` | 挂机收益状态 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
 | table | `drama_milestones` | 推图里程碑领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [018_drama_milestones.sql](../internal/store/migrations/018_drama_milestones.sql) |
 | table | `elite_summon` | 精英召唤保底/积分 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [027_elite_summon.sql](../internal/store/migrations/027_elite_summon.sql) |
+| table | `events` | 登录/进入/下线事件 | 汇总为日活、登录账号、在线时长、留存（read）；有专用页：运营数据 | 保留专用入口/不提供通用表视图 | 有专用页：运营数据；只统计汇总，不逐条展示玩家行为 | [052_analytics.sql](../internal/store/migrations/052_analytics.sql) |
 | table | `feats_claimed` | 成就领取记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
 | table | `forge_logs` | 锻造屋合成记录 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [044_forge_logs.sql](../internal/store/migrations/044_forge_logs.sql) |
 | table | `formation_slots` | 各玩法阵容槽位 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [020_formations.sql](../internal/store/migrations/020_formations.sql) |
@@ -217,12 +219,14 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `module_state` | 玩家模块JSON容器 | 已有状态列表/原始JSON查看（read）；生产重置白名单为空；有专用页：玩家模块API | 保留专用入口/不提供通用表视图 | 有专用页：玩家模块API | [045_module_state.sql](../internal/store/migrations/045_module_state.sql) |
 | table | `notices` | 公告/公告页 | 公告页查看及增改删（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
 | table | `online_gift_claims` | 在线奖励领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [008_online_gift.sql](../internal/store/migrations/008_online_gift.sql) |
+| table | `online_samples` | 每分钟在线人数采样 | 汇总为每日在线峰值（read）；有专用页：运营数据 | 保留专用入口/不提供通用表视图 | 有专用页：运营数据；只统计汇总 | [052_analytics.sql](../internal/store/migrations/052_analytics.sql) |
 | table | `online_time` | 累计在线时长 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [008_online_gift.sql](../internal/store/migrations/008_online_gift.sql) |
 | table | `partner_changes` | 英雄置换预览 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [025_partner_changes.sql](../internal/store/migrations/025_partner_changes.sql) |
 | table | `partner_talents` | 英雄天赋 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [029_partner_talents.sql](../internal/store/migrations/029_partner_talents.sql) |
 | table | `partners` | 英雄实例/属性/培养 | 仅发放新英雄（write），无拥有列表/属性视图；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [012_partners.sql](../internal/store/migrations/012_partners.sql) |
 | table | `pay_config` | 支付收款配置/充值页 | 收款码/说明查看、修改（read/manage）；有专用页：支付配置 | 保留专用入口/不提供通用表视图 | 有专用页：支付配置 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
 | table | `pay_orders` | 充值订单/充值页 | 全局订单及角色充值汇总的真实分页订单（read）；创建/确认/取消（manage）；有专用页：角色charge接口真实分页订单及全局支付页 | 保留专用入口/不提供通用表视图 | 有专用页：角色charge接口真实分页订单及全局支付页 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
+| table | `pay_proofs` | 付款截图 | 订单表“查看截图”按订单号取单张图（read）；有专用页：支付页 | 保留专用入口/不提供通用表视图 | 有专用页：支付页；图片是二进制，不适合表浏览，玩家自传不能当收款证据 | [051_pay_proof.sql](../internal/store/migrations/051_pay_proof.sql) |
 | table | `redeem_codes` | 兑换码配置/兑换码页 | 列表/创建/删除及已用次数（read/write）；有专用页：兑换码管理 | 保留专用入口/不提供通用表视图 | 有专用页：兑换码管理 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `redeem_uses` | 兑换码领取明细 | 仅兑换码已用次数汇总，无逐角色明细（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `replay_collects` | 录像收藏关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [046_replays.sql](../internal/store/migrations/046_replays.sql) |

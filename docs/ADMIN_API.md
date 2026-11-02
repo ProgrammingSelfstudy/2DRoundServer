@@ -28,6 +28,7 @@ demoting or disabling an admin, or changing their password, takes effect at once
 | `POST /api/login` `{username,password}` | public | -> `{token, expires_at, admin}`; 5 failures per (name, IP) lock it for 15 min (429) |
 | `GET /api/me` | read | |
 | `POST /api/me/password` `{old,new}` | read | 8 to 72 characters; ends every session |
+| `GET /api/analytics?days=14` (1-90) | read | operating data: `days` (per China-time day: `new_accounts`, `new_roles`, `active` roles that entered the game, `login_accounts`, `sessions`, `avg_session_sec`, `peak_online`, `orders_created`, `orders_paid`, `paying_roles`, `paid_cents`), `retention` (the roles created on a day and how many entered the game 1, 3 and 7 days later: `d1`/`d3`/`d7`, null while unknown), `cmds` (the 50 most used commands: `hits`, `roles`) and `events_from` (first day with recorded events: earlier days show 0 active, and sign-ups and payments come from the accounts, roles and pay_orders tables) |
 | `GET /api/stats`, `GET /api/online`, `GET /api/meta` | read | online asks the gateway (`online: null` + `error` when it is down); meta lists currency names and role names |
 | `GET/POST /api/admins`, `PATCH /api/admins/{id}` | manage | PATCH takes `role`, `status`, `password`; you cannot lower yourself and one active superadmin always remains |
 | `GET/POST /api/servers`, `PUT/DELETE /api/servers/{srv_id}` | read / manage | `srv_id` like `symlf_1`; delete is refused (409) while the server has roles |

@@ -70,7 +70,8 @@ func main() {
 		(&game.CheckinService{Store: st}).Register(gw.Router)
 		(&game.GuildService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger}).Register(gw.Router)
 		(&game.InviteService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, Metrics: game.InviteMetricsOf(st)}).Register(gw.Router)
-		gw.OnDisconnect = func(s *gateway.Session) { friends.Disconnected(s); online.Disconnected(s) }
+		gw.OnDisconnect = func(s *gateway.Session) { friends.Disconnected(s); online.Disconnected(s); game.RecordLogout(st, s) }
+		gw.OnCommand = game.RecordCommand(st)
 		chat := &game.ChatService{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, MinInterval: time.Second}
 		chat.Register(gw.Router)
 		(&game.Login{Store: st, SrvID: cfg.Gateway.SrvID, Hub: gw.Hub, Log: logger, MaxRoles: 3, Friends: friends, OnlineGift: online, Chat: chat, NewRoleFlow: cfg.Gateway.NewRoleFlow}).Register(gw.Router)
@@ -202,10 +203,18 @@ func main() {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 	closed := make(chan struct{})
+	stopStats := make(chan struct{})
+	statsDone := make(chan struct{})
+	go func() {
+		game.RunAnalytics(st, gw.Hub, logger, time.Minute, stopStats)
+		close(statsDone)
+	}()
 	go func() {
 		s := <-sig
 		logger.Printf("%v: closing all sessions", s)
 		gw.Close() // returns once every session has ended
+		close(stopStats)
+		<-statsDone // the last command counts are written
 		close(closed)
 	}()
 	if err := gw.Serve(ln); err != nil {

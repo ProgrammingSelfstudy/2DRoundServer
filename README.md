@@ -44,6 +44,8 @@ login/register, token, server list from the database.
 
 Admin API and web UI (verified in a real browser and against a device: mail sent from the page arrives live, banning a role from the page disconnects it): see `docs/ADMIN_API.md` and `docs/ADMIN_WEB.md`.
 
+Operating data (migration 052, admin page `/#/analytics`, `GET /api/analytics`, `docs/ADMIN_API.md`): the gateway records `login` (account), `enter` (role) and `logout` (role, seconds connected) in `events`, counts the commands of roles in the game per day in `cmd_daily` (written every minute and when the gateway stops; heartbeats 1169 and 20060 are not counted) and samples the online count each minute into `online_samples` (kept 60 days). Sign-ups and payments are read from `accounts`, `roles` and `pay_orders`, so they have history; active roles, play time, peak online, retention and command use start at the first recorded event (`events_from`) and the page shows "—" before it. Days are China-time days. Not recorded: anything the client does without a request (a tap that never reaches the server), which needs client-side reporting.
+
 Notices (verified on a device): the mailbox's notice tab shows the notices from the admin, new ones appear live, opening one marks it read for that role, deleting one removes it live.
 
 Mail (verified on a device): list, detail, read, claim, claim all, delete, and live

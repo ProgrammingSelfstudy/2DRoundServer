@@ -62,6 +62,8 @@ type Server struct {
 	Now     func() time.Time
 	// OnDisconnect runs when a session ends (after the read loop returns).
 	OnDisconnect func(s *Session)
+	// OnCommand runs after a handler answered a command without an error (operating data).
+	OnCommand func(s *Session, cmd uint16)
 
 	mu      sync.Mutex
 	perIP   map[string]int
@@ -147,7 +149,7 @@ func (s *Server) readLimit(sess *Session) time.Duration {
 }
 
 func (s *Server) handleConn(c net.Conn) {
-	sess := &Session{srv: s, conn: c, Remote: c.RemoteAddr().String()}
+	sess := &Session{srv: s, conn: c, Remote: c.RemoteAddr().String(), Connected: s.Now()}
 	ip := clientIP(c)
 	s.mu.Lock()
 	if s.perIP == nil {
@@ -237,7 +239,13 @@ func (s *Server) dispatch(sess *Session, fr proto.Frame) error {
 		s.Log.Printf("gw %s cmd %d: no handler (payload %d bytes)", sess.Remote, fr.Command, len(fr.Payload))
 		return nil
 	}
-	return h(sess, req)
+	if err := h(sess, req); err != nil {
+		return err
+	}
+	if s.OnCommand != nil {
+		s.OnCommand(sess, fr.Command)
+	}
+	return nil
 }
 
 // checkSignature validates the 1197 that preceded cmd. Phase 1 only logs: the

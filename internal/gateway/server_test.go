@@ -394,3 +394,30 @@ func TestLoginTimeoutNeverExceedsIdle(t *testing.T) {
 	c := r.dial()
 	r.expectClosed(c)
 }
+
+func TestOnCommandRunsOnlyAfterASuccessfulHandler(t *testing.T) {
+	cmds := make(chan uint16, 4)
+	r := newRigWith(t, 5*time.Second, func(s *Server) { s.OnCommand = func(_ *Session, cmd uint16) { cmds <- cmd } })
+	c := r.dial()
+	write(t, c, []byte(proto.Handshake), r.frame(1169, nil))
+	r.expectPong(c)
+	select {
+	case cmd := <-cmds:
+		if cmd != 1169 {
+			t.Fatalf("hook got %d", cmd)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("the hook did not run after a handler answered")
+	}
+	write(t, c, r.frame(1164, nil)) // this handler returns ErrClose
+	r.expectClosed(c)
+	sess := <-r.gone
+	if sess.Connected.IsZero() {
+		t.Fatal("the session does not know when it connected")
+	}
+	select {
+	case cmd := <-cmds:
+		t.Fatalf("the hook ran for a command %d whose handler failed", cmd)
+	default:
+	}
+}

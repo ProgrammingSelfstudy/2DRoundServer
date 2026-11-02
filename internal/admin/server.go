@@ -93,6 +93,7 @@ func (s *Server) Handler() http.Handler {
 	route("POST /api/me/password", levRead, s.changeOwnPassword)
 	route("GET /api/stats", levRead, s.stats)
 	route("GET /api/online", levRead, s.online)
+	route("GET /api/analytics", levRead, s.analytics)
 	route("GET /api/meta", levRead, s.meta)
 	route("GET /api/items", levRead, s.searchItems)
 	route("POST /api/broadcast", levWrite, s.broadcast)

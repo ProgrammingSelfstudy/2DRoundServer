@@ -35,6 +35,7 @@ func TestRoleMatrix(t *testing.T) {
 		{"GET", "/api/stats", nil, 200, 200, 200},
 		{"GET", "/api/meta", nil, 200, 200, 200},
 		{"GET", "/api/online", nil, 200, 200, 200},
+		{"GET", "/api/analytics", nil, 200, 200, 200},
 		{"GET", "/api/admins", nil, 403, 403, 200},
 		{"GET", "/api/audit", nil, 403, 403, 200},
 		{"POST", "/api/admins", map[string]string{"username": "newadmin", "password": "password1", "role": "viewer"}, 403, 403, 201},

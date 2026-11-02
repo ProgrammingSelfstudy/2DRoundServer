@@ -16,6 +16,7 @@ export const moduleCategories: readonly ModuleCategory[] = [
     keys: [
       "chargeacc",
       "cyclegift",
+      "dailygift",
       "daycharge",
       "firstcharge_*",
       "levgift",

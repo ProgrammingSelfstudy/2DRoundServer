@@ -60,7 +60,6 @@ func registerHeroStubs(r *gateway.Router) {
 func registerNoPaymentStubs(r *gateway.Router) {
 	registerStubs(r, map[uint16]func(proto.Message) proto.Message{
 		21005: fixed(proto.Message{"count": 0, "gold": 0, "next_gold": 0}),
-		21006: fixed(proto.Message{"first_gift": []proto.Message{}}),
 		21035: fixed(proto.Message{}),
 		24501: refuse("code", nil),
 		24502: fixed(proto.Message{"list": []proto.Message{}}),

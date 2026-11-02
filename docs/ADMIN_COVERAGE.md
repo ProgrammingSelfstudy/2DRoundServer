@@ -54,6 +54,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `chargeacc` | 累计充值奖励（16700、16712/16713） | 原始JSON查看（read）；无可用重置/编辑 | 查看、充值专用视图；不提供任意编辑累计/领取 | 已接只读模块入口；累计充值和已发奖事实不能靠JSON编辑改写 | [charge_proto.go](../internal/game/charge_proto.go)、[chargeacc.go](../internal/game/chargeacc.go) |
 | role | `crosschamp` | 跨服冠军赛（26200–26215） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
 | role | `cyclegift` | 每周福利/月度礼包限购（21007） | 原始JSON、周/月礼包视图（read）；配置内charge ID重置（manage） | 已接查看/专用视图/单商品计数重置 | 白名单从12项配置生成；roll仅在查看副本中执行，重置只删指定Count键 | [cyclegift.go](../internal/game/cyclegift.go) |
+| role | `dailygift` | 每日礼包购买次数（21006） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；改购买次数会让限购和已发奖励对不上，不默认开放 | [dailygift.go](../internal/game/dailygift.go) |
 | role | `daycharge` | 每日首充（21010/21011） | 原始JSON、每日首充视图（read）；today重置（manage） | 已接查看/专用视图/当日重置 | 仅清当日Num/Taken并对齐Day；既有实付历史不变，须新充值达标 | [daycharge.go](../internal/game/daycharge.go) |
 | role | `daysrank` | 七天排行（22700–22704） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go) |
 | role | `dial` | 转盘抽奖/记录（16670–16676） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [dial.go](../internal/game/dial.go) |

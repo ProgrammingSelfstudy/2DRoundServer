@@ -25,6 +25,7 @@ const registry = [
   "crossarena",
   "crosschamp",
   "cyclegift",
+  "dailygift",
   "daycharge",
   "daysrank",
   "dial",

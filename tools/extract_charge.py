@@ -47,5 +47,16 @@ out["onecent"] = [{"id": r["id"], "power": r["power_limit"], "items": r["award"]
 dc = dump(lua_dir, "charge_data.lua", ["Config.ChargeData.data_daily_reward", "Config.ChargeData.data_constant"])
 out["daily"] = {"goal": dc["Config.ChargeData.data_constant"]["day_charge_goal"]["val"],
                 "rewards": [{"min": r["min"], "max": r["max"], "items": r["reward"]} for r in sorted(dc["Config.ChargeData.data_daily_reward"], key=lambda r: r["id"])]}
+# the daily gifts of the 每日礼包 tab (vip/view/daily_gift_panel.lua): what is sold (charge_id, price, how often a day, the VIP it needs) and
+# what each pays by the role's level (the rows the panel itself shows)
+dg = dump(lua_dir, "charge_data.lua", [K + "data_daily_gift_data", K + "data_daily_gift_award"])
+gifts = dg[K + "data_daily_gift_data"]
+out["daily_gift"] = {
+    "gifts": [{"id": r["id"], "charge_id": r["charge_id"], "name": r["name"], "val": r["val"], "limit": r["limit_count"], "limit_vip": r["limit_vip"],
+               "show_lv": r["show_lv"], "show_vip_lv": r["show_vip_lv"], "sort": r["sort_id"]}
+              for r in sorted(gifts.values() if isinstance(gifts, dict) else gifts, key=lambda r: r["id"])],
+    "award": {str(k): [{"min": r["min"], "max": r["max"], "items": r["reward"]} for r in rows]
+              for k, rows in sorted(dg[K + "data_daily_gift_award"].items(), key=lambda kv: int(kv[0]))},
+}
 json.dump(out, open(out_json, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print("charge:", len(out["products"]), "products")

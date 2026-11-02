@@ -71,6 +71,14 @@ func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 	if err := s.Send(16712, proto.Message{"charge_sum": accSum(rc), "list": chargeAccList(rc, d)}); err != nil {
 		return err
 	}
+	// the 每日礼包 tab shows how many of each gift were bought today
+	gifts, err := dailyGiftList(st, rid, s.Now())
+	if err != nil {
+		return err
+	}
+	if err := s.Send(21006, proto.Message{"first_gift": gifts}); err != nil {
+		return err
+	}
 	// a fund that was just bought
 	fd := &monthFundState{}
 	if _, err := st.LoadState(rid, monthFundModule, fd); err != nil {
@@ -89,6 +97,7 @@ func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
 // reached from the phone). The order is paid by the QR code the operator put in the admin page and delivered when the operator
 // confirms it there.
 func RegisterCharge(r *gateway.Router, st *store.Store, payBase string) {
+	registerDailyGift(r, st)
 	r.Handle(16700, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
 		if role == nil {

@@ -65,8 +65,13 @@ var chargeTable = func() map[int64]ChargeProduct {
 	return m
 }()
 
-// Cents is the price in cents.
-func (p ChargeProduct) Cents() int64 { return int64(math.Round(p.Val * 100)) }
+// Cents is the price in cents. The 快乐币 panel's products are priced by `gold` (see klbcharge.go).
+func (p ChargeProduct) Cents() int64 {
+	if isKlbProduct(p) {
+		return p.Gold * 100
+	}
+	return int64(math.Round(p.Val * 100))
+}
 
 // ChargeProductByID looks a product up.
 func ChargeProductByID(id int64) (ChargeProduct, bool) {
@@ -120,7 +125,7 @@ func RegisterChargeGuard(id int64, g func(st *store.Store, role *store.Role) err
 // chargeGain is what a product pays out in diamonds and items; first says that the role never bought it before.
 func chargeGain(p ChargeProduct, first bool) (assets, items map[int64]int64) {
 	assets, items = map[int64]int64{}, map[int64]int64{}
-	if p.Type == 0 {
+	if p.Type == 0 && !isKlbProduct(p) {
 		extra := p.Add
 		if first {
 			extra = p.FirstAdd

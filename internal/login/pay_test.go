@@ -109,3 +109,48 @@ func TestPayPages(t *testing.T) {
 }
 
 func itoa(n int64) string { return strconv.FormatInt(n, 10) }
+
+// The 快乐币 panel opens PAY_URI?UserID=..&Money=..&qu=..&rid=..&mid=.. in the browser; url_config_demo.lua names it.
+func TestPayKlbPage(t *testing.T) {
+	s, ts := newTestServer(t)
+	if err := s.Store.EnsureServer(s.Cfg.DefaultServer()); err != nil {
+		t.Fatal(err)
+	}
+	acc, _ := s.Store.CreateAccount("symlf", "klb", "x", "")
+	role, err := s.Store.CreateRole(acc.ID, "symlf_1", "快乐人", 1, 1, 10401)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, cfg := get(t, "GET", ts.URL+"/update/config/url_config_demo.lua?build_ver=0")
+	want := `PAY_URI = "` + s.Cfg.LoginHTTP.PublicBase + `/pay/klb"`
+	if !strings.Contains(cfg, want) {
+		t.Fatalf("url_config lacks %s:\n%s", want, cfg)
+	}
+
+	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
+	call := func(query string) (int, string) {
+		resp, err := client.Get(ts.URL + "/pay/klb?" + query)
+		if err != nil {
+			t.Fatal(err)
+		}
+		io.Copy(io.Discard, resp.Body)
+		resp.Body.Close()
+		return resp.StatusCode, resp.Header.Get("Location")
+	}
+	code, loc := call("UserID=klb&Money=38&qu=1&rid=" + itoa(role.RID) + "&mid=1")
+	if code != http.StatusFound || !strings.HasPrefix(loc, "/pay/order/P") {
+		t.Fatalf("38 yuan: %d %q", code, loc)
+	}
+	if _, body := get(t, "GET", ts.URL+loc); !strings.Contains(body, "¥38") || !strings.Contains(body, "快乐币20E") {
+		t.Fatalf("order page: %s", body)
+	}
+	o, err := s.Store.PayOrderByNo(strings.TrimPrefix(loc, "/pay/order/"))
+	if err != nil || o.ChargeID != 30001 || o.AmountCents != 3800 || o.RID != role.RID {
+		t.Fatalf("the order: %v %+v", err, o)
+	}
+	for _, bad := range []string{"UserID=klb", "Money=38&rid=x", "Money=39&rid=" + itoa(role.RID), "Money=38&rid=999999"} {
+		if code, _ := call(bad); code < 400 {
+			t.Fatalf("%q: %d", bad, code)
+		}
+	}
+}

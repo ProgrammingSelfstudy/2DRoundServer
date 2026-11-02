@@ -66,7 +66,7 @@ func (s *Server) Handler() http.Handler {
 func luaStr(s string) string { return strconv.Quote(s) } // Go escapes are valid Lua for plain text
 
 // urlConfig is loaded by the client with loadstring(...)() and must define
-// URL_PATH_ALL (file_update.lua) and get_servers_url (login_model.lua).
+// URL_PATH_ALL (file_update.lua), get_servers_url (login_model.lua) and PAY_URI (klb_panel.lua).
 func (s *Server) urlConfig(w http.ResponseWriter, r *http.Request) {
 	base := s.Cfg.LoginHTTP.PublicBase
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -79,7 +79,9 @@ function get_servers_url(account, platform, channel, local_srv_id)
 	return string.format("%s/api/serverlist?account=%%s&platform=%%s&channel=%%s&srv=%%s",
 		tostring(account), tostring(platform), tostring(channel), tostring(local_srv_id)), nil
 end
-`, luaStr(base+"/update"), luaStr(base+"/voice"), base)
+-- the 快乐币 panel (vip/klb_panel.lua) builds its payment address from this; without it the button fails silently
+PAY_URI = %s
+`, luaStr(base+"/update"), luaStr(base+"/voice"), base, luaStr(base+"/pay/klb"))
 }
 
 func luaBool(b bool) string {

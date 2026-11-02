@@ -188,6 +188,29 @@ func (s *Server) payStart(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad pay request", http.StatusBadRequest)
 		return
 	}
+	s.openOrder(w, r, rid, cid)
+}
+
+// payKlb is the page the client's 快乐币 panel opens (PAY_URI in url_config_demo.lua, after its "contact your assistant" question):
+// UserID, Money (the price in yuan, which names the product), qu, rid and mid. The price comes from the product table, not from Money.
+func (s *Server) payKlb(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	rid, err1 := strconv.ParseInt(q.Get("rid"), 10, 64)
+	money, err2 := strconv.ParseInt(q.Get("Money"), 10, 64)
+	if err1 != nil || err2 != nil {
+		http.Error(w, "请从游戏里的快乐币页面进入", http.StatusBadRequest)
+		return
+	}
+	p, ok := game.KlbProductByPrice(money)
+	if !ok {
+		http.Error(w, "no 快乐币 product costs that", http.StatusUnprocessableEntity)
+		return
+	}
+	s.openOrder(w, r, rid, p.ID)
+}
+
+// openOrder opens an order of a product for a role and sends the browser to its page.
+func (s *Server) openOrder(w http.ResponseWriter, r *http.Request, rid, cid int64) {
 	role, err := s.Store.RoleByID(rid)
 	if errors.Is(err, store.ErrNotFound) {
 		http.Error(w, "no such role", http.StatusNotFound)
@@ -220,6 +243,8 @@ func (s *Server) payRoute(w http.ResponseWriter, r *http.Request) bool {
 		s.payProof(w, r, strings.TrimPrefix(p, "/pay/proof/"))
 	case p == "/pay/start":
 		s.payStart(w, r)
+	case p == "/pay/klb":
+		s.payKlb(w, r)
 	case strings.HasPrefix(p, "/pay/order/"):
 		s.payOrderPage(w, r, strings.TrimPrefix(p, "/pay/order/"))
 	case strings.HasPrefix(p, "/pay/status/"):

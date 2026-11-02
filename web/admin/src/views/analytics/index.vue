@@ -1,7 +1,7 @@
 <template>
   <div class="analytics-page">
     <div class="page-toolbar">
-      <h1>运营数据</h1>
+      <h1>{{ title }}</h1>
       <el-select v-model="days" aria-label="统计天数" style="width: 120px" :disabled="loading" @change="load">
         <el-option v-for="n in analyticsWindows" :key="n" :label="`最近 ${n} 天`" :value="n" />
       </el-select>
@@ -23,18 +23,18 @@
       :closable="false"
       show-icon
     />
-    <div v-loading="loading" class="stat-grid">
+    <div v-if="section === 'overview'" v-loading="loading" class="stat-grid">
       <el-card v-for="card in cards" :key="card.label" shadow="never">
         <div class="stat-label">{{ card.label }}</div>
         <strong>{{ card.value }}</strong>
         <div v-if="card.sub" class="hint">{{ card.sub }}</div>
       </el-card>
     </div>
-    <el-card v-if="data" shadow="never">
+    <el-card v-if="data && section === 'overview'" shadow="never">
       <template #header>趋势</template>
       <div class="chart"><ECharts :option="trend" /></div>
     </el-card>
-    <el-card v-if="data" shadow="never">
+    <el-card v-if="data && section === 'overview'" shadow="never">
       <template #header>每日数据（北京时间）</template>
       <el-table :data="rows" stripe size="small" max-height="460" empty-text="暂无数据">
         <el-table-column prop="day" label="日期" width="110" fixed />
@@ -64,7 +64,7 @@
       </el-table>
       <p class="hint">日活是当天进入过游戏的角色数；平均在线是当天结束的连接的平均时长；转化是当天到账订单占当天开单的比例。</p>
     </el-card>
-    <el-card v-if="data" shadow="never">
+    <el-card v-if="data && section === 'retention'" shadow="never" v-loading="loading">
       <template #header>新角色留存</template>
       <el-table :data="retention" stripe size="small" max-height="360" empty-text="暂无数据">
         <el-table-column prop="day" label="创角日期" width="110" />
@@ -81,7 +81,7 @@
       </el-table>
       <p class="hint">次日留存 = 创角后第 2 天又进入游戏的角色数 ÷ 当天新角色数；那一天还没结束，或在埋点开始之前，显示“—”。</p>
     </el-card>
-    <el-card v-if="data" shadow="never">
+    <el-card v-if="data && section === 'commands'" shadow="never" v-loading="loading">
       <template #header>最常用的协议（前 50）</template>
       <el-table :data="data.cmds" stripe size="small" max-height="420" empty-text="暂无记录">
         <el-table-column prop="cmd" label="协议号" width="110" />
@@ -94,6 +94,7 @@
 </template>
 <script setup lang="ts" name="analytics">
 import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 import { api } from "@/auth/runtime";
 import ECharts from "@/components/ECharts/index.vue";
 import {
@@ -108,6 +109,9 @@ import {
   type Analytics
 } from "@/domain/analytics";
 import { errorMessage } from "@/utils/admin";
+const route = useRoute();
+const section = computed(() => String(route.meta.section || "overview"));
+const title = computed(() => `运营数据 · ${route.meta.title || "数据概览"}`);
 const days = ref<number>(14);
 const data = ref<Analytics>();
 const loading = ref(false);

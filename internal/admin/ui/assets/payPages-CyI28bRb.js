@@ -1,0 +1,1 @@
+function t(e){return e>=30001&&e<=30020?"快乐币面板":e<100?"钻石充值档位":"礼包与活动商品"}const r={0:"等待付款",1:"已到账",2:"已取消"},n=e=>(e/100).toLocaleString("zh-CN",{style:"currency",currency:"CNY"}),a=e=>/^data:image\/(png|jpeg|webp);base64,/.test(e);export{a as i,r as o,t as p,n as y};

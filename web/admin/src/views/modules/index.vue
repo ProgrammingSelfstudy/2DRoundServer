@@ -1,9 +1,9 @@
 <template>
   <CollectionPage
-    title="模块总表"
+    :title="`模块总表 · ${categoryTitle(category)}`"
     :loading="loading"
     :error="error"
-    hint="展示运行时注册覆盖；有接口不代表所有前端业务和写操作已开放。动态前缀表示模块族。"
+    hint="展示这一类的运行时注册覆盖；有接口不代表所有前端业务和写操作已开放。动态前缀表示模块族。"
     @refresh="load()"
   >
     <template #filters
@@ -24,13 +24,19 @@
 </template>
 <script setup lang="ts" name="modules">
 import { ref, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { categoryOf, categoryTitle } from "@/domain/moduleCategories";
 import { useCollection } from "@/composables/useCollection";
 import type { ModuleInfo } from "@/domain/gameAdmin";
 import CollectionPage from "@/components/Admin/CollectionPage.vue";
 import RecordTable, { type Column } from "@/components/Admin/RecordTable.vue";
-const { rows, loading, error, load } = useCollection<ModuleInfo>("/modules", 200, false),
+const route = useRoute();
+// One list for each kind of module: the route (meta.category) says which.
+const category = computed(() => String(route.meta.category || "other"));
+const { rows: all, loading, error, load } = useCollection<ModuleInfo>("/modules", 200, false),
   q = ref(""),
   scope = ref("");
+const rows = computed(() => all.value.filter(m => categoryOf(m.key) === category.value));
 const filtered = computed(() =>
   rows.value.filter(
     m =>

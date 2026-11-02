@@ -6,6 +6,7 @@
           <component :is="subItem.meta.icon"></component>
         </el-icon>
         <span class="sle">{{ subItem.meta.title }}</span>
+        <el-badge v-if="subItem.path === '/menu/pay' && pendingPay" :value="pendingPay" :max="99" class="pay-badge" />
       </template>
       <SubMenu :menu-list="subItem.children" />
     </el-sub-menu>
@@ -15,7 +16,7 @@
       </el-icon>
       <template #title>
         <span class="sle">{{ subItem.meta.title }}</span>
-        <el-badge v-if="subItem.path === '/pay' && pendingPay" :value="pendingPay" :max="99" class="pay-badge" />
+        <el-badge v-if="subItem.path === '/pay/orders' && pendingPay" :value="pendingPay" :max="99" class="pay-badge" />
       </template>
     </el-menu-item>
   </template>

@@ -13,6 +13,10 @@ declare namespace Menu {
     icon: string;
     title: string;
     activeMenu?: string;
+    /** which part of a shared page this route shows (the analytics and game status pages) */
+    section?: string;
+    /** the module category a shared page is limited to */
+    category?: string;
     isLink?: string;
     isHide: boolean;
     isFull: boolean;

@@ -74,7 +74,7 @@
 | 公会列表与解散 | `/#/guilds`，`/api/guilds` | 已完成 |
 | 英雄、皮肤、外观发放 | 角色详情“基本资料与发放”，`/api/roles/{id}/heroes`、`/skins`、`/looks`（后两项同角色路径） | 已完成 |
 | 无API无页面：首充/月卡/月基金/限时礼包/周月礼包状态与重置 | 角色详情“玩法与只读数据 → 充值状态与订单 / 模块数据”，`/api/roles/{id}/charge`、模块GET与白名单reset | 已完成 |
-| 各玩法全服状态、排名、赛季与补结算 | `/#/game-status`，区服overview/modules/rank/season与settle接口 | 已完成 |
+| 各玩法全服状态、排名、赛季与补结算 | `/#/game-status/*`（区服概况、数据表，另按类别分页），区服overview/modules/rank/season与settle接口 | 已完成 |
 | 世界等级、开服时间 | 玩法状态页worldlev GET/PUT；区服管理页编辑开服时间 | 已完成 |
 | 角色专用表 | 角色数据页签；玩法状态页的区服/公会只读表，82项注册及10项专用页/安全排除 | 已完成 |
 

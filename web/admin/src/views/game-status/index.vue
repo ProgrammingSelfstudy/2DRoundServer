@@ -1,6 +1,6 @@
 <template>
   <div class="management-page">
-    <h1>玩法状态</h1>
+    <h1>{{ title }}</h1>
     <el-select v-model="srv" aria-label="玩法区服" filterable :disabled="busy || uncertain" style="width: 300px"
       ><el-option v-for="s in servers" :key="s.srv_id" :value="s.srv_id" :label="`${s.name}（${s.srv_id}）`"
     /></el-select>
@@ -9,10 +9,8 @@
     <el-alert v-if="uncertain" title="写入结果待核对，请刷新状态并核对审计后解除锁定。" type="warning" :closable="false" />
     <el-button v-if="uncertain" :disabled="busy || loading" @click="reviewed">已核对结果，解除锁定</el-button>
     <div v-if="srv" v-loading="loading">
-      <el-tabs v-model="tab"
-        ><el-tab-pane label="区服概况" name="overview" /><el-tab-pane label="排名" name="rank" /><el-tab-pane
-          label="赛季"
-          name="seasons" /><el-tab-pane label="全服数据" name="global" /><el-tab-pane label="区服 / 公会只读表" name="tables"
+      <el-tabs v-if="tabs.length > 1" v-model="tab"
+        ><el-tab-pane v-for="t in tabs" :key="t.name" :label="t.label" :name="t.name"
       /></el-tabs>
       <template v-if="tab === 'overview' && overview">
         <el-descriptions :column="2" border
@@ -92,7 +90,7 @@
       <template v-if="tab === 'global'">
         <el-select v-model="globalKey" aria-label="全服模块" filterable style="width: 420px"
           ><el-option
-            v-for="m in snapshots"
+            v-for="m in visibleSnapshots"
             :key="m.key"
             :value="m.key"
             :label="`${moduleTitle(m.key)}（${m.key}） · ${m.exists ? '已保存' : '未保存'}`"
@@ -145,6 +143,8 @@ import { getServers, type ServerRow } from "@/api/admin";
 import { useAuthStore } from "@/stores/modules/auth";
 import { useCollection } from "@/composables/useCollection";
 import { useCommand } from "@/composables/useCommand";
+import { selectedServer } from "@/composables/useSelectedServer";
+import { categoryOf, categoryTitle } from "@/domain/moduleCategories";
 import {
   canSettle,
   reason,
@@ -163,9 +163,26 @@ const route = useRoute(),
   auth = useAuthStore(),
   { busy, uncertain, error: commandError, execute, reviewed } = useCommand("manage", true);
 const catalog = useCollection<ModuleInfo>("/modules", 200, false);
+// This page is several: the route says which part it shows (meta.section) and, for the server-wide modules, of which kind
+// (meta.category), so each address is one short list instead of every module at once.
+const section = computed(() => String(route.meta.section || "overview"));
+const category = computed(() => String(route.meta.category || ""));
+const title = computed(() => `玩法状态 · ${route.meta.title || "区服概况"}`);
+const tabs = computed(() =>
+  section.value === "tables"
+    ? [{ name: "tables", label: "区服 / 公会只读表" }]
+    : section.value === "category"
+      ? [
+          { name: "rank", label: "排名" },
+          { name: "seasons", label: "赛季" },
+          { name: "global", label: "全服数据" }
+        ]
+      : [{ name: "overview", label: "区服概况" }]
+);
+const inCategory = (key: string) => section.value !== "category" || categoryOf(key) === category.value;
 const servers = ref<ServerRow[]>([]),
-  srv = ref(""),
-  tab = ref("overview"),
+  srv = ref(selectedServer.value),
+  tab = ref(tabs.value[0].name),
   loading = ref(false),
   error = ref("");
 const overview = ref<any>(),
@@ -182,13 +199,14 @@ const override = ref<number>(0),
 const tableScope = ref<"server" | "guild">("server"),
   guildInput = ref(""),
   guildID = ref("");
-const ranked = computed(() => catalog.rows.value.filter(m => m.scope === "global" && m.has_rank));
+const ranked = computed(() => catalog.rows.value.filter(m => m.scope === "global" && m.has_rank && inCategory(m.key)));
+const visibleSnapshots = computed(() => snapshots.value.filter(m => inCategory(m.key)));
 const seasons = computed(() =>
-  snapshots.value
+  visibleSnapshots.value
     .filter(m => m.view?.season?.supported)
     .map(m => ({ key: m.key, title: moduleTitle(m.key), season: m.view!.season! }))
 );
-const globalState = computed(() => snapshots.value.find(m => m.key === globalKey.value));
+const globalState = computed(() => visibleSnapshots.value.find(m => m.key === globalKey.value));
 function moduleTitle(key: string) {
   return catalog.rows.value.find(m => m.key === key || (m.key.endsWith("*") && key.startsWith(m.key.slice(0, -1))))?.title || key;
 }
@@ -216,7 +234,8 @@ async function load() {
       const r = await api<{ items: ModuleState[] }>(base + "/modules");
       if (active && token === seq) {
         snapshots.value = r.items;
-        if (!r.items.some(m => m.key === globalKey.value)) globalKey.value = r.items[0]?.key || "";
+        const own = r.items.filter(m => inCategory(m.key));
+        if (!own.some(m => m.key === globalKey.value)) globalKey.value = own[0]?.key || "";
       }
     } else if (tab.value === "rank") {
       if (!ranked.value.some(m => m.key === rankKey.value)) rankKey.value = ranked.value[0]?.key || "";
@@ -310,6 +329,17 @@ function selectGuild() {
   }
   guildID.value = guildInput.value;
 }
+watch(srv, value => (selectedServer.value = value));
+// Another address of this page (the same component serves them all): start from its first part.
+watch(
+  () => route.name,
+  () => {
+    tab.value = tabs.value[0].name;
+    rankKey.value = "";
+    globalKey.value = "";
+    snapshots.value = [];
+  }
+);
 watch([srv, tab], () => {
   settleTarget.value = "";
   seasonDetail.value = undefined;
@@ -320,7 +350,7 @@ watch([srv, tab], () => {
 async function applyRouteQuery() {
   const want = statusSelection(route.query, servers.value.map(s => s.srv_id));
   srv.value = want.srv || srv.value || servers.value[0]?.srv_id || "";
-  if (!want.gid) return;
+  if (!want.gid || section.value !== "tables") return;
   tab.value = "tables";
   await nextTick(); // the [srv, tab] watcher above has cleared the guild selection by now
   if (!active) return;
@@ -331,7 +361,7 @@ async function applyRouteQuery() {
 watch(
   () => route.query,
   () => {
-    if (route.path === "/game-status" && servers.value.length) void applyRouteQuery();
+    if (route.path.startsWith("/game-status") && servers.value.length) void applyRouteQuery();
   }
 );
 onMounted(async () => {

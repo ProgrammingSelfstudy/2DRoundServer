@@ -1,5 +1,6 @@
-import { managementPages, gameAdminPages } from "@/domain/management";
-import { can, type Role } from "@/auth/permissions";
+import { managementPages } from "@/domain/management";
+import { analyticsGroup, gameStatusGroup, modulesGroup, pageMenus, payGroup, visibleMenu } from "@/domain/menuTree";
+import type { Role } from "@/auth/permissions";
 
 export const dashboardMenu: Menu.MenuOptions = {
   path: "/dashboard",
@@ -53,25 +54,27 @@ function sectionMenu(path: string, title: string, icon: string): Menu.MenuOption
   };
 }
 export const mailMenu = sectionMenu("mail", "邮件管理", "Message");
-export const payMenu = sectionMenu("pay", "充值管理", "Wallet");
 export const activitiesMenu = sectionMenu("activities", "活动管理", "Calendar");
-export const gameStatusMenu = sectionMenu(gameAdminPages[0][0], gameAdminPages[0][1], "DataAnalysis");
-export const modulesMenu = sectionMenu(gameAdminPages[1][0], gameAdminPages[1][1], "Grid");
+
 export const managementMenus = managementPages.map(([path, title, permission]) => ({
   ...sectionMenu(path, title, "Menu"),
   meta: { ...sectionMenu(path, title, "Menu").meta, permission }
 }));
+export { payGroup, analyticsGroup, gameStatusGroup, modulesGroup, pageMenus };
 export function menusForRole(role: Role | undefined) {
   return [
     dashboardMenu,
     serversMenu,
     rolesMenu,
     mailMenu,
-    payMenu,
+    payGroup,
     activitiesMenu,
     ...managementMenus,
-    gameStatusMenu,
-    modulesMenu,
+    analyticsGroup,
+    gameStatusGroup,
+    modulesGroup,
     environmentMenu
-  ].filter(menu => can(role, menu.meta.permission));
+  ]
+    .map(menu => visibleMenu(menu, role))
+    .filter((menu): menu is Menu.MenuOptions => !!menu);
 }

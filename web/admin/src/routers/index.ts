@@ -6,18 +6,34 @@ import {
   serversMenu,
   rolesMenu,
   mailMenu,
-  payMenu,
   activitiesMenu,
   managementMenus,
   environmentMenu,
-  gameStatusMenu,
-  modulesMenu
+  pageMenus
 } from "./menu";
+
+// The page behind each address of the groups in the side menu. Several addresses can share one view: it reads its part
+// (meta.section) and its kind of modules (meta.category) from the route.
+function viewOf(name: string) {
+  if (name.startsWith("pay-")) return () => import(`../views/pay/${name.slice(4)}.vue`);
+  if (name.startsWith("analytics-")) return () => import("@/views/analytics/index.vue");
+  if (name.startsWith("game-status-")) return () => import("@/views/game-status/index.vue");
+  return () => import("@/views/modules/index.vue");
+}
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: "/", redirect: "/dashboard" },
+    // the addresses from before the pages were split
+    { path: "/pay", redirect: "/pay/orders" },
+    { path: "/analytics", redirect: "/analytics/overview" },
+    { path: "/modules", redirect: "/modules/pay" },
+    {
+      path: "/game-status",
+      // the server and guild pages link here with ?srv= and, for a guild, &gid=
+      redirect: to => ({ path: to.query.gid ? "/game-status/tables" : "/game-status/overview", query: to.query })
+    },
     { path: "/login", name: "login", component: () => import("@/views/login/index.vue"), meta: { public: true, title: "登录" } },
     {
       path: "/layout",
@@ -47,25 +63,18 @@ const router = createRouter({
           meta: { ...mailMenu.meta },
           component: () => import("@/views/mail/index.vue")
         },
-        { path: payMenu.path, name: payMenu.name, meta: { ...payMenu.meta }, component: () => import("@/views/pay/index.vue") },
         {
           path: activitiesMenu.path,
           name: activitiesMenu.name,
           meta: { ...activitiesMenu.meta },
           component: () => import("@/views/activities/index.vue")
         },
-        {
-          path: gameStatusMenu.path,
-          name: gameStatusMenu.name,
-          meta: { ...gameStatusMenu.meta },
-          component: () => import("@/views/game-status/index.vue")
-        },
-        {
-          path: modulesMenu.path,
-          name: modulesMenu.name,
-          meta: { ...modulesMenu.meta },
-          component: () => import("@/views/modules/index.vue")
-        },
+        ...pageMenus.map(menu => ({
+          path: menu.path,
+          name: menu.name,
+          meta: { ...menu.meta },
+          component: viewOf(menu.name)
+        })),
         ...managementMenus.map(menu => ({
           path: menu.path,
           name: menu.name,

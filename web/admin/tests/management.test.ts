@@ -16,8 +16,8 @@ import {
 import { can } from "../src/auth/permissions.js";
 import { AdminSession } from "../src/auth/session.js";
 import { createApi, ApiError } from "../src/api/client.js";
-test("eleven pages retain exact server read/write/manage contract, unknown fails closed", () => {
-  assert.equal(managementPages.length, 11);
+test("ten remaining pages retain exact server read/write/manage contract, unknown fails closed", () => {
+  assert.equal(managementPages.length, 10);
   for (const role of ["viewer", "operator", "superadmin"])
     for (const [page, , read, write] of managementPages) {
       assert.equal(can(role, pageCapability(page)), read === "read" || role === "superadmin");

@@ -1,15 +1,15 @@
 # 新后台 Go 接入与验证
 
-新版 Geeker-Admin 已取代 Go 默认管理入口，16 个业务页均使用真实同源 API、Bearer/sessionStorage 和 viewer/operator/superadmin 权限。旧 `internal/admin/web` 仅保留源码参考及回归测试，不再对外提供旧页或循环链接。完整页面/权限矩阵见 [前端说明](../web/admin/README.md)，MIT 和上游版本见 [来源说明](../web/admin/UPSTREAM.md)。
+新版 Geeker-Admin 已取代 Go 默认管理入口，18个业务页均使用真实同源 API、Bearer/sessionStorage 和 viewer/operator/superadmin 权限。旧 `internal/admin/web` 仅保留源码参考及回归测试，不再对外提供旧页或循环链接。完整页面/权限矩阵见 [前端说明](../web/admin/README.md)，MIT 和上游版本见 [来源说明](../web/admin/UPSTREAM.md)。
 
 ## 构建
 
 克隆仓库后可直接 `go build ./cmd/admin`：所需的 `internal/admin/ui/index.html` 及全部生产资源快照随源码入库，二进制运行时不依赖 Node、Vite、dist 或源码目录。
 
-修改前端后，在仓库根目录使用 Node 22.22.2 / Corepack pnpm 10.11.0：
+修改前端后，在仓库根目录使用 Node 22.23.4 / Corepack pnpm 10.11.0：
 
 ```sh
-nvm use 22.22.2
+nvm use 22.23.4
 make build
 # 或只更新前端快照：make admin-ui-embed
 ./bin/admin -config configs/dev.yaml
@@ -60,7 +60,30 @@ go run ./tools/adminliveprobe -dir "$ADMIN_LIVE_DIR" -mode watch
 
 只暂停自己启动的隔离 gateway 后运行 `-mode offline`：邮件/公告仍保存，pushed=null 且有 push_error，踢线返回 502。重启同一隔离 gateway 并同步本地 PID 后运行 `-mode recover`，通过 TCP 列表/详情确认离线保存的数据可读。工具不会把落库成功等同在线通知成功。
 
+## 网关全服管理接口（阶段3–5接入）
+
+控制口仍只绑定loopback，没有面向外部的认证，必须由已鉴权的后台代理访问。后台进程不直接写 `global_state`，也不在网关故障时降级读库。读取持有对应游戏服务的真实锁；写入在同一服务锁内调用既有函数，变更与可信管理员/原因审计同事务。
+
+| 控制口 | 后台同源API | 权限与语义 |
+| --- | --- | --- |
+| `GET /ops/global?srv=&key=` | `/api/servers/{id}/modules`、`/modules/{key}` | read；全服状态及view，省略key返回清单；动态公会前缀列已保存实例 |
+| `GET /ops/rank?srv=&key=&limit=` | `/api/servers/{id}/modules/{key}/rank` | read；16项已有排名，每分类默认50、上限200 |
+| `GET /ops/season?srv=&key=` | `/api/servers/{id}/modules/{key}/season` | read；自然赛季/届次、起止、阶段及结算标记 |
+| `GET /ops/overview?srv=` | `/api/servers/{id}/overview` | read；开服时间/天数、世界等级、竞技场本季 |
+| `POST /ops/season/settle?srv=&key=` | `POST /api/servers/{id}/seasons/{key}/settle` | manage；原因必填，只补到期且未结算项目 |
+| `GET/PUT /ops/worldlev?srv=` | `GET/PUT /api/servers/{id}/worldlev` | GET read、PUT manage；override 0–200，until非负Unix秒、原因必填 |
+
+代理构造可信actor/IP，浏览器不能指定内部审计身份。read对应viewer/operator/superadmin，manage仅superadmin。全服GET不创建存档、不推进日历或发奖；各模块快照分别加锁，不构成跨服务的同一时刻快照。只允许arenateam、elitematch、crossarena、arenamany、daysrank、guildwar、arenachamp、crosschamp补结算，其余23项全服活动/玩法及其排行榜没有结算写入口，除worldlev专用覆盖PUT外只查看，未开放结算返回405。`settled`、`already`、`not_due`分别表示实际补结算、已处理、未到期；不能提前结束、取消或新建赛季。
+
+worldlev的0关闭覆盖，until=0长期，过期按游戏时钟恢复原计算值但GET不清存档；修改提交后推10905，响应区分保存成功与推送失败。原计算仍为活跃角色前10名的平均等级，不改变游戏公式。
+
+网关不可达/未绑定服务/无效上游响应在后台一律502，不能显示为空数据。已收到的业务404/405/409/422保持相应语义。502不一律等于“推送失败”：玩家重置在线检查失败发生在写前，明确未修改；全服代理传输错误可能发生在网关提交之后，必须核对状态/审计，不自动重试。补结算SQLite事务期间其它写入可能短暂排队，邮件在事务提交前可能先推送在线角色；跨进程服务锁和多实例部署未验证。
+
+表视图另走只读SQL白名单API，不经全服ops；82项注册、92表覆盖口径、归属/截断和安全排除见 [ADMIN_TABLE_API.md](ADMIN_TABLE_API.md) 与 [ADMIN_COVERAGE.md](ADMIN_COVERAGE.md)。公会表当前从玩法状态页输入GID读取，不代表公会详情已有直接入口。
+
 ## 验证与边界
+
+本轮阶段6全量验证见 [最终记录](ADMIN_COMPLETION_PLAN.md)。下列28项测试与16页浏览器验收为基础迁移历史；当前前端36项测试、18个业务页，不能据旧记录推断新页全部浏览器验证。
 
 已通过前端类型检查、生产构建、新版 28 项和旧版 18 项测试、Go 管理/存储/网关/登录及相关游戏联动 race 测试、静态依赖/MIME/ETag/安全头/API 与资源 404 回归；浏览器核对全部 16 页、深链刷新、权限和会话。同源 Go 二进制从隔离数据目录独立运行，不依赖 Vite。
 

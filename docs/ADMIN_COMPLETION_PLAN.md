@@ -1,385 +1,63 @@
-# 后台补全计划：所有没接的都接（Codex 执行，Claude 审核验收）
+# 后台补全计划：最终交付记录
 
-## 当前任务：阶段 6（审核方已授权，2026-11-01）
+## 全部阶段已完成（0–6，2026-11-02）
 
-**阶段 0–5 已通过审核。现在只做阶段 6（文档收尾与全量回归），做完停下。这是最后一个阶段。** 先 `git pull`。基线包含审核方对阶段 5 的修复 `c0357f5`（全局请求层把所有 502 改写成“推送未完成”，导致重置失败时误报；现在 502 保留模块、赛季、世界等级接口的精确消息，并清掉残留的校验错误条）。
+阶段0–5已通过审核，阶段6已完成文档收尾与全量回归，现停下等待审核。本次仅修改 `docs/` 和 `web/admin/README.md`，不改功能、接口或游戏规则，不推送。已接入模块注册/覆盖门禁、充值专用只读视图和白名单重置、网关全服状态/排名/自然到期补结算/世界等级、专用表只读API，以及角色数据页签、玩法状态和模块总表。不存在模块JSON的PUT编辑接口、逐表任意编辑或清空，也不提供提前结束/取消赛季。
 
-阶段 5 审核结论：前端 36 项测试、类型检查、构建全过；审核方用 Chrome 在带真实网关的隔离沙盒里实测了模块总表、世界等级覆盖、赛季补结算（首次 `settled`、重复 `already`）、月卡重置、玩家在线 409、viewer 的 403、网关挂掉时的读写表现，均符合预期。
+当前基线为 `210a68b`，已包含阶段5审核修复 `c0357f5`。2026-11-02初查发现两个入口位置缺口后曾按原计划停止；用户随后明确要求继续阶段6。故本轮继续文档和回归，两个缺口保留为已知限制，不补功能，不声称所有入口位置都已实现。
 
-**阶段 6 不改功能代码、不改接口、不改游戏规则。** 发现文档与代码不一致时，以代码和测试为准改文档；发现是代码问题，写进进度段的“发现的问题”并停下报告，不要自己改代码。
+覆盖事实以源码、运行时注册及清单共同校验：**108项模块（77玩家/31全服）、352处持久化调用、86个模块常量、92张表（82项通用只读视图、10项专用页/安全排除）**。阶段6重新运行 `go run ./tools/admincoverage` 核对。覆盖门禁不等于所有玩法可任意管理，也不代表原服规则已确认。
 
-要做的：
-1. **`docs/ROADMAP.md` “后台缺口”一节**：两类缺口都标为已完成，并写清各自对应的页面或接口（链接到 `ADMIN_COVERAGE.md`、`web/admin/README.md`）。**不要夸大**：写明“只补到期赛季、23 项活动和排行榜只查看、首充与月卡重置口径不同、没有 PUT 编辑接口”。
-2. **`web/admin/README.md`**：页面表补上“玩法状态”“模块总表”，角色详情补“玩法与只读数据”页签及其下的子页签，写清各自的权限（viewer 可读，重置、结算、世界等级写入仅 superadmin）。
-3. **`docs/ADMIN_UI_INTEGRATION.md`**：补网关控制口新增的 `/ops/*` 接口（读全服、排名、赛季、结算、世界等级），说明仍只绑 loopback、后台进程不直接写 `global_state`、网关不可达时一律 502。
-4. **`docs/ADMIN_COVERAGE.md`**：把表行里“前端留阶段5”之类已过期的措辞改成现状；统计数字以 `go run ./tools/admincoverage` 的输出为准；保留“不提供”的原因。
-5. **`docs/OPEN_QUESTIONS.md`**：确认下面这些都有记录，没有就补上，每条写“未与原服核对”：月卡重置以当前实付金额为新基数；首充重置删整行后会按已付总额重新激活（与月卡口径不同）；补结算只做自然到期项目，不提前、不取消；世界等级覆盖的 `until=0` 表示长期。
-6. **本文件收尾**：把顶部改成“全部阶段已完成”的一段简短总结（做了什么、没做什么、已知限制），**删掉或压缩**各阶段交付时留下的过期进度记录（“等待审阅”“不push”之类），只保留提交号清单和最终验证结果。已知限制至少包括：
-   - 补结算在一个 SQLite 事务里完成，期间其它写入会短暂排队；邮件在提交前可能先推送给在线玩家
-   - `tickets` 的 `phone/email/phone_info` 对 viewer 可读
-   - 23 项活动和排行榜只查看
-   - 阶段 5 的浏览器验证只覆盖了沙盒里的种子数据；operator 账号界面、有真实数据时的表分页和 `truncated` 标记、任务/阵容/好友/公会/收件页签、公会详情数据表入口、重置后玩家重新登录的实际表现，**均未浏览器验证**
-7. **全量回归，写进最终进度**：`go vet ./...`、`go test -race ./...`（全部包，不是只测 4 个）、`make test`、`make build`、`make admin-ui-check`。出现失败先在上一个提交复现再报告；**不要在没跑的情况下写“全部通过”**。
-8. 约束：只改 `docs/` 和 `web/admin/README.md`，不 push，不碰 `testdata/captures`。完成后在进度段写阶段 6 的提交号和验证结果，如实写出没验证的部分。
+- [覆盖注册表](ADMIN_COVERAGE.md)：逐模块/逐表能力及限制。
+- [前端页面与权限](../web/admin/README.md)：旧16页迁移及新增2页、角色数据页签。
+- [网关接入与验证](ADMIN_UI_INTEGRATION.md)：loopback控制口、代理/事务/推送边界。
+- [HTTP契约](ADMIN_API.md)、[只读表契约](ADMIN_TABLE_API.md)、[未确认规则](OPEN_QUESTIONS.md)。
 
-## 阶段 5 交付记录（已通过审核，历史）
+## 提交号清单
 
-以下为阶段 5 交付时的记录，已通过审核，仅作历史参考，不作为当前执行指令；当前任务见上面“阶段 6”。
-
-### 阶段5交付与验证
-
-- 基线 `dbf1b5f36fe7fce6876213fc47af70deb4e9911d`，在主项目 `main` 实施，无新分支或工作树。提交标题 `Complete stage 5 admin frontend workflows`，本段与实现同一提交；完整提交号可用 `git log -1 --format='%H %s' -- web/admin/src/views/game-status/index.vue` 查询。只提交本地，等待审核，不进入阶段6、不推送。
-- 角色详情保留原基本资料/发放能力，新增充值状态与真实订单分页、模块数据，以及按后端表目录动态生成的全部role分组页签（包括充值表）。英雄/外观、装备/天赋、阵容、公会职位、好友、任务、竞技场、收件等均按后端列白名单和归属路径读取，显示COUNT摘要、total及4KB截断列标记。公会/区服表通过玩法状态入口查看。
-- 六类充值专用视图将后端协议/投影转为中文表格：四个首充窗口、每日首充、两张月卡、两张月基金、23项限时礼包、12项周/月商品。只显示后端已算出的状态，不在前端重写资格、奖励或roll规则；计算状态/协议与原始已保存JSON均可展开核对。4项Kind3神装礼包仍明确为不支持发售。动态首充实际键来自charge接口和已保存行，不在前端硬编码窗口列表。
-- 重置项完全来自返回的模块白名单，仅superadmin可见；未保存行禁用重置，原因按Unicode字符/控制字符校验，提交需确认。复用useCommand提交锁，已知在写前拒绝的reset 502可明确报“网关不可用，未修改”；全服代理传输失败可能发生在提交后，保留结果待核对锁和审计核对提示，不谎称一定未写入。角色重置/踢线过程中及重置结果不明时阻止关闭弹窗或切回基本页来丢失锁。在线409与并发409区别提示，在线冲突提供踢线入口，踢线后仍由重置API再次核验离线。
-- 新增只读入口 `/#/modules` 模块总表（108项，77玩家/31全服，搜索、范围、View/Rank/Resets/Editable覆盖）和 `/#/game-status` 玩法状态（区服概况、世界等级、16项现有排名、赛季列表/详情、全服快照、区服/公会表）。世界等级覆盖与8项到期补结算只对superadmin显示，原因必填、确认及重复结果提示；不提供提前结束、取消赛季或任意JSON编辑。当前后端全部Editable=false，故无JSON编辑表单/PUT请求，也不虚构编辑校验已启用。
-- 新入口沿用hash路由、同源Bearer API、management.ts权限、menu.ts、useCollection、useCommand；页面按路由/角色页签加载，不在隐藏页轮询。异步读带序号和卸载检查，切换归属/模块/分页时清除旧数据；未注册保存行只列键、不冒充可查模块。未增加前端依赖，锁文件未改。生产 `internal/admin/ui` 已通过 `make build` / `admin-ui-embed` 同步。
-- 自动验证：前端typecheck、**35/35测试**通过（原28项完整保留，新增7项权限、白名单、原因、日期、分页、反馈及充值投影只读映射）；`make build`通过。`go vet ./...`通过；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`通过（game180.812秒/admin36.961秒/store13.262秒/coverage缓存命中），更新嵌入资源后的admin race再次通过（35.695秒）。仅保留既有Browserslist数据年龄和Vite大包提示。
-- 新增可重复隔离API验证脚本 `tools/admin-ui-stage5-integration.mjs`：只接受带sandbox标记且DB位于同目录、API为loopback的fixture；三档遍历82项表路径、模块/9项充值汇总、105笔角色订单真实分页、16排名/赛季/白名单重置、世界等级及重复补结算。读取和拒绝写入前后比较除 `global_state` 外全表完全不变；真实网关原生定时器可独立写global_state，所以该脚本不声称其全库全局快照不变。后端GET完全不写库的隔离HTTP门禁仍由阶段4及本次race回归覆盖。
-- 浏览器验证使用新建临时SQLite、19180/15175及19900/19901端口：模块总表108项与搜索、六类充值表格、105订单第二页、真实英雄装备行/归属和空表、模块只读、世界等级保存回读、到期补结算二次确认与重复“本季已结算”、viewer/operator隐藏重置/结算/覆盖按钮及真实API403。真实TCP测试角色在线重置409、页面踢线后离线重置成功；停止该隔离网关后reset返回502并显示“网关不可用，未修改”。控制台无warning/error。
-- 验证边界：测试只改新建隔离实例，未操作真实玩家/付款、原服抓包或现有19080实例；测试凭据不入库、不打印token。未改游戏Go源码、玩法、全局工具版本、前端依赖、`testdata/captures`；没有更新ROADMAP或实施阶段6，源码构建成功不代表现有19080进程已部署本轮版本。其他文档的“前端留阶段5”等历史描述在阶段6再统一收口。
-
-复现新增API验证（会创建/重置测试模块和测试订单，只能指向临时测试库）：
-
-```sh
-ADMIN_UI_FIXTURE=/隔离目录/fixture.json node tools/admin-ui-stage5-integration.mjs
-```
-
-隔离目录需通过现有fixture工具准备三档管理员/区服/角色和公会，且启动对应真实本机网关。该脚本不操作现有19080数据库。
-
-## 阶段5原授权（审核方，2026-11-01）
-
-**阶段 0–4 已通过审核。现在只做阶段 5（前端），做完停下，不要进入阶段 6。** 先 `git pull`。基线包含审核方对两处间歇失败测试的修复：`7e969b8`（return action）、`cbd35ba`（adventure：服务端先回复后存档，测试读早了；加心跳同步）。
-
-阶段 4 审核结论：表视图 82 项静态白名单，敏感列在查询层排除（`chat_offline` 无正文、`replays` 无脚本、无凭据），全部只读，通过。已知并接受：`tickets` 的 `phone/email/phone_info` 对 viewer 可读（现有工单页本来就显示联系方式）。
-
-**阶段 5 是纯前端。不改 Go 后端、不改接口、不改游戏规则。** 如果发现后端接口缺字段或不好用，在进度段写明并停下报告，不要自己改后端。
-
-可用的后端接口（全部已实现，响应格式以代码和测试为准，先读 `internal/admin/*.go` 再写前端类型）：
-- 模块：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`（`levManage`，body `{item, reason}`，409 玩家在线，502 网关不可达/在线状态未知，422 item 或原因不合法）
-- 充值：`GET /api/roles/{id}/charge`
-- 表视图：`GET /api/tables`、`GET /api/roles/{id}/tables`、`GET /api/roles/{id}/tables/{name}?limit=&offset=`、`GET /api/guilds/{id}/tables/{name}`、`GET /api/servers/{id}/tables/{name}`
-- 区服玩法：`GET /api/servers/{id}/overview`、`/modules`、`/modules/{key}`、`/modules/{key}/rank`、`/modules/{key}/season`、`POST /api/servers/{id}/seasons/{key}/settle`（`levManage`，body 带原因）、`GET/PUT /api/servers/{id}/worldlev`（PUT `levManage`）
-
-要做的页面和页签：
-1. **角色详情新增页签**（`src/views/roles/RoleDialog.vue` 及配套组件）：
-   - **充值状态**：展示 `GET /api/roles/{id}/charge` 的各分组（首充每个窗口、每日首充、月卡 ×2、月基金 ×2、限时礼包、周/月礼包、订单）。每个可重置项旁一个“重置”按钮，**仅 superadmin 可见**；点击弹确认框，必须填原因（1–200 字，无控制字符）。
-   - **模块数据**：列出该角色已有的模块，有视图显示视图，没有则显示格式化 JSON；只读。
-   - **数据表**：按分组（英雄/阵容/公会/好友/任务/竞技场/邮件/其它）列出 `GET /api/roles/{id}/tables` 的行数摘要，点开一张表用 `limit/offset/total` 分页显示明细；`truncated` 字段要有标记。
-2. **新页 `/#/game-status`“玩法状态”**（`levRead`，三档可读）：先选区服，再显示概况（世界等级的计算值/覆盖值/生效值、开服第 N 天、开服时间、竞技场本季起止）、排名（下拉选有排名的模块）、赛季（列出有赛季的模块，状态/到期/已结算）、全服数据浏览。写操作仅 superadmin 可见：**立即结算**（二次确认 + 原因，已结算/未到期要用接口返回的 `already`/`not_due` 给出明确提示，不要当作失败）、**设置世界等级覆盖**（等级、到期时间、原因；0 表示取消覆盖）。
-3. **新页 `/#/modules`“模块总表”**（三档可读）：展示 `GET /api/modules` 的注册表，标出有无视图/排名/重置项，用来核对“都接了”。
-4. **公会详情**补一个“数据表”入口，用 `GET /api/guilds/{id}/tables/{name}` 显示公会范围的表；区服页补一个“玩法状态”跳转。
-5. **统一交互**：
-   - 409 提示“玩家在线，请先踢下线”，旁边给踢线按钮（复用现有踢线）
-   - 502 提示“网关不可用，未修改”（读接口则提示“网关不可用，无法读取”），**不要把 502 显示成数据为空**
-   - 沿用 `useCommand` 提交锁、`useCollection`、`CollectionPage`/`RecordTable`、`src/domain/management.ts` 的权限表和 `src/routers/menu.ts`；新页面按路由懒加载，不用 KeepAlive，不在隐藏页轮询
-   - 写操作结果不明（网络中断、超时、5xx）时不自动重试，沿用现有的“先核对再解除锁定”做法
-   - 权限以服务端为准：viewer/operator 看不到任何重置、结算、世界等级写按钮，直接调接口也是 403
-6. **测试**（`web/admin/tests/`）：原有 28 项必须全部保留；新增权限可见性、重置原因与 item 校验、409/502/422 文案映射、`already`/`not_due` 映射、表分页参数（limit 1–200）、`truncated` 处理。
-7. **构建与快照**：用 Node 22.23.4 + corepack pnpm 10.11.0，不加依赖、不改 lockfile。跑 `make admin-ui-embed`，**把更新后的 `internal/admin/ui` 快照一起提交**；`make build` 必须通过。
-8. **验证**：`make admin-ui-check`、`make admin-ui-test`、`make build`、`go vet ./...`、`go test -race ./internal/admin`（前端快照的静态资源回归在里面）。另外用 `make admin-live-sandbox`（带真实网关）实际打开新页面和三个角色页签，记录每个页面的结果；**没有在浏览器里亲自点过的页面，必须在进度段明确写“未浏览器验证”**，不要写成已验证。完成后在下面进度段更新阶段 5 提交号和验证结果，如实写出没验证的部分。
-9. 约束：不 push；不碰 `testdata/captures`；不改 Go 后端。
-
-## 最新进度与交接（2026-11-01）
-
-> **最新状态（审核方更新）：阶段 0–5 已通过审核；阶段 6（文档收尾与全量回归）已授权，进行中。** 下面各阶段交付记录里的“等待审阅”“不push”“不进入阶段N”等措辞只对当时有效，已过期，以最上面“当前任务”为准。阶段 6 是最后一个阶段，完成后停下。
-
-**阶段4已完整实现、通过验收并完成本地提交，停下等待审阅；不push、不进入阶段5。**
-
-- 基线：`f9bac3cb5f8f76fa04c86131daba9406cd16cff0`（origin/main），已包含阶段3全部实现及阶段4授权。实际工作树 `/Users/mountainwalkeralliance/.codex/worktrees/0cfc/2DRoundServer`，分支 `codex/admin-stage4`。主项目只读核对：main当时落后远端2个提交、无本地改动或必需的未推送前置；未写入主项目或历史工作树。
-- 本阶段提交标题：`Add whitelisted read-only admin table views`。本段随实现同一提交；完整号用 `git log -1 --format='%H %s' -- internal/store/admin_tables.go` 查询。
-- 新增82项静态表视图注册及10项专用页/安全排除决定，覆盖清单92张表全部对齐。注册包含中文名、分组、role/guild/server归属、列白名单和完整主键稳定排序；所有值绑定参数，调用方不能提供列、排序或SQL条件。GET表目录、角色COUNT摘要、角色/公会/区服分页明细均levRead，没有新增写接口。
-- 英雄装备/天赋联partners按角色归属筛选；角色邮件联主题，直接读取已保存收件状态、不补投广播；阵容、职位/捐献、好友/申请/黑名单、任务/成就、竞技场、签到/邀请/共鸣/副本等均有后端数据。角色订单继续复用charge，不重复实现。
-- 聊天正文与录像脚本从SQL投影白名单排除；chat_offline.len实为内容类型，新增SQL计算的message_bytes表示长度。凭据、审计、迁移账本和模块容器不进入通用注册表；所有文本含JSON限制为4KB UTF-8预览并列出truncated字段。API、归属及分页约定见ADMIN_TABLE_API.md。
-- 验证：82项查询逐项在迁移生成的真实schema执行；92表文档与注册/排除双向门禁；整体敏感列检查；真实英雄/邮件联表、角色/区服隔离、稳定分页、不漏不重、UTF-8截断；未登录401、三档可读、分页422、未注册/归属不匹配/缺失ID404、写方法405。隔离HTTP测试覆盖所有注册表路径，并比较读取前后全库数据（包括module_state/global_state）完全不变；store测试同时比较全表行数及数据投影。
-- 完整验收通过：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`（game183.148s/admin36.368s/store12.183s/admincoverage2.053s）。最后补强模块状态快照断言后，HTTP专项race再次通过（5.355s）。指定Node22.23.4、Corepack pnpm10.11.0下前端typecheck、原28项测试、`make build`通过；仅既有Browserslist数据年龄和Vite大包提示。新工作树用frozen锁文件安装依赖，锁文件及生产UI快照无差异。
-- 边界：只使用临时SQLite、httptest和测试账号，未操作生产玩家/库、真实付款或现有抓包进程。没有改游戏规则或testdata/captures，没有前端源码/依赖变更；前端页签留阶段5。分页在单次请求内为一致快照，多次offset请求遇到游戏并发增删不提供跨请求快照；截断JSON是预览字符串。无阶段4前置阻碍，无push或PR。
-
-以下为阶段0–3历史交接；其中当时停止条件不代表本轮授权范围。
-
-**阶段 0–3 已通过审核；阶段 4 已完成待审阅；阶段 5–6 尚未开始。** 下面是各阶段交付时的记录，其中“等待审阅”“不push”“不进入阶段N”之类措辞只对当时有效，已过期；以最上面“当前任务”为准。阶段 4 完成后停下，不要自动进入阶段 5。
-
-Phase 3 implementation and full validation passed. Baseline:
-`c140a39`. Stay on main, local commits only; no push or phase 4. Phase 0-2 have
-passed review. Current inventory: 108 registrations (77 role, 31 global), 352
-persistence calls, 86 module constants and 92 tables.
-
-- 3a: `16d4128a98c701329cd25a8aa3666bd2ce93ad6c`
-  `Add gateway-owned global read APIs and season views`.
-  All 30 original global owners bound to their real service locks; 16 existing
-  rankings, season snapshots and server overview. GET never rolls/saves state;
-  no gateway fallback. Vet, four-package race (game166.470s/admin35.597s/store11.180s),
-  frontend type check, existing 28 tests and make build passed before commit.
-- 3b: `ded2c6e8c6bf9216bc16ae32992080b9d47aa667`
-  `Add due-only season settlement through gateway services`.
-  Eight approved season keys only; native calendars/settlement functions and the
-  exact owner lock. No early ending, cancellation or new championship/guild war.
-  Administrative payout mail, state and trusted actor/reason audit are atomic.
-  Every key passed running/not_due, due payout, repeated/already and concurrent
-  native/admin checks against a single-payout mail count. Partial-mail and audit
-  failures roll back. Vet, race (game181.089s/admin38.135s/store11.645s), frontend
-  checks, 28 tests and build passed before commit.
-- 3c title: `Add gateway world level overrides and finish stage 3 validation`.
-  New registered worldlev; computed/configured/effective levels; override0 disables,
-  until0 is persistent and expiry uses the game clock without rewriting the row.
-  Login10192, request10905 and post-PUT online push verified over actual TCP.
-  Backend GET/PUT permissions, invalid fields, trusted actors and gateway-down
-  502 with unchanged configuration/audit passed. Generic/global/overview reads
-  include the new module. Multi-category rankings cap each category, preserving
-  visibility of all categories; championship concurrency regression now runs the
-  actual live tick alongside administrative settlement.
-
-All writes remain gateway-owned; no admin direct-global persistence, JSON editor,
-phase4 role tables or phase5 UI added. Captures, dependency locks and production UI
-snapshots remain unchanged. Tests use isolated SQLite/httptest/local TCP accounts;
-no real player/payment or multi-gateway/cross-process lock validation is claimed.
-Existing native timer database-failure transaction boundaries are not changed.
-The first-charge/month-card reset policy difference is recorded in OPEN_QUESTIONS
-without changing either behavior. Source/document/runtime coverage and the final
-commit scope have been checked; no unrelated working files are included.
-
-阶段3c完整验收：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`全部通过（game188.080秒、admin40.766秒、store12.447秒）；`make admin-ui-check`、原28项前端测试及`make build`通过。使用指定Node22.23.4与Corepack pnpm10.11.0；构建只有既有Vite大包提示，生产UI快照未变化。3a、3b在各自提交前也分别完成了同套完整检查，结果见上。
-
-3c与本段一起提交，标题 `Add gateway world level overrides and finish stage 3 validation`；完整号用 `git log -1 --format='%H %s' -- internal/store/worldlevel.go` 查询。当前阶段3增加31项全服逐项只读、16项排名（多分类分别限量）、8项到期/重复/原生并发结算、失败回滚、世界等级登录/10905/过期和权限/502等回归。没有对生产玩家或真实付款操作；跨进程服务锁和多网关部署未验证，前端及阶段4仍待后续授权。
-
-以下为阶段2及之前的历史记录，旧状态不代表本轮任务授权。
-
-**阶段 0、阶段 1 已通过审核；阶段 2 已完成实现和验证，等待审阅；阶段 3–6 尚未开始。** 本轮仅本地提交，不推送，不自动进入阶段3。
-
-- 阶段2实现提交标题：`Add charge views and whitelisted reset workflows`。本段与实现一起提交；完整提交号用 `git log -1 --format='%H %s' -- internal/game/admincharge.go` 查询。拉取基线为 `e222311`，包含 `7e969b8` 的ReturnAction测试同步修复。
-- 已为六类模块绑定专用View：四个首充窗口、每日首充、两张月卡、两张月基金、限时礼包、周/月礼包。View复用现有activate/view/roll及消息构造器，`protocols`存协议消息、`state`为新解码的内存投影，绝不写回；限时礼包只查看已保存报价，不触发新报价。
-- 白名单仅限首充`all`、每日首充`today`、月卡/基金`0`或`1`、23项配置内限时礼包ID、12项周/月商品charge ID。配置表直接枚举为静态白名单，不接收任意ID或别名。4项神装Kind3配置仍保持游戏原有“不发售”，清遗留记录不解锁玩法。其余模块无重置，全部Editable仍false。
-- 新增 `GET /api/roles/{id}/charge`（read）：汇总9个具体模块的原始已保存JSON、专用视图、role_charge实付汇总，以及先按角色筛选再limit/offset的真实订单分页；不从全局最近订单截取后再过滤，不写默认状态。
-- 月卡重置只清指定卡Start/Last/Days并令Base=当前实付分，另一张卡、role_charge、已付订单及资产不变。此管理策略未从原服确认，已在代码注释和OPEN_QUESTIONS登记；旧钱不能自动重激活同卡，新付款达标后仍按原规则领取。
-- 基线缺陷核实：在隔离的e222311源码上分别复现“已付订单重放先改基金再返回冲突”和“两个并发确认都先读到waiting，单订单写了两次礼包计数”。最小修复为同Store角色付款锁、锁内重读订单并先拒绝非waiting状态；重置在在线检查后也持此锁，再读before/实付基数。保留原SQL原子确认、before比较和事务审计，不改奖励、价格、限购或资格公式。
-- 专项测试已通过：六类View对真实TCP游戏handler协议回包；四个首充窗口、两张月卡、两张基金、每日首充重置后重新达成/领取且重复拒绝；23个限时配置和12个周/月商品逐项清理及原有资格/重复确认验证；全部44个具体HTTP重置项的权限/审计/无奖励副作用；非法配置ID422、在线409、网关故障/未知502；汇总GET不写库及角色订单分页隔离。
-- 并发验证：暂停首个确认的可写钩子、同时发起第二确认，验证只运行一次钩子、只成功一次，计数与实付一致；HTTP重置等待付款锁后才读当前Base。进程内锁不代表分布式锁，未验证多admin进程/多Store跨进程并发部署。
-- 完整验收已通过：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`（game169.237秒，admin37.152秒，store11.756秒）；`make admin-ui-check`、原28项前端测试、`make build`。使用指定Node22.23.4和Corepack pnpm10.11.0；生产UI快照和依赖锁文件无变化。
-- 验证边界：仅用临时SQLite、httptest及本机TCP测试账号，没有真实付款、生产库或真实玩家操作；未进行跨进程锁/多实例确认验证，也不声称完成阶段3的全服ops、结算或阶段5前端。抓包未改；完成后停在阶段2等待审阅，不推送。
-
-以下为阶段0、1的历史交付记录；旧的空白名单/无专用View等描述仅对应阶段1，当前能力以本段阶段2说明为准。
-
-- 阶段1实现提交：`98965e830663083448fdf55cdbc3a44bcd772055`（`Register admin modules and add read-only role state APIs`）。该提交包含90个文件，其中79个模块文件追加注册声明；阶段1拉取基线为 `ef272cef41dbe21a4c574f13cdc5516ae47f20da`。
-- 已完成107项运行时注册（77个玩家模块项、30个全服模块项），各模块文件init注册真实state构造器，三个前缀族验证真实窗口key/正数公会GID。覆盖门禁现在同时比对源码、`ADMIN_COVERAGE.md` 与 `AdminModules()`。
-- 新增玩家侧4个API：`GET /api/modules`、`GET /api/roles/{id}/modules`、`GET /api/roles/{id}/modules/{key}`、`POST /api/roles/{id}/modules/{key}/reset`。GET不写库；未注册key为404；已注册但未保存的状态不创建默认行。
-- 所有 `Editable=false`、`Resets=[]`，没有PUT编辑。重置机制先核对网关离线状态（在线409、不可达/状态未知502），再验证显式item白名单；`all`不例外。当前离线请求因无生产白名单返回422，没有启用任何具体充值重置。
-- 已验证隔离测试描述符的重置成功路径：先读before、在内存应用白名单操作、比较before后写入；数据与带key/item/reason及before/after摘要的审计在同一事务提交。并发变化返回409，审计失败回滚数据。测试描述符不进入生产注册表。
-- 阶段1已通过：`go vet ./...`；`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`（game约161秒）；注册表/构造器/前缀及API专项测试；`make admin-ui-check`、原28项前端测试、`make build`。继续使用指定Node 22.23.4和Corepack pnpm 10.11.0；UI快照及锁文件没有变化。
-- 验证边界：HTTP测试使用临时SQLite与httptest网关，事务失败用隔离数据库触发器注入。没有对真实玩家启用重置，也未做实际在线玩家的阶段2充值重置联动；专用View/Rank、全服ops、PUT编辑和前端均未实现。玩法语句和抓包未改；`tcRole`仅从函数局部移到包作用域供注册使用。
-
-- 阶段0实现提交：`b1f0dc3d11e15bebecd7d9a6f4a859f588980b48`（`Inventory admin data coverage and enforce registry completeness`），基线为计划提交 `24c5b765db14f1a0acb1e5507ddbf7c22da6d12d`。
-- 审阅入口：[ADMIN_COVERAGE.md](ADMIN_COVERAGE.md)。按源码登记 **77 个玩家模块项、30 个全服模块项、92 张表**，覆盖 **343 处持久化调用及 85 个模块常量**。数量含动态前缀族，不是后台功能完成率。
-- 扫描范围包括 `internal/game` 及 `internal/store` 的持久化封装，避免漏掉战技、神装、魂器、赋能；清单分别记录当前能力、后续拟提供能力及限制原因。
-- 阶段0完整性门禁为 `TestAdminCoverageRegistryComplete`；扫描器与文档注册表检查位于 `internal/admincoverage`，只读扫描工具为 `tools/admincoverage`。阶段0当时未实现运行时注册表、模块API或写库入口；阶段1增量见上。
-- 阶段0已通过：`go vet ./...`、`go test -race ./internal/game ./internal/admin ./internal/store ./internal/admincoverage`、注册表及扫描器专项测试、`make admin-ui-check`、原有 28 项前端测试、`make build`。
-- 验证使用 `~/.local/node/node-v22.23.4-darwin-x64/bin` 下的 Node `22.23.4`，项目内 Corepack pnpm `10.11.0`。玩法、`testdata/captures`、前端依赖/锁文件和生产 UI 快照均未改动。
-- 后续动作（已更新）：阶段 2、3 已通过审核，阶段 4 已授权；阶段 5–6 仍须审核方逐阶段另行授权，不要自动继续。
-
-拉取后可复核：
-
-```sh
-git show --stat b1f0dc3d11e15bebecd7d9a6f4a859f588980b48
-git show --stat 98965e830663083448fdf55cdbc3a44bcd772055
-git log -1 --format='%H %s' -- internal/game/admincharge.go
-go run ./tools/admincoverage
-go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|Registry)' -v
-```
-
-## Context
-
-新版后台（`web/admin`，Geeker-Admin，16 页）已经覆盖了 Go 现有的全部管理接口。没接进后台的是**游戏侧数据**：
-- 后端约 65 个玩家模块状态（`module_state` 表）
-- 约 31 个全服模块状态（`global_state` 表）
-- 一批专用表：竞技场、公会、任务、好友、阵容、装备等
-- 赛季结算、世界等级
-
-`docs/ROADMAP.md`"后台缺口"第二类（首充/基金/限时礼包、周礼包、月卡月基金、活动排名和结算、竞技场/冠军赛赛季控制、世界等级和开服时间）是其中的一部分。
-
-**用户要求：还没接的全部要做。** 已定规则：
-- **离线才写**：所有修改玩家数据的接口先问网关 `GET /online?rid=N`。在线返回 409，页面提示"先踢下线"；网关查不到返回 502，**不写**。
-- **全服数据和赛季操作必须在网关进程里做**：这些服务（`amSvc`、`atSvc`、`eliteSvc`、`caSvc`、`drWorld`、`gwSvc`、冠军赛等）的锁和定时器都在网关里。后台只能通过网关控制口调用，**不许直接写 `global_state`**。
-
-95 个模块不能一个模块一个页面地手写。做法是**一个模块注册表 + 通用查看/编辑**覆盖全部模块，再给重要的模块做专用视图。
-
-## 关键事实（已核对）
-
-- 玩家状态：`store.LoadState/SaveState(rid, module)`；全服状态：`LoadGlobal/SaveGlobal(srvID, module)`（`internal/store/module_state.go`）。玩家状态每次请求都从库读，不在内存缓存，所以玩家离线时后台写库是安全的。
-- 状态结构都没导出，模块名常量分散在各文件里。例如：
-  - `monthCardModule`、`limitGiftModule`、`cycleGiftModule`、`"firstcharge_"+key`
-  - 全服的 `champModule`、`drModule`、`atModule`、`caModule`、`guildWarModule`
-- 已有的结算函数：
-  - `atSvc.settleSeason`（`arenateam.go:302`）
-  - `eliteSvc.settleSeasons/settleHalf`（`elitematch_season.go`）
-  - `caSvc.settle`（`crossarena.go:297`）
-  - `amSvc.settle`（`arenamany.go:259`）
-  - `drWorld.settle`（`daysrank.go:168`）
-  - `gwSvc.settleAll`（`guildwar.go:345`）
-  - 冠军赛 ticker（`arenachampion.go:332`）、活动 ticker（`activity.go:521`）
-- World level: original top-10 average remains ComputedWorldLevel; registered worldlev now supplies an active override until expiry. 开服时间已经能在 `/servers` 页编辑；开服天数在 `openday.go`。
-- 网关控制口：`internal/game/adminhttp.go`，只绑 loopback、没有鉴权。`/push/charge`、`/push/refresh`、`/kick`、`/online` 都可以复用。
-- 后台调网关用 `s.gateway(...)`，参考 `kickRole`（`internal/admin/handlers.go:842`）；审计用 `s.audit(...)`。`internal/admin` 已经 import `internal/game`。
-
-## 阶段
-
-### 阶段 0：覆盖清单（先交，作为"全部"的验收标准）
-
-新建 `docs/ADMIN_COVERAGE.md`，脚本生成加人工补充，覆盖：
-- `LoadState/SaveState` 和 `LoadGlobal/SaveGlobal` 的**每个**模块名
-- `internal/store` 里每张跟游戏相关的表
-
-每行写：模块名、中文名和对应窗口、范围（玩家/全服/表）、后台能做什么（查看 / 专用视图 / 重置 / 编辑 / 赛季操作 / 不提供）。选"不提供"必须写原因。
-
-再加一个 Go 测试：扫描 `internal/game/*.go` 里的模块名常量，**任何没在注册表里的模块都让测试失败**。这样以后新加模块也不会漏接后台。
-
-### 阶段 1：模块注册表和通用查看/编辑
-
-新文件 `internal/game/adminreg.go`：
-
-```go
-type AdminModule struct {
-    Key, Title, Window string
-    Scope   string            // "role" | "global"
-    New     func() any        // 返回该模块真实 state 结构的指针，用于反序列化和校验
-    View    func(st *store.Store, id string, now time.Time) (any, error) // 可选：人看得懂的视图，复用模块的 view()/roll()
-    Resets  []AdminReset      // 可选：白名单单项重置，每项一个函数
-    Rank    func(st *store.Store, srv string, limit int) ([]AdminRankRow, error) // 可选：排名
-    Editable bool             // 是否允许整份 JSON 编辑（默认 false）
-}
-func AdminModules() []AdminModule
-```
-
-- 每个模块文件在 `init()` 里注册自己，结构类型留在原文件，不导出。
-- 前缀模块（`firstcharge_<key>`）按前缀注册。
-- 只读视图、重置函数都**复用**模块已有的 `view()`、`roll()` 和规则，不另写一套逻辑。
-
-接口（`internal/admin/modules.go`）：
-
-| 路由 | 权限 | 说明 |
+| 阶段 | 实现提交 | 交付 |
 | --- | --- | --- |
-| `GET /api/modules` | read | 注册表：key、名字、范围，以及有没有 View/Resets/Rank/Editable |
-| `GET /api/roles/{id}/modules` | read | 该角色已有的 module_state 行，按注册表标注 |
-| `GET /api/roles/{id}/modules/{key}` | read | 原始 JSON；有 View 的同时给视图 |
-| `POST /api/roles/{id}/modules/{key}/reset` | manage | body `{item, reason}`，item 必须在白名单；`item:"all"` 表示删整行 |
-| `PUT /api/roles/{id}/modules/{key}` | manage | 只限 `Editable` 的模块。先 `json.Unmarshal` 进 `New()`，**DisallowUnknownFields**，校验通过才保存 |
-| `GET /api/servers/{id}/modules`、`/{key}` | read | 全服状态只读，通过网关读，见阶段 3 |
+| 基础迁移 | `180ef73`、`92d95c8` | Geeker-Admin迁移、Go默认入口与原回归修复 |
+| 0 | `b1f0dc3` | 完整清单、源码扫描和覆盖门禁 |
+| 1 | `98965e8` | 运行时注册、玩家模块只读API与白名单重置基础机制 |
+| 2 | `f7164c2` | 六类充值视图/重置、角色充值订单汇总、付款重放/并发保护 |
+| 3a | `16d4128` | 网关持锁的全服只读、排名、赛季和概况 |
+| 3b | `ded2c6e` | 8项自然到期补结算、幂等与事务审计 |
+| 3c | `d8f6397` | 世界等级覆盖、登录/10905生效与推送 |
+| 4 | `dbf1b5f` | 82项列白名单表视图、归属隔离、分页、4KB预览、覆盖门禁 |
+| 5 | `253daa8` | 角色数据页签、玩法状态、模块总表、权限与嵌入资源 |
+| 5审核修复 | `c0357f5` | 保留模块/赛季/世界等级502精确消息，清除残留校验错误；前端36项测试 |
+| 6 | 本文同次提交 | 文档收口与全量回归；提交标题 `Finalize admin documentation and stage 6 validation`，完整号用 `git log -1 --format='%H %s' -- docs/ADMIN_COMPLETION_PLAN.md` 查询 |
 
-写接口的统一顺序：
-1. 查在线：在线返回 409，网关不可达返回 502
-2. 读出 before
-3. 写入
-4. 审计，action 为 `role.module.reset` 或 `role.module.edit`，detail 带 key、item、reason 和 before/after 的 JSON diff 摘要
+本轮不新增分支、PR或远端分支；主项目main本地提交，等待审核。之前阶段的临时工作树和旧交付时的停止条件不再作为本轮操作指令。
 
-原因必填，1–200 字。
+## 已知能力边界和保留问题
 
-### 阶段 2：充值类专用视图和重置（ROADMAP 点名项）
+1. **入口位置遗漏**：公会详情没有直接“数据表”按钮，区服页没有直达“玩法状态”跳转。公会/区服表可从侧栏玩法状态页读取，公会表手输GID。不是接口不可用，也不是已完成这两个快捷入口；用户要求阶段6不处理此缺口。
+2. **充值重置**：仅superadmin、原因必填、网关明确离线才写；在线409，未知/不可达502。白名单具体item、before比较、变更与审计同事务。首充删除具体窗口整行后，会按历史已付总额重新激活；月卡只清指定卡并将Base设为当前实付，需要新付款达标。两者口径不同，均未与原服核对。重置本身不发奖，不改原奖励/价格/限购公式；Kind3神装礼包仍不发售。
+3. **全服**：只经网关真实服务锁，不由后台直接写global_state。8项审定赛季只补自然到期且未结算项目；其余23项全服活动/玩法及其排行榜只查看、没有结算写入口（worldlev另有专用覆盖PUT）。16项排名复用既有排序，不创建赛季、不提前、不取消。worldlev的0关闭覆盖、until=0长期，过期按游戏时钟回退原计算值而不清存档；管理策略未与原服核对。
+4. **事务和推送**：补结算在一个SQLite事务内完成，期间其它写入会短暂排队；邮件在事务提交前可能先推送在线玩家。回滚数据库不等于撤回已推送通知。世界等级保存后推10905，推送失败不撤销已提交设置。全服代理网络错误可能发生在提交后，不能把所有502都说成未写入；必须核对状态/审计后再重试。
+5. **安全与数据范围**：`tickets.phone/email/phone_info` 对viewer可读，审核已接受。凭据、离线聊天正文、录像脚本从通用表查询层排除。文本4KB截断并标记truncated，截断JSON仅预览。表COUNT和单页查询在同一只读快照，多次offset请求遇并发增删不保证跨请求快照；全服多个服务也不是跨服务一致快照。
+6. **锁的边界**：付款/重置同Store实例共享角色锁；不代表多admin进程、多Store或多网关的分布式互斥。跨进程锁及多实例部署未验证，没有改变原生定时器既有失败事务边界。
+7. **部署和原服**：测试只用隔离库、测试管理员和本机TCP，不操作真实玩家/付款。原服抓包目录未改；真机界面与生产部署未验证。源码/嵌入快照构建通过，不表示原有19080运行进程已更新。没有启动或重启现有实例。
 
-用注册表的 View/Resets 实现：
-- **首充**（每个窗口 key）：两档是否达成、已领天数、选的英雄、每天的状态。可重置：整个窗口。
-- **每日首充**：当天累计、是否已领。可重置：当天。
-- **月卡 ×2**：激活、剩余天数、当天状态、累计金额。可重置：单卡；Base 设为当前已付金额，规则写注释并记入 `OPEN_QUESTIONS.md`。
-- **月基金 ×2**：可重置单个基金。
-- **限时礼包**：每个 id 的开放、过期、是否已买。可重置单条。
-- **周/月礼包**：先 `roll(now)` 再显示，但只在内存里 roll，**不写回**。可重置单个 charge id 的计数。
+## 浏览器验证的明确边界
 
-另加 `GET /api/roles/{id}/charge`：把以上汇总在一起，并附上该角色的充值订单（复用 pay 的 store 查询）。
+阶段5及审核方的浏览器验证限于隔离沙盒种子数据：模块总表、世界等级覆盖、赛季补结算首次settled/重复already、月卡重置、在线409、viewer权限及网关故障反馈已有操作记录。早期手工检查不替代完整验收。
 
-### 阶段 3：全服数据、排名、结算和赛季控制（经网关）
+按阶段6授权要求，以下仍列为**未浏览器验证（未形成完整验收）**：operator账号界面完整流程；有真实数据时的表分页与truncated标记；任务/阵容/好友/公会/收件页签；公会详情数据表入口（当前代码并无该入口）；重置后玩家重新登录的实际表现。本轮仅文档与自动回归，没有补做上述浏览器检查。自动API/race测试与浏览器/真机验证分别记录，不互相替代。
 
-网关控制口新增（`internal/game/adminhttp.go` 或新文件 `adminops.go`，同样只绑 loopback）：
-- `GET /ops/global?srv=&key=`：在该服务自己的锁下读出全服状态；有 View 的同时给视图。
-- `GET /ops/rank?srv=&key=&limit=`：调注册表里的 Rank。
-- `GET /ops/season?srv=&key=`：当前赛季或届次、阶段、起止时间、是否已结算、发奖情况。
-- `POST /ops/season/settle?srv=&key=`：在服务锁下调用**已有**的 settle 函数，**必须幂等**：已结算的直接返回 `{"settled":false,"reason":"already"}`。
+## 阶段6最终验证
 
-  只给结算函数已有、规则已写好的模块：arenateam、elitematch、crossarena、arenamany、daysrank、guildwar、冠军赛（只补自然到期且未结算的届次，进行中不可推进或取消）。其他模块 settle 返回 405，并在覆盖清单里写明原因。
-- `GET/PUT /ops/worldlev?srv=`：世界等级覆盖值，存在 global_state `"worldlev"`，格式 `{override, until}`。`store.WorldLevel` 优先用没过期的覆盖值；0 表示不覆盖。改完推一次 10905 给在线玩家。
+以下命令均在本轮实际执行并退出0。首轮全包race游戏包184.432秒、admin36.924秒；make test再次执行全包race，部分包复用Go测试缓存，store重新运行12.017秒。没有失败或data race。
 
-为此给各服务加一个统一接口，例如：
+| 命令 | 结果 |
+| --- | --- |
+| `go run ./tools/admincoverage` | 已通过；108模块/92表/86常量/352调用 |
+| `go vet ./...` | 通过 |
+| `go test -race ./...` | 全包通过 |
+| `make test` | 通过；vet、旧前端18/18、新前端36/36、全包race |
+| `make build` | 通过；嵌入快照生成及全部cmd构建，65个assets与已跟踪版本无差异 |
+| `make admin-ui-check` | vue-tsc通过 |
 
-```go
-type adminSeasonSvc interface {
-    seasonStatus(srv string, now time.Time) (any, error)
-    settleNow(srv string, now time.Time) (bool, error)
-}
-```
-
-在 `RegisterXxx` 里挂到注册表上。
-
-后台接口转发这些，并加上鉴权：
-- `GET /api/servers/{id}/modules/{key}`、`/rank`、`/season`：read
-- `POST /api/servers/{id}/seasons/{key}/settle`：manage，二次确认，原因必填，记审计
-- `GET/PUT /api/servers/{id}/worldlev`：GET 为 read，PUT 为 manage
-- `GET /api/servers/{id}/overview`：世界等级（算出值和覆盖值）、开服第 N 天、开服时间、竞技场本季起止
-
-网关不可达时所有全服接口都返回 502。
-
-### 阶段 4：角色专用表补全
-
-对照覆盖清单，把还没在角色详情里出现的表接成只读页签，直接用 store 已有的查询函数：
-- 英雄列表、属性、装备、神器
-- 阵容
-- 公会和职位
-- 好友和黑名单
-- 任务进度
-- 竞技场（分数、排名、日志）
-- 角色收到的邮件
-- 充值订单
-
-能安全改的，在覆盖清单里写明后再加写接口，同样离线才写。
-
-### 阶段 5：前端
-
-- 角色详情新增页签：
-  - **充值状态**：专用视图加每项重置
-  - **模块数据**：按注册表列出该角色的所有模块，有视图就显示视图，没有就显示格式化 JSON；重置和编辑只对 superadmin 可见
-  - 阶段 4 的各只读页签
-- 新页 `/#/game-status`"玩法状态"：选区服后显示
-  - 概况：世界等级（superadmin 可以设覆盖值和到期时间）、开服天数、竞技场本季
-  - 排名：下拉选择有 Rank 的模块
-  - 赛季：列出所有有赛季的模块，显示状态和"立即结算"按钮（superadmin，二次确认，填原因）
-  - 全服数据浏览
-- 新页 `/#/modules`"模块总表"：注册表加覆盖情况，方便核对"全部接了"。
-- 统一交互：
-  - 409 提示"玩家在线，请先踢下线"，旁边给踢线按钮
-  - 502 提示"网关不可用，未修改"
-  - 结算返回 already 时提示"本季已结算"
-  - 沿用 `useCommand` 的提交锁、`useCollection`、`management.ts` 权限表、`menu.ts`
-- 前端测试新增：权限可见性、item 和原因校验、错误文案映射、JSON 编辑校验。原有 28 项必须全部保留。
-- 跑 `make admin-ui-embed`，**更新后的 `internal/admin/ui` 快照一起提交**。
-
-### 阶段 6：文档
-
-- `docs/ROADMAP.md`"后台缺口"：两类都逐项标完成，并链接到 `ADMIN_COVERAGE.md`。
-- `web/admin/README.md`：页面表更新。
-- `docs/ADMIN_UI_INTEGRATION.md`：补网关 `/ops/*` 接口说明。
-
-## 给 Codex 的约束
-
-- 每个阶段一个 commit（阶段 0 先单独交，我先审清单），不要 push。
-- 不改游戏规则。只加注册、导出视图、admin 用的 settle 入口和世界等级覆盖；已有 settle 函数的行为不能变。
-- 不碰 `testdata/captures`。不加前端依赖，不重写 lockfile，使用 Node 22 和 corepack pnpm 10.11.0。
-- 未确认的规则写进注释，并在 `docs/OPEN_QUESTIONS.md` 加一条。
-
-## 验收（Claude 逐阶段执行）
-
-1. **阶段 0**：抽查清单，拿 grep 出的模块名逐个比对，不能漏；"不提供"的理由要成立。
-2. **每阶段**：
-   - `go vet ./...`
-   - `go test -race ./internal/game ./internal/admin ./internal/store`，注册表完整性测试必须通过
-   - `make admin-ui-check`、`make admin-ui-test`、`make build`
-   - `git status` 里只有预期文件，快照已更新
-3. **读 diff**，重点看：
-   - 视图和重置有没有复用模块已有逻辑
-   - GET 接口有没有写库
-   - 写接口在查在线之前或失败时有没有写库
-   - 后台有没有绕过网关直接写 global_state
-   - settle 是否幂等，重复调用会不会重复发奖或发邮件
-   - JSON 编辑有没有校验未知字段
-   - 审计有没有带原因
-4. **`make dev` 实测**：
-   - 造有月卡、首充、周礼包状态的角色：在线重置返回 409；踢线后重置成功，审计有记录；重新登录后游戏里状态正确，可以重新达成，不重复发奖
-   - 随便挑 5 个不同模块打开"模块数据"，原始 JSON 和视图都能显示
-   - 世界等级覆盖：登录后 10905 显示覆盖值；过期或清零后恢复按算法计算
-   - 对 arenateam 和 daysrank 各执行两次"立即结算"：第二次返回 already，奖励邮件只发一次
-   - viewer/operator 看不到写按钮，直接调接口返回 403
-   - 网关停掉后，全服页面和写操作都返回 502
+使用Node22.23.4、Corepack pnpm10.11.0；不改全局工具版本、前端依赖或锁文件。最终检查仅六个指定文档有变更，功能源码、快照、依赖/锁文件和testdata/captures均不变；没有新增断链，`git diff --check`通过。额外运行覆盖门禁专项通过。构建仅有既有Browserslist数据年龄与Vite大包提示。本轮无回归失败，因此未执行失败基线复现，也未修改任何测试。

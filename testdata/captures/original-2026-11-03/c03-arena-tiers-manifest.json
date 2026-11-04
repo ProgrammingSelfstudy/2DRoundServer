@@ -1,0 +1,111 @@
+{
+  "analysis_kind": "Offline analysis of existing user-operated original-client capture; ordinary local decoder evidence.",
+  "scenario": "c03-arena-tiers",
+  "source_capture": "cap-20261103-233358-8cea5dfc.pcap",
+  "source_bytes": 219848,
+  "source_sha256": "601cc833eec1675126508eff90bdf6cb580e30fc8372dd1661db564a5e5d3312",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 219848,
+  "pcap_packet_records": 866,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/arena-tiers-20261103-233358",
+  "decoded_file": "arena-tiers-decoded.jsonl",
+  "decoded_sha256": "b370f2ed62dd3291a0c32b500a7b8c8e1d43cf2a67f64108dfaebbb441dc4c33",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 1213,
+  "frames_by_direction": {
+    "c2s": 486,
+    "s2c": 727
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-03T15:34:01.384287Z",
+  "last_frame_utc": "2026-11-03T15:35:52.424027Z",
+  "exported_rows": 253,
+  "unique_source_lines": 253,
+  "source_line_definition": "1-based lines of the fixed full decode; directions emitted separately.",
+  "fresh_initial_weekly_count": 50,
+  "initial_state_source_lines": [
+    602,
+    633
+  ],
+  "final_weekly_count": 92,
+  "final_state_source_line": 1136,
+  "challenge_requests": 46,
+  "accepted_and_settled": 42,
+  "frequency_refusals": 4,
+  "outcomes": {
+    "wins": 1,
+    "losses": 41
+  },
+  "claims": [
+    {
+      "tier": 70,
+      "weekly_count_at_claim": 70,
+      "reward": {
+        "base_id": 37002,
+        "name": "高级探宝券",
+        "quantity": 1
+      },
+      "stock_before": 719,
+      "stock_after": 720,
+      "request_source_line": 347,
+      "reply_source_line": 873
+    },
+    {
+      "tier": 90,
+      "weekly_count_at_claim": 92,
+      "reward": {
+        "base_id": 14001,
+        "name": "强者招募令",
+        "quantity": 1
+      },
+      "stock_before": 419,
+      "stock_after": 420,
+      "request_source_line": 459,
+      "reply_source_line": 1137
+    }
+  ],
+  "initial_ticket_quantity": 39,
+  "final_ticket_quantity": 0,
+  "initial_free_challenges": 3,
+  "final_free_challenges": 0,
+  "purchase_refusals": 6,
+  "purchase_hint": "钻石不足",
+  "purchase_hint_command": 12741,
+  "purchase_reply_msg": "",
+  "latest_reported_gold_before_purchases": "94423",
+  "commands_absent": [
+    20062,
+    20027,
+    20002,
+    20004
+  ],
+  "tier_120_claimed": false,
+  "below_30_skip_test_covered": false,
+  "round_count_confirmed": false,
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "Opponent identity removed from requests and mapped to stable anonymous labels. Settlement projections omit names, portraits, replay IDs and damage-stat identities; retain outcomes, score values and item rewards. Inventory projection explicitly marked. Authentication, addresses, chat, raw payload and unrelated later account/welfare traffic excluded.",
+  "limitations": [
+    "Initial count 50 is freshly observed in this capture; the same historical count is not used as current evidence.",
+    "All 46 requests use is_auto=1; no manual skip request or round script is present.",
+    "Only 70 and 90 chests were claimed; 120 remains absent at count 92.",
+    "All six ticket-purchase requests were refused despite a recent gold value of 94423; original price/payment asset/extra conditions are unresolved.",
+    "Opponents having role data does not establish real-time human play.",
+    "All 42 generic 20006 results are 1; arena win/loss is read from 20210 instead.",
+    "Receiver closure and a clean decode do not establish lossless network capture."
+  ],
+  "artifacts": {
+    "c03-arena-tiers.jsonl": "a490f0ddfedf60f93433090720b490015858cdd86dc43bd654ff583db6652b13",
+    "c03-arena-tiers-analysis.json": "09960f4a6663765c6dc28514db0634d798ac38346397335ff548492af20b2ad8",
+    "ARENA_TIERS_NOTES.md": "17a18ac68b954ee5b2a6f7b71465c77059929fbaa7b62da9d0fdb47dc48e481c"
+  },
+  "reference_source_sha256": {
+    "internal/game/arena.go": "94256000e8545833fc0557af567e183a4e85096969074459a08873caaaa9a11a",
+    "internal/game/data/item_names.json": "6c4d06db23dbfb5fafb6009135b2517a417634658da2f9ed5ce5dbd402fcc5ce"
+  }
+}

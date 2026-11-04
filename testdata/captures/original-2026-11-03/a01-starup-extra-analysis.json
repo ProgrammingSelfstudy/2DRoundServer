@@ -1,0 +1,1202 @@
+{
+  "scenario": "a01-hero-starup-extra",
+  "source_capture": "cap-20261103-231158-4e253908.pcap",
+  "source_decoded": "starup-extra-decoded.jsonl",
+  "source_line_definition": "1-based lines in the unmodified full decode; directions emitted separately.",
+  "target": {
+    "partner_id": 1005,
+    "bid": 30501,
+    "name": "鳄鱼"
+  },
+  "cycles": [
+    {
+      "index": 1,
+      "request_utc": "2026-11-03T15:12:20.222011Z",
+      "partner_id": 1005,
+      "name": "鳄鱼",
+      "before": {
+        "bid": 30501,
+        "break_lev": 0,
+        "end_time": 0,
+        "horcrux_lev": 0,
+        "horcrux_status": 0,
+        "is_lock": [],
+        "lev": 1,
+        "partner_id": 1005,
+        "power": 2032,
+        "resonate_break_lev": 0,
+        "resonate_lev": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 203001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 203101
+          }
+        ],
+        "star": 5,
+        "use_skin": 0,
+        "artifacts": [],
+        "atk": 206,
+        "crit_rate": 0,
+        "crit_ratio": 1500,
+        "def": 49,
+        "def_p": 0,
+        "def_s": 0,
+        "dodge_magic": 0,
+        "dodge_rate": 0,
+        "eqms": [],
+        "hit_magic": 0,
+        "hit_rate": 1000,
+        "hp": 1741,
+        "speed": 124
+      },
+      "after": {
+        "atk": 250,
+        "atk2": 10356,
+        "bid": 30501,
+        "break_lev": 0,
+        "crit_rate": 0,
+        "crit_ratio": 1500,
+        "def": 49,
+        "def2": 6179,
+        "def_p": 0,
+        "def_s": 0,
+        "dodge_magic": 0,
+        "dodge_rate": 0,
+        "end_time": 0,
+        "hit_magic": 0,
+        "hit_rate": 1000,
+        "horcrux_lev": 0,
+        "horcrux_status": 0,
+        "hp": 1972,
+        "hp2": 84549,
+        "is_lock": [],
+        "lev": 1,
+        "partner_id": 1005,
+        "power": 2276,
+        "resonate_break_lev": 0,
+        "resonate_lev": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 203001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 203102
+          }
+        ],
+        "speed": 134,
+        "speed2": 5460,
+        "star": 6,
+        "use_skin": 0
+      },
+      "changes": {
+        "star": 1,
+        "lev": 0,
+        "break_lev": 0,
+        "atk": 44,
+        "def": 0,
+        "hp": 231,
+        "speed": 10,
+        "power": 244
+      },
+      "request": {
+        "expend1": [
+          {
+            "partner_id": 1363
+          },
+          {
+            "partner_id": 423
+          }
+        ],
+        "expend2": [
+          {
+            "partner_id": 243
+          },
+          {
+            "partner_id": 1387
+          },
+          {
+            "partner_id": 731
+          }
+        ],
+        "item_expend": [],
+        "partner_id": 1005
+      },
+      "reply": {
+        "msg": "",
+        "result": 1
+      },
+      "consumed_heroes": [
+        {
+          "partner_id": 1363,
+          "bid": 30501,
+          "name": "鳄鱼",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend1"
+        },
+        {
+          "partner_id": 423,
+          "bid": 30403,
+          "name": "Mr.1",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend1"
+        },
+        {
+          "partner_id": 243,
+          "bid": 30505,
+          "name": "霍古巴克",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend2"
+        },
+        {
+          "partner_id": 1387,
+          "bid": 30505,
+          "name": "霍古巴克",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend2"
+        },
+        {
+          "partner_id": 731,
+          "bid": 30505,
+          "name": "霍古巴克",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend2"
+        }
+      ],
+      "consumed_reply_order": [
+        423,
+        1363,
+        731,
+        1387,
+        243
+      ],
+      "target_star_requirement": {
+        "skills": [
+          [
+            1,
+            203001
+          ],
+          [
+            2,
+            203102
+          ],
+          [
+            3,
+            203202
+          ],
+          [
+            4,
+            203302
+          ],
+          [
+            5,
+            203402
+          ]
+        ],
+        "add": [
+          1500,
+          1400,
+          1000,
+          1000
+        ],
+        "lev_max": 145,
+        "attr": {
+          "hp_max": 400,
+          "atk": 80,
+          "speed": 20
+        },
+        "self": [
+          [
+            30501,
+            5,
+            1
+          ]
+        ],
+        "fodder": [
+          [
+            30501,
+            5,
+            1
+          ],
+          [
+            30403,
+            5,
+            1
+          ]
+        ],
+        "camp_fodder": [
+          [
+            3,
+            5,
+            3
+          ]
+        ],
+        "cost": []
+      },
+      "material_requirements_match": true,
+      "server_command_sequence": [
+        11002,
+        16401,
+        16606,
+        13601,
+        11006,
+        11005
+      ],
+      "source_lines": {
+        "request": 251,
+        "target_update": 409,
+        "delete": 413,
+        "reply": 414
+      }
+    },
+    {
+      "index": 2,
+      "request_utc": "2026-11-03T15:12:29.646729Z",
+      "partner_id": 1005,
+      "name": "鳄鱼",
+      "before": {
+        "atk": 250,
+        "atk2": 10356,
+        "bid": 30501,
+        "break_lev": 0,
+        "crit_rate": 0,
+        "crit_ratio": 1500,
+        "def": 49,
+        "def2": 6179,
+        "def_p": 0,
+        "def_s": 0,
+        "dodge_magic": 0,
+        "dodge_rate": 0,
+        "end_time": 0,
+        "hit_magic": 0,
+        "hit_rate": 1000,
+        "horcrux_lev": 0,
+        "horcrux_status": 0,
+        "hp": 1972,
+        "hp2": 84549,
+        "is_lock": [],
+        "lev": 1,
+        "partner_id": 1005,
+        "power": 2276,
+        "resonate_break_lev": 0,
+        "resonate_lev": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 203001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 203102
+          }
+        ],
+        "speed": 134,
+        "speed2": 5460,
+        "star": 6,
+        "use_skin": 0
+      },
+      "after": {
+        "atk": 294,
+        "atk2": 14499,
+        "bid": 30501,
+        "break_lev": 0,
+        "crit_rate": 0,
+        "crit_ratio": 1500,
+        "def": 49,
+        "def2": 6179,
+        "def_p": 0,
+        "def_s": 0,
+        "dodge_magic": 0,
+        "dodge_rate": 0,
+        "end_time": 0,
+        "hit_magic": 0,
+        "hit_rate": 1000,
+        "horcrux_lev": 0,
+        "horcrux_status": 0,
+        "hp": 2217,
+        "hp2": 126824,
+        "is_lock": [],
+        "lev": 1,
+        "partner_id": 1005,
+        "power": 2526,
+        "resonate_break_lev": 0,
+        "resonate_lev": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 203001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 203103
+          }
+        ],
+        "speed": 144,
+        "speed2": 5460,
+        "star": 7,
+        "use_skin": 0
+      },
+      "changes": {
+        "star": 1,
+        "lev": 0,
+        "break_lev": 0,
+        "atk": 44,
+        "def": 0,
+        "hp": 245,
+        "speed": 10,
+        "power": 250
+      },
+      "request": {
+        "expend1": [],
+        "expend2": [
+          {
+            "partner_id": 1388
+          },
+          {
+            "partner_id": 13
+          },
+          {
+            "partner_id": 706
+          },
+          {
+            "partner_id": 283
+          }
+        ],
+        "item_expend": [],
+        "partner_id": 1005
+      },
+      "reply": {
+        "msg": "",
+        "result": 1
+      },
+      "consumed_heroes": [
+        {
+          "partner_id": 1388,
+          "bid": 30506,
+          "name": "萨博（火拳）",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend2"
+        },
+        {
+          "partner_id": 13,
+          "bid": 30506,
+          "name": "萨博（火拳）",
+          "star": 5,
+          "lev": 100,
+          "break_lev": 5,
+          "is_lock": [],
+          "request_list": "expend2"
+        },
+        {
+          "partner_id": 706,
+          "bid": 30512,
+          "name": "黑胡子",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend2"
+        },
+        {
+          "partner_id": 283,
+          "bid": 30505,
+          "name": "霍古巴克",
+          "star": 5,
+          "lev": 1,
+          "break_lev": 0,
+          "is_lock": [],
+          "request_list": "expend2"
+        }
+      ],
+      "consumed_reply_order": [
+        283,
+        706,
+        13,
+        1388
+      ],
+      "target_star_requirement": {
+        "skills": [
+          [
+            1,
+            203001
+          ],
+          [
+            2,
+            203103
+          ],
+          [
+            3,
+            203202
+          ],
+          [
+            4,
+            203302
+          ],
+          [
+            5,
+            203402
+          ]
+        ],
+        "add": [
+          2250,
+          1960,
+          1000,
+          1000
+        ],
+        "lev_max": 165,
+        "attr": {
+          "hp_max": 600,
+          "atk": 120,
+          "speed": 30
+        },
+        "self": [],
+        "fodder": [],
+        "camp_fodder": [
+          [
+            3,
+            5,
+            4
+          ]
+        ],
+        "cost": [
+          [
+            10001,
+            1000
+          ]
+        ]
+      },
+      "material_requirements_match": true,
+      "server_command_sequence": [
+        16603,
+        11099,
+        12761,
+        1169,
+        10302,
+        10510,
+        10512,
+        10510,
+        10512,
+        12742,
+        11002,
+        11002,
+        11002,
+        11002,
+        11002,
+        11002,
+        16606,
+        11006,
+        11005
+      ],
+      "source_lines": {
+        "request": 257,
+        "target_update": 425,
+        "delete": 432,
+        "reply": 433
+      }
+    }
+  ],
+  "consumed_trained_hero": {
+    "partner_id": 13,
+    "name": "萨博（火拳）",
+    "before": {
+      "bid": 30506,
+      "break_lev": 5,
+      "end_time": 0,
+      "horcrux_lev": 0,
+      "horcrux_status": 0,
+      "is_lock": [],
+      "lev": 100,
+      "partner_id": 13,
+      "power": 31314,
+      "resonate_break_lev": 0,
+      "resonate_lev": 0,
+      "skills": [
+        {
+          "pos": 1,
+          "skill_bid": 150001
+        },
+        {
+          "pos": 2,
+          "skill_bid": 150101
+        },
+        {
+          "pos": 3,
+          "skill_bid": 150201
+        },
+        {
+          "pos": 4,
+          "skill_bid": 150301
+        },
+        {
+          "pos": 5,
+          "skill_bid": 150401
+        }
+      ],
+      "star": 5,
+      "use_skin": 0,
+      "artifacts": [
+        {
+          "artifact_pos": 1,
+          "attr": [
+            {
+              "attr_id": 117,
+              "attr_val": 50000
+            },
+            {
+              "attr_id": 107,
+              "attr_val": 351000
+            }
+          ],
+          "base_id": 10455,
+          "enchant": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700185
+            },
+            {
+              "extra_k": 2,
+              "extra_v": 700375
+            }
+          ],
+          "extra_attr": [],
+          "id": 183
+        }
+      ],
+      "atk": 3492,
+      "crit_rate": 0,
+      "crit_ratio": 1500,
+      "def": 1047,
+      "def_p": 0,
+      "def_s": 0,
+      "dodge_magic": 0,
+      "dodge_rate": 0,
+      "eqms": [
+        {
+          "base_id": 40212,
+          "id": 12,
+          "type": 3
+        },
+        {
+          "base_id": 40305,
+          "id": 94,
+          "type": 4
+        },
+        {
+          "base_id": 40106,
+          "id": 95,
+          "type": 1
+        },
+        {
+          "base_id": 40406,
+          "id": 93,
+          "type": 2
+        }
+      ],
+      "hit_magic": 0,
+      "hit_rate": 1000,
+      "hp": 23482,
+      "speed": 696
+    },
+    "baseline_list_source_line": 317,
+    "baseline_detail_source_line": 329,
+    "delete_source_line": 432,
+    "refund_notice_source_line": 424,
+    "refund": {
+      "coin": 3753622,
+      "hero_exp": 1926110,
+      "item_10001": 1850
+    },
+    "refund_table_match": true,
+    "returned_equipment_base_ids": [
+      40212,
+      40305,
+      40106,
+      40406
+    ],
+    "returned_artifact": {
+      "id": 183,
+      "base_id": 10455
+    },
+    "returned_item_source_lines": [
+      420,
+      421,
+      422
+    ]
+  },
+  "assets": {
+    "before_source_line": 267,
+    "after_source_line": 419,
+    "balance_scope": "The most recent asset baseline precedes both star-up operations; no intervening 10302 after 5-to-6. The 6-to-7 reply includes the gross refund notice.",
+    "before": {
+      "coin": "895002677",
+      "hero_exp": "551679983",
+      "gold": "93973"
+    },
+    "after": {
+      "coin": "898756299",
+      "hero_exp": "553606093",
+      "gold": "93973"
+    },
+    "net_gain": {
+      "coin": 3753622,
+      "hero_exp": 1926110,
+      "gold": 0
+    }
+  },
+  "breakthrough_cards": {
+    "base_id": 10001,
+    "before": 588992,
+    "before_source_line": 303,
+    "after": 589842,
+    "after_source_line": 423,
+    "gross_refund": 1850,
+    "star_up_cost": 1000,
+    "net_gain": 850,
+    "equation": "588992 + 1850 - 1000 = 589842"
+  },
+  "resonance": {
+    "baseline_source_line": 334,
+    "baseline_crystal_lev": 35,
+    "baseline_slots": [
+      {
+        "cool_time": 0,
+        "id": 248,
+        "pos": 1
+      },
+      {
+        "cool_time": 0,
+        "id": 761,
+        "pos": 2
+      },
+      {
+        "cool_time": 0,
+        "id": 904,
+        "pos": 3
+      },
+      {
+        "cool_time": 0,
+        "id": 579,
+        "pos": 4
+      },
+      {
+        "cool_time": 0,
+        "id": 0,
+        "pos": 5
+      },
+      {
+        "cool_time": 0,
+        "id": 507,
+        "pos": 6
+      },
+      {
+        "cool_time": 0,
+        "id": 0,
+        "pos": 7
+      },
+      {
+        "cool_time": 0,
+        "id": 0,
+        "pos": 8
+      }
+    ],
+    "updated_slots": [
+      {
+        "partner_id": 248,
+        "before": {
+          "bid": 10404,
+          "break_lev": 1,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 35,
+          "partner_id": 248,
+          "power": 4326,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 270001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 270101
+            },
+            {
+              "pos": 3,
+              "skill_bid": 270201
+            }
+          ],
+          "star": 5,
+          "use_skin": 0,
+          "artifacts": [],
+          "atk": 553,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 199,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "eqms": [],
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "hp": 3290,
+          "speed": 215
+        },
+        "after": {
+          "atk": 230,
+          "atk2": 7047,
+          "bid": 10404,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 57,
+          "def2": 4332,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 1774,
+          "hp2": 35021,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 248,
+          "power": 1973,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 270001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 270101
+            }
+          ],
+          "speed": 102,
+          "speed2": 3535,
+          "star": 5,
+          "use_skin": 0
+        },
+        "source_line": 426
+      },
+      {
+        "partner_id": 761,
+        "before": {
+          "bid": 10502,
+          "break_lev": 1,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 35,
+          "partner_id": 761,
+          "power": 5872,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 151001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 151101
+            },
+            {
+              "pos": 3,
+              "skill_bid": 151201
+            }
+          ],
+          "star": 5,
+          "use_skin": 0,
+          "artifacts": [],
+          "atk": 771,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 276,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "eqms": [],
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "hp": 4224,
+          "speed": 298
+        },
+        "after": {
+          "atk": 278,
+          "atk2": 10020,
+          "bid": 10502,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 80,
+          "def2": 6188,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 2016,
+          "hp2": 50063,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 761,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 151001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 151101
+            }
+          ],
+          "speed": 141,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        },
+        "source_line": 427
+      },
+      {
+        "partner_id": 904,
+        "before": {
+          "bid": 10503,
+          "break_lev": 1,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 35,
+          "partner_id": 904,
+          "power": 5830,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            },
+            {
+              "pos": 3,
+              "skill_bid": 226201
+            }
+          ],
+          "star": 5,
+          "use_skin": 0,
+          "artifacts": [],
+          "atk": 694,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 275,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "eqms": [],
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "hp": 4351,
+          "speed": 308
+        },
+        "after": {
+          "atk": 278,
+          "atk2": 10014,
+          "bid": 10503,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 80,
+          "def2": 6182,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 2016,
+          "hp2": 50045,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 904,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "speed": 141,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        },
+        "source_line": 428
+      },
+      {
+        "partner_id": 579,
+        "before": {
+          "bid": 10503,
+          "break_lev": 1,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 35,
+          "partner_id": 579,
+          "power": 5830,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            },
+            {
+              "pos": 3,
+              "skill_bid": 226201
+            }
+          ],
+          "star": 5,
+          "use_skin": 0,
+          "artifacts": [],
+          "atk": 694,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 275,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "eqms": [],
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "hp": 4351,
+          "speed": 308
+        },
+        "after": {
+          "atk": 278,
+          "atk2": 10014,
+          "bid": 10503,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 80,
+          "def2": 6182,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 2016,
+          "hp2": 50045,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 579,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "speed": 141,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        },
+        "source_line": 429
+      },
+      {
+        "partner_id": 507,
+        "before": {
+          "bid": 10503,
+          "break_lev": 1,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 35,
+          "partner_id": 507,
+          "power": 5830,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            },
+            {
+              "pos": 3,
+              "skill_bid": 226201
+            }
+          ],
+          "star": 5,
+          "use_skin": 0,
+          "artifacts": [],
+          "atk": 694,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 275,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "eqms": [],
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "hp": 4351,
+          "speed": 308
+        },
+        "after": {
+          "atk": 278,
+          "atk2": 10014,
+          "bid": 10503,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 80,
+          "def2": 6182,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 2016,
+          "hp2": 50045,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 507,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "speed": 141,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        },
+        "source_line": 430
+      }
+    ],
+    "post_starup_26425_present": false,
+    "inference": "All five slot heroes fall from shown level 35 to 6 after consuming a core hero; no post-star-up 26425 confirms the new core list or its ordering."
+  },
+  "protected_heroes_baseline": [
+    {
+      "partner_id": 388,
+      "is_lock": [
+        {
+          "is_lock": 1,
+          "lock_type": 1
+        }
+      ]
+    },
+    {
+      "partner_id": 525,
+      "is_lock": [
+        {
+          "is_lock": 1,
+          "lock_type": 1
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Only successful 5-to-6 and 6-to-7 paths; no material shortage or locked-material rejection request.",
+    "item_expend is empty in both requests; no soul-item or above-20-star fusion sample.",
+    "No historical selection-page screenshots or button-state evidence.",
+    "The target-star table has no item cost for 5-to-6; no isolated post-first-star-up asset snapshot exists.",
+    "Training refunds and slot-level changes reflect this one consumed level-100 core hero, not all possible material heroes."
+  ]
+}

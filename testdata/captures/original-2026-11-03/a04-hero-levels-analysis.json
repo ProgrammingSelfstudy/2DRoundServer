@@ -1,0 +1,6552 @@
+{
+  "hero": {
+    "partner_id": 13,
+    "bid": 30506,
+    "name": "萨博（火拳）",
+    "star": 5
+  },
+  "baseline_source_lines": {
+    "hero_list": 428,
+    "hero_detail": 441,
+    "assets": 378,
+    "items": 414,
+    "resonance": 446,
+    "holy_equipment": 447
+  },
+  "events": [
+    {
+      "index": 1,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:23.876375Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 45,
+        "break_lev": 2,
+        "atk": 1066,
+        "def": 331,
+        "hp": 5111,
+        "speed": 375,
+        "power": 7456,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 50,
+        "break_lev": 2,
+        "atk": 1149,
+        "def": 360,
+        "hp": 5454,
+        "speed": 401,
+        "power": 8002,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 14136,
+        "def2": 5764,
+        "hp2": 64604,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 5,
+        "break_lev": 0,
+        "atk": 83,
+        "def": 29,
+        "hp": 343,
+        "speed": 26,
+        "power": 546
+      },
+      "assets_before": {
+        "coin": "847134541",
+        "hero_exp": "502231814",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "847042805",
+        "hero_exp": "502187486",
+        "gold": "92379"
+      },
+      "item_10001_before": 580416,
+      "item_10001_after": 580416,
+      "spent": {
+        "coin": 91736,
+        "hero_exp": 44328,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        25220,
+        11020,
+        26400,
+        26410,
+        26425,
+        11092,
+        11213,
+        25300,
+        24312,
+        23200,
+        24920,
+        24920,
+        10400,
+        16400,
+        20300,
+        11099,
+        25810,
+        19906,
+        21006,
+        16705,
+        10925,
+        24700,
+        16800,
+        10800,
+        10950,
+        26017,
+        26100,
+        26105,
+        26110,
+        26111,
+        26111,
+        25814,
+        11056,
+        11320,
+        25833,
+        25610,
+        25607,
+        25618,
+        25605,
+        27220,
+        27215,
+        11211,
+        27726,
+        27700,
+        27703,
+        27730,
+        27714,
+        20208,
+        20200,
+        20250,
+        20223,
+        23900,
+        23912,
+        23906,
+        23800,
+        23805,
+        20060,
+        26017,
+        26018,
+        26013,
+        26200,
+        26213,
+        20251,
+        26500,
+        26510,
+        26550,
+        27102,
+        26201,
+        28700,
+        13300,
+        25232,
+        10985,
+        13311,
+        27004,
+        10991,
+        16606,
+        21024,
+        27912,
+        13019,
+        11067,
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 251,
+        "assets": 522,
+        "hero_update": 523,
+        "reply": 524,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 4010,
+        "atk": 872,
+        "def": 320,
+        "speed": 375,
+        "power": 6596
+      },
+      "local_power_using_captured_attributes": 8000,
+      "captured_power_minus_weighted_fit": 2
+    },
+    {
+      "index": 2,
+      "cmd": 11004,
+      "request_utc": "2026-11-03T14:59:25.7391Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 50,
+        "break_lev": 2,
+        "atk": 1149,
+        "def": 360,
+        "hp": 5454,
+        "speed": 401,
+        "power": 8002,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 14136,
+        "def2": 5764,
+        "hp2": 64604,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 50,
+        "break_lev": 3,
+        "atk": 1320,
+        "def": 376,
+        "hp": 6202,
+        "speed": 411,
+        "power": 8750,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 16396,
+        "def2": 5764,
+        "hp2": 74930,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 0,
+        "break_lev": 1,
+        "atk": 171,
+        "def": 16,
+        "hp": 748,
+        "speed": 10,
+        "power": 748
+      },
+      "assets_before": {
+        "coin": "847042805",
+        "hero_exp": "502187486",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "847002805",
+        "hero_exp": "502187486",
+        "gold": "92379"
+      },
+      "item_10001_before": 580416,
+      "item_10001_after": 580216,
+      "spent": {
+        "coin": 40000,
+        "hero_exp": 0,
+        "gold": 0,
+        "item_10001": 200
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        11016,
+        10302,
+        10512,
+        11002,
+        11004
+      ],
+      "source_lines": {
+        "request": 257,
+        "assets": 527,
+        "hero_update": 529,
+        "reply": 530,
+        "item_updates": [
+          528
+        ]
+      },
+      "local_base_calculation": {
+        "hp": 4619,
+        "atk": 1005,
+        "def": 320,
+        "speed": 375,
+        "power": 7106
+      },
+      "local_power_using_captured_attributes": 8748,
+      "captured_power_minus_weighted_fit": 2
+    },
+    {
+      "index": 3,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:28.153443Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 50,
+        "break_lev": 3,
+        "atk": 1320,
+        "def": 376,
+        "hp": 6202,
+        "speed": 411,
+        "power": 8750,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 16396,
+        "def2": 5764,
+        "hp2": 74930,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 55,
+        "break_lev": 3,
+        "atk": 1415,
+        "def": 405,
+        "hp": 6600,
+        "speed": 438,
+        "power": 9349,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 16396,
+        "def2": 5764,
+        "hp2": 74930,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 5,
+        "break_lev": 0,
+        "atk": 95,
+        "def": 29,
+        "hp": 398,
+        "speed": 27,
+        "power": 599
+      },
+      "assets_before": {
+        "coin": "847002805",
+        "hero_exp": "502187486",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846884883",
+        "hero_exp": "502128504",
+        "gold": "92379"
+      },
+      "item_10001_before": 580216,
+      "item_10001_after": 580216,
+      "spent": {
+        "coin": 117922,
+        "hero_exp": 58982,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 259,
+        "assets": 531,
+        "hero_update": 532,
+        "reply": 533,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 4993,
+        "atk": 1088,
+        "def": 349,
+        "speed": 402,
+        "power": 7671
+      },
+      "local_power_using_captured_attributes": 9346,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 4,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:28.840661Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 55,
+        "break_lev": 3,
+        "atk": 1415,
+        "def": 405,
+        "hp": 6600,
+        "speed": 438,
+        "power": 9349,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 16396,
+        "def2": 5764,
+        "hp2": 74930,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 60,
+        "break_lev": 3,
+        "atk": 1510,
+        "def": 434,
+        "hp": 6998,
+        "speed": 464,
+        "power": 9942,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 16396,
+        "def2": 5764,
+        "hp2": 74930,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 5,
+        "break_lev": 0,
+        "atk": 95,
+        "def": 29,
+        "hp": 398,
+        "speed": 26,
+        "power": 593
+      },
+      "assets_before": {
+        "coin": "846884883",
+        "hero_exp": "502128504",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846736719",
+        "hero_exp": "502052027",
+        "gold": "92379"
+      },
+      "item_10001_before": 580216,
+      "item_10001_after": 580216,
+      "spent": {
+        "coin": 148164,
+        "hero_exp": 76477,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        16401,
+        11003
+      ],
+      "source_lines": {
+        "request": 261,
+        "assets": 534,
+        "hero_update": 535,
+        "reply": 537,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 5368,
+        "atk": 1171,
+        "def": 378,
+        "speed": 428,
+        "power": 8230
+      },
+      "local_power_using_captured_attributes": 9939,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 5,
+      "cmd": 11004,
+      "request_utc": "2026-11-03T14:59:30.101584Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 60,
+        "break_lev": 3,
+        "atk": 1510,
+        "def": 434,
+        "hp": 6998,
+        "speed": 464,
+        "power": 9942,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 16396,
+        "def2": 5764,
+        "hp2": 74930,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 60,
+        "break_lev": 4,
+        "atk": 1733,
+        "def": 450,
+        "hp": 7961,
+        "speed": 474,
+        "power": 10880,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 0,
+        "break_lev": 1,
+        "atk": 223,
+        "def": 16,
+        "hp": 963,
+        "speed": 10,
+        "power": 938
+      },
+      "assets_before": {
+        "coin": "846736719",
+        "hero_exp": "502052027",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846636719",
+        "hero_exp": "502052027",
+        "gold": "92379"
+      },
+      "item_10001_before": 580216,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 100000,
+        "hero_exp": 0,
+        "gold": 0,
+        "item_10001": 500
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        11016,
+        10302,
+        10512,
+        11002,
+        11004
+      ],
+      "source_lines": {
+        "request": 265,
+        "assets": 539,
+        "hero_update": 541,
+        "reply": 542,
+        "item_updates": [
+          540
+        ]
+      },
+      "local_base_calculation": {
+        "hp": 6193,
+        "atk": 1351,
+        "def": 378,
+        "speed": 428,
+        "power": 8920
+      },
+      "local_power_using_captured_attributes": 10877,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 6,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:37.415239Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 60,
+        "break_lev": 4,
+        "atk": 1733,
+        "def": 450,
+        "hp": 7961,
+        "speed": 474,
+        "power": 10880,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 61,
+        "break_lev": 4,
+        "atk": 1756,
+        "def": 456,
+        "hp": 8053,
+        "speed": 479,
+        "power": 11010,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 23,
+        "def": 6,
+        "hp": 92,
+        "speed": 5,
+        "power": 130
+      },
+      "assets_before": {
+        "coin": "846636719",
+        "hero_exp": "502052027",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846603087",
+        "hero_exp": "502034366",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 33632,
+        "hero_exp": 17661,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 269,
+        "assets": 544,
+        "hero_update": 545,
+        "reply": 546,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6280,
+        "atk": 1369,
+        "def": 383,
+        "speed": 434,
+        "power": 9043
+      },
+      "local_power_using_captured_attributes": 11007,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 7,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:38.256558Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 61,
+        "break_lev": 4,
+        "atk": 1756,
+        "def": 456,
+        "hp": 8053,
+        "speed": 479,
+        "power": 11010,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 62,
+        "break_lev": 4,
+        "atk": 1778,
+        "def": 461,
+        "hp": 8145,
+        "speed": 485,
+        "power": 11143,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 5,
+        "hp": 92,
+        "speed": 6,
+        "power": 133
+      },
+      "assets_before": {
+        "coin": "846603087",
+        "hero_exp": "502034366",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846568041",
+        "hero_exp": "502015857",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 35046,
+        "hero_exp": 18509,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 271,
+        "assets": 547,
+        "hero_update": 548,
+        "reply": 549,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6366,
+        "atk": 1389,
+        "def": 389,
+        "speed": 439,
+        "power": 9165
+      },
+      "local_power_using_captured_attributes": 11140,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 8,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:40.100032Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 62,
+        "break_lev": 4,
+        "atk": 1778,
+        "def": 461,
+        "hp": 8145,
+        "speed": 485,
+        "power": 11143,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 63,
+        "break_lev": 4,
+        "atk": 1799,
+        "def": 467,
+        "hp": 8238,
+        "speed": 490,
+        "power": 11270,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 21,
+        "def": 6,
+        "hp": 93,
+        "speed": 5,
+        "power": 127
+      },
+      "assets_before": {
+        "coin": "846568041",
+        "hero_exp": "502015857",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846531546",
+        "hero_exp": "501996475",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 36495,
+        "hero_exp": 19382,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 273,
+        "assets": 550,
+        "hero_update": 551,
+        "reply": 552,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6453,
+        "atk": 1407,
+        "def": 395,
+        "speed": 444,
+        "power": 9284
+      },
+      "local_power_using_captured_attributes": 11267,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 9,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:40.860543Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 63,
+        "break_lev": 4,
+        "atk": 1799,
+        "def": 467,
+        "hp": 8238,
+        "speed": 490,
+        "power": 11270,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 64,
+        "break_lev": 4,
+        "atk": 1821,
+        "def": 473,
+        "hp": 8329,
+        "speed": 495,
+        "power": 11398,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 91,
+        "speed": 5,
+        "power": 128
+      },
+      "assets_before": {
+        "coin": "846531546",
+        "hero_exp": "501996475",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846493567",
+        "hero_exp": "501976192",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 37979,
+        "hero_exp": 20283,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 275,
+        "assets": 553,
+        "hero_update": 554,
+        "reply": 555,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6542,
+        "atk": 1427,
+        "def": 401,
+        "speed": 450,
+        "power": 9413
+      },
+      "local_power_using_captured_attributes": 11395,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 10,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:41.552194Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 64,
+        "break_lev": 4,
+        "atk": 1821,
+        "def": 473,
+        "hp": 8329,
+        "speed": 495,
+        "power": 11398,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 65,
+        "break_lev": 4,
+        "atk": 1843,
+        "def": 479,
+        "hp": 8421,
+        "speed": 501,
+        "power": 11533,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 6,
+        "power": 135
+      },
+      "assets_before": {
+        "coin": "846493567",
+        "hero_exp": "501976192",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846454068",
+        "hero_exp": "501954983",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 39499,
+        "hero_exp": 21209,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 277,
+        "assets": 556,
+        "hero_update": 557,
+        "reply": 558,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6629,
+        "atk": 1445,
+        "def": 406,
+        "speed": 455,
+        "power": 9530
+      },
+      "local_power_using_captured_attributes": 11530,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 11,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:42.307973Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 65,
+        "break_lev": 4,
+        "atk": 1843,
+        "def": 479,
+        "hp": 8421,
+        "speed": 501,
+        "power": 11533,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 66,
+        "break_lev": 4,
+        "atk": 1866,
+        "def": 484,
+        "hp": 8514,
+        "speed": 506,
+        "power": 11662,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 23,
+        "def": 5,
+        "hp": 93,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "846454068",
+        "hero_exp": "501954983",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846413013",
+        "hero_exp": "501932820",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 41055,
+        "hero_exp": 22163,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 279,
+        "assets": 559,
+        "hero_update": 560,
+        "reply": 561,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6716,
+        "atk": 1465,
+        "def": 412,
+        "speed": 460,
+        "power": 9652
+      },
+      "local_power_using_captured_attributes": 11659,
+      "captured_power_minus_weighted_fit": 3
+    },
+    {
+      "index": 12,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:43.028444Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 66,
+        "break_lev": 4,
+        "atk": 1866,
+        "def": 484,
+        "hp": 8514,
+        "speed": 506,
+        "power": 11662,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 67,
+        "break_lev": 4,
+        "atk": 1888,
+        "def": 490,
+        "hp": 8606,
+        "speed": 511,
+        "power": 11791,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "846413013",
+        "hero_exp": "501932820",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846370366",
+        "hero_exp": "501909675",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 42647,
+        "hero_exp": 23145,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 281,
+        "assets": 562,
+        "hero_update": 563,
+        "reply": 564,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6802,
+        "atk": 1483,
+        "def": 418,
+        "speed": 465,
+        "power": 9771
+      },
+      "local_power_using_captured_attributes": 11787,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 13,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:43.950549Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 67,
+        "break_lev": 4,
+        "atk": 1888,
+        "def": 490,
+        "hp": 8606,
+        "speed": 511,
+        "power": 11791,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 68,
+        "break_lev": 4,
+        "atk": 1910,
+        "def": 496,
+        "hp": 8698,
+        "speed": 517,
+        "power": 11926,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 6,
+        "power": 135
+      },
+      "assets_before": {
+        "coin": "846370366",
+        "hero_exp": "501909675",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846326090",
+        "hero_exp": "501885521",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 44276,
+        "hero_exp": 24154,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 283,
+        "assets": 565,
+        "hero_update": 566,
+        "reply": 567,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6889,
+        "atk": 1503,
+        "def": 424,
+        "speed": 471,
+        "power": 9900
+      },
+      "local_power_using_captured_attributes": 11922,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 14,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:44.619381Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 68,
+        "break_lev": 4,
+        "atk": 1910,
+        "def": 496,
+        "hp": 8698,
+        "speed": 517,
+        "power": 11926,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 69,
+        "break_lev": 4,
+        "atk": 1932,
+        "def": 502,
+        "hp": 8790,
+        "speed": 522,
+        "power": 12055,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "846326090",
+        "hero_exp": "501885521",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846280148",
+        "hero_exp": "501860329",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 45942,
+        "hero_exp": 25192,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 285,
+        "assets": 568,
+        "hero_update": 569,
+        "reply": 570,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 6976,
+        "atk": 1521,
+        "def": 429,
+        "speed": 476,
+        "power": 10016
+      },
+      "local_power_using_captured_attributes": 12051,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 15,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:45.366111Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 69,
+        "break_lev": 4,
+        "atk": 1932,
+        "def": 502,
+        "hp": 8790,
+        "speed": 522,
+        "power": 12055,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 70,
+        "break_lev": 4,
+        "atk": 1954,
+        "def": 507,
+        "hp": 8882,
+        "speed": 527,
+        "power": 12181,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 5,
+        "hp": 92,
+        "speed": 5,
+        "power": 126
+      },
+      "assets_before": {
+        "coin": "846280148",
+        "hero_exp": "501860329",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846232503",
+        "hero_exp": "501834071",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 47645,
+        "hero_exp": 26258,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 287,
+        "assets": 571,
+        "hero_update": 572,
+        "reply": 573,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7063,
+        "atk": 1541,
+        "def": 435,
+        "speed": 481,
+        "power": 10138
+      },
+      "local_power_using_captured_attributes": 12177,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 16,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:46.792387Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 70,
+        "break_lev": 4,
+        "atk": 1954,
+        "def": 507,
+        "hp": 8882,
+        "speed": 527,
+        "power": 12181,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 71,
+        "break_lev": 4,
+        "atk": 1976,
+        "def": 513,
+        "hp": 8974,
+        "speed": 533,
+        "power": 12316,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 6,
+        "power": 135
+      },
+      "assets_before": {
+        "coin": "846232503",
+        "hero_exp": "501834071",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846183118",
+        "hero_exp": "501806718",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 49385,
+        "hero_exp": 27353,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 291,
+        "assets": 575,
+        "hero_update": 576,
+        "reply": 577,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7150,
+        "atk": 1559,
+        "def": 441,
+        "speed": 487,
+        "power": 10263
+      },
+      "local_power_using_captured_attributes": 12312,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 17,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:47.897275Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 71,
+        "break_lev": 4,
+        "atk": 1976,
+        "def": 513,
+        "hp": 8974,
+        "speed": 533,
+        "power": 12316,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 72,
+        "break_lev": 4,
+        "atk": 1998,
+        "def": 519,
+        "hp": 9067,
+        "speed": 538,
+        "power": 12445,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 93,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "846183118",
+        "hero_exp": "501806718",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846131955",
+        "hero_exp": "501778241",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 51163,
+        "hero_exp": 28477,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 293,
+        "assets": 578,
+        "hero_update": 579,
+        "reply": 580,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7237,
+        "atk": 1579,
+        "def": 447,
+        "speed": 492,
+        "power": 10386
+      },
+      "local_power_using_captured_attributes": 12441,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 18,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:49.173296Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 72,
+        "break_lev": 4,
+        "atk": 1998,
+        "def": 519,
+        "hp": 9067,
+        "speed": 538,
+        "power": 12445,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 73,
+        "break_lev": 4,
+        "atk": 2020,
+        "def": 525,
+        "hp": 9159,
+        "speed": 543,
+        "power": 12574,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "846131955",
+        "hero_exp": "501778241",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846078976",
+        "hero_exp": "501748610",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 52979,
+        "hero_exp": 29631,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 295,
+        "assets": 581,
+        "hero_update": 582,
+        "reply": 583,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7323,
+        "atk": 1597,
+        "def": 453,
+        "speed": 497,
+        "power": 10504
+      },
+      "local_power_using_captured_attributes": 12570,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 19,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:50.235032Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 73,
+        "break_lev": 4,
+        "atk": 2020,
+        "def": 525,
+        "hp": 9159,
+        "speed": 543,
+        "power": 12574,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 74,
+        "break_lev": 4,
+        "atk": 2042,
+        "def": 531,
+        "hp": 9252,
+        "speed": 548,
+        "power": 12703,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 93,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "846078976",
+        "hero_exp": "501748610",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "846024143",
+        "hero_exp": "501717795",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 54833,
+        "hero_exp": 30815,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 297,
+        "assets": 584,
+        "hero_update": 585,
+        "reply": 586,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7410,
+        "atk": 1617,
+        "def": 458,
+        "speed": 503,
+        "power": 10631
+      },
+      "local_power_using_captured_attributes": 12699,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 20,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:50.901197Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 74,
+        "break_lev": 4,
+        "atk": 2042,
+        "def": 531,
+        "hp": 9252,
+        "speed": 548,
+        "power": 12703,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 75,
+        "break_lev": 4,
+        "atk": 2065,
+        "def": 536,
+        "hp": 9343,
+        "speed": 554,
+        "power": 12837,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 23,
+        "def": 5,
+        "hp": 91,
+        "speed": 6,
+        "power": 134
+      },
+      "assets_before": {
+        "coin": "846024143",
+        "hero_exp": "501717795",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845967418",
+        "hero_exp": "501685766",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 56725,
+        "hero_exp": 32029,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 299,
+        "assets": 587,
+        "hero_update": 588,
+        "reply": 589,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7497,
+        "atk": 1635,
+        "def": 464,
+        "speed": 508,
+        "power": 10750
+      },
+      "local_power_using_captured_attributes": 12833,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 21,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:51.426309Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 75,
+        "break_lev": 4,
+        "atk": 2065,
+        "def": 536,
+        "hp": 9343,
+        "speed": 554,
+        "power": 12837,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 76,
+        "break_lev": 4,
+        "atk": 2087,
+        "def": 542,
+        "hp": 9435,
+        "speed": 559,
+        "power": 12966,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 92,
+        "speed": 5,
+        "power": 129
+      },
+      "assets_before": {
+        "coin": "845967418",
+        "hero_exp": "501685766",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845908762",
+        "hero_exp": "501652492",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 58656,
+        "hero_exp": 33274,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 301,
+        "assets": 590,
+        "hero_update": 591,
+        "reply": 592,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7584,
+        "atk": 1655,
+        "def": 470,
+        "speed": 513,
+        "power": 10872
+      },
+      "local_power_using_captured_attributes": 12962,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 22,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:51.919557Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 76,
+        "break_lev": 4,
+        "atk": 2087,
+        "def": 542,
+        "hp": 9435,
+        "speed": 559,
+        "power": 12966,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 77,
+        "break_lev": 4,
+        "atk": 2108,
+        "def": 548,
+        "hp": 9528,
+        "speed": 564,
+        "power": 13093,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 21,
+        "def": 6,
+        "hp": 93,
+        "speed": 5,
+        "power": 127
+      },
+      "assets_before": {
+        "coin": "845908762",
+        "hero_exp": "501652492",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845848136",
+        "hero_exp": "501617942",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 60626,
+        "hero_exp": 34550,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 303,
+        "assets": 593,
+        "hero_update": 594,
+        "reply": 595,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7671,
+        "atk": 1673,
+        "def": 476,
+        "speed": 519,
+        "power": 10997
+      },
+      "local_power_using_captured_attributes": 13089,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 23,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:52.4423Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 77,
+        "break_lev": 4,
+        "atk": 2108,
+        "def": 548,
+        "hp": 9528,
+        "speed": 564,
+        "power": 13093,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 78,
+        "break_lev": 4,
+        "atk": 2130,
+        "def": 554,
+        "hp": 9619,
+        "speed": 570,
+        "power": 13228,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 6,
+        "hp": 91,
+        "speed": 6,
+        "power": 135
+      },
+      "assets_before": {
+        "coin": "845848136",
+        "hero_exp": "501617942",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845785500",
+        "hero_exp": "501582085",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 62636,
+        "hero_exp": 35857,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 305,
+        "assets": 596,
+        "hero_update": 597,
+        "reply": 598,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7758,
+        "atk": 1693,
+        "def": 481,
+        "speed": 524,
+        "power": 11117
+      },
+      "local_power_using_captured_attributes": 13224,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 24,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:52.988313Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 78,
+        "break_lev": 4,
+        "atk": 2130,
+        "def": 554,
+        "hp": 9619,
+        "speed": 570,
+        "power": 13228,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 79,
+        "break_lev": 4,
+        "atk": 2152,
+        "def": 559,
+        "hp": 9711,
+        "speed": 575,
+        "power": 13354,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 22,
+        "def": 5,
+        "hp": 92,
+        "speed": 5,
+        "power": 126
+      },
+      "assets_before": {
+        "coin": "845785500",
+        "hero_exp": "501582085",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845720816",
+        "hero_exp": "501544889",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 64684,
+        "hero_exp": 37196,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 307,
+        "assets": 599,
+        "hero_update": 600,
+        "reply": 601,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7844,
+        "atk": 1711,
+        "def": 487,
+        "speed": 529,
+        "power": 11236
+      },
+      "local_power_using_captured_attributes": 13350,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 25,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:53.449574Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 79,
+        "break_lev": 4,
+        "atk": 2152,
+        "def": 559,
+        "hp": 9711,
+        "speed": 575,
+        "power": 13354,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 80,
+        "break_lev": 4,
+        "atk": 2175,
+        "def": 565,
+        "hp": 9804,
+        "speed": 580,
+        "power": 13485,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 23,
+        "def": 6,
+        "hp": 93,
+        "speed": 5,
+        "power": 131
+      },
+      "assets_before": {
+        "coin": "845720816",
+        "hero_exp": "501544889",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845654043",
+        "hero_exp": "501506322",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 579716,
+      "spent": {
+        "coin": 66773,
+        "hero_exp": 38567,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 309,
+        "assets": 602,
+        "hero_update": 603,
+        "reply": 604,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 7931,
+        "atk": 1731,
+        "def": 493,
+        "speed": 534,
+        "power": 11358
+      },
+      "local_power_using_captured_attributes": 13481,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 26,
+      "cmd": 11004,
+      "request_utc": "2026-11-03T14:59:56.162488Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 80,
+        "break_lev": 4,
+        "atk": 2175,
+        "def": 565,
+        "hp": 9804,
+        "speed": 580,
+        "power": 13485,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 19013,
+        "def2": 5764,
+        "hp2": 86890,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 80,
+        "break_lev": 5,
+        "atk": 2497,
+        "def": 581,
+        "hp": 11184,
+        "speed": 590,
+        "power": 14787,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 0,
+        "break_lev": 1,
+        "atk": 322,
+        "def": 16,
+        "hp": 1380,
+        "speed": 10,
+        "power": 1302
+      },
+      "assets_before": {
+        "coin": "845654043",
+        "hero_exp": "501506322",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845454043",
+        "hero_exp": "501506322",
+        "gold": "92379"
+      },
+      "item_10001_before": 579716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 200000,
+        "hero_exp": 0,
+        "gold": 0,
+        "item_10001": 1000
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        11016,
+        10302,
+        10512,
+        11002,
+        11004
+      ],
+      "source_lines": {
+        "request": 315,
+        "assets": 607,
+        "hero_update": 609,
+        "reply": 610,
+        "item_updates": [
+          608
+        ]
+      },
+      "local_base_calculation": {
+        "hp": 9166,
+        "atk": 2001,
+        "def": 493,
+        "speed": 534,
+        "power": 12392
+      },
+      "local_power_using_captured_attributes": 14783,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 27,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:59.188433Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 80,
+        "break_lev": 5,
+        "atk": 2497,
+        "def": 581,
+        "hp": 11184,
+        "speed": 590,
+        "power": 14787,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 81,
+        "break_lev": 5,
+        "atk": 2523,
+        "def": 587,
+        "hp": 11290,
+        "speed": 596,
+        "power": 14936,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 106,
+        "speed": 6,
+        "power": 149
+      },
+      "assets_before": {
+        "coin": "845454043",
+        "hero_exp": "501506322",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845385141",
+        "hero_exp": "501466351",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 68902,
+        "hero_exp": 39971,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 317,
+        "assets": 611,
+        "hero_update": 612,
+        "reply": 613,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9267,
+        "atk": 2022,
+        "def": 499,
+        "speed": 540,
+        "power": 12529
+      },
+      "local_power_using_captured_attributes": 14932,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 28,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T14:59:59.785389Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 81,
+        "break_lev": 5,
+        "atk": 2523,
+        "def": 587,
+        "hp": 11290,
+        "speed": 596,
+        "power": 14936,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 82,
+        "break_lev": 5,
+        "atk": 2548,
+        "def": 593,
+        "hp": 11397,
+        "speed": 601,
+        "power": 15077,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 107,
+        "speed": 5,
+        "power": 141
+      },
+      "assets_before": {
+        "coin": "845385141",
+        "hero_exp": "501466351",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845314071",
+        "hero_exp": "501424944",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 71070,
+        "hero_exp": 41407,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 319,
+        "assets": 614,
+        "hero_update": 615,
+        "reply": 616,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9368,
+        "atk": 2045,
+        "def": 504,
+        "speed": 545,
+        "power": 12661
+      },
+      "local_power_using_captured_attributes": 15073,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 29,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:00.289621Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 82,
+        "break_lev": 5,
+        "atk": 2548,
+        "def": 593,
+        "hp": 11397,
+        "speed": 601,
+        "power": 15077,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 83,
+        "break_lev": 5,
+        "atk": 2574,
+        "def": 598,
+        "hp": 11504,
+        "speed": 606,
+        "power": 15217,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 5,
+        "hp": 107,
+        "speed": 5,
+        "power": 140
+      },
+      "assets_before": {
+        "coin": "845314071",
+        "hero_exp": "501424944",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845240791",
+        "hero_exp": "501382067",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 73280,
+        "hero_exp": 42877,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 321,
+        "assets": 617,
+        "hero_update": 618,
+        "reply": 619,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9468,
+        "atk": 2066,
+        "def": 510,
+        "speed": 550,
+        "power": 12791
+      },
+      "local_power_using_captured_attributes": 15213,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 30,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:00.83038Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 83,
+        "break_lev": 5,
+        "atk": 2574,
+        "def": 598,
+        "hp": 11504,
+        "speed": 606,
+        "power": 15217,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 84,
+        "break_lev": 5,
+        "atk": 2600,
+        "def": 604,
+        "hp": 11611,
+        "speed": 611,
+        "power": 15360,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 107,
+        "speed": 5,
+        "power": 143
+      },
+      "assets_before": {
+        "coin": "845240791",
+        "hero_exp": "501382067",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845165261",
+        "hero_exp": "501337687",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 75530,
+        "hero_exp": 44380,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 323,
+        "assets": 620,
+        "hero_update": 621,
+        "reply": 622,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9569,
+        "atk": 2089,
+        "def": 516,
+        "speed": 556,
+        "power": 12931
+      },
+      "local_power_using_captured_attributes": 15355,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 31,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:01.37569Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 84,
+        "break_lev": 5,
+        "atk": 2600,
+        "def": 604,
+        "hp": 11611,
+        "speed": 611,
+        "power": 15360,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 85,
+        "break_lev": 5,
+        "atk": 2625,
+        "def": 610,
+        "hp": 11718,
+        "speed": 617,
+        "power": 15507,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 107,
+        "speed": 6,
+        "power": 147
+      },
+      "assets_before": {
+        "coin": "845165261",
+        "hero_exp": "501337687",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845087440",
+        "hero_exp": "501291770",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 77821,
+        "hero_exp": 45917,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 325,
+        "assets": 623,
+        "hero_update": 624,
+        "reply": 625,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9670,
+        "atk": 2110,
+        "def": 522,
+        "speed": 561,
+        "power": 13062
+      },
+      "local_power_using_captured_attributes": 15503,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 32,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:01.829269Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 85,
+        "break_lev": 5,
+        "atk": 2625,
+        "def": 610,
+        "hp": 11718,
+        "speed": 617,
+        "power": 15507,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 86,
+        "break_lev": 5,
+        "atk": 2650,
+        "def": 616,
+        "hp": 11824,
+        "speed": 622,
+        "power": 15647,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 106,
+        "speed": 5,
+        "power": 140
+      },
+      "assets_before": {
+        "coin": "845087440",
+        "hero_exp": "501291770",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "845007287",
+        "hero_exp": "501244282",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 80153,
+        "hero_exp": 47488,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 327,
+        "assets": 626,
+        "hero_update": 627,
+        "reply": 628,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9771,
+        "atk": 2133,
+        "def": 527,
+        "speed": 566,
+        "power": 13193
+      },
+      "local_power_using_captured_attributes": 15643,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 33,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:02.257528Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 86,
+        "break_lev": 5,
+        "atk": 2650,
+        "def": 616,
+        "hp": 11824,
+        "speed": 622,
+        "power": 15647,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 87,
+        "break_lev": 5,
+        "atk": 2676,
+        "def": 621,
+        "hp": 11931,
+        "speed": 627,
+        "power": 15787,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 5,
+        "hp": 107,
+        "speed": 5,
+        "power": 140
+      },
+      "assets_before": {
+        "coin": "845007287",
+        "hero_exp": "501244282",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844924760",
+        "hero_exp": "501195189",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 82527,
+        "hero_exp": 49093,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 329,
+        "assets": 629,
+        "hero_update": 630,
+        "reply": 631,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9871,
+        "atk": 2154,
+        "def": 533,
+        "speed": 572,
+        "power": 13330
+      },
+      "local_power_using_captured_attributes": 15783,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 34,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:02.650247Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 87,
+        "break_lev": 5,
+        "atk": 2676,
+        "def": 621,
+        "hp": 11931,
+        "speed": 627,
+        "power": 15787,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 88,
+        "break_lev": 5,
+        "atk": 2702,
+        "def": 627,
+        "hp": 12038,
+        "speed": 633,
+        "power": 15936,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 107,
+        "speed": 6,
+        "power": 149
+      },
+      "assets_before": {
+        "coin": "844924760",
+        "hero_exp": "501195189",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844839818",
+        "hero_exp": "501144456",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 84942,
+        "hero_exp": 50733,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 331,
+        "assets": 632,
+        "hero_update": 633,
+        "reply": 634,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 9972,
+        "atk": 2177,
+        "def": 539,
+        "speed": 577,
+        "power": 13464
+      },
+      "local_power_using_captured_attributes": 15932,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 35,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:03.075282Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 88,
+        "break_lev": 5,
+        "atk": 2702,
+        "def": 627,
+        "hp": 12038,
+        "speed": 633,
+        "power": 15936,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 89,
+        "break_lev": 5,
+        "atk": 2727,
+        "def": 633,
+        "hp": 12145,
+        "speed": 638,
+        "power": 16077,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 107,
+        "speed": 5,
+        "power": 141
+      },
+      "assets_before": {
+        "coin": "844839818",
+        "hero_exp": "501144456",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844752418",
+        "hero_exp": "501092047",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 87400,
+        "hero_exp": 52409,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 333,
+        "assets": 635,
+        "hero_update": 636,
+        "reply": 637,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10073,
+        "atk": 2198,
+        "def": 545,
+        "speed": 582,
+        "power": 13594
+      },
+      "local_power_using_captured_attributes": 16073,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 36,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:03.520881Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 89,
+        "break_lev": 5,
+        "atk": 2727,
+        "def": 633,
+        "hp": 12145,
+        "speed": 638,
+        "power": 16077,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 90,
+        "break_lev": 5,
+        "atk": 2752,
+        "def": 639,
+        "hp": 12251,
+        "speed": 643,
+        "power": 16218,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 106,
+        "speed": 5,
+        "power": 141
+      },
+      "assets_before": {
+        "coin": "844752418",
+        "hero_exp": "501092047",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844662519",
+        "hero_exp": "501037927",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 89899,
+        "hero_exp": 54120,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 335,
+        "assets": 638,
+        "hero_update": 639,
+        "reply": 640,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10173,
+        "atk": 2221,
+        "def": 550,
+        "speed": 587,
+        "power": 13726
+      },
+      "local_power_using_captured_attributes": 16213,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 37,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:03.914412Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 90,
+        "break_lev": 5,
+        "atk": 2752,
+        "def": 639,
+        "hp": 12251,
+        "speed": 643,
+        "power": 16218,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 91,
+        "break_lev": 5,
+        "atk": 2780,
+        "def": 645,
+        "hp": 12359,
+        "speed": 649,
+        "power": 16371,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 28,
+        "def": 6,
+        "hp": 108,
+        "speed": 6,
+        "power": 153
+      },
+      "assets_before": {
+        "coin": "844662519",
+        "hero_exp": "501037927",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844570077",
+        "hero_exp": "500982060",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 92442,
+        "hero_exp": 55867,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 337,
+        "assets": 641,
+        "hero_update": 642,
+        "reply": 643,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10274,
+        "atk": 2242,
+        "def": 556,
+        "speed": 593,
+        "power": 13862
+      },
+      "local_power_using_captured_attributes": 16366,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 38,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:04.257827Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 91,
+        "break_lev": 5,
+        "atk": 2780,
+        "def": 645,
+        "hp": 12359,
+        "speed": 649,
+        "power": 16371,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 92,
+        "break_lev": 5,
+        "atk": 2805,
+        "def": 650,
+        "hp": 12466,
+        "speed": 654,
+        "power": 16509,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 5,
+        "hp": 107,
+        "speed": 5,
+        "power": 138
+      },
+      "assets_before": {
+        "coin": "844570077",
+        "hero_exp": "500982060",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844475051",
+        "hero_exp": "500924409",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 95026,
+        "hero_exp": 57651,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 339,
+        "assets": 644,
+        "hero_update": 645,
+        "reply": 646,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10375,
+        "atk": 2265,
+        "def": 562,
+        "speed": 598,
+        "power": 13997
+      },
+      "local_power_using_captured_attributes": 16505,
+      "captured_power_minus_weighted_fit": 4
+    },
+    {
+      "index": 39,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:04.703205Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 92,
+        "break_lev": 5,
+        "atk": 2805,
+        "def": 650,
+        "hp": 12466,
+        "speed": 654,
+        "power": 16509,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 93,
+        "break_lev": 5,
+        "atk": 2830,
+        "def": 656,
+        "hp": 12573,
+        "speed": 659,
+        "power": 16650,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 107,
+        "speed": 5,
+        "power": 141
+      },
+      "assets_before": {
+        "coin": "844475051",
+        "hero_exp": "500924409",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844377397",
+        "hero_exp": "500864938",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 97654,
+        "hero_exp": 59471,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 341,
+        "assets": 647,
+        "hero_update": 648,
+        "reply": 649,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10476,
+        "atk": 2286,
+        "def": 568,
+        "speed": 603,
+        "power": 14127
+      },
+      "local_power_using_captured_attributes": 16645,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 40,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:05.000882Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 93,
+        "break_lev": 5,
+        "atk": 2830,
+        "def": 656,
+        "hp": 12573,
+        "speed": 659,
+        "power": 16650,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 94,
+        "break_lev": 5,
+        "atk": 2856,
+        "def": 662,
+        "hp": 12680,
+        "speed": 664,
+        "power": 16793,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 107,
+        "speed": 5,
+        "power": 143
+      },
+      "assets_before": {
+        "coin": "844377397",
+        "hero_exp": "500864938",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844277072",
+        "hero_exp": "500803611",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 100325,
+        "hero_exp": 61327,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 343,
+        "assets": 650,
+        "hero_update": 651,
+        "reply": 652,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10576,
+        "atk": 2310,
+        "def": 574,
+        "speed": 609,
+        "power": 14269
+      },
+      "local_power_using_captured_attributes": 16788,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 41,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:05.192609Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 94,
+        "break_lev": 5,
+        "atk": 2856,
+        "def": 662,
+        "hp": 12680,
+        "speed": 664,
+        "power": 16793,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 95,
+        "break_lev": 5,
+        "atk": 2882,
+        "def": 668,
+        "hp": 12787,
+        "speed": 670,
+        "power": 16942,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 107,
+        "speed": 6,
+        "power": 149
+      },
+      "assets_before": {
+        "coin": "844277072",
+        "hero_exp": "500803611",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844174033",
+        "hero_exp": "500740390",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 103039,
+        "hero_exp": 63221,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 345,
+        "assets": 653,
+        "hero_update": 654,
+        "reply": 655,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10679,
+        "atk": 2331,
+        "def": 579,
+        "speed": 614,
+        "power": 14398
+      },
+      "local_power_using_captured_attributes": 16937,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 42,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:05.353891Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 95,
+        "break_lev": 5,
+        "atk": 2882,
+        "def": 668,
+        "hp": 12787,
+        "speed": 670,
+        "power": 16942,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 96,
+        "break_lev": 5,
+        "atk": 2907,
+        "def": 673,
+        "hp": 12894,
+        "speed": 675,
+        "power": 17080,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 5,
+        "hp": 107,
+        "speed": 5,
+        "power": 138
+      },
+      "assets_before": {
+        "coin": "844174033",
+        "hero_exp": "500740390",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "844068236",
+        "hero_exp": "500675237",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 105797,
+        "hero_exp": 65153,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 347,
+        "assets": 656,
+        "hero_update": 657,
+        "reply": 658,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10780,
+        "atk": 2354,
+        "def": 585,
+        "speed": 619,
+        "power": 14532
+      },
+      "local_power_using_captured_attributes": 17075,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 43,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:05.535247Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 96,
+        "break_lev": 5,
+        "atk": 2907,
+        "def": 673,
+        "hp": 12894,
+        "speed": 675,
+        "power": 17080,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 97,
+        "break_lev": 5,
+        "atk": 2933,
+        "def": 679,
+        "hp": 13001,
+        "speed": 680,
+        "power": 17223,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 107,
+        "speed": 5,
+        "power": 143
+      },
+      "assets_before": {
+        "coin": "844068236",
+        "hero_exp": "500675237",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "843959637",
+        "hero_exp": "500608114",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 108599,
+        "hero_exp": 67123,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 351,
+        "assets": 660,
+        "hero_update": 661,
+        "reply": 662,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10880,
+        "atk": 2375,
+        "def": 591,
+        "speed": 625,
+        "power": 14668
+      },
+      "local_power_using_captured_attributes": 17218,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 44,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:05.681286Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 97,
+        "break_lev": 5,
+        "atk": 2933,
+        "def": 679,
+        "hp": 13001,
+        "speed": 680,
+        "power": 17223,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 98,
+        "break_lev": 5,
+        "atk": 2958,
+        "def": 685,
+        "hp": 13108,
+        "speed": 686,
+        "power": 17370,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 25,
+        "def": 6,
+        "hp": 107,
+        "speed": 6,
+        "power": 147
+      },
+      "assets_before": {
+        "coin": "843959637",
+        "hero_exp": "500608114",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "843848192",
+        "hero_exp": "500538983",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 111445,
+        "hero_exp": 69131,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 353,
+        "assets": 663,
+        "hero_update": 664,
+        "reply": 665,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 10981,
+        "atk": 2398,
+        "def": 597,
+        "speed": 630,
+        "power": 14802
+      },
+      "local_power_using_captured_attributes": 17365,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 45,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:05.834455Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 98,
+        "break_lev": 5,
+        "atk": 2958,
+        "def": 685,
+        "hp": 13108,
+        "speed": 686,
+        "power": 17370,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 99,
+        "break_lev": 5,
+        "atk": 2984,
+        "def": 691,
+        "hp": 13214,
+        "speed": 691,
+        "power": 17512,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 6,
+        "hp": 106,
+        "speed": 5,
+        "power": 142
+      },
+      "assets_before": {
+        "coin": "843848192",
+        "hero_exp": "500538983",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "843733857",
+        "hero_exp": "500467806",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 114335,
+        "hero_exp": 71177,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 355,
+        "assets": 666,
+        "hero_update": 667,
+        "reply": 668,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 11082,
+        "atk": 2419,
+        "def": 602,
+        "speed": 635,
+        "power": 14930
+      },
+      "local_power_using_captured_attributes": 17507,
+      "captured_power_minus_weighted_fit": 5
+    },
+    {
+      "index": 46,
+      "cmd": 11003,
+      "request_utc": "2026-11-03T15:00:06.051143Z",
+      "hero_before": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 99,
+        "break_lev": 5,
+        "atk": 2984,
+        "def": 691,
+        "hp": 13214,
+        "speed": 691,
+        "power": 17512,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "hero_after": {
+        "partner_id": 13,
+        "bid": 30506,
+        "star": 5,
+        "lev": 100,
+        "break_lev": 5,
+        "atk": 3010,
+        "def": 696,
+        "hp": 13321,
+        "speed": 696,
+        "power": 17652,
+        "def_p": 0,
+        "def_s": 0,
+        "skills": [
+          {
+            "pos": 1,
+            "skill_bid": 150001
+          },
+          {
+            "pos": 2,
+            "skill_bid": 150101
+          },
+          {
+            "pos": 3,
+            "skill_bid": 150201
+          },
+          {
+            "pos": 4,
+            "skill_bid": 150301
+          },
+          {
+            "pos": 5,
+            "skill_bid": 150401
+          }
+        ],
+        "is_lock": [],
+        "resonate_lev": 0,
+        "resonate_break_lev": 0,
+        "horcrux_status": 0,
+        "horcrux_lev": 0,
+        "atk2": 22050,
+        "def2": 5764,
+        "hp2": 100772,
+        "speed2": 5303
+      },
+      "changes": {
+        "lev": 1,
+        "break_lev": 0,
+        "atk": 26,
+        "def": 5,
+        "hp": 107,
+        "speed": 5,
+        "power": 140
+      },
+      "assets_before": {
+        "coin": "843733857",
+        "hero_exp": "500467806",
+        "gold": "92379"
+      },
+      "assets_after": {
+        "coin": "843616587",
+        "hero_exp": "500394543",
+        "gold": "92379"
+      },
+      "item_10001_before": 578716,
+      "item_10001_after": 578716,
+      "spent": {
+        "coin": 117270,
+        "hero_exp": 73263,
+        "gold": 0,
+        "item_10001": 0
+      },
+      "cost_table_match": true,
+      "server_command_sequence": [
+        10302,
+        11002,
+        11003
+      ],
+      "source_lines": {
+        "request": 357,
+        "assets": 669,
+        "hero_update": 670,
+        "reply": 671,
+        "item_updates": []
+      },
+      "local_base_calculation": {
+        "hp": 11183,
+        "atk": 2442,
+        "def": 608,
+        "speed": 640,
+        "power": 15064
+      },
+      "local_power_using_captured_attributes": 17647,
+      "captured_power_minus_weighted_fit": 5
+    }
+  ],
+  "totals_by_command": {
+    "11003": {
+      "count": 43,
+      "spent": {
+        "coin": 3177954,
+        "hero_exp": 1837271,
+        "gold": 0,
+        "item_10001": 0
+      }
+    },
+    "11004": {
+      "count": 3,
+      "spent": {
+        "coin": 340000,
+        "hero_exp": 0,
+        "gold": 0,
+        "item_10001": 1700
+      }
+    }
+  },
+  "source_capture": "cap-20261103-225906-9a124e83.pcap",
+  "source_decoded": "hero-levels-decoded.jsonl",
+  "source_line_definition": "1-based line in the unmodified hero-levels-decoded.jsonl; directions emitted separately.",
+  "cost_table": "internal/game/data/partner_growth.json",
+  "local_comparison_assumption": "Same BID 30506, five stars, observed level and break, no equipment/artifacts/holy equipment/horcrux/resonance-slot effects; comparison is the current local base formula, not a derived original-server formula.",
+  "post_upgrade_gift": {
+    "request_source_line": 368,
+    "reply_source_line": 681,
+    "asset_source_line": 678,
+    "base_id": 99955,
+    "quantity_used": 1,
+    "asset_gains": {
+      "coin": 50000000,
+      "hero_exp": 50000000
+    },
+    "note": "After all level/break requests; excluded from growth-cost calculations."
+  }
+}

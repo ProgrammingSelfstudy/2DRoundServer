@@ -1,0 +1,741 @@
+{
+  "source_capture": "cap-20261103-231756-3f5c4c24.pcap",
+  "source_decoded": "hero-star9-decoded.jsonl",
+  "source_line_definition": "1-based lines in the unmodified full decode; directions emitted separately.",
+  "target": {
+    "partner_id": 388,
+    "bid": 70517,
+    "name": "哥尔·D·罗杰"
+  },
+  "request": {
+    "expend1": [
+      {
+        "partner_id": 1359
+      }
+    ],
+    "expend2": [
+      {
+        "partner_id": 709
+      },
+      {
+        "partner_id": 909
+      }
+    ],
+    "item_expend": [],
+    "partner_id": 388
+  },
+  "reply": {
+    "msg": "",
+    "result": 1
+  },
+  "request_utc": "2026-11-03T15:18:08.15102Z",
+  "before": {
+    "bid": 70517,
+    "break_lev": 6,
+    "end_time": 0,
+    "horcrux_lev": 0,
+    "horcrux_status": 0,
+    "is_lock": [
+      {
+        "is_lock": 1,
+        "lock_type": 1
+      }
+    ],
+    "lev": 185,
+    "partner_id": 388,
+    "power": 139325,
+    "resonate_break_lev": 0,
+    "resonate_lev": 0,
+    "skills": [
+      {
+        "pos": 1,
+        "skill_bid": 757001
+      },
+      {
+        "pos": 2,
+        "skill_bid": 757103
+      },
+      {
+        "pos": 3,
+        "skill_bid": 757203
+      },
+      {
+        "pos": 4,
+        "skill_bid": 757302
+      },
+      {
+        "pos": 5,
+        "skill_bid": 757402
+      }
+    ],
+    "star": 8,
+    "use_skin": 0,
+    "artifacts": [
+      {
+        "artifact_pos": 2,
+        "attr": [
+          {
+            "attr_id": 106,
+            "attr_val": 20000
+          }
+        ],
+        "base_id": 10452,
+        "enchant": 0,
+        "extra": [
+          {
+            "extra_k": 11,
+            "extra_v": 0
+          },
+          {
+            "extra_k": 1,
+            "extra_v": 700281
+          }
+        ],
+        "extra_attr": [],
+        "id": 49
+      },
+      {
+        "artifact_pos": 1,
+        "attr": [
+          {
+            "attr_id": 107,
+            "attr_val": 43000
+          }
+        ],
+        "base_id": 10452,
+        "enchant": 0,
+        "extra": [
+          {
+            "extra_k": 11,
+            "extra_v": 0
+          },
+          {
+            "extra_k": 1,
+            "extra_v": 700111
+          }
+        ],
+        "extra_attr": [],
+        "id": 48
+      }
+    ],
+    "atk": 24922,
+    "crit_rate": 150,
+    "crit_ratio": 1500,
+    "def": 1579,
+    "def_p": 0,
+    "def_s": 0,
+    "dodge_magic": 0,
+    "dodge_rate": 0,
+    "eqms": [
+      {
+        "base_id": 40212,
+        "id": 8,
+        "type": 3
+      },
+      {
+        "base_id": 40310,
+        "id": 6,
+        "type": 4
+      },
+      {
+        "base_id": 40107,
+        "id": 91,
+        "type": 1
+      },
+      {
+        "base_id": 40412,
+        "id": 5,
+        "type": 2
+      }
+    ],
+    "hit_magic": 0,
+    "hit_rate": 1000,
+    "hp": 179518,
+    "speed": 1559
+  },
+  "after": {
+    "atk": 34146,
+    "atk2": 121487,
+    "bid": 70517,
+    "break_lev": 6,
+    "crit_rate": 150,
+    "crit_ratio": 1500,
+    "def": 1579,
+    "def2": 7500,
+    "def_p": 0,
+    "def_s": 0,
+    "dodge_magic": 0,
+    "dodge_rate": 0,
+    "end_time": 0,
+    "hit_magic": 0,
+    "hit_rate": 1000,
+    "horcrux_lev": 0,
+    "horcrux_status": 0,
+    "hp": 260469,
+    "hp2": 831320,
+    "is_lock": [
+      {
+        "is_lock": 1,
+        "lock_type": 1
+      }
+    ],
+    "lev": 185,
+    "partner_id": 388,
+    "power": 190218,
+    "resonate_break_lev": 0,
+    "resonate_lev": 0,
+    "skills": [
+      {
+        "pos": 1,
+        "skill_bid": 757001
+      },
+      {
+        "pos": 2,
+        "skill_bid": 757103
+      },
+      {
+        "pos": 3,
+        "skill_bid": 757203
+      },
+      {
+        "pos": 4,
+        "skill_bid": 757303
+      },
+      {
+        "pos": 5,
+        "skill_bid": 757402
+      }
+    ],
+    "speed": 1569,
+    "speed2": 7101,
+    "star": 9,
+    "use_skin": 0
+  },
+  "changes": {
+    "star": 1,
+    "lev": 0,
+    "break_lev": 0,
+    "atk": 9224,
+    "def": 0,
+    "hp": 80951,
+    "speed": 10,
+    "power": 50893,
+    "crit_rate": 0
+  },
+  "source_lines": {
+    "request": 249,
+    "hero_list": 311,
+    "target_detail": 321,
+    "assets_before": 261,
+    "assets_after": 402,
+    "item_before": 297,
+    "item_after": 403,
+    "refund_notice": 404,
+    "target_update": 405,
+    "delete": 413,
+    "reply": 414,
+    "role_power": 415
+  },
+  "target_requirement": {
+    "skills": [
+      [
+        1,
+        757001
+      ],
+      [
+        2,
+        757103
+      ],
+      [
+        3,
+        757203
+      ],
+      [
+        4,
+        757303
+      ],
+      [
+        5,
+        757402
+      ]
+    ],
+    "add": [
+      5062,
+      3841,
+      1000,
+      1000
+    ],
+    "lev_max": 205,
+    "attr": {
+      "hp_max": 1000,
+      "atk": 200,
+      "speed": 50
+    },
+    "self": [],
+    "fodder": [
+      [
+        70517,
+        5,
+        1
+      ]
+    ],
+    "camp_fodder": [
+      [
+        4,
+        6,
+        1
+      ],
+      [
+        5,
+        6,
+        1
+      ]
+    ],
+    "cost": [
+      [
+        10001,
+        4000
+      ]
+    ]
+  },
+  "requirements_match": true,
+  "consumed_heroes": [
+    {
+      "partner_id": 1359,
+      "bid": 70517,
+      "star": 5,
+      "lev": 1,
+      "break_lev": 0,
+      "is_lock": [],
+      "name": "哥尔·D·罗杰",
+      "camp": 7,
+      "request_list": "expend1"
+    },
+    {
+      "partner_id": 709,
+      "bid": 40501,
+      "star": 6,
+      "lev": 40,
+      "break_lev": 1,
+      "is_lock": [],
+      "name": "路奇",
+      "camp": 4,
+      "request_list": "expend2"
+    },
+    {
+      "partner_id": 909,
+      "bid": 50501,
+      "star": 6,
+      "lev": 1,
+      "break_lev": 0,
+      "is_lock": [],
+      "name": "索隆(新世界)",
+      "camp": 5,
+      "request_list": "expend2"
+    }
+  ],
+  "consumed_reply_order": [
+    1359,
+    909,
+    709
+  ],
+  "training_refund": {
+    "partner_id": 709,
+    "coin": 146262,
+    "hero_exp": 56558,
+    "item_10001": 50,
+    "matches_client_refund_table": true
+  },
+  "assets_before": {
+    "coin": "889074732",
+    "hero_exp": "546628599",
+    "gold": "94423"
+  },
+  "assets_after": {
+    "coin": "889220994",
+    "hero_exp": "546685157",
+    "gold": "94423"
+  },
+  "breakthrough_cards": {
+    "before": 590042,
+    "after": 586092,
+    "gross_refund": 50,
+    "star_up_cost": 4000,
+    "net_spent": 3950,
+    "equation": "590042 + 50 - 4000 = 586092"
+  },
+  "resonance": {
+    "baseline_source_line": 328,
+    "baseline_lev": 6,
+    "updates": [
+      {
+        "source_line": 406,
+        "before": {
+          "bid": 10404,
+          "break_lev": 0,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 248,
+          "power": 1973,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 270001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 270101
+            }
+          ],
+          "star": 5,
+          "use_skin": 0
+        },
+        "after": {
+          "atk": 194,
+          "atk2": 7047,
+          "bid": 10404,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 35,
+          "def2": 4332,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 1597,
+          "hp2": 35021,
+          "is_lock": [],
+          "lev": 1,
+          "partner_id": 248,
+          "power": 1663,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 270001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 270101
+            }
+          ],
+          "speed": 85,
+          "speed2": 3535,
+          "star": 5,
+          "use_skin": 0
+        }
+      },
+      {
+        "source_line": 407,
+        "before": {
+          "bid": 10502,
+          "break_lev": 0,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 761,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 151001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 151101
+            }
+          ],
+          "star": 5,
+          "use_skin": 0
+        },
+        "after": {
+          "atk": 228,
+          "atk2": 10020,
+          "bid": 10502,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 49,
+          "def2": 6188,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 1764,
+          "hp2": 50063,
+          "is_lock": [],
+          "lev": 1,
+          "partner_id": 761,
+          "power": 2034,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 151001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 151101
+            }
+          ],
+          "speed": 116,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        }
+      },
+      {
+        "source_line": 408,
+        "before": {
+          "bid": 10503,
+          "break_lev": 0,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 904,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "star": 5,
+          "use_skin": 0
+        },
+        "after": {
+          "atk": 228,
+          "atk2": 10014,
+          "bid": 10503,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 49,
+          "def2": 6182,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 1764,
+          "hp2": 50045,
+          "is_lock": [],
+          "lev": 1,
+          "partner_id": 904,
+          "power": 2034,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "speed": 116,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        }
+      },
+      {
+        "source_line": 409,
+        "before": {
+          "bid": 10503,
+          "break_lev": 0,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 579,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "star": 5,
+          "use_skin": 0
+        },
+        "after": {
+          "atk": 228,
+          "atk2": 10014,
+          "bid": 10503,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 49,
+          "def2": 6182,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 1764,
+          "hp2": 50045,
+          "is_lock": [],
+          "lev": 1,
+          "partner_id": 579,
+          "power": 2034,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "speed": 116,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        }
+      },
+      {
+        "source_line": 410,
+        "before": {
+          "bid": 10503,
+          "break_lev": 0,
+          "end_time": 0,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "is_lock": [],
+          "lev": 6,
+          "partner_id": 507,
+          "power": 2477,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "star": 5,
+          "use_skin": 0
+        },
+        "after": {
+          "atk": 228,
+          "atk2": 10014,
+          "bid": 10503,
+          "break_lev": 0,
+          "crit_rate": 0,
+          "crit_ratio": 1500,
+          "def": 49,
+          "def2": 6182,
+          "def_p": 0,
+          "def_s": 0,
+          "dodge_magic": 0,
+          "dodge_rate": 0,
+          "end_time": 0,
+          "hit_magic": 0,
+          "hit_rate": 1000,
+          "horcrux_lev": 0,
+          "horcrux_status": 0,
+          "hp": 1764,
+          "hp2": 50045,
+          "is_lock": [],
+          "lev": 1,
+          "partner_id": 507,
+          "power": 2034,
+          "resonate_break_lev": 0,
+          "resonate_lev": 1,
+          "skills": [
+            {
+              "pos": 1,
+              "skill_bid": 226001
+            },
+            {
+              "pos": 2,
+              "skill_bid": 226101
+            }
+          ],
+          "speed": 116,
+          "speed2": 5050,
+          "star": 5,
+          "use_skin": 0
+        }
+      }
+    ],
+    "post_starup_26425_present": false
+  },
+  "server_sequence_through_role_power": [
+    10302,
+    10512,
+    12742,
+    11002,
+    11002,
+    11002,
+    11002,
+    11002,
+    11002,
+    16401,
+    16606,
+    11006,
+    11005,
+    10306
+  ],
+  "role_power": {
+    "max_power": 190218,
+    "power": 190218
+  },
+  "target_lock_observation": "The target is locked before and after a successful star-up; this does not establish permission to consume locked material heroes.",
+  "implementation_changed": false
+}

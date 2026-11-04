@@ -1,0 +1,96 @@
+{
+  "source_capture": "cap-20261103-231756-3f5c4c24.pcap",
+  "source_decoded": "hero-star9-decoded.jsonl",
+  "source_line_definition": "1-based lines in the unmodified full decode; directions emitted separately.",
+  "user_report": "The user recalls seeing the holy-equipment entry in this session; no historical UI image was supplied.",
+  "target_hero": 388,
+  "stars_before": 8,
+  "stars_after": 9,
+  "holy_bag_source_line": 298,
+  "holy_item_count": 65,
+  "target_holy_baseline_source_line": 329,
+  "target_holy_baseline": {
+    "holy_eqm": [],
+    "partner_id": 388
+  },
+  "pending_wash_preview": {
+    "all_score": 2260,
+    "attr": [],
+    "base_id": 5020204,
+    "bind": 1,
+    "enchant": 0,
+    "expire_time": 0,
+    "expire_type": 0,
+    "extra": [
+      {
+        "extra_k": 11,
+        "extra_v": 0
+      },
+      {
+        "extra_k": 10,
+        "extra_v": 1
+      }
+    ],
+    "extra_attr": [],
+    "gemstones": [],
+    "holy_eqm_attr": [
+      {
+        "attr_id": 120,
+        "attr_val": 16,
+        "pos": 2
+      },
+      {
+        "attr_id": 117,
+        "attr_val": 17,
+        "pos": 1
+      },
+      {
+        "attr_id": 120,
+        "attr_val": 16,
+        "pos": 102
+      },
+      {
+        "attr_id": 106,
+        "attr_val": 2,
+        "pos": 101
+      }
+    ],
+    "id": 26,
+    "main_attr": [
+      {
+        "attr_id": 104,
+        "attr_val": 5649
+      }
+    ],
+    "pos": 23,
+    "quantity": 1,
+    "score": 2260
+  },
+  "preview_matches_historical_capture": true,
+  "historical_preview": {
+    "file": "testdata/captures/original-2026-11-01/auto-gear.jsonl",
+    "file_sha256": "ef47358745c2f783ec069b2558dc97dba807e77e664b26ecdc0e779e23cc7eb6",
+    "export_line": 13,
+    "source_line": 9194
+  },
+  "commands_absent": [
+    11086,
+    11090,
+    11091,
+    11093,
+    11094,
+    25221,
+    25222,
+    25223,
+    25224
+  ],
+  "confirmed": "Nine-star hero exists; holy inventory and an unchanged pending wash preview are returned at login.",
+  "unconfirmed": [
+    "Actual tab visibility or entry during this session.",
+    "On-screen wear condition text or a nine-star rejection message.",
+    "A close/reopen operation in this session.",
+    "Explicit discard button wording or action.",
+    "Successful holy-equipment wearing or removal."
+  ],
+  "additional_game_actions": false
+}

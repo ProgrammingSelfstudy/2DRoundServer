@@ -1,0 +1,132 @@
+{
+  "analysis_kind": "offline existing capture; ordinary local decoder evidence, not REA Evidence",
+  "capture_source": "User operated original client; PCAPdroid TCP export already received on computer",
+  "capture_complete": true,
+  "receiver_closed_bytes": 108465,
+  "source_capture": "cap-20261102-232244-086bc782.pcap",
+  "source_bytes": 108465,
+  "source_sha256": "530cd0dbc791a2c71665cbba2988dcb30b1473803c12280d8e230afdbd11642c",
+  "decoded_file": "hero-star-decoded.jsonl",
+  "decoded_sha256": "263ae8486fc0ffa3af88fd27c914f079d7b6d541c4792d1f164173beea33de51",
+  "decoder_sha256": "f5f7319fe09c60c586d426af9a2760d6d54d9d0c21684faf7cb006aa1a2960ae",
+  "decoded_frames": 477,
+  "decode_errors": 0,
+  "first_frame_utc": "2026-11-02T15:22:47.359811Z",
+  "last_frame_utc": "2026-11-02T15:23:41.791377Z",
+  "exported_rows": 18,
+  "unique_source_lines": 18,
+  "source_line_definition": "1-based line in unmodified hero-star-decoded.jsonl; messages retain original numeric values. Three baseline commands omit unrelated array entries and are explicitly marked.",
+  "star_up_request_source_line": 275,
+  "star_up_reply_source_line": 469,
+  "star_up_count": 1,
+  "result": 1,
+  "hero": {
+    "partner_id": 388,
+    "bid": 70517,
+    "name": "哥尔·D·罗杰",
+    "changes": {
+      "star": {
+        "before": 7,
+        "after": 8,
+        "delta": 1
+      },
+      "lev": {
+        "before": 165,
+        "after": 165,
+        "delta": 0
+      },
+      "break_lev": {
+        "before": 6,
+        "after": 6,
+        "delta": 0
+      },
+      "power": {
+        "before": 89152,
+        "after": 126070,
+        "delta": 36918
+      },
+      "hp": {
+        "before": 106868,
+        "after": 162058,
+        "delta": 55190
+      },
+      "atk": {
+        "before": 15401,
+        "after": 22440,
+        "delta": 7039
+      },
+      "def": {
+        "before": 1429,
+        "after": 1429,
+        "delta": 0
+      },
+      "speed": {
+        "before": 1407,
+        "after": 1417,
+        "delta": 10
+      },
+      "crit_rate": {
+        "before": 100,
+        "after": 150,
+        "delta": 50
+      }
+    },
+    "skill_change": {
+      "pos": 3,
+      "before": 757202,
+      "after": 757203
+    }
+  },
+  "consumed_heroes": [
+    {
+      "partner_id": 965,
+      "bid": 10508,
+      "name": "小丑巴基",
+      "star": 6,
+      "lev": 1,
+      "camp": 1
+    },
+    {
+      "partner_id": 1179,
+      "bid": 20502,
+      "name": "乌索普",
+      "star": 6,
+      "lev": 1,
+      "camp": 2
+    },
+    {
+      "partner_id": 1241,
+      "bid": 30504,
+      "name": "闪电",
+      "star": 6,
+      "lev": 1,
+      "camp": 3
+    }
+  ],
+  "material": {
+    "base_id": 10001,
+    "name": "突破卡",
+    "before": 582416,
+    "after": 580416,
+    "spent": 2000,
+    "before_source_line": 452,
+    "after_source_line": 464
+  },
+  "sanitization": "Explicit hero/material/progress command selection; raw payload, addresses, authentication, role identity, chat and growth text excluded. Hero instance IDs and gameplay data retained.",
+  "implementation_changed": false,
+  "limitations": [
+    "Only one successful 7-to-8-star sample; no rejection, soul-item or above-20-star fusion cases.",
+    "No post-star-up 10302 in capture; do not claim an independently verified coin/diamond balance change.",
+    "No 11093 equip request; 8-star result does not verify holy-equipment wearing.",
+    "Single observation does not establish server validation of all expend1/expend2 alternatives or general stat formula."
+  ],
+  "artifacts": {
+    "hero-star.jsonl": "ba7c6c58e6c4d2c42bbf0a7acc039ec22f6f8223c60ad896c95a6e2267ec4fbe",
+    "HERO_STAR_NOTES.md": "9d0ff9c8419f9fd1babba80ee437fb0851ec79d7b293b6468515338234667e4d"
+  },
+  "reference_source_sha256": {
+    "internal/game/partner_star.go": "150f3375148426909ca27c7f38f66f4ae933d9a694751b24b35a7cab35ae5314",
+    "internal/game/data/partners.json": "3bc62ea786854950998d284f60c565b7c66d3d3f5065383a25a11dbd40ba7bd8",
+    "internal/game/data/item_names.json": "6c4d06db23dbfb5fafb6009135b2517a417634658da2f9ed5ce5dbd402fcc5ce"
+  }
+}

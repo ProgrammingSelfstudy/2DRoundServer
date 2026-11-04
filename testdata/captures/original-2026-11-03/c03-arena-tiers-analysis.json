@@ -1,0 +1,1668 @@
+{
+  "scenario": "c03-arena-tiers",
+  "source_capture": "cap-20261103-233358-8cea5dfc.pcap",
+  "source_decoded": "arena-tiers-decoded.jsonl",
+  "source_line_definition": "1-based lines of the fixed full decode; directions emitted separately.",
+  "fresh_initial_states": [
+    {
+      "source_line": 602,
+      "msg": {
+        "had_combat_num": 50,
+        "num_list": [
+          {
+            "num": 50
+          },
+          {
+            "num": 35
+          },
+          {
+            "num": 20
+          },
+          {
+            "num": 10
+          }
+        ]
+      }
+    },
+    {
+      "source_line": 633,
+      "msg": {
+        "had_combat_num": 50,
+        "num_list": [
+          {
+            "num": 50
+          },
+          {
+            "num": 35
+          },
+          {
+            "num": 20
+          },
+          {
+            "num": 10
+          }
+        ]
+      }
+    }
+  ],
+  "initial_weekly_count": 50,
+  "final_weekly_count": 92,
+  "initial_claimed": [
+    10,
+    20,
+    35,
+    50
+  ],
+  "final_claimed": [
+    10,
+    20,
+    35,
+    50,
+    70,
+    90
+  ],
+  "final_state_source_line": 1136,
+  "challenge_requests": 46,
+  "accepted_and_settled": 42,
+  "rejected_for_frequency": 4,
+  "outcomes": {
+    "wins": 1,
+    "losses": 41
+  },
+  "score_before": 1125,
+  "score_after": 1144,
+  "challenges": [
+    {
+      "index": 1,
+      "request_utc": "2026-11-03T15:34:04.584621Z",
+      "opponent_alias": "opponent_1",
+      "is_auto": 1,
+      "request_source_line": 253,
+      "ack_source_line": 636,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 50,
+      "weekly_count_after": 51,
+      "state_source_line": 642,
+      "settlement_source_line": 643,
+      "settlement": {
+        "result": 1,
+        "score": 1144,
+        "get_score": 19,
+        "lose_score": -14,
+        "tar_score": 971,
+        "items": [
+          {
+            "bid": 8,
+            "num": 15
+          }
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "request_utc": "2026-11-03T15:34:06.418721Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 257,
+      "ack_source_line": 653,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 51,
+      "weekly_count_after": 52,
+      "state_source_line": 657,
+      "settlement_source_line": 658,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 8,
+            "num": 9
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "request_utc": "2026-11-03T15:34:08.181692Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 261,
+      "ack_source_line": 664,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 52,
+      "weekly_count_after": 53,
+      "state_source_line": 668,
+      "settlement_source_line": 669,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "request_utc": "2026-11-03T15:34:09.3726Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 265,
+      "ack_source_line": 676,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 53,
+      "weekly_count_after": 54,
+      "state_source_line": 679,
+      "settlement_source_line": 680,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "request_utc": "2026-11-03T15:34:10.319039Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 269,
+      "ack_source_line": 685,
+      "ack": {
+        "code": 0,
+        "msg": "操作过于频繁，请稍等几秒钟"
+      },
+      "weekly_count_before": 54,
+      "weekly_count_after": 54
+    },
+    {
+      "index": 6,
+      "request_utc": "2026-11-03T15:34:11.141912Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 271,
+      "ack_source_line": 688,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 54,
+      "weekly_count_after": 55,
+      "state_source_line": 691,
+      "settlement_source_line": 692,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "request_utc": "2026-11-03T15:34:12.348488Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 277,
+      "ack_source_line": 700,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 55,
+      "weekly_count_after": 56,
+      "state_source_line": 703,
+      "settlement_source_line": 704,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "request_utc": "2026-11-03T15:34:13.377791Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 281,
+      "ack_source_line": 711,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 56,
+      "weekly_count_after": 57,
+      "state_source_line": 714,
+      "settlement_source_line": 715,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "request_utc": "2026-11-03T15:34:14.427767Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 285,
+      "ack_source_line": 722,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 57,
+      "weekly_count_after": 58,
+      "state_source_line": 725,
+      "settlement_source_line": 726,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "request_utc": "2026-11-03T15:34:15.796426Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 289,
+      "ack_source_line": 733,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 58,
+      "weekly_count_after": 59,
+      "state_source_line": 736,
+      "settlement_source_line": 737,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 11,
+      "request_utc": "2026-11-03T15:34:17.117891Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 293,
+      "ack_source_line": 744,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 59,
+      "weekly_count_after": 60,
+      "state_source_line": 748,
+      "settlement_source_line": 749,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 12,
+      "request_utc": "2026-11-03T15:34:18.067453Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 297,
+      "ack_source_line": 754,
+      "ack": {
+        "code": 0,
+        "msg": "操作过于频繁，请稍等几秒钟"
+      },
+      "weekly_count_before": 60,
+      "weekly_count_after": 60
+    },
+    {
+      "index": 13,
+      "request_utc": "2026-11-03T15:34:19.494878Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 299,
+      "ack_source_line": 757,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 60,
+      "weekly_count_after": 61,
+      "state_source_line": 760,
+      "settlement_source_line": 761,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 14,
+      "request_utc": "2026-11-03T15:34:20.655622Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 303,
+      "ack_source_line": 768,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 61,
+      "weekly_count_after": 62,
+      "state_source_line": 771,
+      "settlement_source_line": 772,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 15,
+      "request_utc": "2026-11-03T15:34:22.108479Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 309,
+      "ack_source_line": 780,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 62,
+      "weekly_count_after": 63,
+      "state_source_line": 783,
+      "settlement_source_line": 784,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 16,
+      "request_utc": "2026-11-03T15:34:23.102255Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 313,
+      "ack_source_line": 789,
+      "ack": {
+        "code": 0,
+        "msg": "操作过于频繁，请稍等几秒钟"
+      },
+      "weekly_count_before": 63,
+      "weekly_count_after": 63
+    },
+    {
+      "index": 17,
+      "request_utc": "2026-11-03T15:34:23.906412Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 315,
+      "ack_source_line": 792,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 63,
+      "weekly_count_after": 64,
+      "state_source_line": 795,
+      "settlement_source_line": 796,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 18,
+      "request_utc": "2026-11-03T15:34:25.526553Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 319,
+      "ack_source_line": 803,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 64,
+      "weekly_count_after": 65,
+      "state_source_line": 806,
+      "settlement_source_line": 807,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 19,
+      "request_utc": "2026-11-03T15:34:26.520672Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 323,
+      "ack_source_line": 812,
+      "ack": {
+        "code": 0,
+        "msg": "操作过于频繁，请稍等几秒钟"
+      },
+      "weekly_count_before": 65,
+      "weekly_count_after": 65
+    },
+    {
+      "index": 20,
+      "request_utc": "2026-11-03T15:34:27.295733Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 325,
+      "ack_source_line": 815,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 65,
+      "weekly_count_after": 66,
+      "state_source_line": 818,
+      "settlement_source_line": 819,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 21,
+      "request_utc": "2026-11-03T15:34:28.347226Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 329,
+      "ack_source_line": 826,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 66,
+      "weekly_count_after": 67,
+      "state_source_line": 829,
+      "settlement_source_line": 830,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 22,
+      "request_utc": "2026-11-03T15:34:29.353871Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 333,
+      "ack_source_line": 838,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 67,
+      "weekly_count_after": 68,
+      "state_source_line": 841,
+      "settlement_source_line": 842,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 23,
+      "request_utc": "2026-11-03T15:34:30.409859Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 337,
+      "ack_source_line": 849,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 68,
+      "weekly_count_after": 69,
+      "state_source_line": 852,
+      "settlement_source_line": 853,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 24,
+      "request_utc": "2026-11-03T15:34:31.902984Z",
+      "opponent_alias": "opponent_3",
+      "is_auto": 1,
+      "request_source_line": 343,
+      "ack_source_line": 861,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 69,
+      "weekly_count_after": 70,
+      "state_source_line": 864,
+      "settlement_source_line": 865,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 25,
+      "request_utc": "2026-11-03T15:34:35.174062Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 349,
+      "ack_source_line": 876,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 70,
+      "weekly_count_after": 71,
+      "state_source_line": 879,
+      "settlement_source_line": 880,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 26,
+      "request_utc": "2026-11-03T15:34:38.559603Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 353,
+      "ack_source_line": 887,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 71,
+      "weekly_count_after": 72,
+      "state_source_line": 890,
+      "settlement_source_line": 891,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 27,
+      "request_utc": "2026-11-03T15:34:39.668168Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 357,
+      "ack_source_line": 898,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 72,
+      "weekly_count_after": 73,
+      "state_source_line": 901,
+      "settlement_source_line": 902,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 28,
+      "request_utc": "2026-11-03T15:34:40.708507Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 361,
+      "ack_source_line": 909,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 73,
+      "weekly_count_after": 74,
+      "state_source_line": 912,
+      "settlement_source_line": 913,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 29,
+      "request_utc": "2026-11-03T15:34:41.912947Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 367,
+      "ack_source_line": 921,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 74,
+      "weekly_count_after": 75,
+      "state_source_line": 924,
+      "settlement_source_line": 925,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 30,
+      "request_utc": "2026-11-03T15:34:43.222385Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 371,
+      "ack_source_line": 932,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 75,
+      "weekly_count_after": 76,
+      "state_source_line": 935,
+      "settlement_source_line": 936,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 31,
+      "request_utc": "2026-11-03T15:34:44.656433Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 375,
+      "ack_source_line": 943,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 76,
+      "weekly_count_after": 77,
+      "state_source_line": 946,
+      "settlement_source_line": 947,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 32,
+      "request_utc": "2026-11-03T15:34:45.833775Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 379,
+      "ack_source_line": 954,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 77,
+      "weekly_count_after": 78,
+      "state_source_line": 957,
+      "settlement_source_line": 958,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 33,
+      "request_utc": "2026-11-03T15:34:46.974745Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 383,
+      "ack_source_line": 965,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 78,
+      "weekly_count_after": 79,
+      "state_source_line": 968,
+      "settlement_source_line": 969,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 34,
+      "request_utc": "2026-11-03T15:34:48.386813Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 387,
+      "ack_source_line": 976,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 79,
+      "weekly_count_after": 80,
+      "state_source_line": 980,
+      "settlement_source_line": 981,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 35,
+      "request_utc": "2026-11-03T15:34:49.527989Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 391,
+      "ack_source_line": 988,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 80,
+      "weekly_count_after": 81,
+      "state_source_line": 991,
+      "settlement_source_line": 992,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 36,
+      "request_utc": "2026-11-03T15:34:50.555207Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 395,
+      "ack_source_line": 999,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 81,
+      "weekly_count_after": 82,
+      "state_source_line": 1002,
+      "settlement_source_line": 1003,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 37,
+      "request_utc": "2026-11-03T15:34:51.584928Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 399,
+      "ack_source_line": 1010,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 82,
+      "weekly_count_after": 83,
+      "state_source_line": 1013,
+      "settlement_source_line": 1014,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 38,
+      "request_utc": "2026-11-03T15:34:52.584799Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 405,
+      "ack_source_line": 1022,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 83,
+      "weekly_count_after": 84,
+      "state_source_line": 1025,
+      "settlement_source_line": 1026,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    },
+    {
+      "index": 39,
+      "request_utc": "2026-11-03T15:34:53.590669Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 409,
+      "ack_source_line": 1033,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 84,
+      "weekly_count_after": 85,
+      "state_source_line": 1036,
+      "settlement_source_line": 1037,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 40,
+      "request_utc": "2026-11-03T15:34:54.727469Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 413,
+      "ack_source_line": 1044,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 85,
+      "weekly_count_after": 86,
+      "state_source_line": 1047,
+      "settlement_source_line": 1048,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 41,
+      "request_utc": "2026-11-03T15:34:56.40364Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 417,
+      "ack_source_line": 1055,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 86,
+      "weekly_count_after": 87,
+      "state_source_line": 1058,
+      "settlement_source_line": 1059,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 8,
+            "num": 9
+          }
+        ]
+      }
+    },
+    {
+      "index": 42,
+      "request_utc": "2026-11-03T15:34:57.470621Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 421,
+      "ack_source_line": 1066,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 87,
+      "weekly_count_after": 88,
+      "state_source_line": 1069,
+      "settlement_source_line": 1070,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 43,
+      "request_utc": "2026-11-03T15:34:58.532895Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 425,
+      "ack_source_line": 1077,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 88,
+      "weekly_count_after": 89,
+      "state_source_line": 1080,
+      "settlement_source_line": 1081,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 10001,
+            "num": 6
+          }
+        ]
+      }
+    },
+    {
+      "index": 44,
+      "request_utc": "2026-11-03T15:34:59.546296Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 429,
+      "ack_source_line": 1088,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 89,
+      "weekly_count_after": 90,
+      "state_source_line": 1091,
+      "settlement_source_line": 1092,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 45,
+      "request_utc": "2026-11-03T15:35:00.558293Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 433,
+      "ack_source_line": 1099,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 90,
+      "weekly_count_after": 91,
+      "state_source_line": 1102,
+      "settlement_source_line": 1103,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 1,
+            "num": 12000
+          }
+        ]
+      }
+    },
+    {
+      "index": 46,
+      "request_utc": "2026-11-03T15:35:01.7411Z",
+      "opponent_alias": "opponent_2",
+      "is_auto": 1,
+      "request_source_line": 439,
+      "ack_source_line": 1111,
+      "ack": {
+        "code": 1,
+        "msg": ""
+      },
+      "weekly_count_before": 91,
+      "weekly_count_after": 92,
+      "state_source_line": 1114,
+      "settlement_source_line": 1115,
+      "settlement": {
+        "result": 2,
+        "score": 1144,
+        "get_score": 0,
+        "lose_score": 0,
+        "tar_score": 1000,
+        "items": [
+          {
+            "bid": 22,
+            "num": 4800
+          }
+        ]
+      }
+    }
+  ],
+  "claims": [
+    {
+      "tier": 70,
+      "request_source_line": 347,
+      "reply_source_line": 873,
+      "request_utc": "2026-11-03T15:34:33.62089Z",
+      "reply": {
+        "code": 1,
+        "msg": "领取成功"
+      },
+      "weekly_count_at_claim": 70,
+      "reward": {
+        "base_id": 37002,
+        "name": "高级探宝券",
+        "quantity": 1
+      },
+      "stock_before": 719,
+      "stock_after": 720,
+      "stock_before_source_line": 528,
+      "stock_after_source_line": 870,
+      "gain_notice_source_line": 871,
+      "claim_state_before_source_line": 864,
+      "claim_state_after_source_line": 872,
+      "reward_matches_local_table": true
+    },
+    {
+      "tier": 90,
+      "request_source_line": 459,
+      "reply_source_line": 1137,
+      "request_utc": "2026-11-03T15:35:33.861205Z",
+      "reply": {
+        "code": 1,
+        "msg": "领取成功"
+      },
+      "weekly_count_at_claim": 92,
+      "reward": {
+        "base_id": 14001,
+        "name": "强者招募令",
+        "quantity": 1
+      },
+      "stock_before": 419,
+      "stock_after": 420,
+      "stock_before_source_line": 528,
+      "stock_after_source_line": 1134,
+      "gain_notice_source_line": 1135,
+      "claim_state_before_source_line": 1114,
+      "claim_state_after_source_line": 1136,
+      "reward_matches_local_table": true
+    }
+  ],
+  "tickets": {
+    "baseline_source_line": 528,
+    "initial": 39,
+    "final": 0,
+    "updates": [
+      {
+        "source_line": 674,
+        "quantity": 38
+      },
+      {
+        "source_line": 686,
+        "quantity": 37
+      },
+      {
+        "source_line": 698,
+        "quantity": 36
+      },
+      {
+        "source_line": 709,
+        "quantity": 35
+      },
+      {
+        "source_line": 720,
+        "quantity": 34
+      },
+      {
+        "source_line": 731,
+        "quantity": 33
+      },
+      {
+        "source_line": 742,
+        "quantity": 32
+      },
+      {
+        "source_line": 755,
+        "quantity": 31
+      },
+      {
+        "source_line": 766,
+        "quantity": 30
+      },
+      {
+        "source_line": 778,
+        "quantity": 29
+      },
+      {
+        "source_line": 790,
+        "quantity": 28
+      },
+      {
+        "source_line": 801,
+        "quantity": 27
+      },
+      {
+        "source_line": 813,
+        "quantity": 26
+      },
+      {
+        "source_line": 824,
+        "quantity": 25
+      },
+      {
+        "source_line": 836,
+        "quantity": 24
+      },
+      {
+        "source_line": 847,
+        "quantity": 23
+      },
+      {
+        "source_line": 859,
+        "quantity": 22
+      },
+      {
+        "source_line": 874,
+        "quantity": 21
+      },
+      {
+        "source_line": 885,
+        "quantity": 20
+      },
+      {
+        "source_line": 896,
+        "quantity": 19
+      },
+      {
+        "source_line": 907,
+        "quantity": 18
+      },
+      {
+        "source_line": 919,
+        "quantity": 17
+      },
+      {
+        "source_line": 930,
+        "quantity": 16
+      },
+      {
+        "source_line": 941,
+        "quantity": 15
+      },
+      {
+        "source_line": 952,
+        "quantity": 14
+      },
+      {
+        "source_line": 963,
+        "quantity": 13
+      },
+      {
+        "source_line": 974,
+        "quantity": 12
+      },
+      {
+        "source_line": 986,
+        "quantity": 11
+      },
+      {
+        "source_line": 997,
+        "quantity": 10
+      },
+      {
+        "source_line": 1008,
+        "quantity": 9
+      },
+      {
+        "source_line": 1020,
+        "quantity": 8
+      },
+      {
+        "source_line": 1031,
+        "quantity": 7
+      },
+      {
+        "source_line": 1042,
+        "quantity": 6
+      },
+      {
+        "source_line": 1053,
+        "quantity": 5
+      },
+      {
+        "source_line": 1064,
+        "quantity": 4
+      },
+      {
+        "source_line": 1075,
+        "quantity": 3
+      },
+      {
+        "source_line": 1086,
+        "quantity": 2
+      },
+      {
+        "source_line": 1097,
+        "quantity": 1
+      },
+      {
+        "source_line": 1109,
+        "quantity": 0
+      }
+    ]
+  },
+  "free_challenges": {
+    "initial": 3,
+    "initial_source_line": 603,
+    "final": 0,
+    "final_source_line": 1119
+  },
+  "purchase_attempts": [
+    {
+      "request_source_line": 445,
+      "reply_source_line": 1121,
+      "hint_source_line": 1122,
+      "request": {
+        "num": 1
+      },
+      "reply": {
+        "code": 0,
+        "msg": ""
+      },
+      "hint": "钻石不足"
+    },
+    {
+      "request_source_line": 449,
+      "reply_source_line": 1124,
+      "hint_source_line": 1125,
+      "request": {
+        "num": 1
+      },
+      "reply": {
+        "code": 0,
+        "msg": ""
+      },
+      "hint": "钻石不足"
+    },
+    {
+      "request_source_line": 451,
+      "reply_source_line": 1126,
+      "hint_source_line": 1127,
+      "request": {
+        "num": 1
+      },
+      "reply": {
+        "code": 0,
+        "msg": ""
+      },
+      "hint": "钻石不足"
+    },
+    {
+      "request_source_line": 453,
+      "reply_source_line": 1129,
+      "hint_source_line": 1130,
+      "request": {
+        "num": 1
+      },
+      "reply": {
+        "code": 0,
+        "msg": ""
+      },
+      "hint": "钻石不足"
+    },
+    {
+      "request_source_line": 455,
+      "reply_source_line": 1131,
+      "hint_source_line": 1132,
+      "request": {
+        "num": 1
+      },
+      "reply": {
+        "code": 0,
+        "msg": ""
+      },
+      "hint": "钻石不足"
+    },
+    {
+      "request_source_line": 461,
+      "reply_source_line": 1138,
+      "hint_source_line": 1139,
+      "request": {
+        "num": 1
+      },
+      "reply": {
+        "code": 0,
+        "msg": ""
+      },
+      "hint": "钻石不足"
+    }
+  ],
+  "purchase_discrepancy": {
+    "latest_asset_source_line_before_attempts": 1112,
+    "reported_gold": "94423",
+    "rejection_hint": "钻石不足",
+    "local_price_per_ticket": 20,
+    "interpretation": "The refusal and displayed asset balance are both retained. Original price, payment asset or additional conditions are not inferred from this contradiction."
+  },
+  "manual_skip_20062_count": 0,
+  "battle_script_counts": {
+    "20027": 0,
+    "20002": 0,
+    "20004": 0
+  },
+  "below_30_test_covered": false,
+  "round_count_confirmed": false,
+  "tier_120_claimed": false,
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "scope_note": "Later recharge/welfare/other UI traffic after the arena attempts is outside this export and is not treated as successful arena ticket purchase."
+}

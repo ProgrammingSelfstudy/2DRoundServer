@@ -1,0 +1,131 @@
+{
+  "analysis_kind": "Offline analysis of an existing user-operated capture; ordinary local decoder evidence.",
+  "scenarios": [
+    "hero-star9",
+    "b02-holy-entry"
+  ],
+  "source_capture": "cap-20261103-231756-3f5c4c24.pcap",
+  "source_bytes": 104558,
+  "source_sha256": "c793342e186911b2c0237da010b38c79a1e4bae1e139184ad74aa1f37b37e91e",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 104558,
+  "pcap_packet_records": 256,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/hero-star9-20261103-231756",
+  "decoded_file": "hero-star9-decoded.jsonl",
+  "decoded_sha256": "29a54bc738f3da947601e474ae54b653e213bafde72aaa19b79b6c91e63bfc06",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 421,
+  "frames_by_direction": {
+    "c2s": 255,
+    "s2c": 166
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-03T15:18:00.840881Z",
+  "last_frame_utc": "2026-11-03T15:18:27.00868Z",
+  "star_exported_rows": 22,
+  "holy_exported_rows": 4,
+  "counting_note": "The holy projection reuses the same capture and two source frames also used by the star projection; counts must not be combined as unique frames.",
+  "unique_source_frames_across_exports": 24,
+  "source_line_definition": "1-based lines in the unmodified full decode; directions emitted separately.",
+  "target": {
+    "partner_id": 388,
+    "bid": 70517,
+    "name": "哥尔·D·罗杰"
+  },
+  "star_up_result": {
+    "msg": "",
+    "result": 1
+  },
+  "changes": {
+    "star": 1,
+    "lev": 0,
+    "break_lev": 0,
+    "atk": 9224,
+    "def": 0,
+    "hp": 80951,
+    "speed": 10,
+    "power": 50893,
+    "crit_rate": 0
+  },
+  "source_lines": {
+    "request": 249,
+    "hero_list": 311,
+    "target_detail": 321,
+    "assets_before": 261,
+    "assets_after": 402,
+    "item_before": 297,
+    "item_after": 403,
+    "refund_notice": 404,
+    "target_update": 405,
+    "delete": 413,
+    "reply": 414,
+    "role_power": 415
+  },
+  "material_requirement_match": true,
+  "training_refund": {
+    "partner_id": 709,
+    "coin": 146262,
+    "hero_exp": 56558,
+    "item_10001": 50,
+    "matches_client_refund_table": true
+  },
+  "breakthrough_cards": {
+    "before": 590042,
+    "after": 586092,
+    "gross_refund": 50,
+    "star_up_cost": 4000,
+    "net_spent": 3950,
+    "equation": "590042 + 50 - 4000 = 586092"
+  },
+  "affected_resonance_heroes": [
+    248,
+    761,
+    904,
+    579,
+    507
+  ],
+  "resonance_slot_levels": {
+    "before": 6,
+    "after": 1
+  },
+  "holy_status": {
+    "hero_star": 9,
+    "holy_item_count": 65,
+    "pending_preview_id": 26,
+    "preview_matches_2026_11_01": true,
+    "entry_ui_independently_verified": false,
+    "wear_or_remove_captured": false,
+    "discard_captured": false
+  },
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "Only relevant gameplay hero, material, asset, refund, resonance and holy-equipment data. All list projections are marked; identity, authentication, addresses, chat and raw payload excluded.",
+  "limitations": [
+    "Single successful 8-to-9 sample, no soul/fusion/failure branch.",
+    "The hero was already level 185 at login; earlier level-165 captures are not the immediate pre-star-up baseline.",
+    "Locked target upgrading is distinct from consuming locked material heroes.",
+    "No post-star-up 26425 confirms a new core list or ordering.",
+    "Holy-entry UI is user-reported without a historical screenshot; login data does not establish tab navigation.",
+    "The preview exists at this login and matches the old sample; no close/reopen, discard or holy-equipment wearing/removal was captured.",
+    "A clean decode and receiver closure do not establish lossless network capture."
+  ],
+  "artifacts": {
+    "hero-star9.jsonl": "3a265cfa82211cc303c180f0619aa9c6de715e26669e4143fedad46b4e14d0dc",
+    "hero-star9-analysis.json": "5c4c239b69f3f3ffd7f6a3c27aed520026431b70844e085d653f8e1cd249449f",
+    "HERO_STAR9_NOTES.md": "d388c84832f44e1ee523ce87c77f162de1f13a1ac2c005bc353a3a235a14714e",
+    "b02-holy-entry.jsonl": "2b820307373c054bdd7976b37306a37797980927e1d1bc5510b36ef5e05a9780",
+    "b02-holy-entry-status.json": "46f030d11d5e76087bd1fb9c319b3a159a41fbdb93f30441b9c56da2ee0681f4",
+    "HOLY_ENTRY_NOTES.md": "5e98f36fd87f3b9b0ccab05981ac2380190b4dba22b87eef52cff57e5148dc41"
+  },
+  "reference_source_sha256": {
+    "internal/game/data/partners.json": "3bc62ea786854950998d284f60c565b7c66d3d3f5065383a25a11dbd40ba7bd8",
+    "internal/game/data/partner_growth.json": "8d00ab58342c94e4995bf70241ef173e4da0b3d495b5d1591899d67520fde3fd",
+    "internal/game/data/holyeqm.json": "9ab3546ad6e5ea189527c6e2ab03027081225a53aa075f53061754b9958a17a7",
+    "testdata/captures/original-2026-11-01/auto-gear.jsonl": "ef47358745c2f783ec069b2558dc97dba807e77e664b26ecdc0e779e23cc7eb6"
+  }
+}

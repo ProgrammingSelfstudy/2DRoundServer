@@ -1,0 +1,124 @@
+{
+  "analysis_kind": "Offline analysis of existing original-client capture; ordinary local decoder evidence.",
+  "scenario": "a01-hero-starup-extra",
+  "capture_source": "User-operated original client; existing PCAPdroid TCP export closed.",
+  "source_capture": "cap-20261103-231158-4e253908.pcap",
+  "source_bytes": 107918,
+  "source_sha256": "dd7ca29e75c3f8254e7f20e37c3d929442a0a5824e20426771162e4248a972ed",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 107918,
+  "pcap_packet_records": 274,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/starup-extra-20261103-231158",
+  "decoded_file": "starup-extra-decoded.jsonl",
+  "decoded_sha256": "224626d5146b5b11b21e5c57228f81dfe431f12bb012d067baba3efa09996e18",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 436,
+  "frames_by_direction": {
+    "c2s": 261,
+    "s2c": 175
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-03T15:12:01.788545Z",
+  "last_frame_utc": "2026-11-03T15:12:36.613534Z",
+  "exported_rows": 30,
+  "unique_source_lines": 30,
+  "source_line_definition": "1-based lines in the unmodified full decode; directions emitted separately.",
+  "target": {
+    "partner_id": 1005,
+    "bid": 30501,
+    "name": "鳄鱼"
+  },
+  "star_transitions": [
+    {
+      "before": 5,
+      "after": 6,
+      "result": 1,
+      "msg": "",
+      "consumed_hero_count": 5,
+      "source_lines": {
+        "request": 251,
+        "target_update": 409,
+        "delete": 413,
+        "reply": 414
+      }
+    },
+    {
+      "before": 6,
+      "after": 7,
+      "result": 1,
+      "msg": "",
+      "consumed_hero_count": 4,
+      "source_lines": {
+        "request": 257,
+        "target_update": 425,
+        "delete": 432,
+        "reply": 433
+      }
+    }
+  ],
+  "consumed_trained_hero_id": 13,
+  "training_refund": {
+    "coin": 3753622,
+    "hero_exp": 1926110,
+    "item_10001": 1850
+  },
+  "training_refund_matches_client_table": true,
+  "breakthrough_cards": {
+    "base_id": 10001,
+    "before": 588992,
+    "before_source_line": 303,
+    "after": 589842,
+    "after_source_line": 423,
+    "gross_refund": 1850,
+    "star_up_cost": 1000,
+    "net_gain": 850,
+    "equation": "588992 + 1850 - 1000 = 589842"
+  },
+  "resonance_slot_level_changes": {
+    "count": 5,
+    "before": 35,
+    "after": 6,
+    "hero_ids": [
+      248,
+      761,
+      904,
+      579,
+      507
+    ],
+    "post_starup_26425_present": false
+  },
+  "commands_absent": [
+    11001,
+    10306
+  ],
+  "soul_item_request_count": 0,
+  "failure_reply_count": 0,
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "Explicit hero/asset/material/refund/equipment/resonance selection. Array projections are marked per row. Raw payloads, addresses, authentication, role/account identity, chat and unrelated activity content excluded.",
+  "limitations": [
+    "Only successful 5-to-6 and 6-to-7 paths; no material shortage or locked-material rejection request.",
+    "item_expend is empty in both requests; no soul-item or above-20-star fusion sample.",
+    "No historical selection-page screenshots or button-state evidence.",
+    "The target-star table has no item cost for 5-to-6; no isolated post-first-star-up asset snapshot exists.",
+    "Training refunds and slot-level changes reflect this one consumed level-100 core hero, not all possible material heroes."
+  ],
+  "artifacts": {
+    "a01-starup-extra.jsonl": "0ecf04bd06e9483d04756ad888f4a641255eefb80d7898d98e85ee73e3334bb2",
+    "a01-starup-extra-analysis.json": "c509b7c6799827a3f35362528a1f1c1ec1b2701c88000825fff84e1d202863b2",
+    "HERO_STARUP_EXTRA_NOTES.md": "c0663196e6f4e4b84165660d18b6145665e91f61da39c8d4f281e76634e3180a"
+  },
+  "reference_source_sha256": {
+    "internal/game/partner_star.go": "150f3375148426909ca27c7f38f66f4ae933d9a694751b24b35a7cab35ae5314",
+    "internal/store/partners.go": "f4a20f4914a9245a25427e9f000f9fd2c5f558eee9c19d25671ba7cd75070a74",
+    "internal/store/equip.go": "b8a6df620d056bc1cbd058723e697d7604723c490ff00a650b8b473ad6f88987",
+    "internal/game/data/partners.json": "3bc62ea786854950998d284f60c565b7c66d3d3f5065383a25a11dbd40ba7bd8",
+    "internal/game/data/partner_growth.json": "8d00ab58342c94e4995bf70241ef173e4da0b3d495b5d1591899d67520fde3fd",
+    "testdata/captures/original-2026-11-02/hero-star.jsonl": "ba7c6c58e6c4d2c42bbf0a7acc039ec22f6f8223c60ad896c95a6e2267ec4fbe"
+  }
+}

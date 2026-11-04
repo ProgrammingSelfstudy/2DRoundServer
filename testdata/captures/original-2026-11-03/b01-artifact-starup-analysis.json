@@ -1,0 +1,1055 @@
+{
+  "scenario": "b01-artifact-starup",
+  "source_capture": "cap-20261103-232531-0e923bcf.pcap",
+  "source_decoded": "artifact-starup-decoded.jsonl",
+  "source_line_definition": "1-based lines of the unmodified artifact-starup-decoded.jsonl; directions emitted separately.",
+  "star_up_11032_count": 0,
+  "compose_count": 5,
+  "compose_success_count": 3,
+  "compose_failure_count": 2,
+  "melting_redemption_11038_count": 0,
+  "baseline_source_lines": {
+    "assets": 337,
+    "inventory": 373,
+    "melting": 395
+  },
+  "events": [
+    {
+      "index": 1,
+      "request_utc": "2026-11-03T15:25:40.699048Z",
+      "target_base_id": 10452,
+      "target_name": "中级战技",
+      "material_base_id": 10451,
+      "material_name": "低级战技",
+      "material_instance_ids": [
+        27,
+        114,
+        176,
+        177,
+        178
+      ],
+      "material_count": 5,
+      "consumed_pieces": [
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 27,
+          "main_attr": [],
+          "pos": 22,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 104,
+              "attr_val": 1476000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 114,
+          "main_attr": [],
+          "pos": 63,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 104,
+              "attr_val": 1476000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 176,
+          "main_attr": [],
+          "pos": 83,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 104,
+              "attr_val": 1476000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 177,
+          "main_attr": [],
+          "pos": 84,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 178,
+          "main_attr": [],
+          "pos": 85,
+          "quantity": 1,
+          "score": 0
+        }
+      ],
+      "rate_per_mille_from_client_table": 1000,
+      "rate_percent_from_client_table": 100.0,
+      "rate_ui_screenshot_available": false,
+      "client_rule": {
+        "add_num": 10,
+        "award": [
+          [
+            10450,
+            150
+          ]
+        ],
+        "cost_num": 5,
+        "id": 10452,
+        "materials": [
+          10451
+        ],
+        "other_expend": [
+          [
+            1,
+            80000
+          ]
+        ],
+        "rate": 1000
+      },
+      "reply": {
+        "flag": 1,
+        "msg": "合成成功",
+        "result": 1
+      },
+      "coin_before": "889220994",
+      "coin_after": "889140994",
+      "coin_spent": 80000,
+      "training_before": 625930,
+      "training_after": 625930,
+      "training_gained": 0,
+      "lucky_before_latest_known": 0,
+      "lucky_after_observed": null,
+      "lucky_after_latest_known": 0,
+      "lucky_delta_since_last_observation": null,
+      "created_piece": {
+        "all_score": 0,
+        "attr": [
+          {
+            "attr_id": 107,
+            "attr_val": 43000
+          }
+        ],
+        "base_id": 10452,
+        "bind": 1,
+        "enchant": 0,
+        "expire_time": 0,
+        "expire_type": 0,
+        "extra": [
+          {
+            "extra_k": 11,
+            "extra_v": 0
+          },
+          {
+            "extra_k": 1,
+            "extra_v": 700161
+          }
+        ],
+        "extra_attr": [],
+        "gemstones": [],
+        "holy_eqm_attr": [],
+        "id": 194,
+        "main_attr": [],
+        "pos": 22,
+        "quantity": 1,
+        "score": 0,
+        "storage": 1
+      },
+      "source_lines": {
+        "request": 248,
+        "assets": 477,
+        "deletion": 478,
+        "created_items": [
+          479
+        ],
+        "training_updates": [],
+        "gain_notice": 480,
+        "melting_update": null,
+        "reply": 482
+      },
+      "server_command_sequence": [
+        10302,
+        10511,
+        10510,
+        12742,
+        16401,
+        11036
+      ],
+      "cost_and_reward_table_match": true
+    },
+    {
+      "index": 2,
+      "request_utc": "2026-11-03T15:25:43.149996Z",
+      "target_base_id": 10452,
+      "target_name": "中级战技",
+      "material_base_id": 10451,
+      "material_name": "低级战技",
+      "material_instance_ids": [
+        179,
+        186,
+        187,
+        188,
+        190
+      ],
+      "material_count": 5,
+      "consumed_pieces": [
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 179,
+          "main_attr": [],
+          "pos": 86,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 186,
+          "main_attr": [],
+          "pos": 93,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 187,
+          "main_attr": [],
+          "pos": 94,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 104,
+              "attr_val": 1476000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 188,
+          "main_attr": [],
+          "pos": 95,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 190,
+          "main_attr": [],
+          "pos": 96,
+          "quantity": 1,
+          "score": 0
+        }
+      ],
+      "rate_per_mille_from_client_table": 1000,
+      "rate_percent_from_client_table": 100.0,
+      "rate_ui_screenshot_available": false,
+      "client_rule": {
+        "add_num": 10,
+        "award": [
+          [
+            10450,
+            150
+          ]
+        ],
+        "cost_num": 5,
+        "id": 10452,
+        "materials": [
+          10451
+        ],
+        "other_expend": [
+          [
+            1,
+            80000
+          ]
+        ],
+        "rate": 1000
+      },
+      "reply": {
+        "flag": 1,
+        "msg": "合成成功",
+        "result": 1
+      },
+      "coin_before": "889140994",
+      "coin_after": "889060994",
+      "coin_spent": 80000,
+      "training_before": 625930,
+      "training_after": 625930,
+      "training_gained": 0,
+      "lucky_before_latest_known": 0,
+      "lucky_after_observed": null,
+      "lucky_after_latest_known": 0,
+      "lucky_delta_since_last_observation": null,
+      "created_piece": {
+        "all_score": 0,
+        "attr": [
+          {
+            "attr_id": 106,
+            "attr_val": 20000
+          }
+        ],
+        "base_id": 10452,
+        "bind": 1,
+        "enchant": 0,
+        "expire_time": 0,
+        "expire_type": 0,
+        "extra": [
+          {
+            "extra_k": 11,
+            "extra_v": 0
+          },
+          {
+            "extra_k": 1,
+            "extra_v": 700081
+          }
+        ],
+        "extra_attr": [],
+        "gemstones": [],
+        "holy_eqm_attr": [],
+        "id": 195,
+        "main_attr": [],
+        "pos": 43,
+        "quantity": 1,
+        "score": 0,
+        "storage": 1
+      },
+      "source_lines": {
+        "request": 250,
+        "assets": 483,
+        "deletion": 484,
+        "created_items": [
+          485
+        ],
+        "training_updates": [],
+        "gain_notice": 486,
+        "melting_update": null,
+        "reply": 488
+      },
+      "server_command_sequence": [
+        10302,
+        10511,
+        10510,
+        12742,
+        16401,
+        11036
+      ],
+      "cost_and_reward_table_match": true
+    },
+    {
+      "index": 3,
+      "request_utc": "2026-11-03T15:25:51.457198Z",
+      "target_base_id": 10452,
+      "target_name": "中级战技",
+      "material_base_id": 10451,
+      "material_name": "低级战技",
+      "material_instance_ids": [
+        191,
+        192
+      ],
+      "material_count": 2,
+      "consumed_pieces": [
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 107,
+              "attr_val": 21000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 191,
+          "main_attr": [],
+          "pos": 97,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 146000
+            }
+          ],
+          "base_id": 10451,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            }
+          ],
+          "extra_attr": [],
+          "id": 192,
+          "main_attr": [],
+          "pos": 98,
+          "quantity": 1,
+          "score": 0
+        }
+      ],
+      "rate_per_mille_from_client_table": 200,
+      "rate_percent_from_client_table": 20.0,
+      "rate_ui_screenshot_available": false,
+      "client_rule": {
+        "add_num": 4,
+        "award": [
+          [
+            10450,
+            60
+          ]
+        ],
+        "cost_num": 2,
+        "id": 10452,
+        "materials": [
+          10451
+        ],
+        "other_expend": [
+          [
+            1,
+            20000
+          ]
+        ],
+        "rate": 200
+      },
+      "reply": {
+        "flag": 0,
+        "msg": "合成失败",
+        "result": 1
+      },
+      "coin_before": "889060994",
+      "coin_after": "889040994",
+      "coin_spent": 20000,
+      "training_before": 625930,
+      "training_after": 625990,
+      "training_gained": 60,
+      "lucky_before_latest_known": 0,
+      "lucky_after_observed": 4,
+      "lucky_after_latest_known": 4,
+      "lucky_delta_since_last_observation": 4,
+      "created_piece": null,
+      "source_lines": {
+        "request": 254,
+        "assets": 490,
+        "deletion": 491,
+        "created_items": [],
+        "training_updates": [
+          492
+        ],
+        "gain_notice": 493,
+        "melting_update": 494,
+        "reply": 496
+      },
+      "server_command_sequence": [
+        10302,
+        10511,
+        10512,
+        12742,
+        11037,
+        16401,
+        11036
+      ],
+      "cost_and_reward_table_match": true
+    },
+    {
+      "index": 4,
+      "request_utc": "2026-11-03T15:26:04.37836Z",
+      "target_base_id": 10453,
+      "target_name": "高级战技",
+      "material_base_id": 10452,
+      "material_name": "中级战技",
+      "material_instance_ids": [
+        92,
+        93,
+        94,
+        95,
+        194
+      ],
+      "material_count": 5,
+      "consumed_pieces": [
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 293000
+            }
+          ],
+          "base_id": 10452,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700441
+            }
+          ],
+          "extra_attr": [],
+          "id": 92,
+          "main_attr": [],
+          "pos": 56,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 107,
+              "attr_val": 43000
+            }
+          ],
+          "base_id": 10452,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700191
+            }
+          ],
+          "extra_attr": [],
+          "id": 93,
+          "main_attr": [],
+          "pos": 57,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 293000
+            }
+          ],
+          "base_id": 10452,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 750200
+            }
+          ],
+          "extra_attr": [],
+          "id": 94,
+          "main_attr": [],
+          "pos": 58,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 101,
+              "attr_val": 293000
+            }
+          ],
+          "base_id": 10452,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700201
+            }
+          ],
+          "extra_attr": [],
+          "id": 95,
+          "main_attr": [],
+          "pos": 59,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 107,
+              "attr_val": 43000
+            }
+          ],
+          "base_id": 10452,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700161
+            }
+          ],
+          "extra_attr": [],
+          "gemstones": [],
+          "holy_eqm_attr": [],
+          "id": 194,
+          "main_attr": [],
+          "pos": 22,
+          "quantity": 1,
+          "score": 0,
+          "storage": 1
+        }
+      ],
+      "rate_per_mille_from_client_table": 1000,
+      "rate_percent_from_client_table": 100.0,
+      "rate_ui_screenshot_available": false,
+      "client_rule": {
+        "add_num": 50,
+        "award": [
+          [
+            10450,
+            750
+          ]
+        ],
+        "cost_num": 5,
+        "id": 10453,
+        "materials": [
+          10452
+        ],
+        "other_expend": [
+          [
+            1,
+            400000
+          ]
+        ],
+        "rate": 1000
+      },
+      "reply": {
+        "flag": 1,
+        "msg": "合成成功",
+        "result": 1
+      },
+      "coin_before": "889040994",
+      "coin_after": "888640994",
+      "coin_spent": 400000,
+      "training_before": 625990,
+      "training_after": 625990,
+      "training_gained": 0,
+      "lucky_before_latest_known": 4,
+      "lucky_after_observed": null,
+      "lucky_after_latest_known": 4,
+      "lucky_delta_since_last_observation": null,
+      "created_piece": {
+        "all_score": 0,
+        "attr": [
+          {
+            "attr_id": 101,
+            "attr_val": 587000
+          }
+        ],
+        "base_id": 10453,
+        "bind": 1,
+        "enchant": 0,
+        "expire_time": 0,
+        "expire_type": 0,
+        "extra": [
+          {
+            "extra_k": 11,
+            "extra_v": 0
+          },
+          {
+            "extra_k": 1,
+            "extra_v": 700221
+          },
+          {
+            "extra_k": 2,
+            "extra_v": 700101
+          }
+        ],
+        "extra_attr": [],
+        "gemstones": [],
+        "holy_eqm_attr": [],
+        "id": 196,
+        "main_attr": [],
+        "pos": 22,
+        "quantity": 1,
+        "score": 0,
+        "storage": 1
+      },
+      "source_lines": {
+        "request": 260,
+        "assets": 500,
+        "deletion": 501,
+        "created_items": [
+          502
+        ],
+        "training_updates": [],
+        "gain_notice": 503,
+        "melting_update": null,
+        "reply": 505
+      },
+      "server_command_sequence": [
+        10302,
+        10511,
+        10510,
+        12742,
+        16401,
+        11036
+      ],
+      "cost_and_reward_table_match": true
+    },
+    {
+      "index": 5,
+      "request_utc": "2026-11-03T15:26:14.829524Z",
+      "target_base_id": 10454,
+      "target_name": "超级战技",
+      "material_base_id": 10453,
+      "material_name": "高级战技",
+      "material_instance_ids": [
+        150,
+        156
+      ],
+      "material_count": 2,
+      "consumed_pieces": [
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 106,
+              "attr_val": 30000
+            }
+          ],
+          "base_id": 10453,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700103
+            }
+          ],
+          "extra_attr": [],
+          "id": 150,
+          "main_attr": [],
+          "pos": 37,
+          "quantity": 1,
+          "score": 0
+        },
+        {
+          "all_score": 0,
+          "attr": [
+            {
+              "attr_id": 106,
+              "attr_val": 30000
+            }
+          ],
+          "base_id": 10453,
+          "bind": 1,
+          "enchant": 0,
+          "expire_time": 0,
+          "expire_type": 0,
+          "extra": [
+            {
+              "extra_k": 11,
+              "extra_v": 0
+            },
+            {
+              "extra_k": 1,
+              "extra_v": 700221
+            },
+            {
+              "extra_k": 2,
+              "extra_v": 700441
+            }
+          ],
+          "extra_attr": [],
+          "id": 156,
+          "main_attr": [],
+          "pos": 67,
+          "quantity": 1,
+          "score": 0
+        }
+      ],
+      "rate_per_mille_from_client_table": 200,
+      "rate_percent_from_client_table": 20.0,
+      "rate_ui_screenshot_available": false,
+      "client_rule": {
+        "add_num": 100,
+        "award": [
+          [
+            10450,
+            1500
+          ]
+        ],
+        "cost_num": 2,
+        "id": 10454,
+        "materials": [
+          10453
+        ],
+        "other_expend": [
+          [
+            1,
+            300000
+          ]
+        ],
+        "rate": 200
+      },
+      "reply": {
+        "flag": 0,
+        "msg": "合成失败",
+        "result": 1
+      },
+      "coin_before": "888640994",
+      "coin_after": "888340994",
+      "coin_spent": 300000,
+      "training_before": 625990,
+      "training_after": 627490,
+      "training_gained": 1500,
+      "lucky_before_latest_known": 4,
+      "lucky_after_observed": 104,
+      "lucky_after_latest_known": 104,
+      "lucky_delta_since_last_observation": 100,
+      "created_piece": null,
+      "source_lines": {
+        "request": 264,
+        "assets": 507,
+        "deletion": 508,
+        "created_items": [],
+        "training_updates": [
+          509
+        ],
+        "gain_notice": 510,
+        "melting_update": 511,
+        "reply": 513
+      },
+      "server_command_sequence": [
+        10302,
+        10511,
+        10512,
+        12742,
+        11037,
+        16401,
+        11036
+      ],
+      "cost_and_reward_table_match": true
+    }
+  ],
+  "totals": {
+    "coin_spent": 880000,
+    "training_gained": 1560,
+    "training_before": 625930,
+    "training_after": 627490,
+    "latest_observed_lucky": 104
+  },
+  "probability_scope": "The 20% and 100% values are configured client table rates, not screenshots or probability estimates inferred from five outcomes.",
+  "out_of_scope_later_operations": {
+    "recast_request_count": 3,
+    "save_request_count": 3,
+    "wear_request_count": 1,
+    "hero_level_request_count": 20,
+    "note": "These occur after the five compose operations and are excluded from compose totals and material balances."
+  },
+  "implementation_changed": false,
+  "additional_game_actions": false
+}

@@ -1,0 +1,149 @@
+{
+  "analysis_kind": "Offline analysis of an existing user-operated capture; ordinary local decoder evidence.",
+  "scenario": "a03-hero-lock",
+  "capture_source": "User operated the original client; PCAPdroid TCP export already closed on the computer.",
+  "source_capture": "cap-20261103-225039-c5839ee2.pcap",
+  "source_bytes": 277419,
+  "source_sha256": "abaef5442413d18976fa75d6d85c16ab9e390443fb94ea51ea73f92b2a9c912a",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 277419,
+  "pcap_packet_records": 535,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/hero-lock-20261103-225039",
+  "decoded_file": "hero-lock-decoded.jsonl",
+  "decoded_sha256": "580e6cecc1baa80cca6204c80a2958d8132518478f1c29105cbdb042c44d2243",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 601,
+  "frames_by_direction": {
+    "c2s": 378,
+    "s2c": 223
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-03T14:51:51.799564Z",
+  "last_frame_utc": "2026-11-03T14:52:47.845071Z",
+  "exported_rows": 15,
+  "unique_source_lines": 15,
+  "source_line_definition": "1-based line in the unmodified hero-lock-decoded.jsonl; directions are emitted separately, not in global timestamp order.",
+  "baseline_source_line": 435,
+  "baseline_original_hero_count": 392,
+  "baseline_selected_partner_ids": [
+    388,
+    525,
+    13
+  ],
+  "baseline_selection": "The 11025 partners array retains only the three involved heroes; all other exported messages are complete.",
+  "lock_cycles": [
+    {
+      "partner_id": 388,
+      "type": 1,
+      "result": 1,
+      "msg": "锁定成功",
+      "request_utc": "2026-11-03T14:51:59.336838Z",
+      "request_source_line": 358,
+      "push_source_line": 588,
+      "reply_source_line": 589,
+      "is_lock": [
+        {
+          "is_lock": 1,
+          "lock_type": 1
+        }
+      ]
+    },
+    {
+      "partner_id": 388,
+      "type": 0,
+      "result": 1,
+      "msg": "解锁成功",
+      "request_utc": "2026-11-03T14:52:00.853059Z",
+      "request_source_line": 360,
+      "push_source_line": 590,
+      "reply_source_line": 591,
+      "is_lock": [
+        {
+          "is_lock": 0,
+          "lock_type": 1
+        }
+      ]
+    },
+    {
+      "partner_id": 388,
+      "type": 1,
+      "result": 1,
+      "msg": "锁定成功",
+      "request_utc": "2026-11-03T14:52:09.631432Z",
+      "request_source_line": 364,
+      "push_source_line": 593,
+      "reply_source_line": 594,
+      "is_lock": [
+        {
+          "is_lock": 1,
+          "lock_type": 1
+        }
+      ]
+    },
+    {
+      "partner_id": 525,
+      "type": 1,
+      "result": 1,
+      "msg": "锁定成功",
+      "request_utc": "2026-11-03T14:52:32.655654Z",
+      "request_source_line": 372,
+      "push_source_line": 598,
+      "reply_source_line": 599,
+      "is_lock": [
+        {
+          "is_lock": 1,
+          "lock_type": 1
+        }
+      ]
+    }
+  ],
+  "first_lock_to_unlock_request_seconds": 1.516221,
+  "last_observed_lock_state": {
+    "388": 1,
+    "525": 1
+  },
+  "selection_evidence": {
+    "star_material_selection": "unconfirmed",
+    "decomposition_selection": "unconfirmed",
+    "rejection_hint": "not captured",
+    "automatically_hidden": "unconfirmed",
+    "restored_to_initial_state": "not observed; both heroes were initially unlocked"
+  },
+  "commands_absent": [
+    11001,
+    11005,
+    11006,
+    11075,
+    11076
+  ],
+  "other_observation": {
+    "command": 11067,
+    "partner_id": 13,
+    "request_source_line": 368,
+    "reply_source_line": 596,
+    "meaning": "Rebirth-state query, not a material-selection result or hero 525 state change."
+  },
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "Explicit hero-state and lock command selection. Raw payloads, network addresses, authentication, account/role identity, chat and unrelated commands excluded; gameplay hero IDs retained.",
+  "limitations": [
+    "No historical UI screenshot or operation log proves whether locked heroes were selectable, rejected or hidden. No submit packet alone does not prove frontend blocking.",
+    "Only successful lock/unlock paths observed; no server-side material rejection, invalid parameters or repeated same-state lock sample.",
+    "No later unlock was captured. The desired final lock state is not inferable from packet data.",
+    "Receiver closure and a clean decode do not establish lossless observation of all network traffic."
+  ],
+  "artifacts": {
+    "a03-hero-lock.jsonl": "7173687233dec7d53620e3026b85e8c23d36f26463e5649950db4d79e27f3d9f",
+    "HERO_LOCK_NOTES.md": "bb40b835eb7902ae56a27f3c6aa5a7bb6026ba69d41cc0d036679075a9ca4870"
+  },
+  "reference_source_sha256": {
+    "internal/game/hero_lock.go": "12e7b6a0aaa3779067fe588ed578ea4906efdaf67070c475902db772d25f286b",
+    "internal/game/partner.go": "b7902aeb42f69c7e6c32a9c845817ed2c2e91d5ee5f5d9daf5772e607f386e76",
+    "internal/game/data/partners.json": "3bc62ea786854950998d284f60c565b7c66d3d3f5065383a25a11dbd40ba7bd8"
+  }
+}

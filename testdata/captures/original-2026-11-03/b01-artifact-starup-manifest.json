@@ -1,0 +1,83 @@
+{
+  "analysis_kind": "Offline original-client capture analysis; ordinary local decoder evidence.",
+  "scenario": "b01-artifact-starup",
+  "source_capture": "cap-20261103-232531-0e923bcf.pcap",
+  "source_bytes": 127770,
+  "source_sha256": "497412e389d23fa7634f7893cbe1963e36441a2bad9fde5a845f2dac69304c13",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 127770,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/artifact-starup-20261103-232531",
+  "pcap_packet_records": 460,
+  "pcap_trailing_bytes": 0,
+  "decoded_file": "artifact-starup-decoded.jsonl",
+  "decoded_sha256": "6961b6758b11bb58f3de6cef78c665a5b751e013d4a84d980bc3bda50de13f0a",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 655,
+  "frames_by_direction": {
+    "c2s": 331,
+    "s2c": 324
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-03T15:25:34.087586Z",
+  "last_frame_utc": "2026-11-03T15:26:58.629275Z",
+  "exported_rows": 41,
+  "unique_source_lines": 41,
+  "source_line_definition": "1-based lines of the unmodified artifact-starup-decoded.jsonl; directions emitted separately.",
+  "compose_requests": 5,
+  "successes": 3,
+  "failures": 2,
+  "star_up_11032_count": 0,
+  "melting_redemption_11038_count": 0,
+  "failed_reply_values": {
+    "result": 1,
+    "flag": 0,
+    "msg": "合成失败"
+  },
+  "melting_observations": [
+    {
+      "source_line": 395,
+      "lucky": 0
+    },
+    {
+      "source_line": 494,
+      "lucky": 4
+    },
+    {
+      "source_line": 511,
+      "lucky": 104
+    }
+  ],
+  "totals": {
+    "coin_spent": 880000,
+    "training_gained": 1560,
+    "training_before": 625930,
+    "training_after": 627490,
+    "latest_observed_lucky": 104
+  },
+  "all_five_costs_and_failure_rewards_match_client_table": true,
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "Only compose, material/asset changes, gain notices, melting and related progress frames. Baseline inventory explicitly projected. Raw payloads, addresses, authentication, identity and chat excluded.",
+  "limitations": [
+    "No 11032 packet or historical star-up UI screenshot; recast/save commands do not establish star-up.",
+    "Rate percentages come from the extracted client table, not captured UI text or empirical probability estimation.",
+    "Successes emitted no 11037; latest-known values are not fresh post-success observations.",
+    "No 11038 melting reward redemption was captured.",
+    "Later recast, gear change and 20 hero-level operations are outside compose accounting.",
+    "Receiver closure and a clean decode do not prove lossless network observation."
+  ],
+  "artifacts": {
+    "b01-artifact-starup.jsonl": "b52f38082cc64f221a18e395be37439066dc19b11cc20e83ec1caf7da53f0856",
+    "b01-artifact-starup-analysis.json": "3b84c951d341935b836301abe1e8cb64f81759377e49554271b851b7cbad76e4",
+    "ARTIFACT_STARUP_NOTES.md": "7571b5c3bfaca44a6dfcd3b327dcf5ac2c473cd83c4a60fbcfe854e7b2ab72d4"
+  },
+  "reference_source_sha256": {
+    "internal/game/data/artifact.json": "c999615a4c048d89c0905aa646b89beb55d93ee819339033f50ea79e71943b40",
+    "internal/game/data/item_names.json": "6c4d06db23dbfb5fafb6009135b2517a417634658da2f9ed5ce5dbd402fcc5ce",
+    "internal/game/artifact.go": "f1c24c008667afc497b4f178b3dd849909f02ce2f9bb9e8f5fbc6b29a1236c7b"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "analysis_kind": "Offline analysis of an existing user-operated capture; ordinary local decoder evidence.",
+  "scenario": "a04-hero-levels",
+  "capture_source": "Original-client user operation; existing PCAPdroid TCP export already closed.",
+  "source_capture": "cap-20261103-225906-9a124e83.pcap",
+  "source_bytes": 137607,
+  "source_sha256": "ed274103211bc2d3322712acc4c1517f62473f52082b44ee8d67f502ae7321c9",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 137607,
+  "pcap_packet_records": 586,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/hero-levels-20261103-225906",
+  "decoded_file": "hero-levels-decoded.jsonl",
+  "decoded_sha256": "3ef49e6b56e2a5d82262e11918dfe8d019ef716d99598b1f20b9bd827644dcdb",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 682,
+  "frames_by_direction": {
+    "c2s": 372,
+    "s2c": 310
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-03T14:59:15.094777Z",
+  "last_frame_utc": "2026-11-03T15:00:38.421494Z",
+  "exported_rows": 204,
+  "source_line_definition": "1-based line in the unmodified hero-levels-decoded.jsonl; directions emitted separately, not in global timestamp order.",
+  "hero": {
+    "partner_id": 13,
+    "bid": 30506,
+    "name": "萨博（火拳）",
+    "star": 5
+  },
+  "baseline_source_lines": {
+    "hero_list": 428,
+    "hero_detail": 441,
+    "assets": 378,
+    "items": 414,
+    "resonance": 446,
+    "holy_equipment": 447
+  },
+  "level_up_count": 43,
+  "break_count": 3,
+  "successful_level_up_count": 43,
+  "successful_break_count": 3,
+  "five_level_requests": 3,
+  "one_level_requests": 40,
+  "level_before": 45,
+  "level_after": 100,
+  "break_before": 2,
+  "break_after": 5,
+  "power_before": 7456,
+  "power_after": 17652,
+  "costs_by_command": {
+    "11003": {
+      "count": 43,
+      "spent": {
+        "coin": 3177954,
+        "hero_exp": 1837271,
+        "gold": 0,
+        "item_10001": 0
+      }
+    },
+    "11004": {
+      "count": 3,
+      "spent": {
+        "coin": 340000,
+        "hero_exp": 0,
+        "gold": 0,
+        "item_10001": 1700
+      }
+    }
+  },
+  "all_46_costs_match_client_table": true,
+  "all_3_break_previews_match_result": true,
+  "post_upgrade_gift": {
+    "request_source_line": 368,
+    "reply_source_line": 681,
+    "asset_source_line": 678,
+    "base_id": 99955,
+    "quantity_used": 1,
+    "asset_gains": {
+      "coin": 50000000,
+      "hero_exp": 50000000
+    },
+    "note": "After all level/break requests; excluded from growth-cost calculations."
+  },
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "Only hero 13 gameplay/state, assets, growth commands, resonance baseline, breakthrough material 10001 and gift 99955. Raw payloads, network addresses, authentication, role/account identity, chat and unrelated commands excluded. Array selections marked on each altered frame.",
+  "limitations": [
+    "Packet data establishes level changes, not the exact button label or historical UI screenshots.",
+    "Three breakthroughs changed attributes and unlocked skills; compare pure leveling only within a fixed break step.",
+    "All successful costs match this client table, but material-shortage and partial-level paths were not sampled.",
+    "Exact original growth and power formula remains unknown; local base formula does not reproduce the observed attributes.",
+    "The weighted local power function fed captured attributes is 2 to 5 below the observed power.",
+    "The gift after all growth operations adds resources; final capture balances must not be treated as post-upgrade balances.",
+    "Receiver closure and a clean decode do not prove lossless observation of network traffic."
+  ],
+  "artifacts": {
+    "a04-hero-levels.jsonl": "3d4099a7fc1a4b3b95e8be77d65db247cd9caff1018aa4f989187471140fc097",
+    "a04-hero-levels-analysis.json": "10da3469f7f2783b50c0dcd0cefb97ee52e3925c868cb134c07f7c85620dc0d9",
+    "HERO_LEVELS_NOTES.md": "0a0e12d9e4b4726dba33c99fc25ce5cd638ef0e4cef384b16e8c44bb923befc3"
+  },
+  "reference_source_sha256": {
+    "internal/game/partner_growth.go": "bd5b7ddcbfef025a21e268428e7a20ddb9d139d1d94be8f5d31a8986ad131cc4",
+    "internal/game/partner.go": "b7902aeb42f69c7e6c32a9c845817ed2c2e91d5ee5f5d9daf5772e607f386e76",
+    "internal/game/data/partner_growth.json": "8d00ab58342c94e4995bf70241ef173e4da0b3d495b5d1591899d67520fde3fd",
+    "internal/game/data/partners.json": "3bc62ea786854950998d284f60c565b7c66d3d3f5065383a25a11dbd40ba7bd8"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "analysis_kind": "Offline analysis of existing user-operated original-client capture.",
+  "scenario": "c05-peak-bet",
+  "source_capture": "cap-20261104-134516-9f8a5972.pcap",
+  "source_bytes": 128923,
+  "source_sha256": "f1e80d6d34f98efa6c702fe1ad2a6248a5ca39a3e5b67499bda464e997023610",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 128923,
+  "receiver_log_lines": [
+    32,
+    33
+  ],
+  "pcap_packet_records": 278,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/peak-bet-20261104-134516",
+  "decoded_file": "peak-bet-decoded.jsonl",
+  "decoded_sha256": "b3118fe72eb7c274c76e649c459d2fed4a43503ec5ca90a7eb0c5f71cd51ee1a",
+  "decode_log_sha256": "2e06a831efc48504f80f9d42f93c7e3ce63cc209715f9ac90ecfd3b3aab59f99",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 401,
+  "frames_by_direction": {
+    "c2s": 252,
+    "s2c": 149
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-04T05:45:19.962736Z",
+  "last_frame_utc": "2026-11-04T05:45:40.076069Z",
+  "exported_rows": 33,
+  "unique_source_lines": 33,
+  "source_line_definition": "1-based lines in unmodified peak-bet-decoded.jsonl; directions emitted separately, not globally chronological.",
+  "selection": "All 32 peakchampion 27700..27731 frames plus one 10302 asset projection; unrelated login and other champion systems excluded.",
+  "sanitization": "Transport stream and raw payload omitted. Player identity and appearance fields recursively removed; tree ext omitted. Exact removed msg paths recorded per row. Gameplay values, A/B sides, tree positions, hero instance IDs retained. Asset projection is allowlisted.",
+  "limits": [
+    "No UI screenshots or current button text collected.",
+    "27707 refreshes pool/odds; it is not 27705 bet history.",
+    "27716 is an empty notification and does not establish settlement.",
+    "One successful bet cannot establish odds formula, failed-bet behavior, or payout rounding.",
+    "Only one 10302 snapshot; activity can_bet is used for the stake delta.",
+    "No current-bet settlement, payout, like, own participation, or battle phase observed.",
+    "Receiver closure and a clean decode do not prove lossless network observation."
+  ],
+  "artifacts": {
+    "c05-peak-bet.jsonl": "b8894768c17afc52233d36ed6bb20245f9ca58c6bc35456a716b873589a0e5a6",
+    "c05-peak-bet-analysis.json": "3a8d79ac7d32dd74e453e1a3ead51658ddf832d59686ae8f3ad7550f707ecffd",
+    "PEAK_BET_NOTES.md": "8220eec8745e427271dfc610a687a7d55154828b9ce046d97eceebb2e04232ce"
+  },
+  "protocol_schema_path": "internal/proto/protocols.json",
+  "protocol_schema_sha256": "fcc54977c7ce0b0d703c94e796f3a3093390875b017f02e30d1ec2e8f292ce31"
+}

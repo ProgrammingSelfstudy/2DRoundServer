@@ -1,0 +1,2248 @@
+{
+  "scenario": "d01-sky",
+  "source_capture": "cap-20261104-130121-5b744d44.pcap",
+  "source_decoded": "sky-decoded.jsonl",
+  "source_line_definition": "1-based lines in unmodified sky-decoded.jsonl; directions emitted separately.",
+  "initial_state": {
+    "source_line": 712,
+    "msg": {
+      "current_id": 2,
+      "end_time": 1793894400,
+      "id": 2,
+      "is_all_finish": 0,
+      "is_kill_boss": 0,
+      "map_id": 1,
+      "pass_id": 4,
+      "pass_num": 3,
+      "room": 6,
+      "start_time": 1793721600
+    }
+  },
+  "final_state": {
+    "source_line": 1684,
+    "msg": {
+      "current_id": 6,
+      "end_time": 1793894400,
+      "id": 6,
+      "is_all_finish": 0,
+      "is_kill_boss": 0,
+      "map_id": 3,
+      "pass_id": 6,
+      "pass_num": 3,
+      "room": 10,
+      "start_time": 1793721600
+    }
+  },
+  "round_period": {
+    "start_utc8": "2026-11-04T00:00:00+08:00",
+    "end_utc8": "2026-11-06T00:00:00+08:00",
+    "span_seconds": 172800,
+    "approximately_remaining_seconds_at_initial_state": 125877,
+    "reset_boundary_captured": false
+  },
+  "initial_team": {
+    "source_line": 714,
+    "heroes": [
+      {
+        "partner_id": 388,
+        "bid": 70517,
+        "name": "哥尔·D·罗杰",
+        "lev": 205,
+        "star": 9,
+        "base_hp": 313240,
+        "now_hp": 724544
+      },
+      {
+        "partner_id": 1005,
+        "bid": 30501,
+        "name": "鳄鱼",
+        "lev": 1,
+        "star": 7,
+        "base_hp": 2217,
+        "now_hp": 2217
+      },
+      {
+        "partner_id": 522,
+        "bid": 10509,
+        "name": "冯克雷",
+        "lev": 40,
+        "star": 6,
+        "base_hp": 7277,
+        "now_hp": 7277
+      },
+      {
+        "partner_id": 1452,
+        "bid": 20502,
+        "name": "乌索普",
+        "lev": 1,
+        "star": 6,
+        "base_hp": 1933,
+        "now_hp": 1933
+      },
+      {
+        "partner_id": 844,
+        "bid": 40507,
+        "name": "鹤",
+        "lev": 35,
+        "star": 5,
+        "base_hp": 4007,
+        "now_hp": 4007
+      }
+    ]
+  },
+  "battles": [
+    {
+      "index": 1,
+      "floor": 2,
+      "room_id": 9,
+      "start_utc": "2026-11-04T05:02:13.793141Z",
+      "request_source_line": 263,
+      "battle_start_source_line": 812,
+      "result_source_line": 825,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 833226,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 833226,
+      "hp_after_source_line": 823,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 833226,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400204,
+          "object_name": "守卫·海贼2号",
+          "lev": 66,
+          "star": 0,
+          "hp": 7321,
+          "hp_max": 7321
+        }
+      ],
+      "skip_request_source_lines": [
+        264
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 2,
+      "floor": 2,
+      "room_id": 19,
+      "start_utc": "2026-11-04T05:02:16.76726Z",
+      "request_source_line": 272,
+      "battle_start_source_line": 837,
+      "result_source_line": 850,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 958210,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 958210,
+      "hp_after_source_line": 848,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 958210,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400203,
+          "object_name": "守卫·海贼2号",
+          "lev": 64,
+          "star": 0,
+          "hp": 7176,
+          "hp_max": 7176
+        }
+      ],
+      "skip_request_source_lines": [
+        273
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 3,
+      "floor": 2,
+      "room_id": 17,
+      "start_utc": "2026-11-04T05:02:19.788735Z",
+      "request_source_line": 287,
+      "battle_start_source_line": 879,
+      "result_source_line": 898,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 1101942,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 1101942,
+      "hp_after_source_line": 896,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 1101942,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400202,
+          "object_name": "守卫·海贼9号",
+          "lev": 62,
+          "star": 0,
+          "hp": 7032,
+          "hp_max": 7032
+        }
+      ],
+      "skip_request_source_lines": [],
+      "round_headers": [
+        {
+          "source_line": 881,
+          "action_count": 1
+        }
+      ],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 4,
+      "floor": 2,
+      "room_id": 13,
+      "start_utc": "2026-11-04T05:02:26.204711Z",
+      "request_source_line": 310,
+      "battle_start_source_line": 936,
+      "result_source_line": 946,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 1267234,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 1267234,
+      "hp_after_source_line": 943,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 1267234,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400200,
+          "object_name": "守卫·海贼9号",
+          "lev": 68,
+          "star": 0,
+          "hp": 7466,
+          "hp_max": 7466
+        }
+      ],
+      "skip_request_source_lines": [],
+      "round_headers": [
+        {
+          "source_line": 938,
+          "action_count": 1
+        }
+      ],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 5,
+      "floor": 3,
+      "room_id": 7,
+      "start_utc": "2026-11-04T05:03:08.352732Z",
+      "request_source_line": 357,
+      "battle_start_source_line": 1020,
+      "result_source_line": 1033,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 1457320,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 1457320,
+      "hp_after_source_line": 1031,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 1457320,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400301,
+          "object_name": "守卫·海贼9号",
+          "lev": 70,
+          "star": 0,
+          "hp": 7611,
+          "hp_max": 7611
+        }
+      ],
+      "skip_request_source_lines": [
+        358
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 6,
+      "floor": 3,
+      "room_id": 17,
+      "start_utc": "2026-11-04T05:03:11.901392Z",
+      "request_source_line": 369,
+      "battle_start_source_line": 1050,
+      "result_source_line": 1063,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 1675918,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 1675918,
+      "hp_after_source_line": 1061,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 1675918,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400302,
+          "object_name": "守卫·海贼9号",
+          "lev": 72,
+          "star": 0,
+          "hp": 7755,
+          "hp_max": 7755
+        }
+      ],
+      "skip_request_source_lines": [
+        370
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 7,
+      "floor": 3,
+      "room_id": 9,
+      "start_utc": "2026-11-04T05:03:15.380171Z",
+      "request_source_line": 380,
+      "battle_start_source_line": 1082,
+      "result_source_line": 1096,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 1927306,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 1927306,
+      "hp_after_source_line": 1094,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 1927306,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400304,
+          "object_name": "守卫·海贼9号",
+          "lev": 76,
+          "star": 0,
+          "hp": 8044,
+          "hp_max": 8044
+        }
+      ],
+      "skip_request_source_lines": [
+        383
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 8,
+      "floor": 3,
+      "room_id": 19,
+      "start_utc": "2026-11-04T05:03:17.816841Z",
+      "request_source_line": 399,
+      "battle_start_source_line": 1130,
+      "result_source_line": 1146,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 2216402,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 2216402,
+      "hp_after_source_line": 1144,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 2216402,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400303,
+          "object_name": "守卫·海贼9号",
+          "lev": 74,
+          "star": 0,
+          "hp": 7900,
+          "hp_max": 7900
+        }
+      ],
+      "skip_request_source_lines": [
+        400
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 9,
+      "floor": 3,
+      "room_id": 13,
+      "start_utc": "2026-11-04T05:03:20.492918Z",
+      "request_source_line": 414,
+      "battle_start_source_line": 1176,
+      "result_source_line": 1183,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 2548863,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 2548863,
+      "hp_after_source_line": 1181,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 2548863,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400300,
+          "object_name": "守卫·海贼2号",
+          "lev": 78,
+          "star": 0,
+          "hp": 8189,
+          "hp_max": 8189
+        }
+      ],
+      "skip_request_source_lines": [
+        415
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 10,
+      "floor": 4,
+      "room_id": 9,
+      "start_utc": "2026-11-04T05:03:44.455422Z",
+      "request_source_line": 443,
+      "battle_start_source_line": 1227,
+      "result_source_line": 1238,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 2931193,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 2931193,
+      "hp_after_source_line": 1236,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 2931193,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400404,
+          "object_name": "守卫·Mr.5",
+          "lev": 86,
+          "star": 0,
+          "hp": 11455,
+          "hp_max": 11455
+        }
+      ],
+      "skip_request_source_lines": [
+        444
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 11,
+      "floor": 4,
+      "room_id": 19,
+      "start_utc": "2026-11-04T05:03:46.803627Z",
+      "request_source_line": 452,
+      "battle_start_source_line": 1246,
+      "result_source_line": 1259,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 3370872,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 3370872,
+      "hp_after_source_line": 1257,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 3370872,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400403,
+          "object_name": "守卫·巨魔巫医",
+          "lev": 84,
+          "star": 0,
+          "hp": 11738,
+          "hp_max": 11738
+        }
+      ],
+      "skip_request_source_lines": [
+        453
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 12,
+      "floor": 4,
+      "room_id": 17,
+      "start_utc": "2026-11-04T05:03:49.572306Z",
+      "request_source_line": 459,
+      "battle_start_source_line": 1266,
+      "result_source_line": 1279,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 3876503,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 3876503,
+      "hp_after_source_line": 1277,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 3876503,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400402,
+          "object_name": "守卫·Mr.9",
+          "lev": 82,
+          "star": 0,
+          "hp": 11119,
+          "hp_max": 11119
+        }
+      ],
+      "skip_request_source_lines": [
+        460
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 13,
+      "floor": 4,
+      "room_id": 7,
+      "start_utc": "2026-11-04T05:03:52.388588Z",
+      "request_source_line": 476,
+      "battle_start_source_line": 1315,
+      "result_source_line": 1331,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 4457979,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 4457979,
+      "hp_after_source_line": 1329,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 4457979,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400401,
+          "object_name": "守卫·海贼8号",
+          "lev": 80,
+          "star": 0,
+          "hp": 8334,
+          "hp_max": 8334
+        }
+      ],
+      "skip_request_source_lines": [
+        477
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 14,
+      "floor": 4,
+      "room_id": 13,
+      "start_utc": "2026-11-04T05:04:12.431509Z",
+      "request_source_line": 503,
+      "battle_start_source_line": 1386,
+      "result_source_line": 1394,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 5126676,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 5126676,
+      "hp_after_source_line": 1391,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 5126676,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400400,
+          "object_name": "守卫·Mr.9",
+          "lev": 88,
+          "star": 0,
+          "hp": 11623,
+          "hp_max": 11623
+        }
+      ],
+      "skip_request_source_lines": [
+        504
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 15,
+      "floor": 5,
+      "room_id": 9,
+      "start_utc": "2026-11-04T05:04:45.789187Z",
+      "request_source_line": 534,
+      "battle_start_source_line": 1436,
+      "result_source_line": 1451,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 5895678,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 5895678,
+      "hp_after_source_line": 1449,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 5895678,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400504,
+          "object_name": "守卫·吉尔伽美什",
+          "lev": 96,
+          "star": 0,
+          "hp": 12294,
+          "hp_max": 12294
+        }
+      ],
+      "skip_request_source_lines": [
+        539
+      ],
+      "round_headers": [
+        {
+          "source_line": 1439,
+          "action_count": 1
+        }
+      ],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 16,
+      "floor": 5,
+      "room_id": 7,
+      "start_utc": "2026-11-04T05:04:51.044958Z",
+      "request_source_line": 549,
+      "battle_start_source_line": 1468,
+      "result_source_line": 1481,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 6780030,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 6780030,
+      "hp_after_source_line": 1479,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 6780030,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400501,
+          "object_name": "守卫·玛格丽特",
+          "lev": 90,
+          "star": 0,
+          "hp": 11791,
+          "hp_max": 11791
+        }
+      ],
+      "skip_request_source_lines": [
+        550
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 17,
+      "floor": 5,
+      "room_id": 17,
+      "start_utc": "2026-11-04T05:04:59.419002Z",
+      "request_source_line": 564,
+      "battle_start_source_line": 1505,
+      "result_source_line": 1518,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 7977148,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 7977148,
+      "hp_after_source_line": 1516,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 7977148,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400502,
+          "object_name": "守卫·海贼8号",
+          "lev": 92,
+          "star": 0,
+          "hp": 11958,
+          "hp_max": 11958
+        }
+      ],
+      "skip_request_source_lines": [
+        565
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 18,
+      "floor": 5,
+      "room_id": 19,
+      "start_utc": "2026-11-04T05:05:02.689195Z",
+      "request_source_line": 575,
+      "battle_start_source_line": 1536,
+      "result_source_line": 1552,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 9173721,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 9173721,
+      "hp_after_source_line": 1550,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 9173721,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400503,
+          "object_name": "守卫·海贼11号",
+          "lev": 94,
+          "star": 0,
+          "hp": 12126,
+          "hp_max": 12126
+        }
+      ],
+      "skip_request_source_lines": [
+        576
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 19,
+      "floor": 5,
+      "room_id": 13,
+      "start_utc": "2026-11-04T05:05:05.473339Z",
+      "request_source_line": 594,
+      "battle_start_source_line": 1595,
+      "result_source_line": 1602,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 10549780,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 10549780,
+      "hp_after_source_line": 1600,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 10549780,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 1933,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400500,
+          "object_name": "守卫·巨魔巫医",
+          "lev": 98,
+          "star": 0,
+          "hp": 12960,
+          "hp_max": 12960
+        }
+      ],
+      "skip_request_source_lines": [
+        595
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 20,
+      "floor": 6,
+      "room_id": 7,
+      "start_utc": "2026-11-04T05:05:34.801974Z",
+      "request_source_line": 625,
+      "battle_start_source_line": 1642,
+      "result_source_line": 1646,
+      "result": 2,
+      "hero_id": 1452,
+      "hero_bid": 20502,
+      "hero_name": "乌索普",
+      "hero_hp_at_battle_start": 1933,
+      "hero_hp_max_in_battle": 1933,
+      "hero_hp_after": 0,
+      "hp_after_source_line": 1645,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 10549780,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 0,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400601,
+          "object_name": "守卫·海贼8号",
+          "lev": 100,
+          "star": 0,
+          "hp": 13892,
+          "hp_max": 13892
+        }
+      ],
+      "skip_request_source_lines": [
+        626
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 21,
+      "floor": 6,
+      "room_id": 9,
+      "start_utc": "2026-11-04T05:05:39.157163Z",
+      "request_source_line": 633,
+      "battle_start_source_line": 1653,
+      "result_source_line": 1665,
+      "result": 1,
+      "hero_id": 388,
+      "hero_bid": 70517,
+      "hero_name": "哥尔·D·罗杰",
+      "hero_hp_at_battle_start": 12132247,
+      "hero_hp_max_in_battle": 360226,
+      "hero_hp_after": 12132247,
+      "hp_after_source_line": 1663,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 12132247,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 7277,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 0,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400604,
+          "object_name": "守卫·鱼人3号",
+          "lev": 103,
+          "star": 0,
+          "hp": 22318,
+          "hp_max": 22318
+        }
+      ],
+      "skip_request_source_lines": [
+        636
+      ],
+      "round_headers": [],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    },
+    {
+      "index": 22,
+      "floor": 6,
+      "room_id": 7,
+      "start_utc": "2026-11-04T05:05:43.756681Z",
+      "request_source_line": 646,
+      "battle_start_source_line": 1679,
+      "result_source_line": 1686,
+      "result": 2,
+      "hero_id": 522,
+      "hero_bid": 10509,
+      "hero_name": "冯克雷",
+      "hero_hp_at_battle_start": 7277,
+      "hero_hp_max_in_battle": 7277,
+      "hero_hp_after": 0,
+      "hp_after_source_line": 1685,
+      "team_hp_after": [
+        {
+          "partner_id": 388,
+          "now_hp": 12132247,
+          "hp": 313240
+        },
+        {
+          "partner_id": 1005,
+          "now_hp": 2217,
+          "hp": 2217
+        },
+        {
+          "partner_id": 522,
+          "now_hp": 0,
+          "hp": 7277
+        },
+        {
+          "partner_id": 1452,
+          "now_hp": 0,
+          "hp": 1933
+        },
+        {
+          "partner_id": 844,
+          "now_hp": 4007,
+          "hp": 4007
+        }
+      ],
+      "guard_objects": [
+        {
+          "object_id": 0,
+          "object_bid": 400601,
+          "object_name": "守卫·海贼8号",
+          "lev": 100,
+          "star": 0,
+          "hp": 13892,
+          "hp_max": 13892
+        }
+      ],
+      "skip_request_source_lines": [
+        649
+      ],
+      "round_headers": [
+        {
+          "source_line": 1681,
+          "action_count": 1
+        }
+      ],
+      "round_count_caveat": "Only observed action_count headers are listed; skipped fights do not establish full natural round count."
+    }
+  ],
+  "outcomes": {
+    "wins": 20,
+    "losses": 2
+  },
+  "loss_count": 2,
+  "first_loss_continuation": {
+    "first_loss_result_source_line": 1646,
+    "new_hero_selection_source_line": 1649,
+    "next_battle_source_line": 1653,
+    "next_battle_result_source_line": 1665,
+    "continued_and_won": true,
+    "same_room_retry_later": true
+  },
+  "quiz_rounds": [
+    {
+      "floor": 2,
+      "room_id": 6,
+      "open_request_source_line": 321,
+      "open_response_source_line": 956,
+      "questions": [
+        {
+          "question_id": 50408,
+          "question_text": "以下哪个系别的英雄不能通过转换获得？",
+          "options": {
+            "1": "海军",
+            "2": "超新星",
+            "3": "草帽团",
+            "4": "强者"
+          },
+          "selected_option": 3,
+          "selected_text": "草帽团",
+          "correct_option_from_reply": 1,
+          "correct_text_from_client_table": "海军",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 956,
+          "answer_request_source_line": 323,
+          "answer_reply_source_line": 958,
+          "next_question_id": 50414
+        },
+        {
+          "question_id": 50414,
+          "question_text": "竞技场每个赛季前几名可获得头像框？",
+          "options": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4"
+          },
+          "selected_option": 1,
+          "selected_text": "1",
+          "correct_option_from_reply": 3,
+          "correct_text_from_client_table": "3",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 958,
+          "answer_request_source_line": 325,
+          "answer_reply_source_line": 960,
+          "next_question_id": 50387
+        },
+        {
+          "question_id": 50387,
+          "question_text": "英雄碎片合成在哪里进行？",
+          "options": {
+            "1": "图书馆",
+            "2": "锻造屋",
+            "3": "碎片背包",
+            "4": ""
+          },
+          "selected_option": 3,
+          "selected_text": "碎片背包",
+          "correct_option_from_reply": 3,
+          "correct_text_from_client_table": "碎片背包",
+          "correct": true,
+          "reply_ret": 1,
+          "question_source_line": 960,
+          "answer_request_source_line": 329,
+          "answer_reply_source_line": 963,
+          "next_question_id": 0
+        }
+      ],
+      "correct_count": 1,
+      "reward_items": [
+        {
+          "bid": 1,
+          "move_to": 2,
+          "num": 22200
+        },
+        {
+          "bid": 22,
+          "move_to": 2,
+          "num": 12200
+        }
+      ],
+      "result_text": "才对了一道，有点可惜啦~",
+      "final_reply_source_line": 963
+    },
+    {
+      "floor": 3,
+      "room_id": 22,
+      "open_request_source_line": 423,
+      "open_response_source_line": 1193,
+      "questions": [
+        {
+          "question_id": 50431,
+          "question_text": "下列哪个地方不能获取高级召唤卷？",
+          "options": {
+            "1": "酒吧柜台",
+            "2": "冒险商城",
+            "3": "探宝商城",
+            "4": "道具商城"
+          },
+          "selected_option": 4,
+          "selected_text": "道具商城",
+          "correct_option_from_reply": 3,
+          "correct_text_from_client_table": "探宝商城",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 1193,
+          "answer_request_source_line": 425,
+          "answer_reply_source_line": 1195,
+          "next_question_id": 50333
+        },
+        {
+          "question_id": 50333,
+          "question_text": "从抹香鲸体内提炼出的香料是：",
+          "options": {
+            "1": "百里香",
+            "2": "沉水香",
+            "3": "麝香",
+            "4": "龙涎香"
+          },
+          "selected_option": 3,
+          "selected_text": "麝香",
+          "correct_option_from_reply": 4,
+          "correct_text_from_client_table": "龙涎香",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 1195,
+          "answer_request_source_line": 427,
+          "answer_reply_source_line": 1197,
+          "next_question_id": 50399
+        },
+        {
+          "question_id": 50399,
+          "question_text": "高级召唤每天有几次免费次数？",
+          "options": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4"
+          },
+          "selected_option": 4,
+          "selected_text": "4",
+          "correct_option_from_reply": 1,
+          "correct_text_from_client_table": "1",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 1197,
+          "answer_request_source_line": 429,
+          "answer_reply_source_line": 1199,
+          "next_question_id": 0
+        }
+      ],
+      "correct_count": 0,
+      "reward_items": [],
+      "result_text": "运气真是不好呢~",
+      "final_reply_source_line": 1199
+    },
+    {
+      "floor": 4,
+      "room_id": 2,
+      "open_request_source_line": 514,
+      "open_response_source_line": 1409,
+      "questions": [
+        {
+          "question_id": 50309,
+          "question_text": "《资政新篇》是哪一时期的纲领性文件？",
+          "options": {
+            "1": "太平天国后期",
+            "2": "洋务运动",
+            "3": "清末预备立宪",
+            "4": "戊戌变法"
+          },
+          "selected_option": 2,
+          "selected_text": "洋务运动",
+          "correct_option_from_reply": 1,
+          "correct_text_from_client_table": "太平天国后期",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 1409,
+          "answer_request_source_line": 518,
+          "answer_reply_source_line": 1412,
+          "next_question_id": 50401
+        },
+        {
+          "question_id": 50401,
+          "question_text": "积分召唤必出几星英雄？",
+          "options": {
+            "1": "1",
+            "2": "2",
+            "3": "5",
+            "4": "6"
+          },
+          "selected_option": 3,
+          "selected_text": "5",
+          "correct_option_from_reply": 3,
+          "correct_text_from_client_table": "5",
+          "correct": true,
+          "reply_ret": 1,
+          "question_source_line": 1412,
+          "answer_request_source_line": 520,
+          "answer_reply_source_line": 1414,
+          "next_question_id": 50055
+        },
+        {
+          "question_id": 50055,
+          "question_text": "人体最坚硬的部分是",
+          "options": {
+            "1": "指甲",
+            "2": "牙齿",
+            "3": "骨头",
+            "4": "眼睛"
+          },
+          "selected_option": 2,
+          "selected_text": "牙齿",
+          "correct_option_from_reply": 2,
+          "correct_text_from_client_table": "牙齿",
+          "correct": true,
+          "reply_ret": 1,
+          "question_source_line": 1414,
+          "answer_request_source_line": 522,
+          "answer_reply_source_line": 1416,
+          "next_question_id": 0
+        }
+      ],
+      "correct_count": 2,
+      "reward_items": [
+        {
+          "bid": 1,
+          "move_to": 2,
+          "num": 45200
+        },
+        {
+          "bid": 22,
+          "move_to": 2,
+          "num": 25066
+        }
+      ],
+      "result_text": "还差一道就能全对啦，加油！",
+      "final_reply_source_line": 1416
+    },
+    {
+      "floor": 5,
+      "room_id": 16,
+      "open_request_source_line": 607,
+      "open_response_source_line": 1617,
+      "questions": [
+        {
+          "question_id": 50413,
+          "question_text": "套装属性最少需要几件装备才能激活？",
+          "options": {
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4"
+          },
+          "selected_option": 3,
+          "selected_text": "3",
+          "correct_option_from_reply": 2,
+          "correct_text_from_client_table": "2",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 1617,
+          "answer_request_source_line": 609,
+          "answer_reply_source_line": 1619,
+          "next_question_id": 50427
+        },
+        {
+          "question_id": 50427,
+          "question_text": "以下哪个英雄不具备反击能力？",
+          "options": {
+            "1": "卡普",
+            "2": "贝基",
+            "3": "暴君熊",
+            "4": "鳄鱼"
+          },
+          "selected_option": 2,
+          "selected_text": "贝基",
+          "correct_option_from_reply": 4,
+          "correct_text_from_client_table": "鳄鱼",
+          "correct": false,
+          "reply_ret": 2,
+          "question_source_line": 1619,
+          "answer_request_source_line": 613,
+          "answer_reply_source_line": 1622,
+          "next_question_id": 50031
+        },
+        {
+          "question_id": 50031,
+          "question_text": "我独不得出（打一字）",
+          "options": {
+            "1": "团",
+            "2": "咄",
+            "3": "圄",
+            "4": ""
+          },
+          "selected_option": 3,
+          "selected_text": "圄",
+          "correct_option_from_reply": 3,
+          "correct_text_from_client_table": "圄",
+          "correct": true,
+          "reply_ret": 1,
+          "question_source_line": 1622,
+          "answer_request_source_line": 615,
+          "answer_reply_source_line": 1624,
+          "next_question_id": 0
+        }
+      ],
+      "correct_count": 1,
+      "reward_items": [
+        {
+          "bid": 1,
+          "move_to": 2,
+          "num": 22800
+        },
+        {
+          "bid": 22,
+          "move_to": 2,
+          "num": 12700
+        }
+      ],
+      "result_text": "才对了一道，有点可惜啦~",
+      "final_reply_source_line": 1624
+    }
+  ],
+  "quiz_correct": 4,
+  "quiz_incorrect": 8,
+  "npc_dialogues": [
+    {
+      "floor": 2,
+      "room_id": 23,
+      "event_id": 100214,
+      "question_id": 4,
+      "client_table_prompt": "喂，要不要来回答我几个问题，我会看心情给你一点奖励。听题：\n霸气分几种种类?",
+      "client_table_options": [
+        {
+          "num": 1,
+          "msg": "2种"
+        },
+        {
+          "num": 2,
+          "msg": "4种"
+        },
+        {
+          "num": 3,
+          "msg": "3种"
+        }
+      ],
+      "selected_option": 3,
+      "selected_text_from_client_table": "3种",
+      "reply": {
+        "items": [
+          {
+            "bid": 37001,
+            "move_to": 2,
+            "num": 2
+          }
+        ],
+        "msg": "这就是阿喀琉斯之踵的由来"
+      },
+      "correctness": "not graded by an explicit ret/right field in 20628",
+      "source_lines": {
+        "open_request": 315,
+        "prompt": 948,
+        "answer_request": 319,
+        "answer_reply": 952
+      },
+      "prompt_caveat": "Text reconstructed from the retained client table, not a screen. Some server reply themes differ from this table prompt; both are kept verbatim."
+    },
+    {
+      "floor": 3,
+      "room_id": 11,
+      "event_id": 100314,
+      "question_id": 5,
+      "client_table_prompt": "喂，要不要来回答我几个问题，我会看心情给你一点奖励。听题：\n白星公主的宠物是什么?",
+      "client_table_options": [
+        {
+          "num": 1,
+          "msg": "海星"
+        },
+        {
+          "num": 2,
+          "msg": "鲨鱼"
+        },
+        {
+          "num": 3,
+          "msg": "章鱼"
+        }
+      ],
+      "selected_option": 2,
+      "selected_text_from_client_table": "鲨鱼",
+      "reply": {
+        "items": [
+          {
+            "bid": 37001,
+            "move_to": 2,
+            "num": 1
+          }
+        ],
+        "msg": "神也不能对爱情无动于衷"
+      },
+      "correctness": "not graded by an explicit ret/right field in 20628",
+      "source_lines": {
+        "open_request": 417,
+        "prompt": 1185,
+        "answer_request": 419,
+        "answer_reply": 1188
+      },
+      "prompt_caveat": "Text reconstructed from the retained client table, not a screen. Some server reply themes differ from this table prompt; both are kept verbatim."
+    },
+    {
+      "floor": 4,
+      "room_id": 15,
+      "event_id": 100414,
+      "question_id": 4,
+      "client_table_prompt": "喂，要不要来回答我几个问题，我会看心情给你一点奖励。听题：\n霸气分几种种类?",
+      "client_table_options": [
+        {
+          "num": 1,
+          "msg": "2种"
+        },
+        {
+          "num": 2,
+          "msg": "4种"
+        },
+        {
+          "num": 3,
+          "msg": "3种"
+        }
+      ],
+      "selected_option": 3,
+      "selected_text_from_client_table": "3种",
+      "reply": {
+        "items": [
+          {
+            "bid": 1,
+            "move_to": 2,
+            "num": 100000
+          }
+        ],
+        "msg": "这就是阿喀琉斯之踵的由来"
+      },
+      "correctness": "not graded by an explicit ret/right field in 20628",
+      "source_lines": {
+        "open_request": 508,
+        "prompt": 1401,
+        "answer_request": 512,
+        "answer_reply": 1405
+      },
+      "prompt_caveat": "Text reconstructed from the retained client table, not a screen. Some server reply themes differ from this table prompt; both are kept verbatim."
+    },
+    {
+      "floor": 5,
+      "room_id": 6,
+      "event_id": 100514,
+      "question_id": 1,
+      "client_table_prompt": "喂，要不要来回答我几个问题，我会看心情给你一点奖励。听题：\n佛之战国和英雄卡普一起合力活捉过谁?",
+      "client_table_options": [
+        {
+          "num": 1,
+          "msg": "金狮子"
+        },
+        {
+          "num": 2,
+          "msg": "罗杰"
+        },
+        {
+          "num": 3,
+          "msg": "泽法"
+        }
+      ],
+      "selected_option": 1,
+      "selected_text_from_client_table": "金狮子",
+      "reply": {
+        "items": [
+          {
+            "bid": 37001,
+            "move_to": 2,
+            "num": 2
+          }
+        ],
+        "msg": "你真有意思"
+      },
+      "correctness": "not graded by an explicit ret/right field in 20628",
+      "source_lines": {
+        "open_request": 597,
+        "prompt": 1604,
+        "answer_request": 599,
+        "answer_reply": 1607
+      },
+      "prompt_caveat": "Text reconstructed from the retained client table, not a screen. Some server reply themes differ from this table prompt; both are kept verbatim."
+    }
+  ],
+  "rock_paper_scissors": [
+    {
+      "floor": 3,
+      "room_id": 14,
+      "request": {
+        "action": 1,
+        "ext_list": [
+          {
+            "type": 2,
+            "val": 4
+          },
+          {
+            "type": 1,
+            "val": 3
+          }
+        ],
+        "room_id": 14
+      },
+      "reply": {
+        "items": [
+          {
+            "bid": 3,
+            "move_to": 2,
+            "num": 200
+          }
+        ],
+        "ret": 2,
+        "ret_val": 2,
+        "sel_val": 3
+      },
+      "request_source_line": 431,
+      "reply_source_line": 1206,
+      "assets_before_source_line": 1162,
+      "assets_after_source_line": 1203,
+      "assets_before": {
+        "coin": "872481325",
+        "gold": "93703",
+        "hero_exp": "537645096"
+      },
+      "assets_after": {
+        "coin": "872481325",
+        "gold": "93703",
+        "hero_exp": "537645096"
+      },
+      "net_asset_change": {
+        "coin": 0,
+        "gold": 0,
+        "hero_exp": 0
+      },
+      "result_caveat": "ret=2 and both hand values are retained without assigning screenshot-unverified win/tie/loss or hand labels. items is not treated as net gain; the nearest asset balances are unchanged.",
+      "ledger_scope": "net_asset_change compares the nearest 10302 main-role balances only. Deferred move_to=2 run income is tracked separately and may change.",
+      "room_completion_source_line": 1205
+    },
+    {
+      "floor": 4,
+      "room_id": 14,
+      "request": {
+        "action": 1,
+        "ext_list": [
+          {
+            "type": 1,
+            "val": 3
+          },
+          {
+            "type": 2,
+            "val": 1
+          }
+        ],
+        "room_id": 14
+      },
+      "reply": {
+        "items": [
+          {
+            "bid": 1,
+            "move_to": 2,
+            "num": 50000
+          }
+        ],
+        "ret": 2,
+        "ret_val": 2,
+        "sel_val": 3
+      },
+      "request_source_line": 495,
+      "reply_source_line": 1376,
+      "assets_before_source_line": 1349,
+      "assets_after_source_line": 1373,
+      "assets_before": {
+        "coin": "872727325",
+        "gold": "93703",
+        "hero_exp": "537645096"
+      },
+      "assets_after": {
+        "coin": "872727325",
+        "gold": "93703",
+        "hero_exp": "537645096"
+      },
+      "net_asset_change": {
+        "coin": 0,
+        "gold": 0,
+        "hero_exp": 0
+      },
+      "result_caveat": "ret=2 and both hand values are retained without assigning screenshot-unverified win/tie/loss or hand labels. items is not treated as net gain; the nearest asset balances are unchanged.",
+      "ledger_scope": "net_asset_change compares the nearest 10302 main-role balances only. Deferred move_to=2 run income is tracked separately and may change.",
+      "room_completion_source_line": 1375
+    }
+  ],
+  "floor_transition_reward_pushes": [
+    {
+      "entered_floor": 3,
+      "source_lines": [
+        1012,
+        1013
+      ],
+      "message": {
+        "items_list": [
+          {
+            "bid": 22,
+            "num": 12200
+          },
+          {
+            "bid": 1,
+            "num": 353700
+          },
+          {
+            "bid": 37001,
+            "num": 3
+          },
+          {
+            "bid": 72001,
+            "num": 10
+          },
+          {
+            "bid": 29305,
+            "num": 2
+          },
+          {
+            "bid": 3,
+            "num": 220
+          },
+          {
+            "bid": 10152,
+            "num": 1
+          },
+          {
+            "bid": 10450,
+            "num": 80
+          }
+        ],
+        "vip_buff": 0
+      },
+      "counting_note": "Identical consecutive pushes are both retained. They are not counted as two independent payments or automatically summed across floors."
+    },
+    {
+      "entered_floor": 4,
+      "source_lines": [
+        1214,
+        1215
+      ],
+      "message": {
+        "items_list": [
+          {
+            "bid": 3,
+            "num": 420
+          },
+          {
+            "bid": 37001,
+            "num": 4
+          },
+          {
+            "bid": 1,
+            "num": 477700
+          },
+          {
+            "bid": 72001,
+            "num": 16
+          },
+          {
+            "bid": 10450,
+            "num": 230
+          },
+          {
+            "bid": 22,
+            "num": 12200
+          },
+          {
+            "bid": 29305,
+            "num": 2
+          },
+          {
+            "bid": 10152,
+            "num": 1
+          }
+        ],
+        "vip_buff": 0
+      },
+      "counting_note": "Identical consecutive pushes are both retained. They are not counted as two independent payments or automatically summed across floors."
+    },
+    {
+      "entered_floor": 5,
+      "source_lines": [
+        1428,
+        1429
+      ],
+      "message": {
+        "items_list": [
+          {
+            "bid": 22,
+            "num": 37266
+          },
+          {
+            "bid": 1,
+            "num": 798900
+          },
+          {
+            "bid": 29105,
+            "num": 2
+          },
+          {
+            "bid": 10152,
+            "num": 2
+          },
+          {
+            "bid": 72001,
+            "num": 18
+          },
+          {
+            "bid": 10450,
+            "num": 400
+          },
+          {
+            "bid": 3,
+            "num": 420
+          },
+          {
+            "bid": 37001,
+            "num": 4
+          },
+          {
+            "bid": 29305,
+            "num": 2
+          }
+        ],
+        "vip_buff": 0
+      },
+      "counting_note": "Identical consecutive pushes are both retained. They are not counted as two independent payments or automatically summed across floors."
+    },
+    {
+      "entered_floor": 6,
+      "source_lines": [
+        1634,
+        1635
+      ],
+      "message": {
+        "items_list": [
+          {
+            "bid": 22,
+            "num": 49966
+          },
+          {
+            "bid": 1,
+            "num": 981700
+          },
+          {
+            "bid": 37001,
+            "num": 6
+          },
+          {
+            "bid": 10450,
+            "num": 600
+          },
+          {
+            "bid": 72001,
+            "num": 24
+          },
+          {
+            "bid": 29105,
+            "num": 2
+          },
+          {
+            "bid": 10152,
+            "num": 2
+          },
+          {
+            "bid": 3,
+            "num": 420
+          },
+          {
+            "bid": 29305,
+            "num": 2
+          }
+        ],
+        "vip_buff": 0
+      },
+      "counting_note": "Identical consecutive pushes are both retained. They are not counted as two independent payments or automatically summed across floors."
+    }
+  ],
+  "income_page_evidence": {
+    "20652_count": 0,
+    "13006_request_count": 1,
+    "13008_request_count": 1,
+    "before_after_screenshots_obtained": false,
+    "coverage": "One login hook snapshot and four paired 20606 pushes at floor transitions; neither independently confirms before/after opening of an idle-income page.",
+    "deferred_reward_caveat": "20621/20628 rewards with move_to=2 and 20606 lists are retained independently of main ledger assets; unchanged 10302 is not proof of zero change to the run income."
+  },
+  "screenshots_search": "Read-only check of the two standard screenshot directories found no files matching common 2026-11-04 filename formats; this is not a complete inventory of every image/video location.",
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "hp_caveat": "now_hp, base hero hp and battle hp_max are retained independently; now_hp can exceed the other values in this capture, so no inferred health percentage is substituted.",
+  "baseline_source_lines": {
+    "assets": 659,
+    "inventory": 695
+  },
+  "sanitization": "All selected 206xx, battle and reward fields are retained except recursively omitted role/account/server-owner identity fields. Hero and guard instance IDs, names from game templates, actions, HP and reward values remain unchanged."
+}

@@ -1,0 +1,110 @@
+{
+  "analysis_kind": "Offline analysis of existing user-operated original-client capture; ordinary local decoder evidence.",
+  "scenario": "d01-sky",
+  "source_capture": "cap-20261104-130121-5b744d44.pcap",
+  "source_bytes": 235699,
+  "source_sha256": "d055ba09c55150baa77eb9b74b54381b647352a07a396db371a787975e8b0261",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 235699,
+  "pcap_packet_records": 1145,
+  "pcap_trailing_bytes": 0,
+  "raw_archive_directory": "../2DRoundCaptures-raw",
+  "full_decode_archive_directory": "../2DRoundCaptures-raw/sky-20261104-130121",
+  "decoded_file": "sky-decoded.jsonl",
+  "decoded_sha256": "f9f60ce52ccc77a405ff9fbd6288c502a5fc3af07e6bd8b23595d41da91083a2",
+  "decoder_path": "bin/pcapdecode",
+  "decoder_sha256": "4d667498f425556ab30f97d31a469c68c1fb4bf9f1fbd4e49f6679da48a76588",
+  "decoded_frames": 1688,
+  "frames_by_direction": {
+    "c2s": 653,
+    "s2c": 1035
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-04T05:02:02.293163Z",
+  "last_frame_utc": "2026-11-04T05:05:50.977566Z",
+  "exported_rows": 952,
+  "unique_source_lines": 952,
+  "source_line_definition": "1-based lines in unmodified sky-decoded.jsonl; directions emitted separately.",
+  "initial_floor": 2,
+  "final_floor": 6,
+  "floor_5_all_finished": true,
+  "floor_6_completed": false,
+  "full_floor_maps": 5,
+  "rooms_per_full_map": 25,
+  "battle_count": 22,
+  "outcomes": {
+    "wins": 20,
+    "losses": 2
+  },
+  "battles_by_floor": {
+    "2": 4,
+    "3": 5,
+    "4": 5,
+    "5": 5,
+    "6": 3
+  },
+  "skipped_battles": 20,
+  "defeated_heroes": [
+    {
+      "partner_id": 1452,
+      "name": "乌索普",
+      "hp_before": 1933,
+      "hp_after": 0,
+      "result_source_line": 1646
+    },
+    {
+      "partner_id": 522,
+      "name": "冯克雷",
+      "hp_before": 7277,
+      "hp_after": 0,
+      "result_source_line": 1686
+    }
+  ],
+  "continued_after_first_loss_and_won": true,
+  "same_guard_retry_observed": true,
+  "quiz_rounds": 4,
+  "quiz_question_count": 12,
+  "quiz_correct": 4,
+  "quiz_incorrect": 8,
+  "npc_single_question_events": 4,
+  "rps_complete_events": 2,
+  "rps_asset_scope": "Unchanged 10302 main-role balances do not establish unchanged deferred move_to=2 run income. RPS hand/result labels remain unverified.",
+  "floor_reward_message_count": 8,
+  "consecutive_identical_reward_pairs": 4,
+  "round_period": {
+    "start_utc8": "2026-11-04T00:00:00+08:00",
+    "end_utc8": "2026-11-06T00:00:00+08:00",
+    "span_seconds": 172800,
+    "approximately_remaining_seconds_at_initial_state": 125877,
+    "reset_boundary_captured": false
+  },
+  "income_before_after_ui_confirmed": false,
+  "20652_count": 0,
+  "historical_screenshots_obtained": false,
+  "implementation_changed": false,
+  "additional_game_actions": false,
+  "sanitization": "All selected 206xx, battle and reward fields are retained except recursively omitted role/account/server-owner identity fields. Hero and guard instance IDs, names from game templates, actions, HP and reward values remain unchanged.",
+  "limitations": [
+    "Question/option text is reconstructed from retained client tables, not historical UI screenshots; some NPC reply themes differ and are retained verbatim.",
+    "Both defeated fights included a skip request; natural round counts are not inferred from partial action headers.",
+    "Base hp, now_hp and battle hp_max are distinct observed values; no normalized percentage is substituted.",
+    "RPS ret=2 is not assigned an unverified win/tie/loss or hand label; main ledger balances do not settle deferred run rewards.",
+    "Four pairs of identical 20606 messages are retained without counting each copy as a separate payout or summing them as net income.",
+    "No before/after idle-income-page screenshots or round-reset boundary were captured; no request alone cannot determine pure-client UI navigation.",
+    "Read-only screenshot search covered only common current-day filename formats in two standard directories.",
+    "Receiver closure and a clean decode do not prove lossless network observation."
+  ],
+  "artifacts": {
+    "d01-sky.jsonl": "1e40470105d8bd7d6e1bb9edd397beb1cdf16b564478be9bfc0a6e7c5e7375d3",
+    "d01-sky-analysis.json": "942702c10e931f2e9e1b3c60fc9782a321544c45740dae5cceea74512e4fc95c",
+    "SKY_NOTES.md": "c44a261a28e16778666a3b10d8bbbd21b3d32b92afdcd29127d09c5e23650de8"
+  },
+  "reference_source_sha256": {
+    "internal/game/data/adventure.json": "e3acc9dbdb96df9aeafaf5990af35197af6b3074e8b7fc80eb656e4f9ecd109a",
+    "internal/game/data/partners.json": "3bc62ea786854950998d284f60c565b7c66d3d3f5065383a25a11dbd40ba7bd8",
+    "internal/game/adventure.go": "224c806f923aaaaed8de810725daaecc87620084c1ff55236801ebbc89d7ed6c",
+    "internal/game/adventure_mine.go": "1b1b041c1c20ebe3d9f521532008622481e0c0b0318b5f21b53a6df43bb179d5"
+  }
+}

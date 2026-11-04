@@ -1,0 +1,237 @@
+{
+  "scenario": "c05-peak-bet",
+  "capture_date": "2026-11-04",
+  "timezone": "Asia/Shanghai",
+  "season": {
+    "source_lines": [
+      321,
+      357
+    ],
+    "state": {
+      "end_time": 1793863264,
+      "flag": 0,
+      "max_zone_id": 1,
+      "period": 10,
+      "round": 3,
+      "round_status": 2,
+      "round_status_time": 1793795400,
+      "start_time": 1792653664,
+      "step": 8,
+      "step_status": 1,
+      "step_status_time": 1792672200,
+      "zone_id": 1
+    },
+    "phase_interpretation": "竞猜阶段，与历史round_status2及当日规则时段一致；step8/round3原值保留。"
+  },
+  "own_status_before": {
+    "source_lines": [
+      322,
+      393
+    ],
+    "msg": {
+      "best_rank": 0,
+      "can_bet": 666,
+      "group_256": 0,
+      "group_64": 0,
+      "rank": 0
+    }
+  },
+  "bet": {
+    "request_source_line": 238,
+    "request_utc": "2026-11-04T05:45:29.351659Z",
+    "request": {
+      "bet_type": 1,
+      "bet_val": 666
+    },
+    "reply_source_line": 395,
+    "reply_utc": "2026-11-04T05:45:29.391823Z",
+    "reply": {
+      "bet_type": 1,
+      "bet_val": 666,
+      "can_bet": 0,
+      "code": 1,
+      "msg": "押注成功"
+    },
+    "side_interpretation": "bet_type1与A方总池增加666相符；未取得当前界面左右按钮截图。",
+    "available_before": 666,
+    "available_after": 0,
+    "spent": 666,
+    "post_status_source_line": 397
+  },
+  "pool_and_odds": {
+    "before_source_lines": [
+      358,
+      392
+    ],
+    "after_source_line": 398,
+    "before": {
+      "a_bet": 9324,
+      "b_bet": 3330,
+      "a_bet_ratio": 1639,
+      "b_bet_ratio": 1878
+    },
+    "after": {
+      "a_bet": 9990,
+      "a_bet_ratio": 1633,
+      "b_bet": 3330,
+      "b_bet_ratio": 1885
+    },
+    "a_pool_delta": 666,
+    "b_pool_delta": 0,
+    "odds_scaled_by": 1000,
+    "odds_interpretation": "沿用已有客户端规则记录的千倍赔率；一次池变化不能确定通用赔率公式或最终结算赔率。"
+  },
+  "matchup": {
+    "source_lines": [
+      358,
+      392
+    ],
+    "fields": {
+      "step": 8,
+      "round": 3,
+      "group": 0,
+      "ret": 0,
+      "bet_type": 0,
+      "bet_val": 0,
+      "a_lev": 200,
+      "b_lev": 200,
+      "a_power": 4147924178,
+      "b_power": 403171901,
+      "result_info": []
+    },
+    "sanitization": "Player identity and appearance metadata omitted; sides A/B retained."
+  },
+  "chronological_bet_sequence": [
+    {
+      "source_line": 238,
+      "t": "2026-11-04T05:45:29.351659Z",
+      "dir": "c2s",
+      "cmd": 27704,
+      "msg": {
+        "bet_type": 1,
+        "bet_val": 666
+      }
+    },
+    {
+      "source_line": 395,
+      "t": "2026-11-04T05:45:29.391823Z",
+      "dir": "s2c",
+      "cmd": 27704,
+      "msg": {
+        "bet_type": 1,
+        "bet_val": 666,
+        "can_bet": 0,
+        "code": 1,
+        "msg": "押注成功"
+      }
+    },
+    {
+      "source_line": 240,
+      "t": "2026-11-04T05:45:29.409826Z",
+      "dir": "c2s",
+      "cmd": 27701,
+      "msg": {}
+    },
+    {
+      "source_line": 396,
+      "t": "2026-11-04T05:45:29.418571Z",
+      "dir": "s2c",
+      "cmd": 27716,
+      "msg": {}
+    },
+    {
+      "source_line": 242,
+      "t": "2026-11-04T05:45:29.434536Z",
+      "dir": "c2s",
+      "cmd": 27707,
+      "msg": {}
+    },
+    {
+      "source_line": 397,
+      "t": "2026-11-04T05:45:29.468169Z",
+      "dir": "s2c",
+      "cmd": 27701,
+      "msg": {
+        "best_rank": 0,
+        "can_bet": 0,
+        "group_256": 0,
+        "group_64": 0,
+        "rank": 0
+      }
+    },
+    {
+      "source_line": 398,
+      "t": "2026-11-04T05:45:29.552823Z",
+      "dir": "s2c",
+      "cmd": 27707,
+      "msg": {
+        "a_bet": 9990,
+        "a_bet_ratio": 1633,
+        "b_bet": 3330,
+        "b_bet_ratio": 1885
+      }
+    }
+  ],
+  "related_push": {
+    "source_line": 396,
+    "cmd": 27716,
+    "msg": {},
+    "interpretation": "Empty notification, not a result or payout."
+  },
+  "trees": {
+    "champion_source_line": 400,
+    "champion_request_source_line": 246,
+    "champion_positions": 14,
+    "champion_occupied_positions": 14,
+    "qualifier_source_line": 401,
+    "qualifier_request_source_line": 250,
+    "qualifier_type": 1,
+    "qualifier_groups": 16,
+    "qualifier_positions_per_group": [
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28,
+      28
+    ],
+    "interpretation": "Tree contains historical winners/losers; these are not the current pending bet settlement."
+  },
+  "asset_baseline": {
+    "source_line": 258,
+    "cmd": 10302,
+    "msg": {
+      "arena_guesscent": 0,
+      "cluster_guess_cent": 0,
+      "coin": "873247825",
+      "gold": "93703",
+      "hero_exp": "537682862",
+      "peak_guess_cent": 0
+    },
+    "interpretation": "Only one main-asset snapshot. peak_guess_cent0 does not substitute for activity can_bet666; no main-asset before/after claim."
+  },
+  "coverage": {
+    "successful_bet": true,
+    "post_bet_balance_refresh": true,
+    "post_bet_pool_refresh": true,
+    "empty_27716_push": true,
+    "bet_records_27705": false,
+    "settled_bet": false,
+    "payout": false,
+    "like_action": false,
+    "own_participation": false,
+    "battle_phase": false,
+    "ui_screenshot": false
+  },
+  "scope": "Existing user-operated capture only; no new game actions or gameplay changes."
+}

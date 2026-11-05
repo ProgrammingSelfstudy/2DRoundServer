@@ -1,0 +1,107 @@
+{"source_line": 347, "t": "2026-11-05T05:17:53.29352Z", "dir": "c2s", "cmd": 23234, "msg": null}
+{"source_line": 357, "t": "2026-11-05T05:18:38.221642Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 363, "t": "2026-11-05T05:18:52.450414Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 365, "t": "2026-11-05T05:18:56.518648Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 367, "t": "2026-11-05T05:19:00.596562Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 371, "t": "2026-11-05T05:19:04.668198Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 373, "t": "2026-11-05T05:19:08.757755Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 377, "t": "2026-11-05T05:19:12.831276Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 379, "t": "2026-11-05T05:19:16.932365Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 381, "t": "2026-11-05T05:19:21.000721Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 385, "t": "2026-11-05T05:19:25.091641Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 3000}}
+{"source_line": 391, "t": "2026-11-05T05:19:43.341858Z", "dir": "c2s", "cmd": 13401, "msg": {"type": 31}}
+{"source_line": 401, "t": "2026-11-05T05:20:23.215564Z", "dir": "c2s", "cmd": 13402, "msg": {"eid": 31008, "num": 3}}
+{"source_line": 413, "t": "2026-11-05T05:21:12.149668Z", "dir": "c2s", "cmd": 16707, "msg": null}
+{"source_line": 415, "t": "2026-11-05T05:21:12.149943Z", "dir": "c2s", "cmd": 16710, "msg": null}
+{"source_line": 419, "t": "2026-11-05T05:21:29.571348Z", "dir": "c2s", "cmd": 16708, "msg": null}
+{"source_line": 426, "t": "2026-11-05T05:21:50.569752Z", "dir": "c2s", "cmd": 14100, "msg": null}
+{"source_line": 428, "t": "2026-11-05T05:21:50.569752Z", "dir": "c2s", "cmd": 24700, "msg": null}
+{"source_line": 438, "t": "2026-11-05T05:22:26.12121Z", "dir": "c2s", "cmd": 16705, "msg": null}
+{"source_line": 440, "t": "2026-11-05T05:22:26.131848Z", "dir": "c2s", "cmd": 16705, "msg": null}
+{"source_line": 444, "t": "2026-11-05T05:22:38.815398Z", "dir": "c2s", "cmd": 16706, "msg": {"card_type": 2}}
+{"source_line": 448, "t": "2026-11-05T05:22:44.799023Z", "dir": "c2s", "cmd": 16706, "msg": {"card_type": 1}}
+{"source_line": 454, "t": "2026-11-05T05:23:06.387935Z", "dir": "c2s", "cmd": 21007, "msg": {"type": 1}}
+{"source_line": 456, "t": "2026-11-05T05:23:10.289942Z", "dir": "c2s", "cmd": 21007, "msg": {"type": 2}}
+{"source_line": 488, "t": "2026-11-05T05:25:35.973267Z", "dir": "c2s", "cmd": 13402, "msg": {"eid": 51001, "num": 1}}
+{"source_line": 492, "t": "2026-11-05T05:25:50.594276Z", "dir": "c2s", "cmd": 21007, "msg": {"type": 1}}
+{"source_line": 497, "t": "2026-11-05T05:26:01.038224Z", "dir": "c2s", "cmd": 23234, "msg": null}
+{"source_line": 501, "t": "2026-11-05T05:26:03.02124Z", "dir": "c2s", "cmd": 23214, "msg": null}
+{"source_line": 507, "t": "2026-11-05T05:26:29.304995Z", "dir": "c2s", "cmd": 23215, "msg": {"action": 1, "partner_id": 1537}}
+{"source_line": 513, "t": "2026-11-05T05:26:46.02851Z", "dir": "c2s", "cmd": 23215, "msg": {"action": 0, "partner_id": 1537}}
+{"source_line": 519, "t": "2026-11-05T05:26:56.912438Z", "dir": "c2s", "cmd": 23215, "msg": {"action": 2, "partner_id": 1537}}
+{"source_line": 521, "t": "2026-11-05T05:26:57.070425Z", "dir": "c2s", "cmd": 11055, "msg": {"is_point": 1}}
+{"source_line": 523, "t": "2026-11-05T05:26:57.082353Z", "dir": "c2s", "cmd": 11055, "msg": {"is_point": 1}}
+{"source_line": 727, "t": "2026-11-05T05:17:53.425383Z", "dir": "s2c", "cmd": 23234, "msg": {"flag": 1, "msg": ""}}
+{"source_line": 732, "t": "2026-11-05T05:18:38.32722Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 733, "t": "2026-11-05T05:18:38.32722Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 350, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 420, "pos": 21, "storage": 1}]}
+{"source_line": 735, "t": "2026-11-05T05:18:38.32722Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26900, "num": 50}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 742, "t": "2026-11-05T05:18:52.551246Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 743, "t": "2026-11-05T05:18:52.551246Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 380, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 419, "pos": 21, "storage": 1}]}
+{"source_line": 745, "t": "2026-11-05T05:18:52.551246Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26801, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 750, "t": "2026-11-05T05:18:56.629682Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 751, "t": "2026-11-05T05:18:56.629682Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 410, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 418, "pos": 21, "storage": 1}]}
+{"source_line": 752, "t": "2026-11-05T05:18:56.629682Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 203, "base_id": 26801, "quantity": 60, "pos": 57, "storage": 1}]}
+{"source_line": 753, "t": "2026-11-05T05:18:56.629682Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26801, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 758, "t": "2026-11-05T05:19:00.70874Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 759, "t": "2026-11-05T05:19:00.70874Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 440, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 417, "pos": 21, "storage": 1}]}
+{"source_line": 761, "t": "2026-11-05T05:19:00.70874Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26804, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 767, "t": "2026-11-05T05:19:04.789453Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 768, "t": "2026-11-05T05:19:04.789453Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 470, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 416, "pos": 21, "storage": 1}]}
+{"source_line": 769, "t": "2026-11-05T05:19:04.789453Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 203, "base_id": 26801, "quantity": 90, "pos": 57, "storage": 1}]}
+{"source_line": 770, "t": "2026-11-05T05:19:04.789453Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26801, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 775, "t": "2026-11-05T05:19:08.873138Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 776, "t": "2026-11-05T05:19:08.873138Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 500, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 415, "pos": 21, "storage": 1}]}
+{"source_line": 777, "t": "2026-11-05T05:19:08.873138Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 203, "base_id": 26801, "quantity": 120, "pos": 57, "storage": 1}]}
+{"source_line": 778, "t": "2026-11-05T05:19:08.873138Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26801, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 783, "t": "2026-11-05T05:19:12.892167Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 784, "t": "2026-11-05T05:19:12.892167Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 530, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 414, "pos": 21, "storage": 1}]}
+{"source_line": 786, "t": "2026-11-05T05:19:12.892167Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26802, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 790, "t": "2026-11-05T05:19:17.037118Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 791, "t": "2026-11-05T05:19:17.037118Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 560, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 413, "pos": 21, "storage": 1}]}
+{"source_line": 792, "t": "2026-11-05T05:19:17.037118Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 205, "base_id": 26802, "quantity": 60, "pos": 59, "storage": 1}]}
+{"source_line": 793, "t": "2026-11-05T05:19:17.037118Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26802, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 797, "t": "2026-11-05T05:19:21.116803Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 798, "t": "2026-11-05T05:19:21.116803Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 590, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 412, "pos": 21, "storage": 1}]}
+{"source_line": 799, "t": "2026-11-05T05:19:21.116803Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 204, "base_id": 26804, "quantity": 60, "pos": 58, "storage": 1}]}
+{"source_line": 800, "t": "2026-11-05T05:19:21.116803Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26804, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 805, "t": "2026-11-05T05:19:25.190716Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 806, "t": "2026-11-05T05:19:25.190716Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 620, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 411, "pos": 21, "storage": 1}]}
+{"source_line": 808, "t": "2026-11-05T05:19:25.190716Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 3000, "rewards": [{"base_id": 26903, "num": 50}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 821, "t": "2026-11-05T05:20:23.352912Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90123", "coin": "873768030"}}
+{"source_line": 822, "t": "2026-11-05T05:20:23.352912Z", "dir": "s2c", "cmd": 10510, "msg": [{"id": 207, "base_id": 24908, "quantity": 150, "pos": 67, "storage": 1}]}
+{"source_line": 824, "t": "2026-11-05T05:20:23.352912Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "获得<div fontcolor=#c26706>冯克雷碎片</div><div fontcolor=#289b14>x</div><div fontcolor=#289b14>150</div>"}}
+{"source_line": 825, "t": "2026-11-05T05:20:23.352912Z", "dir": "s2c", "cmd": 13402, "msg": {"code": 1, "eid": 31008, "ext": [], "is_half": 0, "msg": "", "type": 31}}
+{"source_line": 831, "t": "2026-11-05T05:21:12.228099Z", "dir": "s2c", "cmd": 16707, "msg": {"status": 1}}
+{"source_line": 832, "t": "2026-11-05T05:21:12.228099Z", "dir": "s2c", "cmd": 16710, "msg": {"list": [{"lev": 3}, {"lev": 2}, {"lev": 1}, {"lev": 0}]}}
+{"source_line": 835, "t": "2026-11-05T05:21:29.650369Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90183", "coin": "873768030"}}
+{"source_line": 836, "t": "2026-11-05T05:21:29.650369Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 11, "base_id": 37001, "quantity": 481, "pos": 11, "storage": 1}]}
+{"source_line": 837, "t": "2026-11-05T05:21:29.650369Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 3, "id": 0, "is_bind": 1, "move_to": 0, "num": "60"}, {"bid": 37001, "id": 0, "is_bind": 1, "move_to": 0, "num": "1"}], "source": 0}}
+{"source_line": 838, "t": "2026-11-05T05:21:29.650369Z", "dir": "s2c", "cmd": 16707, "msg": {"status": 2}}
+{"source_line": 839, "t": "2026-11-05T05:21:29.650369Z", "dir": "s2c", "cmd": 16708, "msg": {"code": 1, "msg": ""}}
+{"source_line": 852, "t": "2026-11-05T05:22:26.2291Z", "dir": "s2c", "cmd": 16705, "msg": {"card1_acc": 0, "card1_days": 15, "card1_end_time": 1795104000, "card1_is_reward": 1, "card2_acc": 0, "card2_days": 15, "card2_end_time": 1795104000, "card2_is_reward": 1}}
+{"source_line": 853, "t": "2026-11-05T05:22:26.2291Z", "dir": "s2c", "cmd": 16705, "msg": {"card1_acc": 0, "card1_days": 15, "card1_end_time": 1795104000, "card1_is_reward": 1, "card2_acc": 0, "card2_days": 15, "card2_end_time": 1795104000, "card2_is_reward": 1}}
+{"source_line": 856, "t": "2026-11-05T05:22:38.948598Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90303", "coin": "873768030"}}
+{"source_line": 857, "t": "2026-11-05T05:22:38.948598Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 3, "id": 0, "is_bind": 1, "move_to": 0, "num": "120"}], "source": 0}}
+{"source_line": 858, "t": "2026-11-05T05:22:38.948598Z", "dir": "s2c", "cmd": 16706, "msg": {"card_type": 2, "code": 1, "msg": ""}}
+{"source_line": 861, "t": "2026-11-05T05:22:44.869243Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873768030"}}
+{"source_line": 862, "t": "2026-11-05T05:22:44.869243Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 3, "id": 0, "is_bind": 1, "move_to": 0, "num": "200"}], "source": 0}}
+{"source_line": 863, "t": "2026-11-05T05:22:44.869243Z", "dir": "s2c", "cmd": 16706, "msg": {"card_type": 1, "code": 1, "msg": ""}}
+{"source_line": 866, "t": "2026-11-05T05:23:06.467106Z", "dir": "s2c", "cmd": 21007, "msg": {"first_gift": [], "ref_time": 1794067200, "reg_day": 26, "type": 1}}
+{"source_line": 867, "t": "2026-11-05T05:23:10.343726Z", "dir": "s2c", "cmd": 21007, "msg": {"first_gift": [], "ref_time": 1794240000, "reg_day": 26, "type": 2}}
+{"source_line": 884, "t": "2026-11-05T05:25:36.065422Z", "dir": "s2c", "cmd": 13402, "msg": {"code": 0, "eid": 51001, "ext": [], "is_half": 0, "msg": "圣羽不足", "type": 51}}
+{"source_line": 885, "t": "2026-11-05T05:25:36.065422Z", "dir": "s2c", "cmd": 12745, "msg": {"bid": 35, "need_num": 60, "num": 0}}
+{"source_line": 891, "t": "2026-11-05T05:26:01.186653Z", "dir": "s2c", "cmd": 23234, "msg": {"flag": 1, "msg": ""}}
+{"source_line": 893, "t": "2026-11-05T05:26:03.108072Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 0, "partner_id": 0, "partner_ids": [{"id": 904}, {"id": 761}, {"id": 579}, {"id": 525}, {"id": 248}, {"id": 1}, {"id": 507}]}}
+{"source_line": 897, "t": "2026-11-05T05:26:29.429761Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 520, "pos": 17, "storage": 1}]}
+{"source_line": 898, "t": "2026-11-05T05:26:29.48536Z", "dir": "s2c", "cmd": 11002, "msg": {"bid": 10509, "id": null, "lev": 1}}
+{"source_line": 899, "t": "2026-11-05T05:26:29.48536Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 10508, "partner_id": 1537, "partner_ids": [{"id": 904}, {"id": 761}, {"id": 579}, {"id": 525}, {"id": 248}, {"id": 1}, {"id": 507}]}}
+{"source_line": 900, "t": "2026-11-05T05:26:29.48536Z", "dir": "s2c", "cmd": 23215, "msg": {"code": 1, "msg": ""}}
+{"source_line": 903, "t": "2026-11-05T05:26:46.148042Z", "dir": "s2c", "cmd": 11002, "msg": {"bid": 10509, "id": null, "lev": 1}}
+{"source_line": 904, "t": "2026-11-05T05:26:46.208101Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 0, "partner_id": 0, "partner_ids": [{"id": 904}, {"id": 761}, {"id": 579}, {"id": 525}, {"id": 248}, {"id": 1}, {"id": 507}]}}
+{"source_line": 905, "t": "2026-11-05T05:26:46.208101Z", "dir": "s2c", "cmd": 23215, "msg": {"code": 1, "msg": ""}}
+{"source_line": 906, "t": "2026-11-05T05:26:50.068129Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 420, "pos": 17, "storage": 1}]}
+{"source_line": 907, "t": "2026-11-05T05:26:50.068129Z", "dir": "s2c", "cmd": 11002, "msg": {"bid": 10509, "id": null, "lev": 1}}
+{"source_line": 908, "t": "2026-11-05T05:26:50.128305Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 10510, "partner_id": 1537, "partner_ids": [{"id": 904}, {"id": 761}, {"id": 579}, {"id": 525}, {"id": 248}, {"id": 1}, {"id": 507}]}}
+{"source_line": 909, "t": "2026-11-05T05:26:50.128305Z", "dir": "s2c", "cmd": 23215, "msg": {"code": 1, "msg": ""}}
+{"source_line": 913, "t": "2026-11-05T05:26:57.091762Z", "dir": "s2c", "cmd": 23214, "msg": {"new_partner_bid": 0, "partner_id": 0, "partner_ids": [{"id": 904}, {"id": 761}, {"id": 579}, {"id": 525}, {"id": 248}, {"id": 1}, {"id": 507}]}}
+{"source_line": 914, "t": "2026-11-05T05:26:57.091762Z", "dir": "s2c", "cmd": 23215, "msg": {"code": 1, "msg": ""}}

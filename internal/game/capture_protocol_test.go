@@ -358,3 +358,71 @@ func TestCapturedReplayPlayback(t *testing.T) {
 		t.Fatalf("rejected server request counted as playback: %+v", replay)
 	}
 }
+
+// original-2026-11-03 starup-extra sources 419-430: a star-up that uses up a levelled hero
+// pays its levels back (10302), puts its worn equipment into the bag, lists all of it in one
+// 12742, then updates the hero (11002) before 11006 and the answer with an empty msg.
+func TestCapturedStarUpRefund(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	seeds := []store.PartnerSeed{{BID: 10501, Star: 5}, {BID: 10501, Star: 5}, {BID: 10405, Star: 5},
+		{BID: 10401, Star: 5}, {BID: 10402, Star: 5}, {BID: 10403, Star: 5}}
+	if ok, err := e.st.GrantStarterPartners(role.RID, seeds); err != nil || !ok {
+		t.Fatal(ok, err)
+	}
+	hs, _ := e.st.PartnersOf(role.RID)
+	if err := e.st.UpgradePartner(role.RID, hs[1].PartnerID, 1, 0, 50, 0, nil, nil); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.SellItems(role.RID, nil, nil, map[int64]int64{40101: 1}); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.EquipPiece(role.RID, hs[1].PartnerID, 1, 40101); err != nil {
+		t.Fatal(err)
+	}
+	levelled, err := e.st.PartnerByID(role.RID, hs[1].PartnerID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantAssets, wantItems := refund(*levelled)
+	if len(wantAssets) == 0 || wantItems[40101] != 1 {
+		t.Fatalf("test needs a refund with assets and the sword: %v %v", wantAssets, wantItems)
+	}
+	beforeA, _ := e.st.RoleAssets(role.RID)
+	var expend1, expend2 []proto.Message
+	for _, h := range hs[1:3] {
+		expend1 = append(expend1, proto.Message{"partner_id": h.PartnerID})
+	}
+	for _, h := range hs[3:6] {
+		expend2 = append(expend2, proto.Message{"partner_id": h.PartnerID})
+	}
+	frames := captureReplies(c, 11005, proto.Message{"partner_id": hs[0].PartnerID, "expend1": expend1, "expend2": expend2, "item_expend": []proto.Message{}})
+	codes := replyCodes(frames)
+	// the new star opens a limited gift (21211) after the answer
+	want := []uint16{10302, 10510, 12742, 11002, 11006, 11005}
+	if len(codes) < len(want) || !reflect.DeepEqual(codes[:len(want)], want) {
+		t.Fatalf("order: %v, want %v first", codes, want)
+	}
+	if frames[5].msg.Int("result") != 1 || frames[5].msg.Str("msg") != "" {
+		t.Fatalf("answer: %v", frames[5].msg)
+	}
+	shown := rewardTotals(t, frames[2].msg)
+	for k, v := range wantAssets {
+		if shown[k] != v {
+			t.Fatalf("12742 asset %d: %d, want %d (%v)", k, shown[k], v, shown)
+		}
+	}
+	if shown[40101] != 1 {
+		t.Fatalf("the sword must be listed: %v", shown)
+	}
+	afterA, _ := e.st.RoleAssets(role.RID)
+	for k, v := range wantAssets {
+		if afterA[k]-beforeA[k] != v {
+			t.Fatalf("asset %d credited %d, want %d", k, afterA[k]-beforeA[k], v)
+		}
+	}
+	items, _ := e.st.RoleItems(role.RID)
+	if items[40101] != 1 {
+		t.Fatalf("the sword is credited once: %v", items)
+	}
+}

@@ -677,6 +677,10 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		}
 		spendA, spendI := splitCost(rule.OtherExpend, 1)
 		spendI[rule.Materials[0]] += int64(len(ids))
+		bagBefore, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
 		win := rand.Int63n(1000) < rule.Rate
 		gain := map[int64]int64{}
 		if win {
@@ -700,18 +704,27 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 		flag, msg := 1, "合成成功"
 		if !win {
 			d.Lucky += rule.AddNum
-			flag, msg = 0, "合成失败，战技已分解"
+			flag, msg = 0, "合成失败"
 		}
 		if err := st.SaveArtifacts(role.RID, d); err != nil {
 			return err
 		}
-		if err := refresh(s, role.RID); err != nil {
+		// the order of captures 2026-10-27 and 2026-11-03: the cost (10302), the materials gone and
+		// the result or the training points changed (10511, 10510/10512), the gain (12742)
+		if err := sendAssets(s, st, role.RID); err != nil {
+			return err
+		}
+		bagAfter, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
+		if err := sendBagDelta(s, bagBefore, bagAfter); err != nil {
 			return err
 		}
 		if err := sendAssetGain(s, gain); err != nil {
 			return err
 		}
-		if !win { // a success sent no 11037 (capture original-2026-10-27); what a failure sent is not known
+		if !win { // a success sent no 11037 (captures original-2026-10-27 and 2026-11-03); a failure sent the new melting value
 			if err := s.Send(11037, proto.Message{"lucky": d.Lucky}); err != nil {
 				return err
 			}

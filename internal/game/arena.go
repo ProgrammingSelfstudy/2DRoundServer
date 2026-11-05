@@ -451,18 +451,29 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			}
 			ga, gi := map[int64]int64{}, map[int64]int64{}
 			splitGains(guildGains(c.Items), 1, ga, gi)
-			err := st.ClaimArenaChest(role.RID, a.Season, c.Num, ga, gi)
+			bagBefore, err := snapshotBags(st, role.RID)
+			if err != nil {
+				return err
+			}
+			err = st.ClaimArenaChest(role.RID, a.Season, c.Num, ga, gi)
 			if errors.Is(err, store.ErrConflict) {
 				return s.Send(20209, proto.Message{"code": 0, "msg": "已经领取过了"})
 			}
 			if err != nil {
 				return err
 			}
-			// the backpack, the notice of what came, the chest list again, then the answer (capture original-2026-10-28, 22-arena)
-			if err := sendAssets(s, st, role.RID); err != nil {
+			// the changed backpack entry, the notice of what came, the chest list again, then the answer
+			// (captures original-2026-10-28 and 2026-11-03: two items, no 10302, no full bag)
+			if len(ga) > 0 {
+				if err := sendAssets(s, st, role.RID); err != nil {
+					return err
+				}
+			}
+			bagAfter, err := snapshotBags(st, role.RID)
+			if err != nil {
 				return err
 			}
-			if err := sendBackpack(s, st); err != nil {
+			if err := sendBagDelta(s, bagBefore, bagAfter); err != nil {
 				return err
 			}
 			if err := sendAssetGain(s, map[int64]int64{c.Items[0][0]: c.Items[0][1]}); err != nil {

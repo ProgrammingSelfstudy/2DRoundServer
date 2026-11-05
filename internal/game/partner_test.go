@@ -2,6 +2,7 @@ package game
 
 import (
 	"2droundserver/internal/store"
+	"reflect"
 	"testing"
 	"time"
 
@@ -197,17 +198,22 @@ func TestHeroStarUp(t *testing.T) {
 		t.Fatalf("a refusal must change nothing: %v", got)
 	}
 
-	if r := up(ids(1, 3), ids(3, 6)); r.Int("result") != 1 {
-		t.Fatalf("star up: %v", r)
+	frames := captureReplies(c, 11005, proto.Message{"partner_id": hs[0].PartnerID, "expend1": ids(1, 3), "expend2": ids(3, 6), "item_expend": []proto.Message{}})
+	// the captured order: the hero (11002), the consumed heroes (11006), the answer with an
+	// empty msg; the total power fell with the five heroes used up, so no 10306, and the new
+	// star opens a limited gift (21211)
+	if got := replyCodes(frames); !reflect.DeepEqual(got, []uint16{11002, 11006, 11005, 21211}) {
+		t.Fatalf("star up replies: %v", got)
 	}
-	if gone := c.recv(11006).Arr("expend2"); len(gone) != 5 {
+	if ref := frames[0].msg; ref.Int("star") != 6 || ref.Int("partner_id") != hs[0].PartnerID {
+		t.Fatalf("11002: %v", ref)
+	}
+	if gone := frames[1].msg.Arr("expend2"); len(gone) != 5 {
 		t.Fatalf("11006: %v", gone)
 	}
-	if ref := c.recv(11001).Arr("partners"); len(ref) != 1 || ref[0].Int("star") != 6 || ref[0].Int("partner_id") != hs[0].PartnerID {
-		t.Fatalf("11001: %v", ref)
+	if r := frames[2].msg; r.Int("result") != 1 || r.Str("msg") != "" {
+		t.Fatalf("11005: %v", r)
 	}
-	c.recv(10302)
-	c.recv(10500)
 	left, _ := e.st.PartnersOf(role.RID)
 	if len(left) != 2 || left[0].Star != 6 || left[1].BID != 10404 {
 		t.Fatalf("heroes after: %v", left)

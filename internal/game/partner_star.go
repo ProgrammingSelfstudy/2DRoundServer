@@ -94,9 +94,49 @@ func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, ha
 	return consumed, cost, ""
 }
 
-// RegisterPartnerStar registers 11005 (raise a hero's star). On success the
-// client is told the consumed heroes are gone (11006), the hero changed
-// (11001), and the resources (10302) and backpack (10500) are re-sent.
+// releaseWorn takes the artifacts and holy equipment off the heroes that are about to be used
+// up and returns what went back to the bag, by base id. The consumed heroes' ordinary
+// equipment is released by the star-up transaction itself.
+func releaseWorn(st *store.Store, rid int64, gone map[int64]bool) (map[int64]int64, error) {
+	back := map[int64]int64{}
+	arts, err := loadArtifacts(st, rid)
+	if err != nil {
+		return nil, err
+	}
+	for i, a := range arts.Pieces {
+		if gone[a.Partner] && a.Pos > 0 {
+			arts.Pieces[i].Partner, arts.Pieces[i].Pos = 0, 0
+			back[a.Base]++
+		}
+	}
+	holy, err := loadHoly(st, rid)
+	if err != nil {
+		return nil, err
+	}
+	for i, x := range holy.Pieces {
+		if gone[x.Partner] && x.Slot > 0 {
+			holy.Pieces[i].Partner, holy.Pieces[i].Slot = 0, 0
+			back[x.Base]++
+		}
+	}
+	if len(back) == 0 {
+		return back, nil
+	}
+	if err := st.Exchange(rid, nil, nil, nil, back); err != nil {
+		return nil, err
+	}
+	if err := st.SaveArtifacts(rid, arts); err != nil {
+		return nil, err
+	}
+	return back, st.SaveHoly(rid, holy)
+}
+
+// RegisterPartnerStar registers 11005 (raise a hero's star). The consumed heroes give back
+// what their levels, break steps, talents and worn gear cost. The order follows the captures
+// of 2026-11-02 and 2026-11-03: the resources (10302, only when they changed), the bag
+// changes (10510/10511/10512), the refund notice (12742), the hero (11002) and the heroes of
+// the resonance slots that followed the crystal, the consumed heroes (11006), the answer with
+// an empty msg and, when the total power set a new high, 10306.
 func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 	r.Handle(11005, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -131,32 +171,91 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		}
 		assets, items := map[int64]int64{}, map[int64]int64{}
 		splitGains(cost, 1, assets, items)
-		if err := st.AscendPartner(role.RID, p.PartnerID, p.Star, consumed, assets, items); err != nil {
+		// what the consumed heroes give back: shown in full, but the worn ordinary equipment is
+		// credited by the transaction that releases it
+		shown, gainAssets, gainItems := map[int64]int64{}, map[int64]int64{}, map[int64]int64{}
+		gone := map[int64]bool{}
+		for _, id := range consumed {
+			gone[id] = true
+			h := owned[id]
+			a, i := refund(h)
+			for k, v := range a {
+				shown[k] += v
+			}
+			for k, v := range i {
+				shown[k] += v
+			}
+			h.Equips = nil
+			a, i = refund(h)
+			for k, v := range a {
+				gainAssets[k] += v
+			}
+			for k, v := range i {
+				gainItems[k] += v
+			}
+		}
+		before, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
+		slots, err := resonanceSnapshot(st, role.RID)
+		if err != nil {
+			return err
+		}
+		if err := st.AscendPartner(role.RID, p.PartnerID, p.Star, consumed, assets, items, gainAssets, gainItems); err != nil {
 			if errors.Is(err, store.ErrConflict) {
 				return reply(0, "所需材料不足")
 			}
 			return err
 		}
-		if err := reply(1, "升星成功"); err != nil {
+		worn, err := releaseWorn(st, role.RID, gone)
+		if err != nil {
 			return err
 		}
-		gone := make([]proto.Message, 0, len(consumed))
-		for _, id := range consumed {
-			gone = append(gone, proto.Message{"partner_id": id})
+		for k, v := range worn {
+			shown[k] += v
 		}
-		if err := s.Send(11006, proto.Message{"expend2": gone}); err != nil {
+		if len(assets)+len(gainAssets) > 0 {
+			if err := sendAssets(s, st, role.RID); err != nil {
+				return err
+			}
+		}
+		after, err := snapshotBags(st, role.RID)
+		if err != nil {
 			return err
 		}
-		np := *p
-		np.Star++
+		if err := sendBagDelta(s, before, after); err != nil {
+			return err
+		}
+		notice := make([]sellGain, 0, len(shown))
+		for _, id := range mergedKeys(shown, nil) {
+			notice = append(notice, sellGain{id, shown[id]})
+		}
+		if err := sendGainList(s, notice); err != nil {
+			return err
+		}
+		np, err := st.PartnerByID(role.RID, p.PartnerID)
+		if err != nil {
+			return err
+		}
+		if err := s.Send(11002, partnerMessage(*np)); err != nil {
+			return err
+		}
+		if err := pushResonanceShifts(s, st, role.RID, slots, p.PartnerID); err != nil {
+			return err
+		}
 		growStar(st, role.RID, partnerTable[p.BID].Name, np.Star, s.Now().Unix())
-		if err := s.Send(11001, proto.Message{"partners": []proto.Message{partnerMessage(np)}}); err != nil {
+		goneList := make([]proto.Message, 0, len(consumed))
+		for _, id := range consumed {
+			goneList = append(goneList, proto.Message{"partner_id": id})
+		}
+		if err := s.Send(11006, proto.Message{"expend2": goneList}); err != nil {
 			return err
 		}
-		if err := sendAssets(s, st, role.RID); err != nil {
+		if err := reply(1, ""); err != nil {
 			return err
 		}
-		if err := sendBackpack(s, st); err != nil {
+		if err := sendPowerIfHigh(s, st, role.RID, rolePower(all)); err != nil {
 			return err
 		}
 		return CheckLimitGifts(s, st, s.Now()) // a star that opens a limited gift

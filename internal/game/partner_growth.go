@@ -79,8 +79,8 @@ const (
 )
 
 // RegisterPartnerGrowth registers 11003 (level up one level) and 11004 (break
-// through), each answered with its result, then the changed hero (11001, a one-hero list update), the
-// resources (10302) and the backpack (10500).
+// through), each answered with its result after the resources (10302), the changed
+// backpack entries (10510/10511/10512) and the changed hero (11002).
 func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 	// 11016 is the break panel's preview: the hero's attributes one break step on
 	// (the same as now when there is no further step).

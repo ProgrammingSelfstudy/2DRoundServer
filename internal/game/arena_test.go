@@ -1,6 +1,7 @@
 package game
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -144,16 +145,24 @@ func TestArenaTicketsChestsAndRank(t *testing.T) {
 	if r := c.waitFor(20208); r.Int("had_combat_num") != 10 || len(r.Arr("num_list")) != 0 {
 		t.Fatalf("chest state: %v", r)
 	}
-	c.send(20209, proto.Message{"num": 10})
-	// the notice of the gain and the chest list come before the answer (capture original-2026-10-28, 22-arena)
-	if n := c.waitFor(12742).Arr("asset_list"); len(n) != 1 || n[0].Int("bid") != 10002 {
+	// the changed bag entry, the notice of the gain and the chest list come before the answer, with no
+	// 10302 and no full bag (captures original-2026-10-28, 22-arena, and 2026-11-03)
+	frames := captureReplies(c, 20209, proto.Message{"num": 10})
+	got := replyCodes(frames)
+	if len(got) < 4 || !reflect.DeepEqual(got[len(got)-3:], []uint16{12742, 20208, 20209}) {
+		t.Fatalf("chest order: %v", got)
+	}
+	for _, code := range got[:len(got)-3] { // a new entry, and the entries that moved to make room for it
+		if code != 10510 && code != 10512 {
+			t.Fatalf("chest order: %v", got)
+		}
+	}
+	frames = frames[len(frames)-3:]
+	if n := frames[0].msg.Arr("asset_list"); len(n) != 1 || n[0].Int("bid") != 10002 {
 		t.Fatalf("chest notice: %v", n)
 	}
-	if l := c.waitFor(20208); len(l.Arr("num_list")) != 1 {
-		t.Fatalf("chest list after: %v", l)
-	}
-	if r := c.waitFor(20209); r.Int("code") != 1 {
-		t.Fatalf("chest: %v", r)
+	if len(frames[1].msg.Arr("num_list")) != 1 || frames[2].msg.Int("code") != 1 {
+		t.Fatalf("chest list or answer: %v %v", frames[1].msg, frames[2].msg)
 	}
 	c.send(20209, proto.Message{"num": 10})
 	if r := c.waitFor(20209); r.Int("code") != 0 {

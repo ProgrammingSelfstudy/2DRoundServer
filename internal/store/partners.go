@@ -189,11 +189,11 @@ func spendTx(tx *sql.Tx, rid int64, assets, items map[int64]int64) error {
 	return err
 }
 
-// AscendPartner raises a hero's star by one, deletes the consumed heroes and
-// takes the cost, in one transaction. It returns ErrConflict, changing nothing,
+// AscendPartner raises a hero's star by one, deletes the consumed heroes, takes the
+// cost and pays what the consumed heroes give back, in one transaction. It returns ErrConflict, changing nothing,
 // when the hero is no longer at fromStar, a consumed hero is gone (or is the
 // hero itself) or the role cannot pay.
-func (s *Store) AscendPartner(rid, partnerID int64, fromStar int, consumed []int64, assets, items map[int64]int64) error {
+func (s *Store) AscendPartner(rid, partnerID int64, fromStar int, consumed []int64, assets, items, gainAssets, gainItems map[int64]int64) error {
 	tx, err := s.db.Begin()
 	if err != nil {
 		return err
@@ -222,6 +222,9 @@ func (s *Store) AscendPartner(rid, partnerID int64, fromStar int, consumed []int
 		}
 	}
 	if err := spendTx(tx, rid, assets, items); err != nil {
+		return err
+	}
+	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
 		return err
 	}
 	return tx.Commit()

@@ -33,3 +33,22 @@ func sendRolePower(s *gateway.Session, st *store.Store, rid, previous int64) err
 func init() {
 	registerAdminModule(AdminModule{Key: "role_power", Title: "角色历史战力", Window: "10306", Scope: "role", New: adminState[rolePowerState]})
 }
+
+// sendPowerIfHigh sends 10306 only when the total power now passes the retained high-water
+// mark: the captures of 2026-11-02 and 2026-11-03 sent it after the 7->8 star-up that set a
+// new high and not after star-ups that used up a levelled hero. previous is the power before
+// the operation.
+func sendPowerIfHigh(s *gateway.Session, st *store.Store, rid, previous int64) error {
+	heroes, err := st.PartnersOf(rid)
+	if err != nil {
+		return err
+	}
+	state := rolePowerState{}
+	if _, err := st.LoadState(rid, "role_power", &state); err != nil {
+		return err
+	}
+	if rolePower(heroes) <= max(state.Max, previous) {
+		return nil
+	}
+	return sendRolePower(s, st, rid, previous)
+}

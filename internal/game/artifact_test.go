@@ -165,6 +165,9 @@ func TestArtifact(t *testing.T) {
 	if (r.Int("flag") == 1) != (d.Lucky == 0) {
 		t.Fatalf("flag %d with melting value %d", r.Int("flag"), d.Lucky)
 	}
+	if want := map[int64]string{0: "合成失败", 1: "合成成功"}[r.Int("flag")]; r.Str("msg") != want { // the original's texts
+		t.Fatalf("compose msg %q, want %q", r.Str("msg"), want)
+	}
 	if r.Int("flag") == 0 && d.Lucky != 4 {
 		t.Fatalf("melting value %d", d.Lucky)
 	}

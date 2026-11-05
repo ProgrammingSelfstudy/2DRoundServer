@@ -60,7 +60,7 @@ func TestFormation(t *testing.T) {
 		t.Fatalf("11213: %v", info)
 	}
 	// a hero that is gone drops out of the saved team
-	if err := e.st.AscendPartner(role.RID, heroes[2].PartnerID, heroes[2].Star, []int64{b}, nil, nil); err != nil {
+	if err := e.st.AscendPartner(role.RID, heroes[2].PartnerID, heroes[2].Star, []int64{b}, nil, nil, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 	saved, _ := e.st.Formation(role.RID, 0)

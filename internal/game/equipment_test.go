@@ -123,7 +123,7 @@ func TestConsumedHeroGivesItsEquipmentBack(t *testing.T) {
 		t.Fatal(err)
 	}
 	consumed := []int64{hs[1].PartnerID, hs[2].PartnerID, hs[3].PartnerID, hs[4].PartnerID, hs[5].PartnerID}
-	if err := e.st.AscendPartner(role.RID, hs[0].PartnerID, 5, consumed, nil, nil); err != nil {
+	if err := e.st.AscendPartner(role.RID, hs[0].PartnerID, 5, consumed, nil, nil, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 	if got, _ := e.st.RoleItems(role.RID); got[40101] != 1 {

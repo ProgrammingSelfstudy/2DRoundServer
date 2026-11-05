@@ -36,6 +36,8 @@ func (s *Server) Handler() http.Handler {
 		// carry filler such as "////log" or "?&&&username=": match loosely.
 		p := r.URL.Path
 		switch {
+		case strings.HasSuffix(p, "/pf/sygame/pay_web/") || strings.HasSuffix(p, "/pf/sygame/pay_web"):
+			s.payWeb(w, r)
 		case strings.HasPrefix(p, "/pay/"):
 			if !s.payRoute(w, r) {
 				http.NotFound(w, r)
@@ -94,7 +96,7 @@ func luaBool(b bool) string {
 // serverEntry renders one server in the shape login_model.lua reads
 // (srv_id, zone_id, name, ip/host, port, is_maintain, is_new, is_recomed,
 // open_time, group_id, main_*).
-func serverEntry(v store.Server) string {
+func serverEntry(v store.Server, payHost string) string {
 	main := v.MainSrvID
 	if main == "" {
 		main = v.SrvID
@@ -107,7 +109,7 @@ func serverEntry(v store.Server) string {
 	}
 	return fmt.Sprintf(`{srv_id=%s, platform=%s, zone_id=%d, name=%s, ip=%s, host=%s, port=%d, main_platform=%s, main_zone_id=%d, `+
 		`is_maintain=%s, is_new=%s, is_recomed=%s, open_time=%d, game_status=0, group_id=%d}`,
-		luaStr(v.SrvID), luaStr(v.Platform), v.ZoneID, luaStr(v.Name), luaStr(v.Host), luaStr(v.Host), v.Port,
+		luaStr(v.SrvID), luaStr(v.Platform), v.ZoneID, luaStr(v.Name), luaStr(v.Host), luaStr(hostOr(payHost, v.Host)), v.Port,
 		luaStr(v.Platform), mainZone, luaBool(v.Status == 0), luaBool(v.IsNew), luaBool(v.IsRecommend), v.OpenTime, v.GroupID)
 }
 
@@ -132,11 +134,11 @@ func (s *Server) serverList(w http.ResponseWriter, r *http.Request) {
 	}
 	entries := make([]string, len(list))
 	for i, v := range list {
-		entries[i] = serverEntry(v)
+		entries[i] = serverEntry(v, s.payHost())
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	fmt.Fprintf(w, `{code=200, data={default_zone=%s, server_list={%s}, roles={}, isWhite=false, sign=""}}`,
-		serverEntry(def), strings.Join(entries, ", "))
+		serverEntry(def, s.payHost()), strings.Join(entries, ", "))
 }
 
 // makeToken issues the token the client later puts into the 1164 args.
@@ -230,4 +232,13 @@ func (s *Server) userReg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprint(w, `{msg="205"}`)
+}
+
+// hostOr is the server entry's `host`: the client builds the pay_web address from it (http://<host>/api.php/...), while `ip` is
+// what it connects the game to. The original had host = ip:port of its web service; without a configured base it is the ip.
+func hostOr(payHost, ip string) string {
+	if payHost != "" {
+		return payHost
+	}
+	return ip
 }

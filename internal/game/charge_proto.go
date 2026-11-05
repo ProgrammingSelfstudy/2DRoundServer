@@ -32,18 +32,33 @@ func ChargeTierList(st *store.Store, rid int64) ([]proto.Message, error) {
 // SendChargeState pushes what a confirmed order changed: the diamonds, the 快乐币 and the backpack, the VIP experience and level (10301) and
 // the top-up page (16700).
 func SendChargeState(s *gateway.Session, st *store.Store, rid int64) error {
-	if err := sendAssets(s, st, rid); err != nil {
-		return err
-	}
-	if err := sendBackpack(s, st); err != nil {
-		return err
-	}
+	return sendChargeState(s, st, rid, 0)
+}
+
+// SendChargePaid is SendChargeState for a pay_web payment of a tier that credited diamonds: the original's order is 10303, 10302,
+// the toast 12741 "充值成功，获得N" and then the rest of the state.
+func SendChargePaid(s *gateway.Session, st *store.Store, rid, diamonds int64) error {
+	return sendChargeState(s, st, rid, diamonds)
+}
+
+func sendChargeState(s *gateway.Session, st *store.Store, rid, diamonds int64) error {
 	// the client reads the 快乐币 amount (10303) once when it enters the game, so a paid 快乐币 product has to push it
 	ledger, err := st.RoleAssets(rid)
 	if err != nil {
 		return err
 	}
 	if err := s.Send(10303, proto.Message{"klb": klbWire(ledger)}); err != nil {
+		return err
+	}
+	if err := sendAssets(s, st, rid); err != nil {
+		return err
+	}
+	if diamonds > 0 {
+		if err := s.Send(12741, proto.Message{"msg": fmt.Sprintf("充值成功，获得<assets=3/><div fontcolor=#289b14>%d</div>", diamonds)}); err != nil {
+			return err
+		}
+	}
+	if err := sendBackpack(s, st); err != nil {
 		return err
 	}
 	role, err := st.RoleByID(rid)

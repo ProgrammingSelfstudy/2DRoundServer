@@ -150,6 +150,8 @@ var (
 	ErrNoProduct   = errors.New("no such product")
 	ErrNotPayable  = errors.New("this product cannot be paid for yet")
 	ErrTooManyOpen = errors.New("too many orders wait for payment")
+	ErrNoKlb       = errors.New("not enough 快乐币")
+	ErrPriceMoney  = errors.New("the money does not match the product")
 )
 
 // errNotPayable makes a reason that is a kind of ErrNotPayable.
@@ -194,36 +196,60 @@ func ConfirmChargeOrder(st *store.Store, no, operator, note string) (*store.PayO
 	}
 	unlock := st.LockRoleCharge(o.RID)
 	defer unlock()
+	o, _, err = confirmChargeLocked(st, no, operator, note, 0)
+	return o, err
+}
+
+// confirmChargeLocked is ConfirmChargeOrder with the role's charge lock already held. With spendKlb > 0 the order is paid in 快乐币
+// (pay_web): that many are taken in the same transaction, the diamonds are the tier's own and the first-purchase or later extra of
+// the tier is not credited but returned for the 充值返利 mail.
+func confirmChargeLocked(st *store.Store, no, operator, note string, spendKlb int64) (*store.PayOrder, int64, error) {
 	// Another confirmation may have committed while this request waited.
-	o, err = st.PayOrderByNo(no)
+	o, err := st.PayOrderByNo(no)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	// Reject a completed/cancelled order before hooks can mutate module state.
 	// This matters after an authorized reset: replaying an old paid order must
 	// not reactivate a fund or increment a gift counter before the SQL conflict.
 	// The store keeps its atomic status check as well; rewards/rules are unchanged.
 	if o.Status != store.PayWaiting {
-		return nil, store.ErrConflict
+		return nil, 0, store.ErrConflict
 	}
 	p, ok := chargeTable[o.ChargeID]
 	if !ok {
-		return nil, ErrNoProduct
+		return nil, 0, ErrNoProduct
 	}
 	role, err := st.RoleByID(o.RID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	rc, err := st.RoleCharge(o.RID)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	bought := rc.Bought[fmt.Sprint(p.ID)]
 	assets, items := chargeGain(p, bought == 0)
+	var extra int64
+	if spendKlb > 0 {
+		ledger, err := st.RoleAssets(o.RID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if ledger[klbLabel] < spendKlb {
+			return nil, 0, ErrNoKlb
+		}
+		// the original credits the tier's diamonds and mails the extra (充值返利); the 快乐币 go in the same transaction
+		if assets[3] > p.Gold {
+			extra = assets[3] - p.Gold
+			assets[3] = p.Gold
+		}
+		assets[klbLabel] -= spendKlb
+	}
 	if h, ok := chargeHooks[p.ID]; ok {
 		a, i, err := h(st, role, p, bought)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		for k, v := range a {
 			assets[k] += v
@@ -234,21 +260,21 @@ func ConfirmChargeOrder(st *store.Store, no, operator, note string) (*store.PayO
 	}
 	o, err = st.ConfirmPayOrder(no, operator, note, p.VIPExp, assets, items)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	for _, h := range chargePaidHooks {
 		if err := h(st, role, p); err != nil {
-			return o, err
+			return o, extra, err
 		}
 	}
 	if rc, err = st.RoleCharge(o.RID); err == nil {
 		if lev := vipLevelFor(rc.VIPExp); lev > role.VIPLev {
 			if err := st.SetRoleVIP(o.RID, lev); err != nil {
-				return o, err
+				return o, extra, err
 			}
 		}
 	}
-	return o, err
+	return o, extra, err
 }
 
 // PayableProducts are the products that can be paid for now, the diamond tiers first and then the ones with a hook by id.

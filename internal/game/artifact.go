@@ -372,8 +372,8 @@ func loadArtifacts(st *store.Store, rid int64) (*store.ArtifactDoc, error) {
 }
 
 // RegisterArtifact registers the artifacts: 11030 wear / take off, 11033 recast, 11034 save the recast, 11035 decompose,
-// 11036 compose, 11037 the melting value, 11038 take its gift, 11048 the recast counters. 11032 (star up) is still a refusal:
-// the client's table has no rule for it. The rules the client does not give are ours (OPEN_QUESTIONS.md).
+// 11036 compose, 11037 the melting value, 11038 take its gift, 11048 the recast counters. 11032 (star up) has no handler:
+// the client cannot send it (see ARTIFACT_DESIGN.md). The rules the client does not give are ours (OPEN_QUESTIONS.md).
 func RegisterArtifact(r *gateway.Router, st *store.Store) {
 	load := func(rid int64) (*store.ArtifactDoc, error) { return loadArtifacts(st, rid) }
 	refresh := func(s *gateway.Session, rid int64) error {
@@ -783,13 +783,6 @@ func RegisterArtifact(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		return sendRecastCounters(s, d)
-	})
-
-	r.Handle(11032, func(s *gateway.Session, _ proto.Message) error {
-		if s.Role() == nil {
-			return nil
-		}
-		return reply(s, 11032, 0, notOpen, nil)
 	})
 }
 

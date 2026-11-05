@@ -13,7 +13,21 @@
 1. **每件的存储**：现在背包是“物品编号 → 数量”的账本，没有每件的属性。方案：账本照旧记数量（卖、发奖励都不用改），`module_state "artifact"` 里按件存 `{star, attr, skills, pending, worn}`；一件的编号 = `base*10000 + 序号`；打开背包时和账本对齐（账本多了就随机生成新件，少了就删最大序号的）。
 2. **10500 列表**：`backpackItems` 里 type 10 的物品改成逐件输出。`sell.go` 目前把编号当基础编号，战技的件编号要换算。
 3. **穿戴进属性**：`partnerStats(p store.Partner)` 只看 `Partner`，没有角色上下文。要么给 `store.Partner` 加 `Artifacts` 字段（`PartnersOf`、`PartnerByID` 等 4 处查询要带上），要么把加成放进 `Partner` 的一个 `ExtraAttr`。战斗用的是同一个函数，所以接一次两边都对。战技的技能要进战斗脚本（`fight.go` 的被动技能），这一步另说。
-4. **未确认**：升星（11032）的星级规则表里没有（`next_attr_star`/`next_skill_star` 全是 0）；重铸技能概率、保底次数、幸运重铸加成表里只有技能池和 `lucky_artifact_add_pro` 1500；技能的出现概率没有表。这些都得“我们定”并记进 `OPEN_QUESTIONS.md`。
+4. **未确认**：重铸技能概率、保底次数、幸运重铸加成表里只有技能池和 `lucky_artifact_add_pro` 1500；技能的出现概率没有表。这些都得“我们定”并记进 `OPEN_QUESTIONS.md`。
 
 ## 神装、魂器、共鸣赋能
 同样是“每件带随机属性”的物品，等 1~3 做完后照这套存储做（神装 `holy_eqm`、魂器 `horcrux`）。
+
+## 战技升星 11032：这一版客户端没有入口（11-05 结论，已删除服务端处理器）
+
+结论：11032 在这一版客户端里**发不出来**，不是等级、材料或账号条件隐藏，也不是缺抓包。服务端的 11032 处理器（原先回“该功能暂未开放”）已删除，`protocols.json` 里保留协议字段定义，用于解码。
+
+客户端依据（还原源码 `lua-restored-paths`，反编译原文 `lua-decompiled-raw` 同样如此）：
+
+- 11032 只由 `hero/hero_controller.lua` 的 `sender11032(partner_id, artifact_id, expends)` 发出，唯一调用点是 `hero/view/artifact/artifact_compose_panel.lua` 确定按钮（文字“XX 升星”，材料不足提示“材料不足”）。
+- `ArtifactComposePanel` 只在 `hero/view/artifact/artifact_window.lua` 的 `createSubPanel(1)` 里创建，该窗口有两个页签“升星 / 重铸”。
+- 打开这个窗口要调用 `HeroController.openArtifactWindow(true, …)`，但这个函数在**整份客户端 Lua 里没有定义**；唯一的引用是 `ArtifactWindow.close_callback` 里的 `openArtifactWindow(false)`。同组的 `openArtifactRecastWindow`、`openArtifactListWindow`、`openArtifactTipsWindow` 等都有定义（`hero_controller.lua` 1913 行起），唯独缺这一个。
+- 战技详情窗 `artifact_tips_window.lua` 只有四个按钮：背包里是“合成 / 重铸 / 分解 / 穿戴”，穿在英雄身上是“合成 / 重铸 / 卸下 / 替换”。其中“合成”打开锻造屋战技页（11036），“重铸”打开重铸窗口（11033/11034）。`PartnerConst.Artifact_Type.Upstar = 7` 虽然存在，但详情窗没有对应按钮。
+- 真机观察一致：11-04 战技详情没有升星按钮；11-05 在锻造屋、战技详情里也没有任何路径发出 11032。
+
+所以 `OPEN_QUESTIONS.md` 里“升星规则表里没有”的说法换成：这个功能在这一版客户端里是死代码，不需要实现，也没有可抓的包。原服服务端是否支持不影响客户端。

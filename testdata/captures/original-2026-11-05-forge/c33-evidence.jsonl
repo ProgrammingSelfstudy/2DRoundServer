@@ -1,0 +1,15 @@
+{"t": "2026-11-05T08:50:08.964607Z", "stream": "game", "dir": "c2s", "cmd": 11080, "msg": {"base_id": 40102, "num": 1}}
+{"t": "2026-11-05T08:50:44.93737Z", "stream": "game", "dir": "c2s", "cmd": 11036, "msg": {"expends": [{"artifact_id": 193}, {"artifact_id": 209}, {"artifact_id": 213}, {"artifact_id": 214}, {"artifact_id": 215}], "item_id": 10452}}
+{"t": "2026-11-05T08:53:07.521729Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 0}}
+{"t": "2026-11-05T08:53:10.598352Z", "stream": "game", "dir": "c2s", "cmd": 10397, "msg": {"status": 1}}
+{"t": "2026-11-05T08:50:09.062389Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1230756514"}}
+{"t": "2026-11-05T08:50:09.062389Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:50:09.062389Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 40102, "id": 0, "is_bind": 1, "move_to": 0, "num": "1"}], "source": 0}}
+{"t": "2026-11-05T08:50:09.122137Z", "stream": "game", "dir": "s2c", "cmd": 11080, "msg": {"msg": "", "result": 1}}
+{"t": "2026-11-05T08:50:45.028342Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1230676514"}}
+{"t": "2026-11-05T08:50:45.028342Z", "stream": "game", "dir": "s2c", "cmd": 10511, "msg": {"item_list": [{"id": 193, "pos": 99, "storage": 1}, {"id": 209, "pos": 83, "storage": 1}, {"id": 213, "pos": 93, "storage": 1}, {"id": 214, "pos": 94, "storage": 1}, {"id": 215, "pos": 95, "storage": 1}]}}
+{"t": "2026-11-05T08:50:45.028342Z", "stream": "game", "dir": "s2c", "cmd": 10510, "msg": "(omitted)"}
+{"t": "2026-11-05T08:50:45.028342Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 10452, "id": 217, "is_bind": 1, "move_to": 0, "num": "1"}], "source": 0}}
+{"t": "2026-11-05T08:50:45.096736Z", "stream": "game", "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 21030, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 25, "value": 20}]}]}}
+{"t": "2026-11-05T08:50:45.096736Z", "stream": "game", "dir": "s2c", "cmd": 11036, "msg": {"flag": 1, "msg": "合成成功", "result": 1}}
+{"t": "2026-11-05T08:53:07.581207Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 0, "type": 0}}

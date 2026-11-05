@@ -1,0 +1,88 @@
+{"t": "2026-11-05T08:30:44.30185Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 0}}
+{"t": "2026-11-05T08:30:44.30214Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 3}}
+{"t": "2026-11-05T08:30:45.085221Z", "stream": "game", "dir": "c2s", "cmd": 10926}
+{"t": "2026-11-05T08:31:10.742784Z", "stream": "game", "dir": "c2s", "cmd": 13018}
+{"t": "2026-11-05T08:31:22.212509Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 0}}
+{"t": "2026-11-05T08:31:25.260237Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 2}}
+{"t": "2026-11-05T08:31:25.471747Z", "stream": "game", "dir": "c2s", "cmd": 20208}
+{"t": "2026-11-05T08:31:25.471747Z", "stream": "game", "dir": "c2s", "cmd": 20201, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:25.123274Z", "stream": "game", "dir": "c2s", "cmd": 20203, "msg": {"is_auto": 1, "rid": 127, "srv_id": "symlf_90"}}
+{"t": "2026-11-05T08:32:25.848059Z", "stream": "game", "dir": "c2s", "cmd": 20200}
+{"t": "2026-11-05T08:32:50.492429Z", "stream": "game", "dir": "c2s", "cmd": 20203, "msg": {"is_auto": 1, "rid": 289, "srv_id": "symlf_90"}}
+{"t": "2026-11-05T08:32:50.689434Z", "stream": "game", "dir": "c2s", "cmd": 20200}
+{"t": "2026-11-05T08:32:58.636515Z", "stream": "game", "dir": "c2s", "cmd": 20203, "msg": {"is_auto": 1, "rid": 289, "srv_id": "symlf_90"}}
+{"t": "2026-11-05T08:32:58.832154Z", "stream": "game", "dir": "c2s", "cmd": 20200}
+{"t": "2026-11-05T08:33:06.766555Z", "stream": "game", "dir": "c2s", "cmd": 20203, "msg": {"is_auto": 1, "rid": 289, "srv_id": "symlf_90"}}
+{"t": "2026-11-05T08:33:06.944948Z", "stream": "game", "dir": "c2s", "cmd": 20200}
+{"t": "2026-11-05T08:33:28.768508Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 0}}
+{"t": "2026-11-05T08:33:31.860052Z", "stream": "game", "dir": "c2s", "cmd": 10397, "msg": {"status": 1}}
+{"t": "2026-11-05T08:30:44.363935Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 0, "type": 0}}
+{"t": "2026-11-05T08:30:44.41727Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 3, "type": 2}}
+{"t": "2026-11-05T08:30:44.41727Z", "stream": "game", "dir": "s2c", "cmd": 20061, "msg": "(omitted)"}
+{"t": "2026-11-05T08:30:45.164085Z", "stream": "game", "dir": "s2c", "cmd": 10926, "msg": {"list": [{"time": 14400}, {"time": 10800}, {"time": 7200}, {"time": 5400}, {"time": 3600}, {"time": 2400}, {"time": 1680}, {"time": 840}, {"time": 530}, {"time": 210}, {"time": 150}, {"time": 60}], "time": 77757}}
+{"t": "2026-11-05T08:31:10.804815Z", "stream": "game", "dir": "s2c", "cmd": 28701, "msg": {"list": [{"end_time": 1793894399, "finish": 1, "id": 50128, "target_val": 500, "type": 7, "value": 500}]}}
+{"t": "2026-11-05T08:31:10.804815Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"diamond": null, "coin": "1230757570"}}
+{"t": "2026-11-05T08:31:10.804815Z", "stream": "game", "dir": "s2c", "cmd": 10510, "msg": "(omitted)"}
+{"t": "2026-11-05T08:31:10.804815Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:31:10.804815Z", "stream": "game", "dir": "s2c", "cmd": 10510, "msg": "(omitted)"}
+{"t": "2026-11-05T08:31:10.869439Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:31:10.869439Z", "stream": "game", "dir": "s2c", "cmd": 13007, "msg": {"auto_end_dun_id": 0, "auto_start_dun_id": 0, "dun_id": 50120, "fast_add_time1": 0, "fast_add_time2": 0, "honor_buff": 0, "items": [{"bid": 1, "num": 887040}, {"bid": 3, "num": 155}, {"bid": 5, "num": 668160}, {"bid": 22, "num": 685440}, {"bid": 10001, "num": 336}, {"bid": 10451, "num": 1}, {"bid": 10451, "num": 1}, {"bid": 10451, "num": 1}, {"bid": 29905, "num": 7}, {"bid": 40101, "num": 4}, {"bid": 40102, "num": 4}, {"bid": 40103, "num": 7}, {"bid": 40104, "num": 4}, {"bid": 40201, "num": 1}, {"bid": 40202, "num": 3}, {"bid": 40203, "num": 10}, {"bid": 40204, "num": 2}, {"bid": 40301, "num": 7}, {"bid": 40302, "num": 4}, {"bid": 40303, "num": 10}, {"bid": 40304, "num": 8}, {"bid": 40306, "num": 2}, {"bid": 40402, "num": 6}, {"bid": 40403, "num": 4}, {"bid": 40404, "num": 10}, {"bid": 40406, "num": 2}], "new_exp": 6167380, "new_lev": 124, "old_exp": 5499220, "old_lev": 124, "time": 57600, "type": 1, "vip_buff": 200}}
+{"t": "2026-11-05T08:31:10.869439Z", "stream": "game", "dir": "s2c", "cmd": 13017, "msg": {"hook_time": 0, "list": [{"bid": 5, "num": 0}, {"bid": 1, "num": 0}, {"bid": 7, "num": 0}, {"bid": 22, "num": 0}]}}
+{"t": "2026-11-05T08:31:10.869439Z", "stream": "game", "dir": "s2c", "cmd": 13018, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T08:31:22.282387Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 0, "type": 0}}
+{"t": "2026-11-05T08:31:25.323488Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 2, "type": 0}}
+{"t": "2026-11-05T08:31:25.562663Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 92, "num_list": [{"num": 90}, {"num": 70}, {"num": 50}, {"num": 35}, {"num": 20}, {"num": 10}]}}
+{"t": "2026-11-05T08:31:26.197125Z", "stream": "game", "dir": "s2c", "cmd": 20201, "msg": "(omitted)"}
+{"t": "2026-11-05T08:31:35.394617Z", "stream": "game", "dir": "s2c", "cmd": 13017, "msg": {"hook_time": 60, "list": [{"bid": 5, "num": 696}, {"bid": 1, "num": 924}, {"bid": 7, "num": 0}, {"bid": 22, "num": 714}]}}
+{"t": "2026-11-05T08:32:25.204419Z", "stream": "game", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"t": "2026-11-05T08:32:25.204419Z", "stream": "game", "dir": "s2c", "cmd": 20203, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T08:32:25.204419Z", "stream": "game", "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 0, "id": 90005, "progress": [{"ext_data": [], "finish": 0, "id": 0, "target": 0, "target_val": 3, "value": 1}]}]}}
+{"t": "2026-11-05T08:32:25.266123Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:25.743274Z", "stream": "game", "dir": "s2c", "cmd": 28701, "msg": {"list": [{"end_time": 1793894399, "finish": 0, "id": 50130, "target_val": 10, "type": 7, "value": 1}]}}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 20201, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 2, "cont_win": 1, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1144, "start_time": 1793376000}}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 93, "num_list": [{"num": 90}, {"num": 70}, {"num": 50}, {"num": 35}, {"num": 20}, {"num": 10}]}}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 20210, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 24317, "msg": {"code": 0}}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 31127, "msg": {"effect": []}}
+{"t": "2026-11-05T08:32:25.758796Z", "stream": "game", "dir": "s2c", "cmd": 11007, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:25.81152Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:25.81152Z", "stream": "game", "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 72010, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 100, "value": 0}]}]}}
+{"t": "2026-11-05T08:32:25.81152Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T08:32:25.81152Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 2, "cont_win": 1, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:32:25.914471Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 2, "cont_win": 1, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:32:35.396177Z", "stream": "game", "dir": "s2c", "cmd": 13017, "msg": {"hook_time": 120, "list": [{"bid": 5, "num": 1392}, {"bid": 1, "num": 1848}, {"bid": 7, "num": 0}, {"bid": 22, "num": 1428}]}}
+{"t": "2026-11-05T08:32:50.564489Z", "stream": "game", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"t": "2026-11-05T08:32:50.564489Z", "stream": "game", "dir": "s2c", "cmd": 20203, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T08:32:50.564489Z", "stream": "game", "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 0, "id": 90005, "progress": [{"ext_data": [], "finish": 0, "id": 0, "target": 0, "target_val": 3, "value": 2}]}]}}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"diamond": null, "coin": "1230757570"}}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 1, "cont_win": 0, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 94, "num_list": [{"num": 90}, {"num": 70}, {"num": 50}, {"num": 35}, {"num": 20}, {"num": 10}]}}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 20210, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 72010, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 100, "value": 0}]}]}}
+{"t": "2026-11-05T08:32:50.633644Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T08:32:50.738799Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 1, "cont_win": 0, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:32:58.723266Z", "stream": "game", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"t": "2026-11-05T08:32:58.723266Z", "stream": "game", "dir": "s2c", "cmd": 20203, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T08:32:58.723266Z", "stream": "game", "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 1, "id": 90005, "progress": [{"ext_data": [], "finish": 1, "id": 0, "target": 0, "target_val": 3, "value": 3}]}]}}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 0, "cont_win": 0, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 95, "num_list": [{"num": 90}, {"num": 70}, {"num": 50}, {"num": 35}, {"num": 20}, {"num": 10}]}}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 20210, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted)"}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 72010, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 100, "value": 0}]}]}}
+{"t": "2026-11-05T08:32:58.786599Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T08:32:58.903888Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 0, "cont_win": 0, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:33:06.844845Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:33:06.844845Z", "stream": "game", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"t": "2026-11-05T08:33:06.844845Z", "stream": "game", "dir": "s2c", "cmd": 20203, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 0, "cont_win": 0, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 96, "num_list": [{"num": 90}, {"num": 70}, {"num": 50}, {"num": 35}, {"num": 20}, {"num": 10}]}}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 20210, "msg": "(omitted)"}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted)"}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 72010, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 100, "value": 0}]}]}}
+{"t": "2026-11-05T08:33:06.919084Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T08:33:07.009632Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 0, "cont_win": 0, "end_time": 1793980799, "rank": 1, "ref_time": 1793867546, "score": 1163, "start_time": 1793376000}}
+{"t": "2026-11-05T08:33:28.843873Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 0, "type": 0}}

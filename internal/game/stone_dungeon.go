@@ -75,7 +75,8 @@ func stoneCost(typ, done int64) int64 {
 // 20006) and 13032 a sweep of a cleared dungeon. A kind has 2 free attempts a day and more for gems and VIP, the
 // day turns at 5:00 and a dungeon opens when the one before it is cleared; the client also asks for the role's
 // power (what 10306 says) to reach the dungeon's. The monsters are those of the dungeon's unit group, fought
-// with the heroes' own attack. Our rules, not captured.
+// with the heroes' own attack. The pushes follow the capture original-2026-11-05-materials (13031 and
+// 13032 of the first gold dungeon); the rules around them are ours.
 func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 	fights := fightServiceOf(st)
 	rngOf := func() *rand.Rand {
@@ -165,16 +166,33 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		}
 		return out
 	}
-	give := func(s *gateway.Session, role *store.Role, list [][2]int64) error {
+	// give credits a reward list and sends what changed: 10302, then the bag entries that changed
+	// (10510/10512, capture original-2026-11-05-materials), and returns the gain by id for the notice
+	give := func(s *gateway.Session, role *store.Role, list [][2]int64) ([]sellGain, error) {
 		ga, gi := map[int64]int64{}, map[int64]int64{}
 		splitGains(guildGains(list), 1, ga, gi)
+		before, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return nil, err
+		}
 		if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
-			return err
+			return nil, err
 		}
 		if err := sendAssets(s, st, role.RID); err != nil {
-			return err
+			return nil, err
 		}
-		return sendBackpack(s, st)
+		after, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return nil, err
+		}
+		if err := sendBagDelta(s, before, after); err != nil {
+			return nil, err
+		}
+		var gain []sellGain
+		for _, id := range mergedKeys(ga, gi) {
+			gain = append(gain, sellGain{id, ga[id] + gi[id]})
+		}
+		return gain, nil
 	}
 	r.Handle(13031, func(s *gateway.Session, req proto.Message) error {
 		d, role, _, done, msg, err := check(s, req.Int("id"), false)
@@ -213,6 +231,11 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 			"a_object_num": len(team), "actor_role_name": role.Name, "target_role_name": d.Name, "suppress": 0, "halo_list": []proto.Message{},
 			"hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 		}
+		// the daily quest and the feat count when the fight starts, before the answer (capture
+		// original-2026-11-05-materials: 10409 and 16401 come before 13031)
+		if err := questEvent(s, st, role.RID, evtStoneFight, 1); err != nil {
+			return err
+		}
 		if err := s.Send(13031, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
@@ -230,10 +253,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 					return err
 				}
 				gained = rewards(d, first)
-				if err := give(s, role, gained); err != nil {
-					return err
-				}
-				if err := questEvent(s, st, role.RID, evtStoneFight, 1); err != nil {
+				if _, err := give(s, role, gained); err != nil {
 					return err
 				}
 			}
@@ -241,11 +261,13 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 			for _, g := range gained {
 				items = append(items, proto.Message{"bid": g[0], "is_bind": 1, "num": g[1], "id": 0})
 			}
-			if err := s.Send(20006, proto.Message{"result": result, "item_rewards": items, "show_panel_type": 0, "current_time": 0, "best_time": 0,
-				"combat_type": combatStoneDungeon, "target_role_name": d.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}}); err != nil {
+			// the state comes before the result (capture original-2026-11-05-materials: 10302, 10512, 13030, 20006)
+			if err := state(s); err != nil {
 				return err
 			}
-			return state(s)
+			return s.Send(20006, proto.Message{"result": result, "item_rewards": items, "show_panel_type": 1, "current_time": 0, "best_time": 0,
+				"room_id": 0, "adventure_end_hp": 1000, "ext_list": []proto.Message{},
+				"combat_type": combatStoneDungeon, "target_role_name": d.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}})
 		})
 	})
 	r.Handle(13032, func(s *gateway.Session, req proto.Message) error {
@@ -262,12 +284,21 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		} else if err != nil {
 			return err
 		}
-		if err := give(s, role, rewards(d, false)); err != nil {
+		gain, err := give(s, role, rewards(d, false))
+		if err != nil {
 			return err
 		}
-		if err := s.Send(13032, proto.Message{"code": 1, "msg": "扫荡成功", "id": d.ID}); err != nil {
+		// capture original-2026-11-05-materials: 10302, 10512, 12742, the quest (10409) and feat
+		// (16401), 13030, then the answer with an empty msg
+		if err := sendGainList(s, gain); err != nil {
 			return err
 		}
-		return state(s)
+		if err := questEvent(s, st, role.RID, evtStoneFight, 1); err != nil {
+			return err
+		}
+		if err := state(s); err != nil {
+			return err
+		}
+		return s.Send(13032, proto.Message{"code": 1, "msg": "", "id": d.ID})
 	})
 }

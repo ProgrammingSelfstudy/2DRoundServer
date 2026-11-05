@@ -1,0 +1,26 @@
+{"source_line": 189, "dir": "c2s", "cmd": 13030, "msg": null}
+{"source_line": 353, "dir": "c2s", "cmd": 13030, "msg": null}
+{"source_line": 357, "dir": "c2s", "cmd": 13031, "msg": {"id": 104}}
+{"source_line": 358, "dir": "c2s", "cmd": 20001, "msg": null}
+{"source_line": 370, "dir": "c2s", "cmd": 13032, "msg": {"id": 104}}
+{"source_line": 414, "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"source_line": 489, "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 0, "type": 5}, {"day_num": 0, "type": 3}, {"day_num": 0, "type": 2}, {"day_num": 0, "type": 4}, {"day_num": 0, "type": 1}], "pass_list": [{"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 576, "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 0, "type": 5}, {"day_num": 0, "type": 3}, {"day_num": 0, "type": 2}, {"day_num": 0, "type": 4}, {"day_num": 0, "type": 1}], "pass_list": [{"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 579, "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 0, "id": 90023, "progress": [{"ext_data": [], "finish": 0, "id": 0, "target": 0, "target_val": 2, "value": 1}]}]}}
+{"source_line": 580, "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 22010, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 20, "value": 6}]}]}}
+{"source_line": 581, "dir": "s2c", "cmd": 13031, "msg": {"code": 1, "msg": ""}}
+{"source_line": 582, "dir": "s2c", "cmd": 20063, "msg": {"type_list": [{"combat_type": 14}]}}
+{"source_line": 583, "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 20001, "combat_type": 14}}
+{"source_line": 585, "dir": "s2c", "cmd": 20001, "msg": {"code": 1, "msg": ""}}
+{"source_line": 589, "dir": "s2c", "cmd": 10302, "msg": {"coin": "873496769", "gold": "90723"}, "selection_note": "selection: coin and gold only"}
+{"source_line": 590, "dir": "s2c", "cmd": 10512, "msg": {"item_list": [{"base_id": 10001, "quantity": 589462, "storage": 1}]}, "selection_note": "selection: base_id, quantity, storage"}
+{"source_line": 591, "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 0, "type": 5}, {"day_num": 0, "type": 3}, {"day_num": 0, "type": 2}, {"day_num": 0, "type": 4}, {"day_num": 1, "type": 1}], "pass_list": [{"id": 104}, {"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 592, "dir": "s2c", "cmd": 20006, "msg": {"adventure_end_hp": 1000, "best_time": 0, "combat_type": 14, "current_time": 0, "ext_list": [], "item_rewards": [{"bid": 10001, "id": 0, "is_bind": 1, "num": 40}, {"bid": 1, "id": 0, "is_bind": 1, "num": 250000}], "result": 1, "room_id": 0, "show_panel_type": 1, "target_role_name": "贝里副本_噩梦1"}, "selection_note": "hurt_statistics omitted (player identity)"}
+{"source_line": 593, "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"source_line": 597, "dir": "s2c", "cmd": 10302, "msg": {"coin": "873746769", "gold": "90723"}, "selection_note": "selection: coin and gold only"}
+{"source_line": 598, "dir": "s2c", "cmd": 10512, "msg": {"item_list": [{"base_id": 10001, "quantity": 589502, "storage": 1}]}, "selection_note": "selection: base_id, quantity, storage"}
+{"source_line": 599, "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 1, "id": 0, "is_bind": 1, "move_to": 0, "num": "250000"}, {"bid": 10001, "id": 0, "is_bind": 1, "move_to": 0, "num": "40"}], "source": 0}}
+{"source_line": 600, "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 1, "id": 90023, "progress": [{"ext_data": [], "finish": 1, "id": 0, "target": 0, "target_val": 2, "value": 2}]}]}}
+{"source_line": 601, "dir": "s2c", "cmd": 16401, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 22010, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 20, "value": 7}]}]}}
+{"source_line": 602, "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 0, "type": 5}, {"day_num": 0, "type": 3}, {"day_num": 0, "type": 2}, {"day_num": 0, "type": 4}, {"day_num": 2, "type": 1}], "pass_list": [{"id": 104}, {"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 603, "dir": "s2c", "cmd": 13032, "msg": {"code": 1, "id": 104, "msg": ""}}

@@ -426,3 +426,37 @@ func TestCapturedStarUpRefund(t *testing.T) {
 		t.Fatalf("the sword is credited once: %v", items)
 	}
 }
+
+// original-2026-11-05-materials sources 597-603: a sweep sends 10302, the changed bag entries,
+// one 12742 of the gain, the daily quest and feat (10409, 16401), the state (13030) and then
+// the answer with an empty msg.
+func TestCapturedStoneSweepOrder(t *testing.T) {
+	e, c, role := stoneEnv(t)
+	if _, err := e.st.MarkStoneCleared(role.RID, 101); err != nil {
+		t.Fatal(err)
+	}
+	frames := captureReplies(c, 13032, proto.Message{"id": 101})
+	codes := replyCodes(frames)
+	n := len(codes)
+	if n < 4 || codes[0] != 10302 || codes[n-2] != 13030 || codes[n-1] != 13032 {
+		t.Fatalf("sweep order: %v", codes)
+	}
+	notice := -1
+	for i, code := range codes {
+		if code == 12742 {
+			notice = i
+		}
+		if code == 10500 {
+			t.Fatalf("a sweep must not send the full bag: %v", codes)
+		}
+	}
+	if notice < 1 || notice > n-3 {
+		t.Fatalf("12742 must follow the credit and precede the state: %v", codes)
+	}
+	if r := frames[n-1].msg; r.Int("code") != 1 || r.Str("msg") != "" || r.Int("id") != 101 {
+		t.Fatalf("answer: %v", r)
+	}
+	if got := rewardTotals(t, frames[notice].msg); got[1] != 100000 {
+		t.Fatalf("notice: %v", got)
+	}
+}

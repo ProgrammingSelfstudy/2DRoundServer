@@ -1,0 +1,9 @@
+{
+  "source": "c16-material-dungeon.pcap (outside the repository)",
+  "bytes": 284010,
+  "sha256": "9db812ff9b110497cb2a43d4b2d458546cee6dd9d698d03762bc5cd0759b78e6",
+  "decoded_frames": 605,
+  "decode_errors": 0,
+  "evidence_rows": 26,
+  "note": "source_line is the 1-based line of the full decoded jsonl, kept outside the repository"
+}

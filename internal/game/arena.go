@@ -394,7 +394,10 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 		err = st.Exchange(role.RID, map[int64]int64{3: arenaTicketGems * n}, map[int64]int64{}, map[int64]int64{}, map[int64]int64{arenaTicket: n})
 		if errors.Is(err, store.ErrConflict) {
-			return s.Send(20207, proto.Message{"code": 0, "msg": "钻石不足"})
+			if err := s.Send(20207, proto.Message{"code": 0, "msg": ""}); err != nil {
+				return err
+			}
+			return s.Send(12741, proto.Message{"msg": "钻石不足"})
 		}
 		if err != nil {
 			return err

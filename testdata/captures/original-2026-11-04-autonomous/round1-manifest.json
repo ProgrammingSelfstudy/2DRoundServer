@@ -1,0 +1,208 @@
+{
+  "batch": "autonomous-20261104-round1",
+  "evidence_kind": "Ordinary local pcapdecode and ADB UI observations; not REA Evidence. REA MCP tools were absent.",
+  "source_capture": "cap-20261104-220041-88af1928.pcap",
+  "source_bytes": 337288,
+  "source_sha256": "ed0dbb42cbf79c5d45f2f45b38d733f63b05ac6a096f8c782dfc79963e0989f4",
+  "source_snapshot": "round1-final.pcap",
+  "snapshot_sha256": "ed0dbb42cbf79c5d45f2f45b38d733f63b05ac6a096f8c782dfc79963e0989f4",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 337288,
+  "receiver_log_line": 38,
+  "pcap_record_count": 906,
+  "pcap_consumed_bytes": 337288,
+  "pcap_trailing_bytes": 0,
+  "decoded_file": "round1-final.jsonl",
+  "decoded_sha256": "3953611a030943d6cc3286d6f14c25b6a24c6dd9c46bb7964bc4f096fdf59a08",
+  "decoder_sha256": "f5f7319fe09c60c586d426af9a2760d6d54d9d0c21684faf7cb006aa1a2960ae",
+  "decoder_source_sha256": "8b644befab96189afe77cf5b882b417245844b1ff5028731bce8e61103b289b8",
+  "protocol_schema_sha256": "fcc54977c7ce0b0d703c94e796f3a3093390875b017f02e30d1ec2e8f292ce31",
+  "decoded_frames": 811,
+  "frames_by_direction": {
+    "c2s": 501,
+    "s2c": 310
+  },
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-04T14:04:29.989791Z",
+  "last_frame_utc": "2026-11-04T14:15:59.494902Z",
+  "exported_rows": 45,
+  "unique_source_lines": 45,
+  "export_file": "round1-evidence.jsonl",
+  "export_sha256": "6716ec3cb083405c9a4efe7da88def7a2e6eea7938a8fca7cf955972a4ac02d9",
+  "source_line_definition": "1-based line of the fixed complete round1-final.jsonl; checkpoint01 line numbers are obsolete. Rows sorted by timestamp then original line, not a claim of finer cross-direction wire order.",
+  "selected_command_counts": {
+    "10302": 3,
+    "10306": 2,
+    "10500": 1,
+    "10501": 1,
+    "10510": 2,
+    "10511": 2,
+    "10512": 3,
+    "11025": 1,
+    "11080": 2,
+    "11091": 2,
+    "11092": 1,
+    "11093": 4,
+    "12742": 3,
+    "12745": 1,
+    "26420": 2,
+    "26421": 2,
+    "26422": 2,
+    "26423": 2,
+    "31103": 2,
+    "31115": 2,
+    "31116": 3,
+    "31130": 2
+  },
+  "commands_absent": [
+    11032,
+    11079,
+    11081,
+    11090,
+    11094,
+    26424,
+    26430,
+    26431,
+    26432,
+    31101,
+    31104,
+    31105
+  ],
+  "holy": {
+    "wear_successes": 1,
+    "unwear_successes": 1,
+    "target_hero": 388,
+    "item_instance": 20,
+    "base_id": 1030101,
+    "unequipped_attack": 39947,
+    "equipped_attack": 40781,
+    "unequipped_power": 232787,
+    "equipped_power": 234455,
+    "final_equipped": false
+  },
+  "empower": {
+    "target_hero": 904,
+    "target_star": 6,
+    "daily_remaining": 5,
+    "preview_power": 35377,
+    "created": false,
+    "failure_result": 0,
+    "failure_msg": "",
+    "missing_item_bid": 10096,
+    "missing_need_num": 1,
+    "missing_current_num": 0,
+    "skill_list": []
+  },
+  "fruit_draw": {
+    "requests": 1,
+    "request_id": 10001,
+    "request_type": 3,
+    "up_id": 100011,
+    "times_before": 0,
+    "times_after": 10,
+    "diamonds_before": 93703,
+    "diamonds_after": 90703,
+    "diamond_cost": 3000,
+    "reward_totals": {
+      "19502": 700,
+      "19101": 36,
+      "42": 100
+    },
+    "emzz_before": 110,
+    "emzz_after": 210,
+    "result": 1,
+    "msg": "召唤成功"
+  },
+  "fruit_recycle": {
+    "requests": 1,
+    "request_item_instance": 145,
+    "base_id": 19103,
+    "quantity": 3,
+    "result": 1,
+    "msg": "分解成功",
+    "reward_base_id": 19502,
+    "reward_quantity": 75,
+    "per_shard_yield": 25,
+    "source_item_removed": true,
+    "fruit_list_initially_empty": true
+  },
+  "forge": {
+    "requests": 1,
+    "command": 11080,
+    "base_id": 40102,
+    "num": 1,
+    "result": 1,
+    "msg": "",
+    "material_base_id": 40101,
+    "material_before": 6,
+    "material_after": 3,
+    "output_before": 12,
+    "output_after": 13,
+    "coin_before": 873247825,
+    "coin_after": 873246769,
+    "coin_cost": 1056
+  },
+  "screenshots_retained_outside_repository": true,
+  "screenshots": [
+    {
+      "file": "20261104-220612-952935-holy-wear-earring.png",
+      "sha256": "66010300acb02d165dcc452104819805e4583a0403ea5b2105533131e448ff15",
+      "observation": "Observed equipped earring; attack502+229 shown and power+1668 animation."
+    },
+    {
+      "file": "20261104-220644-666859-holy-unwear-earring.png",
+      "sha256": "76f2bed8e38bd37b0cd5daefbc5eee6713f7504f4f24bcb9a13b9b8d783174ad",
+      "observation": "Observed earring slot empty and wear button restored."
+    },
+    {
+      "file": "20261104-220902-390126-empower-create-attempt.png",
+      "sha256": "c563d4da8fb6b484b962268263de0c27227aa039edc9e6120ab0483ba2f852f1",
+      "observation": "Observed missing resonance relic0, target145-level preview, one-day limit, target6stars and5 daily attempts."
+    },
+    {
+      "file": "20261104-220912-797869-empower-relic-shop.png",
+      "sha256": "946cbed54cefc77e4771f69e76bbfc060304ce5c9756cccf8d57ef2a175d4565",
+      "observation": "Observed resonance relic price5000 elite coins and current balance820; purchase not performed."
+    },
+    {
+      "file": "20261104-221149-545937-fruit-ten-draw.png",
+      "sha256": "8b4e404f095672e48f10d799c67b6a5be5dddacc39872830c8eab25140a8a4aa",
+      "observation": "Observed summon success, magnetic fragments and power-source rewards, daily diamond draw10/10."
+    },
+    {
+      "file": "20261104-221353-663564-fruit-recycle-three.png",
+      "sha256": "0b112a0b943053e57651b15e7332b5803ad26158a82ebc0b29f6bc9dff7502e0",
+      "observation": "Observed decomposition success and power-source75 reward."
+    },
+    {
+      "file": "20261104-221334-582136-fruit-extra-fragment-detail.png",
+      "sha256": "c24476139ed65f74b47d1c1689fa0e6daee625289768bfc1038c54999d2dd8ce",
+      "observation": "Observed three Human-Human fruit fragments with an available decomposition button."
+    },
+    {
+      "file": "20261104-221440-090470-forge-equipment-compose.png",
+      "sha256": "7111eb812f9952ac1397c8533047404ae8e8d35cfcabb88feaad8a0e4cdc2460",
+      "observation": "Observed forge recipe3 lower-tier pieces and1056coins for1 output."
+    },
+    {
+      "file": "20261104-221611-972400-round1-stop-capture.png",
+      "sha256": "ac7bb2d9c6f2976783fca61ac359d7a77c254cf9bd61b591ece421efd8dd4015",
+      "observation": "Observed PCAPdroid ready state/play button after normal Stop; receiver CLOSED and exact bytes additionally verified."
+    }
+  ],
+  "sanitization": {
+    "policy_source": "Reviewed literal identity_keys/strip from export-autocapture.py; no old exporter executed. Expanded denylist and projected baselines.",
+    "removed_field_paths": {},
+    "raw_payload_and_endpoints_exported": false,
+    "hero_and_item_instances_preserved": true,
+    "projections_annotated": true
+  },
+  "gameplay_implementation_changed": false,
+  "limitations": [
+    "This final file proves the captured bytes and complete stored PCAP records, not absence of network loss.",
+    "No capture-failure, holy discard, artifact star-up, empowerment success, fruit activation/star-up/awakening, forge all-compose11079/11081, or probabilistic distribution established.",
+    "UI timestamps and stored screenshots document actions; protocol results establish server effects. Raw screenshots remain private."
+  ]
+}

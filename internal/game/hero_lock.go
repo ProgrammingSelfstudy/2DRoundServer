@@ -30,6 +30,21 @@ func RegisterHeroLock(r *gateway.Router, st *store.Store) {
 			}
 			return err
 		}
-		return reply(1, "")
+		p, err := st.PartnerByID(role.RID, id)
+		if err != nil {
+			return err
+		}
+		m := partnerMessage(*p)
+		// Unlock increments explicitly retain lock_type1/is_lock0. Unlocked
+		// login baselines continue using an empty list.
+		m["is_lock"] = []proto.Message{{"lock_type": heroLockType, "is_lock": typ}}
+		if err := s.Send(11002, m); err != nil {
+			return err
+		}
+		text := "解锁成功"
+		if typ == 1 {
+			text = "锁定成功"
+		}
+		return reply(1, text)
 	})
 }

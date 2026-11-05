@@ -39,8 +39,11 @@ func TestEmpower(t *testing.T) {
 		t.Fatalf("preview: %v", r)
 	}
 	c.send(26421, req)
-	if r := c.waitFor(26421); r.Int("result") != 0 || r.Str("msg") != "材料不足" {
+	if r := c.waitFor(26421); r.Int("result") != 0 || r.Str("msg") != "" {
 		t.Fatalf("without materials: %v", r)
+	}
+	if r := c.waitFor(12745); r.Int("bid") != 10096 || r.Int("need_num") != 1 || r.Int("num") != 0 {
+		t.Fatalf("missing material: %v", r)
 	}
 	cost := empowerCfg.Cost[6]
 	e.give(c, role, map[int64]int64{cost.Item[0][0]: 3})

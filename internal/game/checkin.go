@@ -27,12 +27,12 @@ var checkinMonths = func() [][][][2]int64 {
 	return f.Months
 }()
 
-// Sign-in status the client understands (sign_panel.lua): 0 not signed in today,
-// 2 signed in today. (1 is "signed in, an extra reward waits for a recharge";
-// there is no recharge, so it is never used.)
+// Original 2026-11-05: 0 before the free sign-in, 1 after it (also on reopening
+// 14100). The client's extra-claim button does not establish eligibility for
+// another reward; its conditions have not been captured.
 const (
 	checkinOpen = 0
-	checkinDone = 2
+	checkinDone = 1
 )
 
 // CheckinService implements the daily sign-in (14100 state, 14101 sign in). The
@@ -115,17 +115,30 @@ func (c *CheckinService) signIn(s *gateway.Session, _ proto.Message) error {
 	}
 	assets, items := map[int64]int64{}, map[int64]int64{}
 	splitGains(gains, 1, assets, items)
+	before, err := snapshotBags(c.Store, me.RID)
+	if err != nil {
+		return err
+	}
 	switch err := c.Store.DoCheckin(me.RID, monthKey(now), dayKey(now), count, assets, items); {
 	case errors.Is(err, store.ErrConflict):
 		return reply(false, "今天已经签到过了") // signed in from another session in between
 	case err != nil:
 		return err
 	}
-	if err := reply(true, "签到成功"); err != nil {
+	after, err := snapshotBags(c.Store, me.RID)
+	if err != nil {
 		return err
 	}
-	if err := sendAssets(s, c.Store, me.RID); err != nil {
+	if len(assets) > 0 {
+		if err := sendAssets(s, c.Store, me.RID); err != nil {
+			return err
+		}
+	}
+	if err := sendBagDelta(s, before, after); err != nil {
 		return err
 	}
-	return sendBackpack(s, c.Store)
+	if err := sendGainList(s, gains); err != nil {
+		return err
+	}
+	return reply(true, "")
 }

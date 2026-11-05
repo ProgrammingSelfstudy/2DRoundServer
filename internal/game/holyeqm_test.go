@@ -55,12 +55,13 @@ func TestHolyEqm(t *testing.T) {
 	}
 	// wear: the hero shows it, attack grows by the main attack
 	c.send(11093, proto.Message{"partner_id": hero, "holy_eqm_id": p.Int("id"), "type": 1})
-	if r := c.until(11093); r.Int("result") != 1 {
-		t.Fatalf("wear: %v", r)
-	}
 	if hv := c.until(11091); len(hv.Arr("holy_eqm")) != 1 || hv.Arr("holy_eqm")[0].Int("id") != p.Int("id") {
 		t.Fatalf("hero push: %v", hv)
 	}
+	if r := c.until(11093); r.Int("result") != 1 || r.Str("msg") != "" {
+		t.Fatalf("wear: %v", r)
+	}
+	c.until(10306)
 	if got := len(holyBagOf(t, c)); got != 2 {
 		t.Fatalf("bag after wearing: %d", got)
 	}

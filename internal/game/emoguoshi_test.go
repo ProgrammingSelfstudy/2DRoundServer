@@ -114,20 +114,108 @@ func TestEmoguoshiLevelStarAndAwaken(t *testing.T) {
 	if f := e.emoState(t, role).Fruits["101"]; f.Juexing != 1 {
 		t.Fatalf("awakened: %+v", f)
 	}
-	// the shards of an awakened fruit turn into 力量源质
-	e.addItems(t, role, map[int64]int64{19101: 4})
-	before, _ := e.st.RoleItems(role.RID)
-	c.send(31130, proto.Message{"id": 19101, "num": 4})
-	if r := c.waitFor(31130); r.Int("result") != 1 {
-		t.Fatalf("decompose: %v", r)
+}
+
+func TestEmoguoshiShardInstanceMatchesCapture(t *testing.T) {
+	// Original 2026-11-04 round1 source541/472: the stack's instance is
+	// 145, its base id is 19103; the request sends 145, never 19103.
+	items := []proto.Message{
+		{"id": 144, "base_id": 19502, "quantity": 1700},
+		{"id": 145, "base_id": 19103, "quantity": 3},
 	}
-	after, _ := e.st.RoleItems(role.RID)
-	if after[19502]-before[19502] != 100 {
-		t.Fatalf("source: %d -> %d", before[19502], after[19502])
+	if item := emoShardInstance(items, 145); item.Int("base_id") != 19103 || item.Int("quantity") != 3 {
+		t.Fatalf("captured shard instance: %v", item)
 	}
-	c.send(31130, proto.Message{"id": 19103, "num": 1}) // not awakened
-	if r := c.waitFor(31130); r.Int("result") != 0 {
-		t.Fatalf("decompose of a fruit that is not awake: %v", r)
+	for _, id := range []int64{19103, 144, 0} {
+		if item := emoShardInstance(items, id); item != nil {
+			t.Fatalf("accepted a base id, non-shard or unknown instance %d: %v", id, item)
+		}
+	}
+}
+
+func TestEmoguoshiShardsListedInBackpack(t *testing.T) {
+	ledger := map[int64]int64{19101: 36, 19103: 3, 19502: 1700, 10601: 1, 100201: 1}
+	items := backpackItems(ledger)
+	if len(items) != 3 || items[0].Int("base_id") != 19101 || items[1].Int("base_id") != 19103 || items[2].Int("base_id") != 19502 {
+		t.Fatalf("fruit shards and source must be in 10500: %v", items)
+	}
+	sprites := spriteBag(ledger)
+	if len(sprites) != 2 || sprites[0].Int("base_id") != 10601 || sprites[1].Int("base_id") != 100201 {
+		t.Fatalf("fruit shards must not be duplicated in 10503: %v", sprites)
+	}
+	if !ItemListedInBackpack(19103) || !summary(19103).InBackpack {
+		t.Fatal("item metadata still reports fruit shards outside the backpack")
+	}
+}
+
+// Original 2026-11-04: with 31103.list empty, three unactivated 19103 shards
+// decomposed into 75 source. Requests use the id advertised by the backpack.
+func TestEmoguoshiDecomposeUnactivatedShards(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		baseID     int64
+		num        int64
+		wantResult int64
+		wantShards int64
+		wantSource int64
+	}{
+		{"all three", 19103, 3, 1, 0, 1775},
+		{"partial stack", 19103, 1, 1, 2, 1725},
+		{"zero", 19103, 0, 0, 3, 1700},
+		{"insufficient", 19103, 4, 0, 3, 1700},
+		{"maximum wire quantity", 19103, 1<<32 - 1, 0, 3, 1700},
+		{"not a shard", 19502, 1, 0, 3, 1700},
+		{"missing instance", 145, 1, 0, 3, 1700},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e, c, role := emoEnv(t)
+			e.addItems(t, role, map[int64]int64{19103: 3, 19502: 1700})
+			c.send(31103, proto.Message{})
+			if list := c.waitFor(31103).Arr("list"); len(list) != 0 {
+				t.Fatalf("expected no activated fruits: %v", list)
+			}
+			c.send(10500, proto.Message{})
+			bag := c.waitFor(10500).Arr("item_list")
+			instance := tc.baseID
+			found := false
+			for _, item := range bag {
+				if item.Int("base_id") == tc.baseID {
+					instance = item.Int("id")
+					found = true
+				}
+			}
+			if tc.baseID != 145 && !found {
+				t.Fatalf("owned item %d absent from 10500: %v", tc.baseID, bag)
+			}
+			c.settle()
+			c.send(31130, proto.Message{"id": instance, "num": tc.num})
+			if reply := c.waitFor(31130); reply.Int("result") != tc.wantResult || tc.wantResult == 1 && reply.Str("msg") != "分解成功" {
+				t.Fatalf("decompose: %v", reply)
+			}
+			c.settle()
+			items, err := e.st.RoleItems(role.RID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if items[19103] != tc.wantShards || items[19502] != tc.wantSource {
+				t.Fatalf("shards=%d source=%d, want %d/%d", items[19103], items[19502], tc.wantShards, tc.wantSource)
+			}
+			if fruits := e.emoState(t, role).Fruits; len(fruits) != 0 {
+				t.Fatalf("decomposition changed fruit activation: %v", fruits)
+			}
+			if tc.wantResult == 1 {
+				// Reusing a fully consumed instance or asking for more than remains
+				// must not credit the reward a second time.
+				c.send(31130, proto.Message{"id": instance, "num": 3})
+				if reply := c.waitFor(31130); reply.Int("result") != 0 {
+					t.Fatalf("repeated decomposition: %v", reply)
+				}
+				after, err := e.st.RoleItems(role.RID)
+				if err != nil || after[19103] != tc.wantShards || after[19502] != tc.wantSource {
+					t.Fatalf("failed request changed inventory: %v, %v", after, err)
+				}
+			}
+		})
 	}
 }
 
@@ -156,6 +244,10 @@ func TestEmoguoshiShopAndDraw(t *testing.T) {
 	if e.emoState(t, role).Total["10001"] != 10 {
 		t.Fatalf("pulls: %v", e.emoState(t, role).Total)
 	}
+	c.send(31116, proto.Message{})
+	if r := c.waitFor(31116); r.Int("times") != 0 {
+		t.Fatalf("ticket pulls counted as diamond pulls: %v", r)
+	}
 	c.send(31115, proto.Message{"id": 10002, "type": 1}) // the second box wants 2100 points
 	if r := c.waitFor(31115); r.Int("result") != 0 {
 		t.Fatalf("a box that is not open: %v", r)
@@ -163,16 +255,32 @@ func TestEmoguoshiShopAndDraw(t *testing.T) {
 	// diamonds: 300 a pull, ten pulls a day at most
 	e.grantAssets(c, role, map[int64]int64{3: 100000, emoSeed: 5000})
 	c.send(31116, proto.Message{})
-	if r := c.waitFor(31116); r.Int("times") != 10 {
+	if r := c.waitFor(31116); r.Int("times") != 0 {
 		t.Fatalf("31116: %v", r)
 	}
 	c.send(31115, proto.Message{"id": 10001, "type": 10})
 	if r := c.waitFor(31115); r.Int("result") != 1 {
 		t.Fatalf("ten pulls with diamonds: %v", r)
 	}
+	if r := c.waitFor(31116); r.Int("times") != 10 {
+		t.Fatalf("used diamond count push after ten pulls: %v", r)
+	}
 	c.send(31115, proto.Message{"id": 10001, "type": 1})
 	if r := c.waitFor(31115); r.Int("result") != 0 {
 		t.Fatalf("an eleventh diamond pull: %v", r)
+	}
+	c.send(31116, proto.Message{})
+	if r := c.waitFor(31116); r.Int("times") != 10 {
+		t.Fatalf("failed pull changed used diamond count: %v", r)
+	}
+	e.addItems(t, role, map[int64]int64{10411: 1})
+	c.send(31115, proto.Message{"id": 10001, "type": 1})
+	if r := c.waitFor(31115); r.Int("result") != 1 {
+		t.Fatalf("ticket pull at diamond limit: %v", r)
+	}
+	c.send(31116, proto.Message{})
+	if r := c.waitFor(31116); r.Int("times") != 10 {
+		t.Fatalf("ticket pull changed used diamond count: %v", r)
 	}
 	// the shop
 	c.send(31106, proto.Message{"id": 8801, "num": 1})
@@ -197,6 +305,46 @@ func TestEmoguoshiShopAndDraw(t *testing.T) {
 	c.send(31109, proto.Message{})
 	if r := c.waitFor(31109); r.Int("jifen") != 1500 {
 		t.Fatalf("points: %v", r)
+	}
+}
+
+func TestEmoguoshiDrawTimesPersistAndReset(t *testing.T) {
+	e, c, role := emoEnv(t)
+	c.send(31115, proto.Message{"id": 10001, "type": 1})
+	if r := c.waitFor(31115); r.Int("result") != 0 {
+		t.Fatalf("draw without payment: %v", r)
+	}
+	c.send(31116, proto.Message{})
+	if r := c.waitFor(31116); r.Int("times") != 0 {
+		t.Fatalf("failed payment consumed a diamond pull: %v", r)
+	}
+	e.grantAssets(c, role, map[int64]int64{3: 1000})
+	c.send(31115, proto.Message{"id": 10001, "type": 1})
+	if r := c.waitFor(31115); r.Int("result") != 1 {
+		t.Fatalf("single diamond pull: %v", r)
+	}
+	if r := c.waitFor(31116); r.Int("times") != 1 {
+		t.Fatalf("single diamond pull count push: %v", r)
+	}
+	c.settle()
+	assets, err := e.st.RoleAssets(role.RID)
+	if err != nil || assets[3] != 700 {
+		t.Fatalf("diamond balance after single pull: %v, %v", assets, err)
+	}
+	c, _ = e.dialSameRole("ug", role)
+	c.send(31116, proto.Message{})
+	if r := c.waitFor(31116); r.Int("times") != 1 {
+		t.Fatalf("used diamond count after reentry: %v", r)
+	}
+	c.settle()
+	e.advance(24 * time.Hour)
+	c.send(31116, proto.Message{})
+	if r := c.waitFor(31116); r.Int("times") != 0 {
+		t.Fatalf("used diamond count after daily reset: %v", r)
+	}
+	c.settle()
+	if state := e.emoState(t, role); state.DrawToday != 0 || state.Total["10001"] != 1 {
+		t.Fatalf("daily reset changed lifetime draws: %+v", state)
 	}
 }
 

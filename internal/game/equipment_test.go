@@ -37,7 +37,7 @@ func TestWearAndTakeOffEquipment(t *testing.T) {
 
 	c.send(10501, proto.Message{})
 	bag := c.recv(10501).Arr("item_list")
-	if len(bag) != 4 || bag[0].Int("id") != 40101001 || bag[1].Int("id") != 40101002 || bag[0].Int("base_id") != 40101 ||
+	if len(bag) != 3 || bag[0].Int("id") != 40101001 || bag[0].Int("quantity") != 2 || bag[0].Int("base_id") != 40101 ||
 		bag[0].Arr("main_attr")[0].Int("attr_id") != 101 || bag[0].Arr("main_attr")[0].Int("attr_val") != 43 {
 		t.Fatalf("bag: %v", bag)
 	}

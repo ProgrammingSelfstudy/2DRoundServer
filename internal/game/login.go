@@ -291,8 +291,7 @@ func (l *Login) giveStarter(s *gateway.Session, role *store.Role) error {
 	if err := sendRoleBase(l.Store, s, role); err != nil {
 		return err
 	}
-	power := rolePower(heroes)
-	return s.Send(10306, proto.Message{"power": power, "max_power": power})
+	return sendRolePower(s, l.Store, role.RID, 0)
 }
 
 func heartbeat(s *gateway.Session, _ proto.Message) error {

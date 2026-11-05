@@ -65,9 +65,9 @@ func dayStart(t time.Time) time.Time {
 }
 
 // OnlineGiftService implements the online gifts (10926 progress, 10927 claim).
-// The client shows the day's online seconds and the steps already claimed. What
-// counts as "a day" is our policy (calendar day, China time): the original rule
-// is unknown.
+// Calendar-day storage in China time remains the existing local policy. The
+// original 2026-11-05 capture retained time and claims across dates; its actual
+// cycle is unknown, so this protocol alignment does not change the reset rule.
 type OnlineGiftService struct {
 	Store *store.Store
 	Hub   *gateway.Hub
@@ -150,13 +150,19 @@ func (o *OnlineGiftService) progress(s *gateway.Session, _ proto.Message) error 
 	if err != nil {
 		return err
 	}
-	claimed, err := o.Store.OnlineGiftClaims(me.RID, dayKey(now))
+	return o.sendProgress(s, me.RID, now, secs)
+}
+
+// Reuse the already sampled online seconds when pushing progress after a
+// claim. Original 2026-11-05 lists claimed thresholds in descending order.
+func (o *OnlineGiftService) sendProgress(s *gateway.Session, rid int64, now time.Time, secs int64) error {
+	claimed, err := o.Store.OnlineGiftClaims(rid, dayKey(now))
 	if err != nil {
 		return err
 	}
 	list := make([]proto.Message, 0, len(claimed))
-	for _, t := range claimed {
-		list = append(list, proto.Message{"time": t})
+	for i := len(claimed) - 1; i >= 0; i-- {
+		list = append(list, proto.Message{"time": claimed[i]})
 	}
 	return s.Send(10926, proto.Message{"time": secs, "list": list})
 }
@@ -199,17 +205,33 @@ func (o *OnlineGiftService) claim(s *gateway.Session, req proto.Message) error {
 	}
 	assets, items := map[int64]int64{}, map[int64]int64{}
 	splitGains(gains, 1, assets, items)
+	before, err := snapshotBags(o.Store, me.RID)
+	if err != nil {
+		return err
+	}
 	switch err := o.Store.ClaimOnlineGift(me.RID, dayKey(now), step.Time, assets, items); {
 	case errors.Is(err, store.ErrConflict):
 		return reply(false, "已经领取过了")
 	case err != nil:
 		return err
 	}
-	if err := reply(true, "领取成功"); err != nil {
+	after, err := snapshotBags(o.Store, me.RID)
+	if err != nil {
 		return err
 	}
-	if err := sendAssets(s, o.Store, me.RID); err != nil {
+	if len(assets) > 0 {
+		if err := sendAssets(s, o.Store, me.RID); err != nil {
+			return err
+		}
+	}
+	if err := sendBagDelta(s, before, after); err != nil {
 		return err
 	}
-	return sendBackpack(s, o.Store)
+	if err := sendGainList(s, gains); err != nil {
+		return err
+	}
+	if err := o.sendProgress(s, me.RID, now, secs); err != nil {
+		return err
+	}
+	return reply(true, "")
 }

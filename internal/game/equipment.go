@@ -38,8 +38,8 @@ var equipmentTable = func() map[int64]equipmentInfo {
 // for the keys equipment uses.
 var attrIDs = map[string]int64{"atk": 101, "def_p": 102, "def_s": 103, "hp_max": 104, "speed": 106, "def": 107}
 
-// A piece in the equipment bag has the id baseID*pieceIDFactor + k (k = 1, 2, ...
-// for the role's copies of that piece); the base id is what the ledger counts.
+// Ordinary equipment uses one stable stack id per base. Preserve the former
+// first-piece id so existing local requests still resolve to the same base.
 const pieceIDFactor = 1000
 
 func eqmsOf(p store.Partner) []proto.Message {
@@ -50,7 +50,8 @@ func eqmsOf(p store.Partner) []proto.Message {
 	return out
 }
 
-// equipmentBag lists the equipment in the item ledger, one entry per piece.
+// equipmentBag lists one stack per base, as 10501/10512 do in the original
+// 2026-11-04 capture. Holy equipment retains its per-piece identity.
 func equipmentBag(ledger map[int64]int64) []proto.Message {
 	ids := make([]int64, 0)
 	for id, n := range ledger {
@@ -71,11 +72,9 @@ func equipmentBag(ledger map[int64]int64) []proto.Message {
 		for _, k := range keys {
 			main = append(main, proto.Message{"attr_id": attrIDs[k], "attr_val": eq.Attr[k]})
 		}
-		for k := int64(1); k <= ledger[base]; k++ {
-			out = append(out, proto.Message{"id": base*pieceIDFactor + k, "base_id": base, "bind": 0, "quantity": 1, "pos": len(out) + 1,
-				"expire_type": 0, "expire_time": 0, "main_attr": main, "enchant": 0, "attr": []proto.Message{}, "extra_attr": []proto.Message{},
-				"score": 0, "all_score": 0, "extra": []proto.Message{}, "gemstones": []proto.Message{}, "holy_eqm_attr": []proto.Message{}})
-		}
+		out = append(out, proto.Message{"id": base*pieceIDFactor + 1, "base_id": base, "bind": 0, "quantity": ledger[base], "pos": len(out) + 1,
+			"expire_type": 0, "expire_time": 0, "main_attr": main, "enchant": 0, "attr": []proto.Message{}, "extra_attr": []proto.Message{},
+			"score": 0, "all_score": 0, "extra": []proto.Message{}, "gemstones": []proto.Message{}, "holy_eqm_attr": []proto.Message{}})
 	}
 	return out
 }

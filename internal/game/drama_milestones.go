@@ -119,12 +119,24 @@ func RegisterDramaMilestones(r *gateway.Router, st *store.Store) {
 // (mainui_controller handle12742). num is a string on the wire; source 0, is_bind
 // 1, id 0 and move_to 0 are what the original sent. Nothing is sent for no assets.
 func sendAssetGain(s *gateway.Session, assets map[int64]int64) error {
-	if len(assets) == 0 {
-		return nil
-	}
-	list := make([]proto.Message, 0, len(assets))
+	gains := make([]sellGain, 0, len(assets))
 	for _, k := range mergedKeys(assets, nil) {
-		list = append(list, proto.Message{"bid": k, "is_bind": 1, "num": strconv.FormatInt(assets[k], 10), "id": 0, "move_to": 0})
+		gains = append(gains, sellGain{k, assets[k]})
+	}
+	return sendGainList(s, gains)
+}
+
+// sendGainList preserves per-pull rewards, including duplicate base ids. It is
+// a display notification only: inventory was already credited by the handler.
+func sendGainList(s *gateway.Session, gains []sellGain) error {
+	list := make([]proto.Message, 0, len(gains))
+	for _, gain := range gains {
+		if gain.Amount > 0 {
+			list = append(list, proto.Message{"bid": gain.ID, "is_bind": 1, "num": strconv.FormatInt(gain.Amount, 10), "id": 0, "move_to": 0})
+		}
+	}
+	if len(list) == 0 {
+		return nil
 	}
 	return s.Send(12742, proto.Message{"asset_list": list, "source": 0})
 }

@@ -1,13 +1,13 @@
 # 后台数据覆盖注册表（更新至阶段6文档收口）
 
-执行计划见 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md)。阶段3拉取基线为 `c140a39`；当前108项运行时注册（77玩家、31全服）。阶段2的六类充值视图/重置保持不变；阶段3已接全服状态、16项现有排名、赛季及区服概览、8个审定赛季状态项的自然到期补结算和世界等级覆盖。全服操作只经网关，在真实服务锁内执行；补结算和世界等级修改与审计同事务。全部 `Editable=false`，不提供全局JSON编辑；前端已接角色数据页签、玩法状态和模块总表；区服列表“玩法状态”链接和公会列表“数据表”按钮可直达对应视图。
+执行计划见 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md)。阶段3拉取基线为 `c140a39`；当前111项运行时注册（80玩家、31全服；11-05源码复核）。阶段2的六类充值视图/重置保持不变；阶段3已接全服状态、16项现有排名、赛季及区服概览、8个审定赛季状态项的自然到期补结算和世界等级覆盖。全服操作只经网关，在真实服务锁内执行；补结算和世界等级修改与审计同事务。全部 `Editable=false`，不提供全局JSON编辑；前端已接角色数据页签、玩法状态和模块总表；区服列表“玩法状态”链接和公会列表“数据表”按钮可直达对应视图。
 
 阶段4新增82项静态表视图注册，10项明确保留专用页或不提供通用查询；每张表均在下表注明。API及归属/截断约定见 [ADMIN_TABLE_API.md](ADMIN_TABLE_API.md)。表接口只有GET，不改变任何既有写权限；前端已接角色数据页签、玩法状态和模块总表；区服列表“玩法状态”链接和公会列表“数据表”按钮可直达对应视图。
 
 ## 口径与生成
 
 - `role`：`LoadState/SaveState` 的模块参数；`global`：`LoadGlobal/SaveGlobal` 的模块参数。相同 key 在两个范围出现须分别登记，不按 key 去重。
-- 源码扫描到 **352 处持久化调用、77 项玩家模块、31 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查86个以 `Module`/`Mod` 结尾的字符串模块常量。阶段3新增 `worldlev`；计划中的“约65/31”是估计，不能当验收数量。
+- 源码扫描到 **360 处持久化调用、80 项玩家模块、31 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查88个以 `Module`/`Mod` 结尾的字符串模块常量。阶段3新增 `worldlev`；计划中的“约65/31”是估计，不能当验收数量。
 - `table`：92 张显式建表，来自 `internal/store/migrations/*.sql` 和 `store.go` 的启动建表；包括游戏相关表及4张安全/运维表 `admins`、`audit_logs`、`login_tokens`、`schema_migrations`，后者也列出以说明边界。SQLite 自动维护的 `sqlite_sequence` 等内部表不由项目注册，不计入。
 - 下表的范围、键和源码列由 `tools/admincoverage` 扫描结果生成；中文窗口、当前能力、后续处置和原因经人工补充。窗口协议用于定位游戏功能，不等于后台 HTTP 路由。**“当前未接”是待补缺口，不是永久排除；“拟提供”不表示已经实现或已经授权具体写操作。**
 - 本文机器可读表格是覆盖清单；阶段1已在各模块文件的 `init()` 中注册到 `internal/game/adminreg.go` 的 `AdminModules()`。完整性门禁同时核对源码扫描、本文及运行时注册，任一边缺项都失败。测试采用精确的 `(scope,key)` 对比，不能用一个任意 `*` 冒充全覆盖。
@@ -32,12 +32,14 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 核对来源：[实际路由](../internal/admin/server.go)、[角色详情](../internal/admin/handlers.go)、[支付接口](../internal/admin/pay.go)、[新前端路由](../web/admin/src/routers/index.ts)、[角色详情界面](../web/admin/src/views/roles/RoleDialog.vue)。
 
 - 现有 `read/write/manage` 对应 viewer/operator/superadmin；管理员、审计、备份读取仅 manage，支付写入及区服/管理员维护也仅 manage。原有业务权限不在本阶段改变。
-- **77项玩家模块和31项全服模块均有只读API，108项可查询注册元数据。** 全服读取只经网关；无网关或缺服务绑定返回502，不降级读库。GET不创建默认行、不触发结算；原始data与内存view分别返回。阶段2六类充值重置保持原白名单，阶段3全服16项Rank复用现有排序；`GET /api/roles/{id}/charge`仍汇总9个具体充值模块与该角色订单。
+- **80项玩家模块和31项全服模块均有只读API，111项可查询注册元数据。** 全服读取只经网关；无网关或缺服务绑定返回502，不降级读库。GET不创建默认行、不触发结算；原始data与内存view分别返回。阶段2六类充值重置保持原白名单，阶段3全服16项Rank复用现有排序；`GET /api/roles/{id}/charge`仍汇总9个具体充值模块与该角色订单。
 - 当前角色详情保留基本资料、发放及账本，另有“玩法与只读数据”：充值状态与角色订单、模块JSON及计算视图、全部role表分组。英雄/装备/天赋、阵容、任务/好友、收件等经通用白名单表读取；没有专用投影的字段显示存储值，不虚构游戏计算属性。
 - 现有写操作并非全部执行新计划的“先查离线、不可达不写”；本阶段不更改旧接口或规则。后续新增玩家数据写必须先网关在线校验（在线409、未知502），再读before、写入、审计。不能用当前踢线选项代替这一前置条件。
 - 全服模块数据必须经网关，在所属服务的锁/定时器边界内读取/修改；禁止后台直接调用 `SaveGlobal`。专用表若同样受网关服务锁保护，也不能因其是SQL表就绕开该边界。
 
-## 玩家模块（77项）
+## 玩家模块（80项）
+
+2026-11-05新增 `role_power` 的只读登记，用于查看10306历史战力峰值；不开放编辑或重置。当前源码扫描为360处持久化调用、80项玩家模块、31项全服模块、96张显式表、88个模块常量。前文阶段统计保留历史口径，当前运行时共111项登记。
 
 原始JSON和充值专用视图均只读。专用视图在新解码的内存副本中复用现有activate/view/roll；不调用会保存或发奖的游戏loader。重置仅superadmin，先核对网关离线状态，再持同一角色付款锁检查白名单/读before，最后比较before并将写入与审计同事务提交。`all`只在首充窗口显式开放；不提供JSON编辑。
 
@@ -103,6 +105,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `recruithero` | 新人招募（25100/25101） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [recruithero.go](../internal/game/recruithero.go) |
 | role | `redbagday` | 公会红包每日领取（13534–13546） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [guild_redbag.go](../internal/game/guild_redbag.go) |
 | role | `returnaction` | 回归活动（27900–27915） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [returnaction.go](../internal/game/returnaction.go) |
+| role | `role_power` | 角色历史战力峰值（10306） | 原始JSON查看（read）；无重置/编辑 | 已接只读模块页签 | 卸下神装保留历史峰值，不开放修改峰值的写权限 | [role_power.go](../internal/game/role_power.go) |
 | role | `sandybeach` | 沙滩Boss（25400–25405） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [sandybeach.go](../internal/game/sandybeach.go) |
 | role | `sevengoal` | 七日目标（13604–13609） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [sevengoal.go](../internal/game/sevengoal.go) |
 | role | `skinlottery` | 世界征兵（26600–26602） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [skinlottery.go](../internal/game/skinlottery.go) |

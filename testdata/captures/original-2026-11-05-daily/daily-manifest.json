@@ -1,0 +1,334 @@
+{
+  "batch": "daily-20261105-074300",
+  "evidence_kind": "Original-client UI and ordinary local pcapdecode; not REA Evidence. REA MCP absent; existing config_drift retained without configuration changes.",
+  "private_artifact_directory": "/Users/mountainwalkeralliance/Documents/code/2DRoundCaptures-raw/daily-20261105-074300",
+  "source_capture": "cap-20261105-074515-a0370bde.pcap",
+  "source_snapshot": "daily-final.pcap",
+  "decoded_file": "daily-final.jsonl",
+  "source_line_definition": "1-based line in the named fixed complete private JSONL. Rows are sorted by timestamp then source line; decoder groups directions, so source-line order is not cross-direction wire order.",
+  "source_sha256": "3a786717407bbb4fe47e56efe3e230c868706bdfb9105659afc054c2d82161d6",
+  "source_bytes": 305125,
+  "original_equals_snapshot": true,
+  "pcap_record_count": 842,
+  "pcap_link_type": 101,
+  "pcap_consumed_bytes": 305125,
+  "pcap_trailing_bytes": 0,
+  "pcap_clipped_records": 0,
+  "game_stream_count": 1,
+  "stream_framing": {
+    "c2s": {
+      "stream_bytes_excluding_handshake": 17804,
+      "framed_bytes": 17804,
+      "trailing_bytes": 0,
+      "frames": 500,
+      "holes": 0,
+      "conflicting_retransmissions": 0
+    },
+    "s2c": {
+      "stream_bytes_excluding_handshake": 87033,
+      "framed_bytes": 87033,
+      "trailing_bytes": 0,
+      "frames": 294,
+      "holes": 0,
+      "conflicting_retransmissions": 0
+    }
+  },
+  "decoded_frames": 794,
+  "frames_by_direction": {
+    "c2s": 500,
+    "s2c": 294
+  },
+  "decoded_sha256": "6c21595da5809e0b49b1afc53951854cd9c76a5ebcb8de386f282554490db4a3",
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "current_source_output_matches_retained_decode": true,
+  "retained_decoder_sha256": "f5f7319fe09c60c586d426af9a2760d6d54d9d0c21684faf7cb006aa1a2960ae",
+  "rebuilt_decoder_sha256": "22392f4096ec8b9700d05d326d3218b31e686769698ec37c822b6b9b5a766b41",
+  "decoder_source_sha256": "8b644befab96189afe77cf5b882b417245844b1ff5028731bce8e61103b289b8",
+  "protocol_schema_sha256": "fcc54977c7ce0b0d703c94e796f3a3093390875b017f02e30d1ec2e8f292ce31",
+  "decode_log_sha256": "27cb14ac5112f93439722b09c7a01d7efd4e78aa242d0bd8bff29207463a796b",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 305125,
+  "export_file": "daily-evidence.jsonl",
+  "exported_rows": 55,
+  "export_sha256": "7d1fa19bfc54ae654c419e7bba6a357bd5c1014c6e174dd42df6d5132d302380",
+  "selected_command_counts": {
+    "10302": 2,
+    "10400": 2,
+    "10406": 2,
+    "10500": 1,
+    "10512": 2,
+    "10926": 7,
+    "10927": 2,
+    "12741": 1,
+    "12742": 2,
+    "13030": 4,
+    "13401": 2,
+    "13403": 2,
+    "14100": 8,
+    "14101": 2,
+    "16603": 2,
+    "20300": 4,
+    "21100": 4,
+    "23200": 4,
+    "23230": 2
+  },
+  "previous_day": {
+    "private_directory": "/Users/mountainwalkeralliance/Documents/code/2DRoundCaptures-raw/autonomous-20261104-232314",
+    "snapshot": "round3-final.pcap",
+    "source_sha256": "932c42538251446f2cbdf6374a99169b95c086e8e5cb20a212122c1b219a6eb7",
+    "decoded_file": "round3-final.jsonl",
+    "decoded_sha256": "e614a91db7b2862bf74548f4ff7e5b06b1879638733201f478ff99f5e5e44eac",
+    "export_file": "previous-day-baseline.jsonl",
+    "exported_rows": 4,
+    "export_sha256": "a4c130c92334806bb342815298d58972239d2c9ab7f42acc1044ea3291918f00"
+  },
+  "first_frame_utc": "2026-11-04T23:46:05.843683Z",
+  "last_frame_utc": "2026-11-04T23:55:21.049499Z",
+  "ui_actions_file": "ui-actions.jsonl",
+  "ui_actions_sha256": "75661818a9347c39fbddb2280696065a0f74d1687fe97924f7541c068266dc40",
+  "ui_actions_count": 60,
+  "screenshots_retained_outside_repository": true,
+  "screenshots": [
+    {
+      "file": "screens/20261105-074607-965188-start-game.png",
+      "sha256": "1cd22b94e79527f4d0df48bbc521bbfd33419c43efee2a5f156e2b6b23509ff9",
+      "ui_action_line": 7,
+      "ui_action_time": "2026-11-05T07:46:06.732355+08:00",
+      "label": "start-game"
+    },
+    {
+      "file": "screens/20261105-074635-088479-welfare-open.png",
+      "sha256": "fca49af111ed4ee6f4e330d272bd6c9e6b8abdaf6c83d37ea9982e76da3318d5",
+      "ui_action_line": 10,
+      "ui_action_time": "2026-11-05T07:46:33.847976+08:00",
+      "label": "welfare-open"
+    },
+    {
+      "file": "screens/20261105-074646-473292-daily-signin-fourth-claim.png",
+      "sha256": "758ff4c2f73c676c8495080a47fc10e58fa683118e81f15c2521c64f54e4caf5",
+      "ui_action_line": 11,
+      "ui_action_time": "2026-11-05T07:46:45.233166+08:00",
+      "label": "daily-signin-fourth-claim"
+    },
+    {
+      "file": "screens/20261105-074700-144303-signin-reward-close-and-state.png",
+      "sha256": "6654f6b5ff19a9ff6d6b87aef487f6c30088351d3cb5f1f7ec20ddeec2cc14f7",
+      "ui_action_line": 12,
+      "ui_action_time": "2026-11-05T07:46:58.904612+08:00",
+      "label": "signin-reward-close-and-state"
+    },
+    {
+      "file": "screens/20261105-074721-737255-tasks-daily-open.png",
+      "sha256": "969d918296c4f0a32aa88cb38b65dcb8eee737eaf39e89a23511c2eae77f0740",
+      "ui_action_line": 14,
+      "ui_action_time": "2026-11-05T07:47:20.495962+08:00",
+      "label": "tasks-daily-open"
+    },
+    {
+      "file": "screens/20261105-074734-833864-daily-login-task-submit.png",
+      "sha256": "c0f2a4e1d4ae168545298939bb15c506844b1890848429ba5e9c64c250f89706",
+      "ui_action_line": 15,
+      "ui_action_time": "2026-11-05T07:47:33.593791+08:00",
+      "label": "daily-login-task-submit"
+    },
+    {
+      "file": "screens/20261105-074748-699333-daily-tasks-lower-status.png",
+      "sha256": "cf294e4f45ad6c9826c774b9db4d28878f45762fa59a66793b1a5393731bc778",
+      "ui_action_line": 16,
+      "ui_action_time": "2026-11-05T07:47:46.974802+08:00",
+      "label": "daily-tasks-lower-status"
+    },
+    {
+      "file": "screens/20261105-074828-682249-theme-activities-status.png",
+      "sha256": "3ea83a6829d4220eb10f9ee029e6679eaf084e9817343f2999ff3a696e257982",
+      "ui_action_line": 20,
+      "ui_action_time": "2026-11-05T07:48:27.442723+08:00",
+      "label": "theme-activities-status"
+    },
+    {
+      "file": "screens/20261105-074902-634112-activity-login-signin-status.png",
+      "sha256": "795bd91d04b36f463504c3a38ca597cfa16f6ef468e7d589a5511476ce6619f2",
+      "ui_action_line": 22,
+      "ui_action_time": "2026-11-05T07:49:01.369356+08:00",
+      "label": "activity-login-signin-status"
+    },
+    {
+      "file": "screens/20261105-074931-511455-welfare-revisit.png",
+      "sha256": "0968df0cca47b4bebaf18bf66254257b0a174db267135672cbeafdd41fb6b3be",
+      "ui_action_line": 25,
+      "ui_action_time": "2026-11-05T07:49:30.247436+08:00",
+      "label": "welfare-revisit"
+    },
+    {
+      "file": "screens/20261105-075112-983920-login-reward-claimable-status.png",
+      "sha256": "cf722688d0eb6eb5c28fc65f31aa2a15a97fd60187a25fcebe1bbd1bf79fb46d",
+      "ui_action_line": 35,
+      "ui_action_time": "2026-11-05T07:51:11.719758+08:00",
+      "label": "login-reward-claimable-status"
+    },
+    {
+      "file": "screens/20261105-075126-026966-online-final-free-claim.png",
+      "sha256": "9eab346c69da34d63f0a1469fe102d6dd2cdc00577e37a6c14f1df5582f56ed1",
+      "ui_action_line": 36,
+      "ui_action_time": "2026-11-05T07:51:24.762493+08:00",
+      "label": "online-final-free-claim"
+    },
+    {
+      "file": "screens/20261105-075143-124671-online-all-claimed-state.png",
+      "sha256": "44d4a0e8e0d27975fbd1f023f763b4aeb241a95c17614634d31fb2992c62e252",
+      "ui_action_line": 38,
+      "ui_action_time": "2026-11-05T07:51:43.124252+08:00",
+      "label": "online-all-claimed-state"
+    },
+    {
+      "file": "screens/20261105-075215-531863-resource-dungeon-today-status.png",
+      "sha256": "c627f4acd24e77541ff550ea25b26f84c9e8bfab969fdd205932b8abdd908669",
+      "ui_action_line": 41,
+      "ui_action_time": "2026-11-05T07:52:14.267893+08:00",
+      "label": "resource-dungeon-today-status"
+    },
+    {
+      "file": "screens/20261105-075229-185000-dungeon-exp-status.png",
+      "sha256": "eb024363ee4800624ac06835ebf468aa545fcf600eed70696fc3d128a30da139",
+      "ui_action_line": 42,
+      "ui_action_time": "2026-11-05T07:52:27.939714+08:00",
+      "label": "dungeon-exp-status"
+    },
+    {
+      "file": "screens/20261105-075232-148438-dungeon-hero-status.png",
+      "sha256": "717dc90cc58d03663be5fc9386493f925b1cf496df1d13de7b96df9b1e38b53d",
+      "ui_action_line": 43,
+      "ui_action_time": "2026-11-05T07:52:30.893381+08:00",
+      "label": "dungeon-hero-status"
+    },
+    {
+      "file": "screens/20261105-075235-160338-dungeon-artifact-status.png",
+      "sha256": "5d0eb44d6042885aa38cabed6f9942ac939def9e6b5e062028858ef79eb7ee0d",
+      "ui_action_line": 44,
+      "ui_action_time": "2026-11-05T07:52:33.895791+08:00",
+      "label": "dungeon-artifact-status"
+    },
+    {
+      "file": "screens/20261105-075238-111012-dungeon-rune-status.png",
+      "sha256": "89508d780a75f5b2bf68f7753f8c33c62c4d934896ccbbe390948e0333820de7",
+      "ui_action_line": 45,
+      "ui_action_time": "2026-11-05T07:52:36.847110+08:00",
+      "label": "dungeon-rune-status"
+    },
+    {
+      "file": "screens/20261105-075336-537813-regular-summon-today-status.png",
+      "sha256": "dbed9cae054ebe75aa73b13efbebd52d685e8b96b8c698e651d379e9acc79f67",
+      "ui_action_line": 50,
+      "ui_action_time": "2026-11-05T07:53:35.273828+08:00",
+      "label": "regular-summon-today-status"
+    },
+    {
+      "file": "screens/20261105-075353-983179-ordinary-summon-today-status.png",
+      "sha256": "ce3d306d819d5391a30385d2d8fa85f597b2fd916cca015b50782f4a7fd87e98",
+      "ui_action_line": 51,
+      "ui_action_time": "2026-11-05T07:53:52.722035+08:00",
+      "label": "ordinary-summon-today-status"
+    },
+    {
+      "file": "screens/20261105-075411-717471-shop-today-status.png",
+      "sha256": "b1985fbb320e0d8c2f905c9720c945ae4d19fbe70e92f63e3210b1f99ad82e03",
+      "ui_action_line": 53,
+      "ui_action_time": "2026-11-05T07:54:10.466685+08:00",
+      "label": "shop-today-status"
+    },
+    {
+      "file": "screens/20261105-075430-087879-market-refresh-status.png",
+      "sha256": "6cda9635d53cc1afa7a92cdb47437a40d652077a6d356a13d1e9e10ef1a1cbae",
+      "ui_action_line": 55,
+      "ui_action_time": "2026-11-05T07:54:28.833483+08:00",
+      "label": "market-refresh-status"
+    },
+    {
+      "file": "screens/20261105-075453-119145-bag-final-state.png",
+      "sha256": "6a81bf516eb6c2b79b73112484b69e9ec072161b167edbc5e9a87ab4c2b82fac",
+      "ui_action_line": 57,
+      "ui_action_time": "2026-11-05T07:54:51.855381+08:00",
+      "label": "bag-final-state"
+    },
+    {
+      "file": "screens/20261105-075519-976841-final-main-state.png",
+      "sha256": "3b623498a127736be7d8b9c2227d4bbbc9e3f55703446cbd9e6d9d22c263598d",
+      "ui_action_line": 58,
+      "ui_action_time": "2026-11-05T07:55:18.712554+08:00",
+      "label": "final-main-state"
+    },
+    {
+      "file": "screens/20261105-075539-279287-normal-stop-pcap.png",
+      "sha256": "b2b31624bb58ac84da7ab483c3f8ce39d142a1539e3e080d91624604d2517d93",
+      "ui_action_line": 60,
+      "ui_action_time": "2026-11-05T07:55:38.022859+08:00",
+      "label": "normal-stop-pcap"
+    }
+  ],
+  "stop": {
+    "method": "PCAPdroid in-app Stop",
+    "local_time": "2026-11-05 07:55:39 Asia/Shanghai",
+    "receiver_pid": 32859,
+    "receiver_closed": true,
+    "closed_bytes": 305125,
+    "receiver_terminated_after_identity_check": true,
+    "reverse_5123_removed": true,
+    "final_phone_page": "PCAPdroid ready",
+    "game_page_in_background": "main city",
+    "source_stable_at_finalization": true,
+    "stop_handoff_sha256": "05b4f01e7f96d14fe72ae1ad00b45a0789b49b18854bba0e9248358e7af4f4ea"
+  },
+  "claims": [
+    {
+      "kind": "daily_signin",
+      "cmd": 14101,
+      "day_before": 3,
+      "status_before": 0,
+      "day_after": 4,
+      "status_after": 1,
+      "result": 1,
+      "item_base_id": 99955,
+      "quantity_before": 3,
+      "quantity_after": 4
+    },
+    {
+      "kind": "daily_login_task",
+      "cmd": 10406,
+      "id": 90000,
+      "result_field": "flag",
+      "result": 1,
+      "diamonds_before": 90703,
+      "diamonds_after": 90723,
+      "activity_before": 0,
+      "activity_after": 5
+    },
+    {
+      "kind": "online_gift",
+      "cmd": 10927,
+      "request_time": 12,
+      "response_time": 14400,
+      "result": 1,
+      "item_base_id": 10403,
+      "quantity_before": 2,
+      "quantity_after": 7
+    }
+  ],
+  "gameplay_implementation_changed": false,
+  "pcap_active": false,
+  "sanitization": {
+    "policy": "Command and field allowlists; only three asset fields and two inventory entities. No authentication/login frames, raw bytes, endpoints, chat role_list, identity or screenshots exported.",
+    "raw_payload_and_endpoints_exported": false,
+    "identity_fields_exported": false,
+    "projections_annotated": true
+  },
+  "limitations": [
+    "After 05:00 only; no midnight or 05:00 boundary captured.",
+    "Internally complete saved PCAP/TCP streams do not establish absence of network loss.",
+    "Observed original-client actions completed; private-server client acceptance or universal absence of stalls is not established.",
+    "No extra signin, active chest claim, summon, battle, purchase, manual refresh, recharge, or social action was performed.",
+    "Online time and 11 claimed tiers persisted between yesterday and today; the exact reset policy remains unknown.",
+    "APK package baseline is versionName1.0/versionCode1; no new APK installation or hot-update version difference established."
+  ]
+}

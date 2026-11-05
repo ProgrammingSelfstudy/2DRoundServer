@@ -39,7 +39,10 @@ func ItemName(id int64) (string, bool) { n, ok := itemNames[id]; return n, ok }
 // ItemListedInBackpack reports whether the game's backpack (10500) shows this item.
 func ItemListedInBackpack(id int64) bool {
 	info, ok := itemTable[id]
-	return ok && goesToBackpack(info.Type)
+	// Fruit shards are type38 in the restored item table, but the original
+	// lists them in 10500, not the sprite bag (capture 2026-11-04).
+	_, fruitShard := emoCfg.shardOf[id]
+	return ok && (goesToBackpack(info.Type) || fruitShard)
 }
 
 // sellGain is one thing a sold item turns into: an asset (currency) or an item.
@@ -89,8 +92,8 @@ const (
 // goesToBackpack reports whether an item of this type lives in the normal
 // backpack (10500). Currencies (type 7) are not items, they are in 10302;
 // equipment (10501) needs per-piece attributes that the ledger does not hold;
-// the home and sprite types (30-38) belong to other bags whose commands are
-// not implemented. Those stay in the ledger and are simply not listed.
+// home and sprite types (30-38) belong to other bags. Fruit shards are the
+// type38 exception handled by ItemListedInBackpack, using their base ids.
 func goesToBackpack(t int) bool {
 	switch t {
 	case 7, 1, 2, 3, 4, 23, 24, 25, 26:
@@ -109,15 +112,21 @@ func backpackItems(ledger map[int64]int64) []proto.Message {
 		if n <= 0 {
 			continue
 		}
-		if info, ok := itemTable[id]; ok && goesToBackpack(info.Type) && !isArtifact(id) { // artifacts are listed piece by piece
+		if ItemListedInBackpack(id) && !isArtifact(id) { // artifacts are listed piece by piece
 			ids = append(ids, id)
 		}
 	}
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 	out := make([]proto.Message, 0, len(ids))
 	for i, id := range ids {
+		bind := 0
+		// Both the sign-in gift and advanced summon ticket are bound in
+		// the original 2026-11-05 full bag and reward updates.
+		if id == 99955 || id == 10403 {
+			bind = 1
+		}
 		out = append(out, proto.Message{
-			"id": id, "base_id": id, "bind": 0, "quantity": ledger[id], "pos": i + 1,
+			"id": id, "base_id": id, "bind": bind, "quantity": ledger[id], "pos": i + 1,
 			"expire_type": itemTable[id].ExpireType, "expire_time": 0,
 			"main_attr": []proto.Message{}, "enchant": 0, "attr": []proto.Message{}, "extra_attr": []proto.Message{},
 			"score": 0, "all_score": 0, "extra": []proto.Message{},
@@ -127,11 +136,12 @@ func backpackItems(ledger map[int64]int64) []proto.Message {
 }
 
 // spriteBag lists the sprites, eggs and sprite items of the ledger (types 36-38) and the food, items and treasures of the
-// home pet (types 31-33, homepet.go) as the sprite bag (10503).
+// home pet (types 31-33, homepet.go) as the sprite bag (10503). Fruit shards
+// share type38 but belong in the normal backpack instead.
 func spriteBag(ledger map[int64]int64) []proto.Message {
 	ids := make([]int64, 0)
 	for id, n := range ledger {
-		if info, ok := itemTable[id]; ok && n > 0 && (info.Type >= 36 && info.Type <= 38 || info.Type >= 31 && info.Type <= 33) {
+		if info, ok := itemTable[id]; ok && n > 0 && !ItemListedInBackpack(id) && (info.Type >= 36 && info.Type <= 38 || info.Type >= 31 && info.Type <= 33) {
 			ids = append(ids, id)
 		}
 	}
@@ -249,7 +259,7 @@ type ItemSummary struct {
 func summary(id int64) ItemSummary {
 	info := itemTable[id]
 	return ItemSummary{BaseID: id, Name: itemNames[id], Type: info.Type, Overlap: info.Overlap, Sellable: len(info.Value) > 0,
-		InBackpack: goesToBackpack(info.Type), Currency: info.Type == 7}
+		InBackpack: ItemListedInBackpack(id), Currency: info.Type == 7}
 }
 
 // ItemKnown reports whether the client has an item with this base id.

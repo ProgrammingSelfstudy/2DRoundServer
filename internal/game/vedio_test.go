@@ -106,10 +106,12 @@ func TestVedioKeepSharePlay(t *testing.T) {
 		t.Fatalf("play nothing: %v", r)
 	}
 	c.send(20036, proto.Message{"replay_id": id, "replay_srv_id": "symlf_1"})
+	if r := c.waitFor(20000); r.Int("combat_map") != 0 || r.Int("combat_type") != combatArena {
+		t.Fatalf("replay scene before confirmation: %v", r)
+	}
 	if r := c.waitFor(20036); r.Int("code") != 1 {
 		t.Fatalf("play: %v", r)
 	}
-	c.waitFor(20000)
 	intro := c.waitFor(20027)
 	if intro.Int("combat_type") != combatArena || len(intro.Arr("objects")) != len(list[0].Arr("a_plist"))+len(list[0].Arr("b_plist")) {
 		t.Fatalf("replay intro: %v", intro)

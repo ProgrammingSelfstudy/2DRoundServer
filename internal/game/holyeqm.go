@@ -345,6 +345,15 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 		} else if err != nil {
 			return err
 		}
+		before, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
+		heroes, err := st.PartnersOf(role.RID)
+		if err != nil {
+			return err
+		}
+		previousPower := rolePower(heroes)
 		back, spend := map[int64]int64{}, map[int64]int64{}
 		switch {
 		case req.Int("type") == 0 && id == 0: // all off
@@ -391,10 +400,24 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 		if err := st.SaveHoly(role.RID, d); err != nil {
 			return err
 		}
-		if err := reply(s, 11093, "result", 1, "操作成功", nil); err != nil {
+		after, err := snapshotBags(st, role.RID)
+		if err != nil {
 			return err
 		}
-		return push(s, role.RID, pid)
+		if err := sendBagDelta(s, before, after); err != nil {
+			return err
+		}
+		p, err := st.PartnerByID(role.RID, pid)
+		if err != nil {
+			return err
+		}
+		if err := s.Send(11091, partnerMessage(*p)); err != nil {
+			return err
+		}
+		if err := reply(s, 11093, "result", 1, "", nil); err != nil {
+			return err
+		}
+		return sendRolePower(s, st, role.RID, previousPower)
 	})
 
 	r.Handle(11094, func(s *gateway.Session, req proto.Message) error {

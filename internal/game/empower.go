@@ -254,6 +254,22 @@ func RegisterEmpower(r *gateway.Router, st *store.Store) {
 		np, err := st.GrantEmpowered(role.RID, h.BID, h.Star, h.Lev, h.BreakLev, talents, spendA, spendI)
 		if err != nil {
 			if errors.Is(err, store.ErrConflict) {
+				items, err := st.RoleItems(role.RID)
+				if err != nil {
+					return err
+				}
+				for _, item := range cost.Item {
+					if len(item) < 2 {
+						continue
+					}
+					id := guildLabel(item[0])
+					if need := spendI[id]; items[id] < need {
+						if err := no(""); err != nil {
+							return err
+						}
+						return s.Send(12745, proto.Message{"bid": id, "need_num": need, "num": items[id]})
+					}
+				}
 				return no("材料不足")
 			}
 			return err

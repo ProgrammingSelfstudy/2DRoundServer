@@ -1,6 +1,7 @@
 package game
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -20,14 +21,21 @@ func progress(c *client) (secs int64, claimed []int64) {
 // claimStep claims the step that needs the given online seconds. The client sends the
 // step's number (its index in the table), which is what the real device was seen to do.
 func claimStep(c *client, seconds int64) proto.Message {
+	frames := claimStepReplies(c, seconds)
+	if len(frames) == 0 || frames[len(frames)-1].cmd != 10927 {
+		c.t.Fatalf("missing online gift reply: %v", replyCodes(frames))
+	}
+	return frames[len(frames)-1].msg
+}
+
+func claimStepReplies(c *client, seconds int64) []capturedReply {
 	index := int64(99) // not a step
 	for _, st := range onlineSteps {
 		if st.Time == seconds {
 			index = int64(st.Index)
 		}
 	}
-	c.send(10927, proto.Message{"time": index})
-	return c.recv(10927)
+	return captureReplies(c, 10927, proto.Message{"time": index})
 }
 
 // waitOnlineSeconds waits until the disconnect hook has stored the role's time.
@@ -60,15 +68,18 @@ func TestOnlineGiftStepsAndClaims(t *testing.T) {
 		t.Fatalf("after 70 s: %d", secs)
 	}
 
-	// step 60 pays 5000 gold (currency 3) and refreshes the resources and the backpack
-	r := claimStep(c, 60)
-	if r.Int("code") != 1 || r.Str("msg") == "" || r.Int("time") != 60 {
+	// A currency step refreshes resources and progress, without a full bag push.
+	frames := claimStepReplies(c, 60)
+	if !reflect.DeepEqual(replyCodes(frames), []uint16{10302, 12742, 10926, 10927}) {
+		t.Fatalf("currency reward notifications: %v", replyCodes(frames))
+	}
+	r := frames[len(frames)-1].msg
+	if r.Int("code") != 1 || r.Str("msg") != "" || r.Int("time") != 60 {
 		t.Fatalf("claim: %v", r)
 	}
-	if as := c.recv(10302); as.Str("gold") != "5000" {
+	if as := frames[0].msg; as.Str("gold") != "5000" {
 		t.Fatalf("assets after the claim: %v", as)
 	}
-	c.recv(10500)
 	if _, claimed := progress(c); !same(claimed, 60) {
 		t.Fatalf("claimed: %v", claimed)
 	}
@@ -91,14 +102,8 @@ func TestOnlineGiftStepsAndClaims(t *testing.T) {
 	if r := claimStep(c, 530); r.Int("code") != 1 {
 		t.Fatalf("claim 530: %v", r)
 	}
-	c.recv(10302)
-	bag := c.recv(10500).Arr("item_list")
-	found := false
-	for _, it := range bag {
-		found = found || (it.Int("base_id") == 26301 && it.Int("quantity") == 1)
-	}
-	if !found {
-		t.Fatalf("item 26301 missing from %v", bag)
+	if n := giftCount(c, 26301); n != 1 {
+		t.Fatalf("item 26301 quantity: %d", n)
 	}
 }
 
@@ -136,6 +141,8 @@ func TestOnlineTimeAddsUpAcrossLogins(t *testing.T) {
 }
 
 func TestOnlineGiftNewDay(t *testing.T) {
+	// Preserve the existing local calendar policy. The original reset cycle
+	// remains unknown; this test does not assert original-server behavior.
 	e := newEnv(t, time.Minute)
 	e.setNow(time.Date(2026, 10, 19, 23, 59, 0, 0, dayZone)) // a minute before midnight
 	c, _ := e.enter("u1", "甲")
@@ -154,8 +161,6 @@ func TestOnlineGiftNewDay(t *testing.T) {
 	if r := claimStep(c, 60); r.Int("code") != 1 {
 		t.Fatalf("claim on the new day: %v", r)
 	}
-	c.recv(10302)
-	c.recv(10500)
 	// a day later (still online) the clock starts again at midnight and nothing is claimed
 	e.advance(24 * time.Hour)
 	if secs, claimed := progress(c); secs != 70 || len(claimed) != 0 {

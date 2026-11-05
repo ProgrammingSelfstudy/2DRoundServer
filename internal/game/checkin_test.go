@@ -14,15 +14,13 @@ func checkinState(c *client) (day, status int64) {
 	return r.Int("day"), r.Int("status")
 }
 
-// signIn signs in and, when it worked, drains the refreshed resources and backpack.
+// signIn drains all operation pushes, including rewards before the reply.
 func signIn(c *client) proto.Message {
-	c.send(14101, proto.Message{})
-	r := c.recv(14101)
-	if r.Int("code") == 1 {
-		c.recv(10302)
-		c.recv(10500)
+	frames := captureReplies(c, 14101, proto.Message{})
+	if len(frames) == 0 || frames[len(frames)-1].cmd != 14101 {
+		c.t.Fatalf("missing sign-in reply: %v", replyCodes(frames))
 	}
-	return r
+	return frames[len(frames)-1].msg
 }
 
 func giftCount(c *client, id int64) int64 {
@@ -44,19 +42,19 @@ func TestCheckin(t *testing.T) {
 		t.Fatalf("a new role: %d %d", day, status)
 	}
 	r := signIn(c)
-	if r.Int("code") != 1 || r.Int("day") != 1 || r.Int("status") != 2 || r.Str("msg") == "" {
+	if r.Int("code") != 1 || r.Int("day") != 1 || r.Int("status") != 1 || r.Str("msg") != "" {
 		t.Fatalf("first sign-in: %v", r)
 	}
 	// the reward is the daily gift box (99955), one per sign-in
 	if n := giftCount(c, 99955); n != 1 {
 		t.Fatalf("gift boxes: %d", n)
 	}
-	if day, status := checkinState(c); day != 1 || status != 2 {
+	if day, status := checkinState(c); day != 1 || status != 1 {
 		t.Fatalf("signed today: %d %d", day, status)
 	}
 	// once a day
 	c.send(14101, proto.Message{})
-	if r := c.recv(14101); r.Int("code") != 0 || r.Str("msg") != "今天已经签到过了" || r.Int("day") != 1 || r.Int("status") != 2 {
+	if r := c.recv(14101); r.Int("code") != 0 || r.Str("msg") != "今天已经签到过了" || r.Int("day") != 1 || r.Int("status") != 1 {
 		t.Fatalf("second sign-in today: %v", r)
 	}
 	if n := giftCount(c, 99955); n != 1 {
@@ -68,7 +66,7 @@ func TestCheckin(t *testing.T) {
 	if day, status := checkinState(c); day != 1 || status != 0 {
 		t.Fatalf("next day: %d %d", day, status)
 	}
-	if r := signIn(c); r.Int("day") != 2 || r.Int("status") != 2 {
+	if r := signIn(c); r.Int("day") != 2 || r.Int("status") != 1 {
 		t.Fatalf("second sign-in: %v", r)
 	}
 	// days skipped do not matter: the third sign-in is day 3, a week later

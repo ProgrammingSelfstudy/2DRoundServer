@@ -72,7 +72,8 @@ func forgeAll(top forgeStep, before []forgeStep, items map[int64]int64, coin int
 
 // RegisterForge registers the forge house, where equipment is composed from three pieces of the tier below and some
 // coin: 11080 makes a number of one item, 11079 shows what composing everything up to an item would make, 11081
-// does it, 11082 lists the records. Our rules, not captured.
+// does it, 11082 lists the records. 11080's recipe and response order were
+// captured on 2026-11-04; the all-compose rules remain local policy.
 func RegisterForge(r *gateway.Router, st *store.Store) {
 	coinOf := func(rid int64) (int64, error) {
 		a, err := st.RoleAssets(rid)
@@ -135,10 +136,7 @@ func RegisterForge(r *gateway.Router, st *store.Store) {
 		if err := st.AddForgeLog(role.RID, store.ForgeLog{Time: s.Now().Unix(), Coin: spent, Items: string(raw)}); err != nil {
 			return err
 		}
-		if err := sendAssets(s, st, role.RID); err != nil {
-			return err
-		}
-		return sendBackpack(s, st)
+		return nil
 	}
 	r.Handle(11080, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -153,12 +151,29 @@ func RegisterForge(r *gateway.Router, st *store.Store) {
 		}
 		made := []forgeMade{{step.ID, num}}
 		used := map[int64]int64{step.Need: step.N * num}
+		before, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
 		if err := run(s, role, made, step.Coin*num, used); errors.Is(err, store.ErrConflict) {
 			return refuse("合成材料不足或贝里不足")
 		} else if err != nil {
 			return err
 		}
-		return s.Send(11080, proto.Message{"result": 1, "msg": "合成成功"})
+		after, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
+		if err := sendAssets(s, st, role.RID); err != nil {
+			return err
+		}
+		if err := sendBagDelta(s, before, after); err != nil {
+			return err
+		}
+		if err := sendAssetGain(s, map[int64]int64{step.ID: num}); err != nil {
+			return err
+		}
+		return s.Send(11080, proto.Message{"result": 1, "msg": ""})
 	})
 	r.Handle(11081, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -185,6 +200,12 @@ func RegisterForge(r *gateway.Router, st *store.Store) {
 		if err := run(s, role, made, spent, used); errors.Is(err, store.ErrConflict) {
 			return refuse("合成材料不足或贝里不足")
 		} else if err != nil {
+			return err
+		}
+		if err := sendAssets(s, st, role.RID); err != nil {
+			return err
+		}
+		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
 		return s.Send(11081, proto.Message{"result": 1, "msg": "合成成功"})

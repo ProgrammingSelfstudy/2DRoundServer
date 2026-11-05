@@ -146,7 +146,7 @@ type emoState struct {
 	Bought    map[string]int64
 	Jifen     int64
 	DrawDay   int64
-	DrawToday int64
+	DrawToday int64            // used diamond pulls, also reported by 31116
 	Total     map[string]int64 // pulls of a box
 	Since     map[string]int64 // pulls since a group last hit, "box:group"
 	Hits      map[string]int64
@@ -513,15 +513,46 @@ func (e *emoSvc) awaken(s *gateway.Session, req proto.Message) error {
 	})
 }
 
-// decompose (31130): shards of an awakened fruit turn into 力量源质 (25 for a purple fruit, 50 for an orange one).
+// emoShardInstance resolves the backpack instance sent by 31130 to its shard
+// base id. Do not interpret the request as a base id: the original advertised
+// instance145/base_id19103, then accepted id145 (capture 2026-11-04).
+func emoShardInstance(items []proto.Message, id int64) proto.Message {
+	for _, item := range items {
+		if item.Int("id") == id {
+			if _, ok := emoCfg.shardOf[item.Int("base_id")]; ok {
+				return item
+			}
+			return nil
+		}
+	}
+	return nil
+}
+
+// decompose (31130): owned shards turn into the table's 力量源质 reward.
+// Activation and awakening are not required: the original accepted three
+// shards of an unactivated fruit and awarded 75 source (capture 2026-11-04).
 func (e *emoSvc) decompose(s *gateway.Session, req proto.Message) error {
-	item, num := req.Int("id"), req.Int("num")
+	instance, num := req.Int("id"), req.Int("num")
 	return e.with(s, func(role *store.Role, st *emoState) error {
 		refuse := func(msg string) error { return s.Send(31130, proto.Message{"result": 0, "msg": msg}) }
-		fruit, ok := emoCfg.shardOf[item]
-		if !ok || num <= 0 || e.fruit(st, fruit).Juexing <= 0 {
-			return refuse("只有已觉醒果实的碎片可以分解")
+		if num <= 0 {
+			return refuse("分解数量不正确")
 		}
+		ledger, err := e.st.RoleItems(role.RID)
+		if err != nil {
+			return err
+		}
+		// Resolve only this role's advertised backpack entries. Ordinary local
+		// stacks currently share their numeric instance and base ids.
+		item := emoShardInstance(backpackItems(ledger), instance)
+		if item == nil {
+			return refuse("只有背包中的果实碎片可以分解")
+		}
+		if num > item.Int("quantity") {
+			return refuse("碎片不足")
+		}
+		baseID := item.Int("base_id")
+		fruit := emoCfg.shardOf[baseID]
 		var yield []int64
 		_ = json.Unmarshal(emoCfg.Const["emo_fenjie_zi"], &yield)
 		if fruit < 100 { // the orange fruits
@@ -532,12 +563,23 @@ func (e *emoSvc) decompose(s *gateway.Session, req proto.Message) error {
 		}
 		ga, gi := map[int64]int64{}, map[int64]int64{}
 		splitGains(guildGains([][2]int64{{yield[0], yield[1] * num}}), 1, ga, gi)
-		if err := e.st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{item: num}, ga, gi); errors.Is(err, store.ErrConflict) {
+		before, err := snapshotBags(e.st, role.RID)
+		if err != nil {
+			return err
+		}
+		if err := e.st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{baseID: num}, ga, gi); errors.Is(err, store.ErrConflict) {
 			return refuse("碎片不足")
 		} else if err != nil {
 			return err
 		}
-		if err := e.refresh(s, role); err != nil {
+		after, err := snapshotBags(e.st, role.RID)
+		if err != nil {
+			return err
+		}
+		if err := sendBagDelta(s, before, after); err != nil {
+			return err
+		}
+		if err := sendGainList(s, guildGains([][2]int64{{yield[0], yield[1] * num}})); err != nil {
 			return err
 		}
 		return s.Send(31130, proto.Message{"result": 1, "msg": "分解成功"})

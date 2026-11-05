@@ -94,7 +94,9 @@ func (e *emoSvc) unlockedBoxes(role *store.Role, st *emoState) int64 {
 
 func (e *emoSvc) drawTimes(s *gateway.Session, _ proto.Message) error {
 	return e.with(s, func(role *store.Role, st *emoState) error {
-		return s.Send(31116, proto.Message{"times": max(0, emoCfg.num("emo_choujaing_times")-st.DrawToday)})
+		// The original reports used diamond pulls: 0 before a ten-pull, 10
+		// afterward, including after reentry (capture 2026-11-04).
+		return s.Send(31116, proto.Message{"times": st.DrawToday})
 	})
 }
 
@@ -155,6 +157,10 @@ func (e *emoSvc) draw(s *gateway.Session, req proto.Message) error {
 		if kind != 1 {
 			times, cost1, cost2, add = 10, box.TenNeedItems1, box.TenNeedItems2, box.TenAddItems
 		}
+		before, err := snapshotBags(e.st, role.RID)
+		if err != nil {
+			return err
+		}
 		viaTickets, err := e.pay(role, cost2, 1) // tickets first, gems otherwise
 		if err != nil {
 			return err
@@ -213,10 +219,32 @@ func (e *emoSvc) draw(s *gateway.Session, req proto.Message) error {
 			return err
 		}
 		st.tick(5 * times)
-		if err := e.refresh(s, role); err != nil {
+		after, err := snapshotBags(e.st, role.RID)
+		if err != nil {
 			return err
 		}
-		return s.Send(31115, proto.Message{"result": 1, "msg": ""})
+		if err := sendAssets(s, e.st, role.RID); err != nil {
+			return err
+		}
+		if err := sendBagDelta(s, before, after); err != nil {
+			return err
+		}
+		if err := s.Send(31115, proto.Message{"result": 1, "msg": "召唤成功"}); err != nil {
+			return err
+		}
+		var rewards []sellGain
+		for _, p := range prize {
+			if len(p) > 1 {
+				rewards = append(rewards, sellGain{guildLabel(p[0]), p[1]})
+			}
+		}
+		if err := sendGainList(s, rewards); err != nil {
+			return err
+		}
+		if !viaTickets {
+			return s.Send(31116, proto.Message{"times": st.DrawToday})
+		}
+		return nil
 	})
 }
 

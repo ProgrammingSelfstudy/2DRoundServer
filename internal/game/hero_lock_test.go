@@ -16,9 +16,16 @@ func TestHeroLock(t *testing.T) {
 	id := hs[0].PartnerID
 	lock := func(pid, typ int64) proto.Message {
 		c.send(11015, proto.Message{"partner_id": pid, "type": typ})
+		if pid == id && (typ == 0 || typ == 1) {
+			m := c.recv(11002)
+			locks := m.Arr("is_lock")
+			if m.Int("partner_id") != pid || len(locks) != 1 || locks[0].Int("lock_type") != 1 || locks[0].Int("is_lock") != typ {
+				t.Fatalf("lock increment: %v", m)
+			}
+		}
 		return c.recv(11015)
 	}
-	if r := lock(id, 1); r.Int("result") != 1 || r.Int("partner_id") != id || r.Int("type") != 1 {
+	if r := lock(id, 1); r.Int("result") != 1 || r.Str("msg") != "锁定成功" || r.Int("partner_id") != id || r.Int("type") != 1 {
 		t.Fatalf("lock: %v", r)
 	}
 	c.send(11025, proto.Message{})
@@ -35,7 +42,7 @@ func TestHeroLock(t *testing.T) {
 	if p, _ := e.st.PartnerByID(role.RID, id); !p.Locked {
 		t.Fatal("not saved")
 	}
-	if r := lock(id, 0); r.Int("result") != 1 {
+	if r := lock(id, 0); r.Int("result") != 1 || r.Str("msg") != "解锁成功" {
 		t.Fatalf("unlock: %v", r)
 	}
 	if p, _ := e.st.PartnerByID(role.RID, id); p.Locked {

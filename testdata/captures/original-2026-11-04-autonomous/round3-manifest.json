@@ -1,0 +1,239 @@
+{
+  "batch": "autonomous-20261104-round3-final",
+  "evidence_kind": "Ordinary local pcapdecode and retained original-client UI screenshots; not REA Evidence. REA MCP absent; existing config_drift diagnosis reused without setup changes.",
+  "source_capture": "cap-20261104-232341-08fb4190.pcap",
+  "source_snapshot": "round3-final.pcap",
+  "snapshot_sha256": "932c42538251446f2cbdf6374a99169b95c086e8e5cb20a212122c1b219a6eb7",
+  "private_artifact_directory": "/Users/mountainwalkeralliance/Documents/code/2DRoundCaptures-raw/autonomous-20261104-232314",
+  "source_sha256": "932c42538251446f2cbdf6374a99169b95c086e8e5cb20a212122c1b219a6eb7",
+  "source_bytes": 332722,
+  "original_equals_snapshot": true,
+  "pcap_record_count": 1277,
+  "pcap_consumed_bytes": 332722,
+  "pcap_trailing_bytes": 0,
+  "pcap_clipped_records": 0,
+  "game_stream_count": 1,
+  "stream_framing": {
+    "c2s": {
+      "stream_bytes_excluding_handshake": 23485,
+      "framed_bytes": 23485,
+      "trailing_bytes": 0,
+      "frames": 699,
+      "holes": 0,
+      "conflicting_retransmissions": 0
+    },
+    "s2c": {
+      "stream_bytes_excluding_handshake": 84443,
+      "framed_bytes": 84443,
+      "trailing_bytes": 0,
+      "frames": 392,
+      "holes": 0,
+      "conflicting_retransmissions": 0
+    }
+  },
+  "decoded_frames": 1091,
+  "decoded_sha256": "e614a91db7b2862bf74548f4ff7e5b06b1879638733201f478ff99f5e5e44eac",
+  "decoder_binary_sha256": "22392f4096ec8b9700d05d326d3218b31e686769698ec37c822b6b9b5a766b41",
+  "decoder_source_sha256": "8b644befab96189afe77cf5b882b417245844b1ff5028731bce8e61103b289b8",
+  "protocol_schema_sha256": "fcc54977c7ce0b0d703c94e796f3a3093390875b017f02e30d1ec2e8f292ce31",
+  "decode_log_sha256": "d397fb6138347225ae953ec955731f82b272603eb91d7aff3b410eda66fd8014",
+  "decode_errors": 0,
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "current_source_output_matches_retained_decode": true,
+  "receiver_closed": true,
+  "receiver_closed_bytes": 332722,
+  "receiver_log_line": 43,
+  "decoded_file": "round3-final.jsonl",
+  "decode_log_file": "round3-decode.log",
+  "integrity_report_file": "round3-integrity.json",
+  "first_frame_utc": "2026-11-04T15:24:39.331028Z",
+  "last_frame_utc": "2026-11-04T15:54:22.915886Z",
+  "frames_by_direction": {
+    "c2s": 699,
+    "s2c": 392
+  },
+  "export_file": "round3-evidence.jsonl",
+  "exported_rows": 6,
+  "export_sha256": "6d00bf67d9f918abb3bdf854cd858d044aa45643da1c558109dbdd6dd61e4fd3",
+  "source_line_definition": "1-based line in fixed complete round3-final.jsonl; projections sorted by timestamp then source line. Decoder groups directions; source-line order is not cross-direction wire order.",
+  "selected_command_counts": {
+    "10302": 1,
+    "10501": 1,
+    "11025": 1,
+    "11026": 1,
+    "11092": 1,
+    "31116": 1
+  },
+  "commands_absent": [
+    11005,
+    11015,
+    11032,
+    11033,
+    11034,
+    11036,
+    11075,
+    11076,
+    11079,
+    11080,
+    11081,
+    11090,
+    11093,
+    11094,
+    12741
+  ],
+  "ui_actions_file": "ui-actions.jsonl",
+  "ui_actions_sha256": "5440ded4dc4c58c8f61951dcdc9d8df509cd4a5f85965f3ca59f28e4b0bf6b78",
+  "ui_actions_count": 44,
+  "stop_handoff_file": "STOP_HANDOFF.json",
+  "stop_handoff_sha256": "ee96982534ddf8e479b46d9e86b75ed6236932faa5d3bb8bd8c0bb7697a30f57",
+  "locked_material": {
+    "ui_action_line": 22,
+    "hero_instance": 525,
+    "base_id": 30506,
+    "baseline_source_line": 745,
+    "ui_message": "该英雄已锁定，请前往英雄界面解锁",
+    "selected_count_before": 0,
+    "selected_count_after": 0,
+    "required_count": 3,
+    "ui_rejection_observed": true,
+    "server_rejection_observed": false,
+    "limitation": "Observed UI rejection only; absence of a request does not prove direct-submission server validation."
+  },
+  "artifact_starup": {
+    "observed_detail_buttons": [
+      "合成",
+      "重铸",
+      "卸下",
+      "替换"
+    ],
+    "hero_starup_pages_are_not_artifact_starup": true,
+    "command11032_observed": false,
+    "coverage": "Only the two retained artifact detail views; other qualities, heroes and entry paths remain unknown."
+  },
+  "holy": {
+    "hero_instance": 388,
+    "baseline_equipped": false,
+    "item26_preview_positions": [
+      1,
+      2,
+      101,
+      102
+    ],
+    "wash_entry_visible_in_backpack_detail": true,
+    "wash_entry_click_recorded": false,
+    "explicit_discard_ui_observed": false,
+    "discard_request_observed": false,
+    "management_view": "套装管理"
+  },
+  "forge_all_compose": {
+    "visible_backpack_button": "一键出售",
+    "command11079_observed": false,
+    "command11080_observed": false,
+    "command11081_observed": false,
+    "execution_confirmed": false
+  },
+  "screenshots_retained_outside_repository": true,
+  "screenshots": [
+    {
+      "file": "screens/20261104-232537-253429-artifact-slot.png",
+      "sha256": "4178a7e8c09dd09cc13fb4789a63f71036635a08305b3f77447ec902937123d4",
+      "ui_action_line": 12,
+      "ui_action_time": "2026-11-04T23:25:36.012602+08:00",
+      "observation": "罗杰已装备战技详情；与另一件详情合看，按钮范围为合成、重铸、卸下、替换，没有看到战技升星按钮。"
+    },
+    {
+      "file": "screens/20261104-232555-674805-artifact-other-slot.png",
+      "sha256": "940cfec582f2c24946266db74569f51bb10a2df3b731f5a4cc7a05e0d4c20171",
+      "ui_action_line": 14,
+      "ui_action_time": "2026-11-04T23:25:54.436734+08:00",
+      "observation": "罗杰另一件已装备战技详情；没有看到战技升星按钮，观察不推广到其他品质或入口。"
+    },
+    {
+      "file": "screens/20261104-232631-176898-roger-star-preview.png",
+      "sha256": "fc519fdc0ef78a4d9d65184d0c1baeab7c722dfaec7a03e51b97cc3b0701b2f2",
+      "ui_action_line": 16,
+      "ui_action_time": "2026-11-04T23:26:29.942961+08:00",
+      "observation": "罗杰英雄升星页；这不是战技11032入口或执行证据。"
+    },
+    {
+      "file": "screens/20261104-232801-391209-hogback-star-preview.png",
+      "sha256": "f8ba588e8b7dbf98c87e2650756f00b435d5ec642df0d3e1d38601408d9bb808",
+      "ui_action_line": 20,
+      "ui_action_time": "2026-11-04T23:28:00.128585+08:00",
+      "observation": "霍古巴克英雄升星页；这不是战技11032入口或执行证据。"
+    },
+    {
+      "file": "screens/20261104-232815-670202-five-star-material-list.png",
+      "sha256": "46d5725d3862d34bd341bb15ed450b95a6dc439d4cfe27f70c570c246834cc8c",
+      "ui_action_line": 21,
+      "ui_action_time": "2026-11-04T23:28:14.407333+08:00",
+      "observation": "5星英雄材料选择列表，萨博（火拳）卡片带锁；已选择0/3。"
+    },
+    {
+      "file": "screens/20261104-232828-468646-locked-sabo-star-material-attempt.png",
+      "sha256": "56ab06ad6536984b3ec59a36377339b16b561325a4f29adbfbba684ce86d79c7",
+      "ui_action_line": 22,
+      "ui_action_time": "2026-11-04T23:28:27.211244+08:00",
+      "observation": "点击锁定萨博后提示“该英雄已锁定，请前往英雄界面解锁”，卡片仍可见带锁，已选择仍0/3；这是UI观察，不是服务端回包。"
+    },
+    {
+      "file": "screens/20261104-232930-293089-holy-tab.png",
+      "sha256": "a21c60f40c72a9329c608aa7b3a2388568efdb1f90ec9fc8eeab17932eca1ea2",
+      "ui_action_line": 28,
+      "ui_action_time": "2026-11-04T23:29:29.040056+08:00",
+      "observation": "罗杰神装页；仅打开页面不能当新增穿戴或洗练。"
+    },
+    {
+      "file": "screens/20261104-233007-220666-holy-bracelet-list.png",
+      "sha256": "208ebe86dcf1eedc38ef0ece7681b88fb0654330048f315bb714db8ece0a2933",
+      "ui_action_line": 30,
+      "ui_action_time": "2026-11-04T23:30:05.961331+08:00",
+      "observation": "神装手镯更换选择列表；没有明确放弃洗练操作。"
+    },
+    {
+      "file": "screens/20261104-233018-270981-holy-preview-item-detail.png",
+      "sha256": "c516706c6aba48383b51b7acf3c9a91f30605930b1bf053a3c80d13a9d660dfd",
+      "ui_action_line": 31,
+      "ui_action_time": "2026-11-04T23:30:17.022688+08:00",
+      "observation": "2星穿甲手镯详情；不是洗练后预览或放弃确认。"
+    },
+    {
+      "file": "screens/20261104-233038-030707-holy-management.png",
+      "sha256": "b5e0133247fb35e5c61d0b43d09a5da2bff3302c6dede7f9f7437bcc3a4ac53b",
+      "ui_action_line": 34,
+      "ui_action_time": "2026-11-04T23:30:36.788877+08:00",
+      "observation": "实际打开“套装管理”；不能把动作名holy-management解读为洗练或放弃。"
+    },
+    {
+      "file": "screens/20261104-233106-573556-equipment-bag-tab.png",
+      "sha256": "7a7203af8e669079df0c982ee1d5417f4c51407def9c4da2de1b92d50afe2492",
+      "ui_action_line": 37,
+      "ui_action_time": "2026-11-04T23:31:05.331722+08:00",
+      "observation": "装备背包下方按钮是“一键出售”，不是“一键合成”；只观察到背包浏览。"
+    },
+    {
+      "file": "screens/20261104-233253-242331-holy-backpack-preview-item.png",
+      "sha256": "6262cf4d951c1d543f693e18a80ff4412ad4b78285e7cfdaf31feff02236954d",
+      "ui_action_line": 44,
+      "ui_action_time": "2026-11-04T23:32:52.006898+08:00",
+      "observation": "神装背包的极品2星穿甲手镯详情，显示生命5649、抗暴1.7%、生命1.6%，可见“出售/洗练/穿戴”按钮；底部为“一键出售”。洗练入口可见，但没有进入洗练或放弃操作。"
+    }
+  ],
+  "sanitization": {
+    "policy_source": "Literal identity_keys/strip from reviewed prior exporter plus expanded denylist. Explicit field and entity allowlists minimize six baseline projections. Old exporter not executed.",
+    "identity_fields_removed": true,
+    "raw_payload_and_endpoints_exported": false,
+    "hero_and_item_instances_preserved": true,
+    "projections_annotated": true,
+    "original_screenshots_exported": false
+  },
+  "gameplay_implementation_changed": false,
+  "capture_remains_paused": true,
+  "limitations": [
+    "Saved PCAP and observed game streams are internally complete; this does not establish absence of network loss.",
+    "Six login projections are not six new operations or complete protocol objects.",
+    "No target transaction request/response establishes artifact star-up, holy discard or forge all-compose.",
+    "UI label and action intent do not establish server effects; no device or network action was taken in the analysis chat."
+  ]
+}

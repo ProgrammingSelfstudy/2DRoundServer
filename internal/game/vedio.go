@@ -469,15 +469,41 @@ func (v *vedioSvc) play(s *gateway.Session, req proto.Message) error {
 	if r == nil {
 		return refuse("录像不存在")
 	}
+	if server := req.Str("replay_srv_id"); server != "" && server != r.SrvID {
+		return refuse("录像不存在")
+	}
 	intro, rounds, d, err := fightOfReplay(r.Data)
 	if err != nil {
 		return refuse("录像已损坏")
 	}
+	if err := v.st.BumpReplay(r.ID, 0, 0, 1); err != nil {
+		return err
+	}
+	return v.fights.beginReplay(s, role, d.Combat, intro, rounds, d.Won)
+}
+
+// beginReplay uses the captured 20000 -> 20036 -> 20027 startup, without the
+// live battle's 20063. A replay ends with a playback acknowledgement (result1,
+// combat+1000), not a second settlement or the attacking side's win/loss.
+func (f *FightService) beginReplay(s *gateway.Session, role *store.Role, combat int64, intro proto.Message, rounds []fightRound, won bool) error {
+	f.mu.Lock()
+	if f.active == nil {
+		f.active = map[int64]*fightState{}
+	}
+	f.active[role.RID] = &fightState{rounds: rounds, won: won, combat: combat,
+		settle: func(s *gateway.Session, _ bool) error {
+			return s.Send(20006, proto.Message{"result": 1, "combat_type": combat + 1000,
+				"item_rewards": []proto.Message{}, "hurt_statistics": []proto.Message{}})
+		}}
+	f.mu.Unlock()
+	fillHalo(intro)
+	if err := s.Send(20000, proto.Message{"combat_map": 0, "combat_type": combat}); err != nil {
+		return err
+	}
 	if err := s.Send(20036, proto.Message{"code": 1, "msg": ""}); err != nil {
 		return err
 	}
-	_ = v.st.BumpReplay(r.ID, 0, 0, 1)
-	return v.fights.begin(s, role, d.Combat, intro, rounds, d.Won, func(*gateway.Session, bool) error { return nil })
+	return s.Send(20027, intro)
 }
 
 // Register the persisted state without loading or changing gameplay data.

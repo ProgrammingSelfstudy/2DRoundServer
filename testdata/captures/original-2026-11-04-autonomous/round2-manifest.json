@@ -1,0 +1,175 @@
+{
+  "batch": "autonomous-20261104-round2-final",
+  "evidence_kind": "Ordinary local pcapdecode and retained ADB UI observations; not REA Evidence. REA MCP tools absent.",
+  "source_capture": "cap-20261104-221657-6dded55a.pcap",
+  "source_bytes": 348804,
+  "source_sha256": "1d4f1345a5f9df81357c842a6da66c3546089888cfd3f069c1af08036c6e8de2",
+  "source_snapshot": "round2-final.pcap",
+  "snapshot_sha256": "1d4f1345a5f9df81357c842a6da66c3546089888cfd3f069c1af08036c6e8de2",
+  "private_artifact_directory": "/Users/mountainwalkeralliance/Documents/code/2DRoundCaptures-raw/autonomous-20261104-2200",
+  "receiver_closed": true,
+  "receiver_closed_bytes": 348804,
+  "receiver_log_line": 40,
+  "pcap_record_count": 1058,
+  "pcap_consumed_bytes": 348804,
+  "pcap_trailing_bytes": 0,
+  "decoded_file": "round2-final.jsonl",
+  "decoded_sha256": "f6ab23c8287ddc744de82a7b0de2d96858c171a23b6665ba3adb0afc0aafebaa",
+  "decoder_source_sha256": "8b644befab96189afe77cf5b882b417245844b1ff5028731bce8e61103b289b8",
+  "protocol_schema_sha256": "fcc54977c7ce0b0d703c94e796f3a3093390875b017f02e30d1ec2e8f292ce31",
+  "verification": "Built decoder from current repository source; both rounds byte-identical to previous decoder outputs.",
+  "decoded_frames": 926,
+  "decode_errors": 0,
+  "frames_by_direction": {
+    "c2s": 587,
+    "s2c": 339
+  },
+  "decoder_reports_hole": false,
+  "decoder_reports_stopped_at_byte": false,
+  "first_frame_utc": "2026-11-04T14:17:51.438105Z",
+  "last_frame_utc": "2026-11-04T14:35:39.032956Z",
+  "export_file": "round2-evidence.jsonl",
+  "export_sha256": "a28111a3217f3f504e488223439dff094a92e8829977a5821379d32f0cc5d57a",
+  "exported_rows": 67,
+  "source_line_definition": "1-based line in fixed complete round2-final.jsonl; exported rows sorted by timestamp then source line. Decoder groups directions, so line order is not cross-direction wire order.",
+  "selected_command_counts": {
+    "10302": 1,
+    "10500": 1,
+    "10501": 1,
+    "12741": 2,
+    "20000": 1,
+    "20001": 2,
+    "20002": 4,
+    "20004": 4,
+    "20005": 4,
+    "20006": 1,
+    "20019": 4,
+    "20027": 1,
+    "20036": 2,
+    "20060": 5,
+    "20063": 2,
+    "20200": 2,
+    "20207": 4,
+    "20208": 4,
+    "20223": 2,
+    "27700": 4,
+    "27701": 4,
+    "27703": 4,
+    "27705": 2,
+    "27714": 4,
+    "31116": 2
+  },
+  "commands_absent": [
+    27704,
+    27706,
+    27716,
+    20062,
+    20203,
+    20209,
+    20210
+  ],
+  "peak_record": {
+    "step": 8,
+    "round": 3,
+    "group": 0,
+    "target": 1,
+    "bet": 666,
+    "get_bet": 0,
+    "ret": 2
+  },
+  "peak_replay": {
+    "request_source_line": 376,
+    "request_matches_order1": true,
+    "rounds": 4,
+    "combat_type": 37,
+    "end_combat_type": 1037,
+    "end_result": 1,
+    "reward_count": 0
+  },
+  "arena": {
+    "gold_baseline": 90703,
+    "ui_quantity": 1,
+    "ui_displayed_cost": 100000000,
+    "requests": 2,
+    "request_source_lines": [
+      433,
+      515
+    ],
+    "response_source_lines": [
+      838,
+      887
+    ],
+    "result_codes": [
+      0,
+      0
+    ],
+    "result_messages": [
+      "",
+      ""
+    ],
+    "notification_source_lines": [
+      839,
+      888
+    ],
+    "notification": "钻石不足",
+    "weekly_challenges": 92,
+    "local_ticket_price": 20,
+    "successful_purchase_observed": false
+  },
+  "screenshots_retained_outside_repository": true,
+  "screenshots": [
+    {
+      "file": "screens/20261104-221912-509314-peak-betting-records.png",
+      "sha256": "448937773dbeecc68dfa4a1974e229ec6de62cb36378edb5ede5002fb37cf5e4",
+      "observation": "UI explicitly shows bet failure and loss666."
+    },
+    {
+      "file": "screens/20261104-222002-635594-peak-replay-first-team.png",
+      "sha256": "36ff12de96e20f032d0b6d2451d5fcfe045daa3aaecd6b35a10d84f6ed27f4ce",
+      "observation": "Observed peak final replay first team."
+    },
+    {
+      "file": "screens/20261104-222138-337337-peak-replay-completion.png",
+      "sha256": "bc6d494e28f6a5cab96c763f84a04bb000fe205834ea7a552e79b442a48d744c",
+      "observation": "Observed return to replay list after playback."
+    },
+    {
+      "file": "screens/20261104-222246-448122-arena-buy-one-dialog.png",
+      "sha256": "2dcf7a45e364767dec1608b48f1469c36b79854f212b1e2832f08f5b053a802f",
+      "observation": "One arena ticket selected; UI shows diamonds90703 / cost1亿 (100000000)."
+    },
+    {
+      "file": "screens/20261104-222312-090079-arena-buy-one-confirm.png",
+      "sha256": "2079b9d264cdb3e01fd91ab30c620dc636708ee807a1f7011ac69aa6cca36c85",
+      "observation": "UI after first ticket purchase attempt; success must be checked from response."
+    },
+    {
+      "file": "round2-stop-capture.png",
+      "sha256": "85b76c11d26132a44dbd4d6d3ebca0ff0622f3818566fddebdf5c2b4cebea058",
+      "observation": "PCAPdroid ready state with play button after normal Stop."
+    }
+  ],
+  "sanitization": {
+    "identity_fields_removed": true,
+    "raw_payload_and_endpoints_exported": false,
+    "replay_ids": "consistent aliases across all selected records, raw-to-alias mapping not exported",
+    "removed_field_paths": {
+      "msg.replay_srv_id": 1,
+      "msg.result_info[].replay_sid": 4,
+      "msg.rank_list[].avatar_bid": 9,
+      "msg.rank_list[].face_file": 9,
+      "msg.rank_list[].face_id": 9,
+      "msg.rank_list[].face_update_time": 9,
+      "msg.rank_list[].name": 9,
+      "msg.rank_list[].rid": 9,
+      "msg.rank_list[].srv_id": 9,
+      "msg.list[].result_info[].replay_sid": 2,
+      "msg.owner_id": 4,
+      "msg.owner_srv_id": 4,
+      "msg.skill_plays[].talk_content": 44,
+      "msg.target_role_name": 1
+    },
+    "projections_annotated": true
+  },
+  "gameplay_implementation_changed": false
+}

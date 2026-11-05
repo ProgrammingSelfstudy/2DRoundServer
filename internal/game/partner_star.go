@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"sort"
 	"strconv"
 
 	"2droundserver/internal/gateway"
@@ -16,22 +17,58 @@ import (
 // are heroes of one exact base id and star, `camp_fodder` heroes of a camp
 // (camp 0 = any) and star. The client sends the chosen specific ones in
 // `expend1` and the camp ones in `expend2`; we do not trust which list a hero
-// came in, only that every slot is filled by distinct owned heroes. Hero soul
-// items (`item_expend`) are not supported. Rows whose `self` entry is not "this
-// hero, one star below" (the fusion path above star 20) are refused.
-func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, hasItems bool) (consumed []int64, cost []sellGain, msg string) {
+// came in, only that every slot is filled by distinct owned heroes.
+//
+// Hero souls (`item_expend`, items 90500 to 91000) stand in for the heroes of a camp slot: a soul fills a slot of
+// its own camp and star (the client lists a soul only for `camp_type == slot camp and eqm_jie == slot star`, so
+// the any-camp souls fill the any-camp slots), one soul per hero, and the souls are part of the cost. Souls cannot
+// fill the slots of one exact hero. From star 21 the row's `self` entry names the hero itself with a count of
+// more than one (the fusion rows; the capture of 2026-11-05 evening raised a hero from 7 to 25 stars with
+// expend1 equal to `fodder` and no extra hero for `self`), so there only the base id has to match.
+func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, souls map[int64]int64) (consumed []int64, cost []sellGain, msg string) {
 	info := partnerTable[p.BID]
 	row, ok := info.Stars[strconv.Itoa(p.Star+1)]
-	switch {
-	case !ok:
+	if !ok {
 		return nil, nil, "已升至最高星级"
-	case hasItems:
-		return nil, nil, "暂不支持使用英雄魂石升星"
 	}
 	for _, sf := range row.Self {
-		if sf[0] != p.BID || sf[1] != int64(p.Star) || sf[2] != 1 {
+		if sf[0] != p.BID || (sf[2] == 1 && sf[1] != int64(p.Star)) {
 			return nil, nil, "该升星方式暂未开放"
 		}
+	}
+	// the camp slots the souls fill first; what is left of each slot is for heroes
+	camps := append([][3]int64(nil), row.CampFodder...)
+	soulIDs := make([]int64, 0, len(souls))
+	for id, n := range souls {
+		if _, _, ok := heroSoul(id); !ok || n <= 0 {
+			return nil, nil, "所选材料与升星要求不符"
+		}
+		soulIDs = append(soulIDs, id)
+	}
+	sort.Slice(soulIDs, func(i, j int) bool { return soulIDs[i] < soulIDs[j] })
+	soulLeft := map[int64]int64{}
+	for id, n := range souls {
+		soulLeft[id] = n
+	}
+	for i := range camps {
+		for _, id := range soulIDs {
+			camp, star, _ := heroSoul(id)
+			if camp != camps[i][0] || star != camps[i][1] || soulLeft[id] == 0 || camps[i][2] == 0 {
+				continue
+			}
+			use := soulLeft[id]
+			if use > camps[i][2] {
+				use = camps[i][2]
+			}
+			camps[i][2] -= use
+			soulLeft[id] -= use
+		}
+	}
+	for _, id := range soulIDs {
+		if soulLeft[id] != 0 {
+			return nil, nil, "所选材料与升星要求不符"
+		}
+		cost = append(cost, sellGain{id, souls[id]})
 	}
 	used := map[int64]bool{p.PartnerID: true}
 	for _, id := range chosen {
@@ -71,7 +108,6 @@ func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, ha
 		}
 	}
 	// camp slots with a named camp first, so "any camp" slots take what is left
-	camps := append([][3]int64(nil), row.CampFodder...)
 	for pass := 0; pass < 2; pass++ {
 		for _, f := range camps {
 			f := f
@@ -92,6 +128,22 @@ func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, ha
 		cost = append(cost, sellGain{c[0], c[1]})
 	}
 	return consumed, cost, ""
+}
+
+// heroSoul says whether an item is a hero soul and for which camp and star (items 90500 to 90505 are the 5-star
+// souls of camp 0 to 5, 906xx the 6-star ones, 909xx the 9-star ones and 91000 the 10-star any-camp soul; camp 0 is any).
+func heroSoul(id int64) (camp, star int64, ok bool) {
+	switch {
+	case id >= 90500 && id <= 90505:
+		return id - 90500, 5, true
+	case id >= 90600 && id <= 90605:
+		return id - 90600, 6, true
+	case id >= 90900 && id <= 90905:
+		return id - 90900, 9, true
+	case id == 91000:
+		return 0, 10, true
+	}
+	return 0, 0, false
 }
 
 // releaseWorn takes the artifacts and holy equipment off the heroes that are about to be used
@@ -165,7 +217,11 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 				chosen = append(chosen, a.Int("partner_id"))
 			}
 		}
-		consumed, cost, msg := starPlan(*p, owned, chosen, len(req.Arr("item_expend")) > 0)
+		souls := map[int64]int64{}
+		for _, a := range req.Arr("item_expend") {
+			souls[a.Int("item_id")] += a.Int("num")
+		}
+		consumed, cost, msg := starPlan(*p, owned, chosen, souls)
 		if msg != "" {
 			return reply(0, msg)
 		}
@@ -233,6 +289,12 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		}
 		if err := sendGainList(s, notice); err != nil {
 			return err
+		}
+		if len(souls) > 0 && len(shown) == 0 {
+			// the capture's star-ups with souls all carried a 12742 with an empty list when no hero gave anything back
+			if err := s.Send(12742, proto.Message{"asset_list": []proto.Message{}, "source": 0}); err != nil {
+				return err
+			}
 		}
 		np, err := st.PartnerByID(role.RID, p.PartnerID)
 		if err != nil {

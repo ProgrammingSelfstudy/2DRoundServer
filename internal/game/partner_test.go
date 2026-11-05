@@ -224,17 +224,17 @@ func TestStarPlanCost(t *testing.T) {
 	// 10501 star 10 -> 11: one star-6 10501 and a star-9 hero of any camp, and 15000 of item 10001
 	p := store.Partner{PartnerID: 1, BID: 10501, Star: 10}
 	owned := map[int64]store.Partner{1: p, 2: {PartnerID: 2, BID: 10501, Star: 6}, 3: {PartnerID: 3, BID: 10201, Star: 9}}
-	consumed, cost, msg := starPlan(p, owned, []int64{2, 3}, false)
+	consumed, cost, msg := starPlan(p, owned, []int64{2, 3}, nil)
 	if msg != "" || len(consumed) != 2 || len(cost) != 1 || cost[0] != (sellGain{10001, 15000}) {
 		t.Fatalf("%v %v %q", consumed, cost, msg)
 	}
 	// an extra hero that fills no slot is refused
 	owned[4] = store.Partner{PartnerID: 4, BID: 10201, Star: 9}
-	if _, _, msg := starPlan(p, owned, []int64{2, 3, 4}, false); msg == "" {
+	if _, _, msg := starPlan(p, owned, []int64{2, 3, 4}, nil); msg == "" {
 		t.Fatal("surplus hero accepted")
 	}
 	// the top star and the fusion path are refused
-	if _, _, msg := starPlan(store.Partner{BID: 10101, Star: 1}, nil, nil, false); msg == "" {
+	if _, _, msg := starPlan(store.Partner{BID: 10101, Star: 1}, nil, nil, nil); msg == "" {
 		t.Fatal("10101 has no star 2")
 	}
 }
@@ -395,5 +395,122 @@ func TestHeroPowerMatchesCaptures(t *testing.T) {
 		if got := heroPower(c.atk, c.hp, c.def, c.speed); got < c.power-2 || got > c.power+2 {
 			t.Errorf("stats %+v: power %d, the original shows %d", c, got, c.power)
 		}
+	}
+}
+
+// Hero souls (item_expend) stand in for the heroes of a camp slot of their own camp and star (captures of 2026-11-05 evening:
+// 70501 went from 7 to 25 stars, from 21 stars with expend1 = the fodder heroes and 91000 x20 + 90900 x30 for the any-camp slots).
+func TestStarPlanSouls(t *testing.T) {
+	hero := func(id int64, bid int64, star int) store.Partner { return store.Partner{PartnerID: id, BID: bid, Star: star} }
+
+	// 70501 star 6 -> 7 wants two star-5 heroes of camp 4 and two of camp 5; a soul replaces one hero of its camp
+	p := hero(1, 70501, 6)
+	owned := map[int64]store.Partner{1: p, 2: hero(2, 40501, 5), 3: hero(3, 50501, 5)}
+	consumed, cost, msg := starPlan(p, owned, []int64{2, 3}, map[int64]int64{90504: 1, 90505: 1})
+	if msg != "" || len(consumed) != 2 || len(cost) != 3 || cost[2] != (sellGain{10001, 1000}) {
+		t.Fatalf("a soul per camp: %v %v %q", consumed, cost, msg)
+	}
+	if got := map[int64]int64{cost[0].ID: cost[0].Amount, cost[1].ID: cost[1].Amount}; got[90504] != 1 || got[90505] != 1 {
+		t.Fatalf("the souls are part of the cost: %v", cost)
+	}
+	// only souls
+	if _, cost, msg := starPlan(p, nil, nil, map[int64]int64{90504: 2, 90505: 2}); msg != "" || len(cost) != 3 {
+		t.Fatalf("souls only: %v %q", cost, msg)
+	}
+	// a soul of another camp or star, a surplus soul and an item that is no soul fill nothing
+	for name, souls := range map[string]map[int64]int64{
+		"other camp": {90503: 1, 90505: 1},
+		"other star": {90604: 2, 90505: 2},
+		"surplus":    {90504: 3, 90505: 2},
+		"not a soul": {10001: 1, 90505: 2},
+		"zero":       {90504: 0, 90505: 2},
+	} {
+		if _, _, msg := starPlan(p, map[int64]store.Partner{1: p, 2: hero(2, 40501, 5), 3: hero(3, 40502, 5)}, []int64{2, 3}, souls); msg == "" {
+			t.Fatalf("%s accepted", name)
+		}
+	}
+	// a hero too many next to the souls is refused as well
+	if _, _, msg := starPlan(p, map[int64]store.Partner{1: p, 2: hero(2, 40501, 5), 3: hero(3, 40502, 5), 4: hero(4, 50501, 5)}, []int64{2, 3, 4}, map[int64]int64{90505: 1, 90504: 1}); msg == "" {
+		t.Fatal("surplus hero next to souls accepted")
+	}
+
+	// 20 -> 21 (a fusion row): ten star-5 70501 heroes, 20 star-10 and 30 star-9 any-camp souls; the hero itself is not consumed
+	p = hero(1, 70501, 20)
+	owned = map[int64]store.Partner{1: p}
+	var chosen []int64
+	for id := int64(2); id < 12; id++ {
+		owned[id] = hero(id, 70501, 5)
+		chosen = append(chosen, id)
+	}
+	consumed, cost, msg = starPlan(p, owned, chosen, map[int64]int64{91000: 20, 90900: 30})
+	if msg != "" || len(consumed) != 10 {
+		t.Fatalf("fusion: %v %v %q", consumed, cost, msg)
+	}
+	got := map[int64]int64{}
+	for _, c := range cost {
+		got[c.ID] += c.Amount
+	}
+	if got[91000] != 20 || got[90900] != 30 || got[10090] != 180 || got[10001] != 200000 {
+		t.Fatalf("fusion cost: %v", got)
+	}
+	// without the souls the any-camp slots stay empty, and another hero's fusion is not this one's
+	if _, _, msg := starPlan(p, owned, chosen, nil); msg == "" {
+		t.Fatal("fusion without the camp slots accepted")
+	}
+	if _, _, msg := starPlan(hero(1, 10501, 20), owned, chosen, map[int64]int64{91000: 20, 90900: 30}); msg == "" {
+		t.Fatal("a hero that is not 70501 went through its fusion row")
+	}
+}
+
+// A star-up with souls takes the souls from the bag and answers like the captures: the bag delta, an empty 12742 (nothing came
+// back from heroes), the hero, 11006 and the answer.
+func TestHeroStarUpWithSouls(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	// 70501 star 5 -> 6 takes one more 70501 (star 5) and six star-5 heroes of any camp
+	if ok, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: 70501, Star: 5}, {BID: 70501, Star: 5}}); err != nil || !ok {
+		t.Fatal(ok, err)
+	}
+	if err := e.st.Exchange(role.RID, nil, nil, nil, map[int64]int64{90500: 6, 90501: 1}); err != nil {
+		t.Fatal(err)
+	}
+	hs, _ := e.st.PartnersOf(role.RID)
+	req := func(souls ...proto.Message) proto.Message {
+		return proto.Message{"partner_id": hs[0].PartnerID, "expend1": []proto.Message{{"partner_id": hs[1].PartnerID}}, "expend2": []proto.Message{}, "item_expend": souls}
+	}
+	// a soul of another camp does not fill an any-camp slot: nothing changes
+	c.send(11005, req(proto.Message{"item_id": 90501, "num": 6}))
+	if r := c.recv(11005); r.Int("result") != 0 {
+		t.Fatalf("a camp soul in an any-camp slot: %v", r)
+	}
+	// souls the role does not have
+	c.send(11005, req(proto.Message{"item_id": 90500, "num": 7}))
+	if r := c.recv(11005); r.Int("result") != 0 {
+		t.Fatalf("too many souls: %v", r)
+	}
+	if items, _ := e.st.RoleItems(role.RID); items[90500] != 6 || items[90501] != 1 {
+		t.Fatalf("a refusal must change nothing: %v", items)
+	}
+
+	frames := captureReplies(c, 11005, req(proto.Message{"item_id": 90500, "num": 6}))
+	var star6, empty12742, answered bool
+	for _, f := range frames {
+		switch f.cmd {
+		case 11002:
+			star6 = f.msg.Int("star") == 6
+		case 12742:
+			empty12742 = len(f.msg.Arr("asset_list")) == 0
+		case 11005:
+			answered = f.msg.Int("result") == 1 && f.msg.Str("msg") == ""
+		}
+	}
+	if !star6 || !empty12742 || !answered {
+		t.Fatalf("replies %v: star6 %v empty12742 %v answered %v", replyCodes(frames), star6, empty12742, answered)
+	}
+	if items, _ := e.st.RoleItems(role.RID); items[90500] != 0 || items[90501] != 1 {
+		t.Fatalf("the souls were not taken: %v", items)
+	}
+	if left, _ := e.st.PartnersOf(role.RID); len(left) != 1 || left[0].Star != 6 {
+		t.Fatalf("heroes after: %v", left)
 	}
 }

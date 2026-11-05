@@ -1,0 +1,13 @@
+{"t": "2026-11-05T09:28:44.570185Z", "stream": "game", "dir": "c2s", "cmd": 13300}
+{"t": "2026-11-05T09:28:44.853907Z", "stream": "game", "dir": "c2s", "cmd": 13311}
+{"t": "2026-11-05T09:35:19.04347Z", "stream": "game", "dir": "c2s", "cmd": 13314, "msg": {"name": "王者之单身"}}
+{"t": "2026-11-05T09:28:44.523562Z", "stream": "game", "dir": "s2c", "cmd": 13330, "msg": {"black_list": []}}
+{"t": "2026-11-05T09:28:44.523562Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "exp": 80, "lev": 2}}
+{"t": "2026-11-05T09:28:44.678568Z", "stream": "game", "dir": "s2c", "cmd": 13300, "msg": {"draw_all": 30, "draw_count": 30, "friend_list": [], "present_count": 10}}
+{"t": "2026-11-05T09:28:44.943335Z", "stream": "game", "dir": "s2c", "cmd": 13311, "msg": {"friend_req_list": []}}
+{"t": "2026-11-05T09:30:11.853614Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "exp": 1695900, "lev": 124}}
+{"t": "2026-11-05T09:30:11.855645Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "exp": 1695900, "lev": 124}}
+{"t": "2026-11-05T09:30:11.919171Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "exp": 1695900, "lev": 124}}
+{"t": "2026-11-05T09:30:11.919171Z", "stream": "game", "dir": "s2c", "cmd": 10344, "msg": {"lev": 124, "old_lev": 2}}
+{"t": "2026-11-05T09:30:11.919485Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 1643, "power": 1643}}
+{"t": "2026-11-05T09:35:19.133388Z", "stream": "game", "dir": "s2c", "cmd": 13314, "msg": {"role_list": []}}

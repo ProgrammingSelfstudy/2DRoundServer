@@ -1,0 +1,33 @@
+{"t": "2026-11-05T13:30:02.358104Z", "stream": "game", "dir": "c2s", "cmd": 13333, "msg": {"rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:30:33.966286Z", "stream": "game", "dir": "c2s", "cmd": 13311, "emu": "A"}
+{"t": "2026-11-05T13:30:37.06235Z", "stream": "game", "dir": "c2s", "cmd": 13311, "emu": "A"}
+{"t": "2026-11-05T13:30:46.915053Z", "stream": "game", "dir": "c2s", "cmd": 13305, "msg": {"agreed": 0, "rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:31:10.966002Z", "stream": "game", "dir": "c2s", "cmd": 13311, "emu": "A"}
+{"t": "2026-11-05T13:31:15.36228Z", "stream": "game", "dir": "c2s", "cmd": 13311, "emu": "A"}
+{"t": "2026-11-05T13:31:26.433813Z", "stream": "game", "dir": "c2s", "cmd": 13305, "msg": {"agreed": 1, "rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:31:54.630741Z", "stream": "game", "dir": "c2s", "cmd": 13307, "msg": {"rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:30:02.39947Z", "stream": "game", "dir": "s2c", "cmd": 13331, "msg": {"black_list": [{"career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "gid": 0, "gname": "", "gsrv_id": "", "is_online": 1, "lev": 148, "login_time": 1793885402, "name": "王者之单身", "power": 1643, "rid": 22, "sex": 1, "srv_id": "symlf_93"}], "type": 2}, "emu": "A"}
+{"t": "2026-11-05T13:30:02.39947Z", "stream": "game", "dir": "s2c", "cmd": 13333, "msg": {"code": 1, "msg": "", "rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:30:33.936667Z", "stream": "game", "dir": "s2c", "cmd": 16800, "msg": {"arg_str": [], "arg_uint32": [], "idx": 0, "type": 2}, "emu": "A"}
+{"t": "2026-11-05T13:30:33.936667Z", "stream": "game", "dir": "s2c", "cmd": 13304, "msg": {"avatar_bid": 1000, "career": 0, "lev": 148, "name": "王者之单身", "rid": 22, "sex": 1, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:30:33.997172Z", "stream": "game", "dir": "s2c", "cmd": 13311, "msg": {"friend_req_list": [{"avatar_bid": 1000, "career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 148, "name": "王者之单身", "power": 1643, "rid": 22, "sex": 1, "srv_id": "symlf_93"}]}, "emu": "A"}
+{"t": "2026-11-05T13:30:37.096758Z", "stream": "game", "dir": "s2c", "cmd": 13311, "msg": {"friend_req_list": [{"avatar_bid": 1000, "career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 148, "name": "王者之单身", "power": 1643, "rid": 22, "sex": 1, "srv_id": "symlf_93"}]}, "emu": "A"}
+{"t": "2026-11-05T13:30:46.946469Z", "stream": "game", "dir": "s2c", "cmd": 13305, "msg": {"code": 1, "msg": "", "rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:31:10.914327Z", "stream": "game", "dir": "s2c", "cmd": 16800, "msg": {"arg_str": [], "arg_uint32": [], "idx": 0, "type": 2}, "emu": "A"}
+{"t": "2026-11-05T13:31:10.914327Z", "stream": "game", "dir": "s2c", "cmd": 13304, "msg": {"avatar_bid": 1000, "career": 0, "lev": 148, "name": "王者之单身", "rid": 22, "sex": 1, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:31:10.997447Z", "stream": "game", "dir": "s2c", "cmd": 13311, "msg": {"friend_req_list": [{"avatar_bid": 1000, "career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 148, "name": "王者之单身", "power": 1643, "rid": 22, "sex": 1, "srv_id": "symlf_93"}]}, "emu": "A"}
+{"t": "2026-11-05T13:31:15.393115Z", "stream": "game", "dir": "s2c", "cmd": 13311, "msg": {"friend_req_list": [{"avatar_bid": 1000, "career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 148, "name": "王者之单身", "power": 1643, "rid": 22, "sex": 1, "srv_id": "symlf_93"}]}, "emu": "A"}
+{"t": "2026-11-05T13:31:26.468619Z", "stream": "game", "dir": "s2c", "cmd": 13310, "msg": {"avatar_bid": 1000, "career": 0, "dun_id": 1, "face_file": "", "face_id": 10401, "face_update_time": 0, "gid": 0, "gname": "", "gsrv_id": "", "intimacy": 0, "is_awake": 0, "is_cross": 0, "is_draw": 0, "is_home": 0, "is_online": 1, "is_present": 1, "is_used": 0, "lev": 148, "login_out_time": 0, "login_time": 1793885486, "main_partner_id": 0, "name": "王者之单身", "partner_bid": 0, "partner_lev": 0, "partner_star": 0, "power": 1643, "rid": 22, "sex": 1, "soft": 0, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:31:26.468619Z", "stream": "game", "dir": "s2c", "cmd": 13305, "msg": {"code": 1, "msg": "", "rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:31:54.667697Z", "stream": "game", "dir": "s2c", "cmd": 13307, "msg": {"code": 1, "msg": "删除成功", "rid": 22, "srv_id": "symlf_93"}, "emu": "A"}
+{"t": "2026-11-05T13:30:18.199686Z", "stream": "game", "dir": "c2s", "cmd": 13320, "emu": "B"}
+{"t": "2026-11-05T13:30:33.899868Z", "stream": "game", "dir": "c2s", "cmd": 13303, "msg": {"rid": 21, "srv_id": "symlf_93"}, "emu": "B"}
+{"t": "2026-11-05T13:31:07.811667Z", "stream": "game", "dir": "c2s", "cmd": 13320, "emu": "B"}
+{"t": "2026-11-05T13:31:10.881848Z", "stream": "game", "dir": "c2s", "cmd": 13303, "msg": {"rid": 21, "srv_id": "symlf_93"}, "emu": "B"}
+{"t": "2026-11-05T13:30:18.231088Z", "stream": "game", "dir": "s2c", "cmd": 13320, "msg": {"recommend_list": [{"career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 124, "name": "纯情的回忆", "power": 1643, "rid": 21, "sex": 1, "srv_id": "symlf_93"}]}, "emu": "B"}
+{"t": "2026-11-05T13:30:33.936645Z", "stream": "game", "dir": "s2c", "cmd": 13303, "msg": {"code": 1, "msg": "请求已发放，请耐心等待"}, "emu": "B"}
+{"t": "2026-11-05T13:30:46.946483Z", "stream": "game", "dir": "s2c", "cmd": 12741, "msg": {"msg": "纯情的回忆拒绝了你的加好友申请"}, "emu": "B"}
+{"t": "2026-11-05T13:31:07.843615Z", "stream": "game", "dir": "s2c", "cmd": 13320, "msg": {"recommend_list": [{"career": 0, "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 124, "name": "纯情的回忆", "power": 1643, "rid": 21, "sex": 1, "srv_id": "symlf_93"}]}, "emu": "B"}
+{"t": "2026-11-05T13:31:10.913749Z", "stream": "game", "dir": "s2c", "cmd": 13303, "msg": {"code": 1, "msg": "请求已发放，请耐心等待"}, "emu": "B"}
+{"t": "2026-11-05T13:31:26.467708Z", "stream": "game", "dir": "s2c", "cmd": 13310, "msg": {"avatar_bid": 1000, "career": 0, "dun_id": 1, "face_file": "", "face_id": 10401, "face_update_time": 0, "gid": 0, "gname": "", "gsrv_id": "", "intimacy": 0, "is_awake": 0, "is_cross": 0, "is_draw": 0, "is_home": 0, "is_online": 1, "is_present": 1, "is_used": 0, "lev": 124, "login_out_time": 0, "login_time": 1793885486, "main_partner_id": 0, "name": "纯情的回忆", "partner_bid": 0, "partner_lev": 0, "partner_star": 0, "power": 1643, "rid": 21, "sex": 1, "soft": 0, "srv_id": "symlf_93"}, "emu": "B"}
+{"t": "2026-11-05T13:31:54.667672Z", "stream": "game", "dir": "s2c", "cmd": 13308, "msg": {"rid": 21, "srv_id": "symlf_93"}, "emu": "B"}

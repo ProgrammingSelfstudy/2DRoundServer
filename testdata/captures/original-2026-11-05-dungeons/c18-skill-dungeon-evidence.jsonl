@@ -1,0 +1,20 @@
+{"source_line": 111, "t": "2026-11-05T03:51:29.695163Z", "dir": "c2s", "cmd": 13011, "msg": null}
+{"source_line": 189, "t": "2026-11-05T03:51:30.204268Z", "dir": "c2s", "cmd": 13030, "msg": null}
+{"source_line": 349, "t": "2026-11-05T03:52:07.284697Z", "dir": "c2s", "cmd": 13030, "msg": null}
+{"source_line": 367, "t": "2026-11-05T03:53:20.371313Z", "dir": "c2s", "cmd": 13031, "msg": {"id": 403}}
+{"source_line": 452, "t": "2026-11-05T03:51:29.786187Z", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"source_line": 492, "t": "2026-11-05T03:51:30.284269Z", "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 3, "type": 5}, {"day_num": 3, "type": 3}, {"day_num": 4, "type": 2}, {"day_num": 4, "type": 4}, {"day_num": 4, "type": 1}], "pass_list": [{"id": 502}, {"id": 501}, {"id": 402}, {"id": 401}, {"id": 303}, {"id": 302}, {"id": 301}, {"id": 205}, {"id": 204}, {"id": 203}, {"id": 105}, {"id": 104}, {"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 553, "t": "2026-11-05T03:51:31.314043Z", "dir": "s2c", "cmd": 13019, "msg": null}
+{"source_line": 577, "t": "2026-11-05T03:52:07.366923Z", "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 3, "type": 5}, {"day_num": 3, "type": 3}, {"day_num": 4, "type": 2}, {"day_num": 4, "type": 4}, {"day_num": 4, "type": 1}], "pass_list": [{"id": 502}, {"id": 501}, {"id": 402}, {"id": 401}, {"id": 303}, {"id": 302}, {"id": 301}, {"id": 205}, {"id": 204}, {"id": 203}, {"id": 105}, {"id": 104}, {"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 586, "t": "2026-11-05T03:53:20.472387Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90223", "coin": "874346769"}}
+{"source_line": 587, "t": "2026-11-05T03:53:20.472387Z", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"source_line": 588, "t": "2026-11-05T03:53:20.472387Z", "dir": "s2c", "cmd": 13031, "msg": {"code": 1, "msg": ""}}
+{"source_line": 589, "t": "2026-11-05T03:53:20.531648Z", "dir": "s2c", "cmd": 20063, "msg": {"type_list": [{"combat_type": 14}]}}
+{"source_line": 590, "t": "2026-11-05T03:53:20.531648Z", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 20001, "combat_type": 14}}
+{"source_line": 591, "t": "2026-11-05T03:53:20.531648Z", "dir": "s2c", "cmd": 20027, "msg": "(battle script omitted)"}
+{"source_line": 592, "t": "2026-11-05T03:53:22.402673Z", "dir": "s2c", "cmd": 20001, "msg": {"code": 1, "msg": ""}}
+{"source_line": 593, "t": "2026-11-05T03:53:22.402673Z", "dir": "s2c", "cmd": 20002, "msg": "(battle script omitted)"}
+{"source_line": 594, "t": "2026-11-05T03:53:22.563707Z", "dir": "s2c", "cmd": 20004, "msg": "(battle script omitted)"}
+{"source_line": 595, "t": "2026-11-05T03:53:26.081583Z", "dir": "s2c", "cmd": 10512, "msg": {"item_list": [{"all_score": 0, "attr": [], "base_id": 72001, "bind": 1, "enchant": 0, "expire_time": 0, "expire_type": 0, "extra": [{"extra_k": 11, "extra_v": 0}], "extra_attr": [], "gemstones": [], "holy_eqm_attr": [], "id": 22, "main_attr": [], "pos": 20, "quantity": 2479, "score": 0, "storage": 1}]}}
+{"source_line": 596, "t": "2026-11-05T03:53:26.081583Z", "dir": "s2c", "cmd": 13030, "msg": {"list": [{"day_num": 3, "type": 5}, {"day_num": 4, "type": 3}, {"day_num": 4, "type": 2}, {"day_num": 4, "type": 4}, {"day_num": 4, "type": 1}], "pass_list": [{"id": 403}, {"id": 502}, {"id": 501}, {"id": 402}, {"id": 401}, {"id": 303}, {"id": 302}, {"id": 301}, {"id": 205}, {"id": 204}, {"id": 203}, {"id": 105}, {"id": 104}, {"id": 202}, {"id": 201}, {"id": 103}, {"id": 102}, {"id": 101}]}}
+{"source_line": 597, "t": "2026-11-05T03:53:26.081583Z", "dir": "s2c", "cmd": 20006, "msg": {"result": 1, "show_panel_type": 1, "room_id": 0, "adventure_end_hp": 1000, "target_role_name": "神技副本_困难", "item_rewards": [{"bid": 72001, "id": 0, "is_bind": 1, "num": 8}], "ext_list": []}}

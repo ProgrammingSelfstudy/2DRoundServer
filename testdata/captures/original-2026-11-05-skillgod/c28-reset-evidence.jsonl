@@ -1,0 +1,10 @@
+{"t": "2026-11-05T07:54:05.319464Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 0}}
+{"t": "2026-11-05T07:54:55.876422Z", "stream": "game", "dir": "c2s", "cmd": 24123, "msg": {"id": 5}}
+{"t": "2026-11-05T07:55:27.663601Z", "stream": "game", "dir": "c2s", "cmd": 10397, "msg": {"status": 1}}
+{"t": "2026-11-05T07:54:05.376797Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 0, "type": 0}}
+{"t": "2026-11-05T07:54:55.936954Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1230050530"}}
+{"t": "2026-11-05T07:54:55.936954Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T07:54:55.936954Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 72001, "id": 0, "is_bind": 1, "move_to": 0, "num": "14"}, {"bid": 32, "id": 0, "is_bind": 1, "move_to": 0, "num": "500"}], "source": 0}}
+{"t": "2026-11-05T07:54:55.936954Z", "stream": "game", "dir": "s2c", "cmd": 24107, "msg": {"add_attr": [{"attr_id": 104, "attr_val": 471}, {"attr_id": 101, "attr_val": 55}], "id": 5, "look_id": 0, "lucky": 0, "lucky_endtime": 0, "refine_lev": 0, "seal": 0, "skill": [{"lev": 1, "skill_bid": 0}], "step": 1}}
+{"t": "2026-11-05T07:54:55.986889Z", "stream": "game", "dir": "s2c", "cmd": 11007, "msg": "(omitted)"}
+{"t": "2026-11-05T07:54:55.986889Z", "stream": "game", "dir": "s2c", "cmd": 24123, "msg": {"code": 1, "msg": ""}}

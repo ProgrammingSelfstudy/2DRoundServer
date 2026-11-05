@@ -1,0 +1,54 @@
+{"t": "2026-11-05T08:04:19.301784Z", "stream": "game", "dir": "c2s", "cmd": 31101, "msg": {"id": 101}}
+{"t": "2026-11-05T08:04:33.557347Z", "stream": "game", "dir": "c2s", "cmd": 31101, "msg": {"id": 101}}
+{"t": "2026-11-05T08:04:35.605796Z", "stream": "game", "dir": "c2s", "cmd": 31101, "msg": {"id": 101}}
+{"t": "2026-11-05T08:04:37.680893Z", "stream": "game", "dir": "c2s", "cmd": 31101, "msg": {"id": 101}}
+{"t": "2026-11-05T08:05:27.749124Z", "stream": "game", "dir": "c2s", "cmd": 31104, "msg": {"id": 101, "items": [], "use_list": []}}
+{"t": "2026-11-05T08:05:41.862317Z", "stream": "game", "dir": "c2s", "cmd": 20060, "msg": {"combat_type": 0}}
+{"t": "2026-11-05T08:05:44.968888Z", "stream": "game", "dir": "c2s", "cmd": 10397, "msg": {"status": 1}}
+{"t": "2026-11-05T08:04:19.478703Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:19.478703Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [], "source": 0}}
+{"t": "2026-11-05T08:04:19.478703Z", "stream": "game", "dir": "s2c", "cmd": 11007, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 31127, "msg": {"effect": []}}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 31103, "msg": {"list": [{"id": 101, "juexing": 0, "level": 1, "star": 1}]}}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 31102, "msg": {"id": 101, "juexing": 0, "level": 1, "star": 1}}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 31101, "msg": {"msg": "激活成功", "result": 1}}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 239305, "power": 239305}}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}
+{"t": "2026-11-05T08:04:19.545635Z", "stream": "game", "dir": "s2c", "cmd": 25811, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 52000, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 1000000, "value": 239305}]}]}}
+{"t": "2026-11-05T08:04:33.650175Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1229995530"}}
+{"t": "2026-11-05T08:04:33.650175Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:33.650175Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [], "source": 0}}
+{"t": "2026-11-05T08:04:33.678717Z", "stream": "game", "dir": "s2c", "cmd": 11007, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 31127, "msg": {"effect": []}}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 31103, "msg": {"list": [{"id": 101, "juexing": 0, "level": 2, "star": 1}]}}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 31102, "msg": {"id": 101, "juexing": 0, "level": 2, "star": 1}}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 31101, "msg": {"msg": "升级成功", "result": 1}}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 239364, "power": 239364}}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}
+{"t": "2026-11-05T08:04:33.701127Z", "stream": "game", "dir": "s2c", "cmd": 25811, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 52000, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 1000000, "value": 239364}]}]}}
+{"t": "2026-11-05T08:04:35.688448Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1229935530"}}
+{"t": "2026-11-05T08:04:35.708558Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:35.708558Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [], "source": 0}}
+{"t": "2026-11-05T08:04:35.708558Z", "stream": "game", "dir": "s2c", "cmd": 11007, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 31127, "msg": {"effect": []}}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 31103, "msg": {"list": [{"id": 101, "juexing": 0, "level": 3, "star": 1}]}}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 31102, "msg": {"id": 101, "juexing": 0, "level": 3, "star": 1}}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 31101, "msg": {"msg": "升级成功", "result": 1}}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 239423, "power": 239423}}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}
+{"t": "2026-11-05T08:04:35.758732Z", "stream": "game", "dir": "s2c", "cmd": 25811, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 52000, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 1000000, "value": 239423}]}]}}
+{"t": "2026-11-05T08:04:37.767637Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1229870530"}}
+{"t": "2026-11-05T08:04:37.79493Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:37.79493Z", "stream": "game", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [], "source": 0}}
+{"t": "2026-11-05T08:04:37.79493Z", "stream": "game", "dir": "s2c", "cmd": 11007, "msg": "(omitted)"}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 31127, "msg": {"effect": []}}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 31103, "msg": {"list": [{"id": 101, "juexing": 0, "level": 4, "star": 1}]}}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 31102, "msg": {"id": 101, "juexing": 0, "level": 4, "star": 1}}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 31101, "msg": {"msg": "升级成功", "result": 1}}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 239482, "power": 239482}}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}
+{"t": "2026-11-05T08:04:37.833769Z", "stream": "game", "dir": "s2c", "cmd": 25811, "msg": {"feat_list": [{"end_time": 0, "finish": 0, "finish_time": 0, "id": 52000, "progress": [{"finish": 0, "id": 0, "target": 0, "target_val": 1000000, "value": 239482}]}]}}
+{"t": "2026-11-05T08:05:18.041245Z", "stream": "game", "dir": "s2c", "cmd": 16606, "msg": {"bid": 991050, "can_get_num": 0}}
+{"t": "2026-11-05T08:05:18.041245Z", "stream": "game", "dir": "s2c", "cmd": 21024, "msg": {"list": [{"id": 4}]}}
+{"t": "2026-11-05T08:05:27.846989Z", "stream": "game", "dir": "s2c", "cmd": 31104, "msg": {"msg": "升星失败,消耗数量有误", "result": 0}}
+{"t": "2026-11-05T08:05:41.917626Z", "stream": "game", "dir": "s2c", "cmd": 20060, "msg": {"combat_type": 0, "type": 0}}

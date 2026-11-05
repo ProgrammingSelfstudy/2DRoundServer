@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"time"
@@ -142,13 +143,18 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		case int64(role.Lev) < stoneCfg.OpenLev[strconv.FormatInt(d.Type, 10)] || int64(role.Lev) < d.LevLimit:
 			msg = "等级不足"
 		case d.PreID != 0 && !cleared[d.PreID]:
-			msg = "请先通关前一个难度"
+			msg = "通关前置难度后开启"
 		case rolePower(heroes) < d.Power:
 			msg = "战力不足"
 		case sweep && !cleared[d.ID]:
 			msg = "通关后才能扫荡"
 		case done >= stoneAllowed(d.Type, role.VIPLev):
-			msg = "今日已无次数"
+			// the original names the VIP level the next attempt needs (capture original-2026-11-05-dungeons)
+			if list := stoneCfg.Buys[strconv.FormatInt(d.Type, 10)]; int(done) < len(list) {
+				msg = fmt.Sprintf("需要vip等级达%d级后可购买", list[done].VIP)
+			} else {
+				msg = "今日已无次数"
+			}
 		}
 		return
 	}
@@ -223,6 +229,13 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 			return refuse("钻石不足或今日已无次数")
 		} else if err != nil {
 			return err
+		}
+		// a paid attempt shows its gems at once: 10302 comes before the quest and the answer (capture
+		// original-2026-11-05-dungeons); the sweep carries them in the 10302 of its reward
+		if stoneCost(d.Type, done) > 0 {
+			if err := sendAssets(s, st, role.RID); err != nil {
+				return err
+			}
 		}
 		rounds, won, _ := playFightOpts(team, foes, rngOf(), maxFightRounds, true)
 		intro := proto.Message{

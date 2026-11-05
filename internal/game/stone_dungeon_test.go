@@ -69,7 +69,7 @@ func TestStoneDungeonRules(t *testing.T) {
 		t.Fatalf("coin after two sweeps: %v", items)
 	}
 	c.send(13032, proto.Message{"id": 101})
-	if r := c.waitFor(13032); r.Int("code") != 0 {
+	if r := c.waitFor(13032); r.Int("code") != 0 || r.Str("msg") != "需要vip等级达1级后可购买" {
 		t.Fatalf("third attempt without VIP: %v", r)
 	}
 	if err := e.st.SetRoleVIP(role.RID, 1); err != nil {
@@ -127,5 +127,31 @@ func TestStoneDungeonFight(t *testing.T) {
 	counts, _ := e.st.StoneCounts(role.RID, summonDay(time.Unix(0, e.clk.Load())))
 	if counts[1] != 1 {
 		t.Fatalf("attempts: %v", counts)
+	}
+}
+
+// a paid challenge shows the gems it cost with a 10302 before the answer (capture
+// original-2026-11-05-dungeons: 90723 -> 90673 at the 13031 of a 50-gem attempt)
+func TestStoneDungeonPaidChallengeShowsGems(t *testing.T) {
+	e, c, role := stoneEnv(t)
+	if _, err := e.st.MarkStoneCleared(role.RID, 101); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ { // the free attempts
+		c.send(13032, proto.Message{"id": 101})
+		c.waitFor(13032)
+	}
+	if err := e.st.SetRoleVIP(role.RID, 1); err != nil {
+		t.Fatal(err)
+	}
+	e.grantAssets(c, role, map[int64]int64{3: 60})
+	c.send(13031, proto.Message{"id": 101})
+	for {
+		if r := c.waitFor(10302); r.Str("gold") == "10" {
+			break
+		}
+	}
+	if r := c.waitFor(13031); r.Int("code") != 1 {
+		t.Fatalf("paid challenge: %v", r)
 	}
 }

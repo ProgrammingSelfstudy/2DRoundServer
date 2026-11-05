@@ -1,0 +1,75 @@
+{"t": "2026-11-05T13:48:59.812773Z", "stream": "game", "dir": "c2s", "cmd": 20208}
+{"t": "2026-11-05T13:48:59.823976Z", "stream": "game", "dir": "c2s", "cmd": 20201, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:49:17.90107Z", "stream": "game", "dir": "c2s", "cmd": 20203, "msg": {"is_auto": 0, "rid": 1, "srv_id": ""}}
+{"t": "2026-11-05T13:49:24.671225Z", "stream": "game", "dir": "c2s", "cmd": 20001}
+{"t": "2026-11-05T13:49:45.265972Z", "stream": "game", "dir": "c2s", "cmd": 20200}
+{"t": "2026-11-05T13:50:47.783115Z", "stream": "game", "dir": "c2s", "cmd": 24905}
+{"t": "2026-11-05T13:50:47.794438Z", "stream": "game", "dir": "c2s", "cmd": 24900}
+{"t": "2026-11-05T13:51:02.42734Z", "stream": "game", "dir": "c2s", "cmd": 24920, "msg": {"type": 1}}
+{"t": "2026-11-05T13:51:02.438204Z", "stream": "game", "dir": "c2s", "cmd": 24901, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:51:18.266733Z", "stream": "game", "dir": "c2s", "cmd": 24902, "msg": {"type": 0}}
+{"t": "2026-11-05T13:51:39.334529Z", "stream": "game", "dir": "c2s", "cmd": 24903}
+{"t": "2026-11-05T13:51:39.402998Z", "stream": "game", "dir": "c2s", "cmd": 10958, "msg": {"combat_msg": "[fight_type:23],[crossground/crossground_main],[elitematch/elitematch_main_window],[elitematch/elitematch_matching_window]"}}
+{"t": "2026-11-05T13:51:43.029882Z", "stream": "game", "dir": "c2s", "cmd": 20001}
+{"t": "2026-11-05T13:52:05.738409Z", "stream": "game", "dir": "c2s", "cmd": 24950}
+{"t": "2026-11-05T13:52:06.453587Z", "stream": "game", "dir": "c2s", "cmd": 24900}
+{"t": "2026-11-05T13:52:51.025375Z", "stream": "game", "dir": "c2s", "cmd": 24902, "msg": {"type": 0}}
+{"t": "2026-11-05T13:53:03.157811Z", "stream": "game", "dir": "c2s", "cmd": 24903}
+{"t": "2026-11-05T13:53:03.213378Z", "stream": "game", "dir": "c2s", "cmd": 10958, "msg": {"combat_msg": "[fight_type:23],[crossground/crossground_main],[elitematch/elitematch_main_window],[elitematch/elitematch_matching_window]"}}
+{"t": "2026-11-05T13:53:06.736431Z", "stream": "game", "dir": "c2s", "cmd": 20001}
+{"t": "2026-11-05T13:53:32.238443Z", "stream": "game", "dir": "c2s", "cmd": 24950}
+{"t": "2026-11-05T13:53:32.728088Z", "stream": "game", "dir": "c2s", "cmd": 24900}
+{"t": "2026-11-05T13:48:40.993401Z", "stream": "game", "dir": "s2c", "cmd": 16606, "msg": {"bid": 991050, "can_get_num": 0}}
+{"t": "2026-11-05T13:48:40.993401Z", "stream": "game", "dir": "s2c", "cmd": 21024, "msg": {"list": [{"id": 4}]}}
+{"t": "2026-11-05T13:48:59.845304Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 0, "num_list": []}}
+{"t": "2026-11-05T13:48:59.876919Z", "stream": "game", "dir": "s2c", "cmd": 20201, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:49:17.936428Z", "stream": "game", "dir": "s2c", "cmd": 13011, "msg": {"buff_list": []}}
+{"t": "2026-11-05T13:49:17.936428Z", "stream": "game", "dir": "s2c", "cmd": 20203, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T13:49:17.936428Z", "stream": "game", "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 0, "id": 90005, "progress": [{"ext_data": [], "finish": 0, "id": 0, "target": 0, "target_val": 3, "value": 1}]}]}}
+{"t": "2026-11-05T13:49:17.969559Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": [{"combat_type": 2}]}}
+{"t": "2026-11-05T13:49:17.969559Z", "stream": "game", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 0, "combat_type": 2}}
+{"t": "2026-11-05T13:49:24.703702Z", "stream": "game", "dir": "s2c", "cmd": 20001, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T13:49:44.502692Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1014000"}}
+{"t": "2026-11-05T13:49:44.64266Z", "stream": "game", "dir": "s2c", "cmd": 20201, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 2, "cont_win": 1, "end_time": 1794067199, "rank": 0, "ref_time": 1793886585, "score": 1000, "start_time": 1793462400}}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 20208, "msg": {"had_combat_num": 1, "num_list": []}}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 20210, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 24317, "msg": {"code": 0}}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 31127, "msg": {"effect": []}}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T13:49:44.676407Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 2, "cont_win": 1, "end_time": 1794067199, "rank": 5, "ref_time": 1793886585, "score": 1022, "start_time": 1793462400}}
+{"t": "2026-11-05T13:49:45.296518Z", "stream": "game", "dir": "s2c", "cmd": 20200, "msg": {"buy_combat_num": 0, "can_combat_num": 2, "cont_win": 1, "end_time": 1794067199, "rank": 5, "ref_time": 1793886585, "score": 1022, "start_time": 1793462400}}
+{"t": "2026-11-05T13:50:47.815293Z", "stream": "game", "dir": "s2c", "cmd": 24905, "msg": {"end_time": 5951, "state": 1}}
+{"t": "2026-11-05T13:50:47.84578Z", "stream": "game", "dir": "s2c", "cmd": 24900, "msg": {"day_buy_count": 0, "day_combat_count": 3, "day_max_buy_count": 5, "end_time": 1795017600, "is_king": 0, "is_skip": 0, "lev": 1, "lev_reward": [{"flag": 0, "lev": 2}, {"flag": 0, "lev": 3}, {"flag": 0, "lev": 4}, {"flag": 0, "lev": 5}, {"flag": 0, "lev": 6}, {"flag": 0, "lev": 7}, {"flag": 0, "lev": 8}, {"flag": 0, "lev": 9}, {"flag": 0, "lev": 10}, {"flag": 0, "lev": 11}, {"flag": 0, "lev": 12}, {"flag": 0, "lev": 13}, {"flag": 0, "lev": 14}, {"flag": 0, "lev": 15}, {"flag": 0, "lev": 16}, {"flag": 0, "lev": 17}, {"flag": 0, "lev": 18}, {"flag": 0, "lev": 19}, {"flag": 0, "lev": 20}, {"flag": 0, "lev": 21}, {"flag": 0, "lev": 22}], "match_cd_time": 0, "period": 13, "promoted_info": [], "rank": 0, "rmb_status": 0, "score": 0, "start_time": 1793203200, "state": 1, "state_time": 94152, "zone_id": 2}}
+{"t": "2026-11-05T13:51:02.459313Z", "stream": "game", "dir": "s2c", "cmd": 24920, "msg": {"formations": [{"formation_type": 1, "hallows_id": 0, "order": 1, "pos_info": [{"id": 2, "pos": 6}, {"id": 1, "pos": 1}]}], "type": 1}}
+{"t": "2026-11-05T13:51:02.490501Z", "stream": "game", "dir": "s2c", "cmd": 24901, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:51:22.758913Z", "stream": "game", "dir": "s2c", "cmd": 24901, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:51:39.367278Z", "stream": "game", "dir": "s2c", "cmd": 10957}
+{"t": "2026-11-05T13:51:39.367278Z", "stream": "game", "dir": "s2c", "cmd": 24903, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T13:51:39.402781Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": [{"combat_type": 23}]}}
+{"t": "2026-11-05T13:51:39.402781Z", "stream": "game", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 0, "combat_type": 23}}
+{"t": "2026-11-05T13:51:43.06253Z", "stream": "game", "dir": "s2c", "cmd": 20001, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T13:52:03.919187Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1014000"}}
+{"t": "2026-11-05T13:52:03.919187Z", "stream": "game", "dir": "s2c", "cmd": 10512, "msg": {"coin": null}}
+{"t": "2026-11-05T13:52:03.952375Z", "stream": "game", "dir": "s2c", "cmd": 24901, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:52:03.952375Z", "stream": "game", "dir": "s2c", "cmd": 24952, "msg": {"cur_day": 1, "end_time": 1796400000, "lev": 1, "list": [], "period": 2, "rmb_status": 0, "win_count": 1}}
+{"t": "2026-11-05T13:52:03.952375Z", "stream": "game", "dir": "s2c", "cmd": 24906, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:52:03.952375Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:52:03.952375Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T13:52:06.484614Z", "stream": "game", "dir": "s2c", "cmd": 24900, "msg": {"day_buy_count": 0, "day_combat_count": 2, "day_max_buy_count": 5, "end_time": 1795017600, "is_king": 0, "is_skip": 0, "lev": 1, "lev_reward": [{"flag": 0, "lev": 2}, {"flag": 0, "lev": 3}, {"flag": 0, "lev": 4}, {"flag": 0, "lev": 5}, {"flag": 0, "lev": 6}, {"flag": 0, "lev": 7}, {"flag": 0, "lev": 8}, {"flag": 0, "lev": 9}, {"flag": 0, "lev": 10}, {"flag": 0, "lev": 11}, {"flag": 0, "lev": 12}, {"flag": 0, "lev": 13}, {"flag": 0, "lev": 14}, {"flag": 0, "lev": 15}, {"flag": 0, "lev": 16}, {"flag": 0, "lev": 17}, {"flag": 0, "lev": 18}, {"flag": 0, "lev": 19}, {"flag": 0, "lev": 20}, {"flag": 0, "lev": 21}, {"flag": 0, "lev": 22}], "match_cd_time": 1793886683, "period": 13, "promoted_info": [{"count": 1, "flag": 0}], "rank": 0, "rmb_status": 0, "score": 33, "start_time": 1793203200, "state": 1, "state_time": 94073, "zone_id": 2}}
+{"t": "2026-11-05T13:52:55.152288Z", "stream": "game", "dir": "s2c", "cmd": 24901, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:53:03.190852Z", "stream": "game", "dir": "s2c", "cmd": 10957}
+{"t": "2026-11-05T13:53:03.190852Z", "stream": "game", "dir": "s2c", "cmd": 24903, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T13:53:03.221222Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": [{"combat_type": 23}]}}
+{"t": "2026-11-05T13:53:03.221222Z", "stream": "game", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 0, "combat_type": 23}}
+{"t": "2026-11-05T13:53:06.767834Z", "stream": "game", "dir": "s2c", "cmd": 20001, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T13:53:30.487213Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1014000"}}
+{"t": "2026-11-05T13:53:30.487213Z", "stream": "game", "dir": "s2c", "cmd": 10510, "msg": {"item_list": [{"all_score": 0, "attr": [], "base_id": 37001, "bind": 1, "enchant": 0, "expire_time": 0, "expire_type": 0, "extra": [{"extra_k": 11, "extra_v": 0}], "extra_attr": [], "gemstones": [], "holy_eqm_attr": [], "id": 6, "main_attr": [], "pos": 6, "quantity": 1, "score": 0, "storage": 1}]}}
+{"t": "2026-11-05T13:53:30.517545Z", "stream": "game", "dir": "s2c", "cmd": 24901, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:53:30.517545Z", "stream": "game", "dir": "s2c", "cmd": 24906, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:53:30.517545Z", "stream": "game", "dir": "s2c", "cmd": 20006, "msg": "(omitted long list)"}
+{"t": "2026-11-05T13:53:30.517545Z", "stream": "game", "dir": "s2c", "cmd": 20063, "msg": {"type_list": []}}
+{"t": "2026-11-05T13:53:32.757343Z", "stream": "game", "dir": "s2c", "cmd": 24900, "msg": {"day_buy_count": 0, "day_combat_count": 1, "day_max_buy_count": 5, "end_time": 1795017600, "is_king": 0, "is_skip": 0, "lev": 1, "lev_reward": [{"flag": 0, "lev": 2}, {"flag": 0, "lev": 3}, {"flag": 0, "lev": 4}, {"flag": 0, "lev": 5}, {"flag": 0, "lev": 6}, {"flag": 0, "lev": 7}, {"flag": 0, "lev": 8}, {"flag": 0, "lev": 9}, {"flag": 0, "lev": 10}, {"flag": 0, "lev": 11}, {"flag": 0, "lev": 12}, {"flag": 0, "lev": 13}, {"flag": 0, "lev": 14}, {"flag": 0, "lev": 15}, {"flag": 0, "lev": 16}, {"flag": 0, "lev": 17}, {"flag": 0, "lev": 18}, {"flag": 0, "lev": 19}, {"flag": 0, "lev": 20}, {"flag": 0, "lev": 21}, {"flag": 0, "lev": 22}], "match_cd_time": 1793886775, "period": 13, "promoted_info": [], "rank": 0, "rmb_status": 0, "score": 15, "start_time": 1793203200, "state": 1, "state_time": 93987, "zone_id": 2}}
+{"t": "2026-11-05T13:53:40.980079Z", "stream": "game", "dir": "s2c", "cmd": 16606, "msg": {"bid": 991050, "can_get_num": 0}}
+{"t": "2026-11-05T13:53:40.980079Z", "stream": "game", "dir": "s2c", "cmd": 21024, "msg": {"list": [{"id": 4}]}}

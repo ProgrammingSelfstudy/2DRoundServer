@@ -1,0 +1,119 @@
+{"source_line": 121, "t": "2026-11-05T05:31:01.867474Z", "dir": "c2s", "cmd": 20700, "msg": null}
+{"source_line": 221, "t": "2026-11-05T05:31:02.599578Z", "dir": "c2s", "cmd": 20706, "msg": null}
+{"source_line": 273, "t": "2026-11-05T05:31:03.00241Z", "dir": "c2s", "cmd": 23900, "msg": null}
+{"source_line": 275, "t": "2026-11-05T05:31:03.00241Z", "dir": "c2s", "cmd": 23912, "msg": null}
+{"source_line": 277, "t": "2026-11-05T05:31:03.00241Z", "dir": "c2s", "cmd": 23906, "msg": null}
+{"source_line": 349, "t": "2026-11-05T05:31:39.581324Z", "dir": "c2s", "cmd": 23903, "msg": {"type": 5}}
+{"source_line": 351, "t": "2026-11-05T05:31:39.583945Z", "dir": "c2s", "cmd": 23900, "msg": null}
+{"source_line": 365, "t": "2026-11-05T05:32:19.486142Z", "dir": "c2s", "cmd": 23901, "msg": {"formation_type": 1, "hallows_id": 0, "pos_info": [{"id": 388, "owner_id": 167, "owner_srv_id": "symlf_90", "pos": 3}], "type": 5}}
+{"source_line": 369, "t": "2026-11-05T05:32:20.971313Z", "dir": "c2s", "cmd": 23902, "msg": null}
+{"source_line": 378, "t": "2026-11-05T05:32:57.95624Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 102}}
+{"source_line": 405, "t": "2026-11-05T05:33:35.720306Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 102}}
+{"source_line": 426, "t": "2026-11-05T05:33:59.929562Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 103}}
+{"source_line": 455, "t": "2026-11-05T05:34:51.424476Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 303}}
+{"source_line": 480, "t": "2026-11-05T05:35:31.486115Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 301}}
+{"source_line": 509, "t": "2026-11-05T05:36:11.617427Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 301}}
+{"source_line": 532, "t": "2026-11-05T05:36:35.544964Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 101}}
+{"source_line": 553, "t": "2026-11-05T05:36:54.066193Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 102}}
+{"source_line": 556, "t": "2026-11-05T05:36:56.388609Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 2, "type": 5}}
+{"source_line": 558, "t": "2026-11-05T05:36:58.803218Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 3, "type": 5}}
+{"source_line": 560, "t": "2026-11-05T05:37:00.951259Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 4, "type": 5}}
+{"source_line": 564, "t": "2026-11-05T05:37:02.89195Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 5, "type": 5}}
+{"source_line": 571, "t": "2026-11-05T05:37:04.891334Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 6, "type": 5}}
+{"source_line": 579, "t": "2026-11-05T05:37:12.129298Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 7, "type": 5}}
+{"source_line": 590, "t": "2026-11-05T05:37:25.093552Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 101}}
+{"source_line": 611, "t": "2026-11-05T05:37:44.497573Z", "dir": "c2s", "cmd": 23911, "msg": {"buff_id": 104}}
+{"source_line": 618, "t": "2026-11-05T05:37:54.250389Z", "dir": "c2s", "cmd": 20008, "msg": null}
+{"source_line": 621, "t": "2026-11-05T05:37:59.478552Z", "dir": "c2s", "cmd": 23913, "msg": {"type": 5}}
+{"source_line": 623, "t": "2026-11-05T05:37:59.630728Z", "dir": "c2s", "cmd": 23913, "msg": {"type": 5}}
+{"source_line": 629, "t": "2026-11-05T05:38:16.956952Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 8, "type": 5}}
+{"source_line": 635, "t": "2026-11-05T05:38:34.448205Z", "dir": "c2s", "cmd": 23904, "msg": {"id": 9, "type": 5}}
+{"source_line": 651, "t": "2026-11-05T05:39:19.561194Z", "dir": "c2s", "cmd": 20700, "msg": null}
+{"source_line": 653, "t": "2026-11-05T05:39:19.561194Z", "dir": "c2s", "cmd": 20701, "msg": null}
+{"source_line": 685, "t": "2026-11-05T05:41:51.224943Z", "dir": "c2s", "cmd": 20702, "msg": {"num": 1, "pos": 1}}
+{"source_line": 704, "t": "2026-11-05T05:31:01.196791Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873768030"}}
+{"source_line": 775, "t": "2026-11-05T05:31:01.984887Z", "dir": "s2c", "cmd": 20700, "msg": {"num": 0, "time": 0}}
+{"source_line": 826, "t": "2026-11-05T05:31:02.70273Z", "dir": "s2c", "cmd": 20706, "msg": {"is_show": 0}}
+{"source_line": 851, "t": "2026-11-05T05:31:03.069135Z", "dir": "s2c", "cmd": 23900, "msg": {"current_round": 1, "day_pass_round": 0, "is_appoint": 0, "is_employ": 0, "is_reward": 0, "list": [], "max_round": 9, "my_idx": 24, "new_current_round": 1, "new_day_pass_round": 0, "new_max_round": 0, "new_my_idx": 0, "new_rank_list": [], "next_time": 124137, "next_type": 3, "rank_list": [{"idx": 1, "name": "龙哥", "rid": 8, "srv_id": "symlf_90", "val": 1500}, {"idx": 2, "name": "米霍克", "rid": 19, "srv_id": "symlf_90", "val": 1313}, {"idx": 3, "name": "燃烧的南宫", "rid": 6, "srv_id": "symlf_90", "val": 1017}], "select_type": 2, "type": 0}}
+{"source_line": 852, "t": "2026-11-05T05:31:03.069135Z", "dir": "s2c", "cmd": 23912, "msg": {"flag": 0}}
+{"source_line": 853, "t": "2026-11-05T05:31:03.069135Z", "dir": "s2c", "cmd": 23906, "msg": {"list": []}}
+{"source_line": 895, "t": "2026-11-05T05:31:39.651748Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 2, "max_id": 9, "rewarded": [{"id": 1}], "status": 0, "type": 5}}
+{"source_line": 896, "t": "2026-11-05T05:31:39.651748Z", "dir": "s2c", "cmd": 23900, "msg": {"current_round": 1, "day_pass_round": 0, "is_appoint": 0, "is_employ": 0, "is_reward": 0, "list": [], "max_round": 9, "my_idx": 24, "new_current_round": 1, "new_day_pass_round": 0, "new_max_round": 0, "new_my_idx": 0, "new_rank_list": [], "next_time": 124100, "next_type": 3, "rank_list": [{"idx": 1, "name": "龙哥", "rid": 8, "srv_id": "symlf_90", "val": 1500}, {"idx": 2, "name": "米霍克", "rid": 19, "srv_id": "symlf_90", "val": 1313}, {"idx": 3, "name": "燃烧的南宫", "rid": 6, "srv_id": "symlf_90", "val": 1017}], "select_type": 2, "type": 0}}
+{"source_line": 903, "t": "2026-11-05T05:32:19.571584Z", "dir": "s2c", "cmd": 23901, "msg": {"code": 1, "msg": ""}}
+{"source_line": 905, "t": "2026-11-05T05:32:19.636249Z", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 0, "combat_type": 11}}
+{"source_line": 907, "t": "2026-11-05T05:32:19.636249Z", "dir": "s2c", "cmd": 23910, "msg": {"formation_lev": 1, "formation_type": 1, "is_select": 1, "list": [{"buff_id": 303, "group_id": 3}, {"buff_id": 204, "group_id": 2}, {"buff_id": 102, "group_id": 1}]}}
+{"source_line": 908, "t": "2026-11-05T05:32:19.636249Z", "dir": "s2c", "cmd": 20027, "msg": "(battle script omitted)"}
+{"source_line": 910, "t": "2026-11-05T05:32:21.030957Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 0, "round": 1, "status": 0, "type": 5}}
+{"source_line": 915, "t": "2026-11-05T05:32:58.028977Z", "dir": "s2c", "cmd": 23911, "msg": {"code": 1, "msg": "选择成功"}}
+{"source_line": 917, "t": "2026-11-05T05:32:58.028977Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [], "buff_list": [{"count": 5, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 0, "round": 1, "status": 0, "type": 5}}
+{"source_line": 922, "t": "2026-11-05T05:33:03.793948Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 20000}, {"base_id": 22, "num": 30000}], "buff_list": [{"count": 4, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 0, "round": 2, "status": 0, "type": 5}}
+{"source_line": 927, "t": "2026-11-05T05:33:06.870083Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 40500}, {"base_id": 22, "num": 60600}], "buff_list": [{"count": 3, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 0, "round": 3, "status": 0, "type": 5}}
+{"source_line": 932, "t": "2026-11-05T05:33:09.396605Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 61500}, {"base_id": 22, "num": 91800}], "buff_list": [{"count": 2, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 0, "round": 4, "status": 0, "type": 5}}
+{"source_line": 940, "t": "2026-11-05T05:33:16.049418Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 83000}, {"base_id": 22, "num": 123600}], "buff_list": [{"count": 1, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 0, "round": 5, "status": 0, "type": 5}}
+{"source_line": 946, "t": "2026-11-05T05:33:19.081516Z", "dir": "s2c", "cmd": 23910, "msg": {"formation_lev": 1, "formation_type": 1, "is_select": 1, "list": [{"buff_id": 301, "group_id": 3}, {"buff_id": 204, "group_id": 2}, {"buff_id": 102, "group_id": 1}]}}
+{"source_line": 947, "t": "2026-11-05T05:33:19.081516Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 105000}, {"base_id": 22, "num": 156000}], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 1, "round": 6, "status": 0, "type": 5}}
+{"source_line": 951, "t": "2026-11-05T05:33:35.787246Z", "dir": "s2c", "cmd": 23911, "msg": {"code": 1, "msg": "选择成功"}}
+{"source_line": 952, "t": "2026-11-05T05:33:35.787246Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 105000}, {"base_id": 22, "num": 156000}], "buff_list": [{"count": 5, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 1, "reward_flag": 1, "round": 6, "status": 0, "type": 5}}
+{"source_line": 956, "t": "2026-11-05T05:33:38.549129Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 107500}, {"base_id": 22, "num": 159000}], "buff_list": [{"count": 4, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 0, "reward_flag": 1, "round": 7, "status": 0, "type": 5}}
+{"source_line": 962, "t": "2026-11-05T05:33:45.189513Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 110000}, {"base_id": 22, "num": 162000}], "buff_list": [{"count": 3, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 0, "reward_flag": 1, "round": 8, "status": 0, "type": 5}}
+{"source_line": 967, "t": "2026-11-05T05:33:48.791564Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 112500}, {"base_id": 22, "num": 165000}], "buff_list": [{"count": 2, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 0, "reward_flag": 1, "round": 9, "status": 0, "type": 5}}
+{"source_line": 972, "t": "2026-11-05T05:33:51.883975Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 115000}, {"base_id": 22, "num": 168000}], "buff_list": [{"count": 1, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 9, "rest_round": 0, "reward_flag": 1, "round": 10, "status": 0, "type": 5}}
+{"source_line": 979, "t": "2026-11-05T05:33:54.40172Z", "dir": "s2c", "cmd": 23910, "msg": {"formation_lev": 1, "formation_type": 1, "is_select": 1, "list": [{"buff_id": 301, "group_id": 3}, {"buff_id": 201, "group_id": 2}, {"buff_id": 103, "group_id": 1}]}}
+{"source_line": 980, "t": "2026-11-05T05:33:54.40172Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 117500}, {"base_id": 22, "num": 171000}], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 10, "rest_round": 0, "reward_flag": 1, "round": 11, "status": 1, "type": 5}}
+{"source_line": 982, "t": "2026-11-05T05:34:00.037485Z", "dir": "s2c", "cmd": 23911, "msg": {"code": 1, "msg": "选择成功"}}
+{"source_line": 983, "t": "2026-11-05T05:34:00.037485Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 117500}, {"base_id": 22, "num": 171000}], "buff_list": [{"count": 5, "group_id": 1, "id": 103}], "id": 2, "max_reward_round": 5, "max_round": 10, "rest_round": 0, "reward_flag": 1, "round": 11, "status": 1, "type": 5}}
+{"source_line": 1014, "t": "2026-11-05T05:34:22.19397Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 130000}, {"base_id": 22, "num": 186000}], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 15, "rest_round": 0, "reward_flag": 1, "round": 16, "status": 1, "type": 5}}
+{"source_line": 1019, "t": "2026-11-05T05:34:51.561579Z", "dir": "s2c", "cmd": 23911, "msg": {"code": 1, "msg": "选择成功"}}
+{"source_line": 1020, "t": "2026-11-05T05:34:51.561579Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 130000}, {"base_id": 22, "num": 186000}], "buff_list": [{"count": 1, "group_id": 3, "id": 303}], "id": 2, "max_reward_round": 5, "max_round": 15, "rest_round": 0, "reward_flag": 1, "round": 16, "status": 1, "type": 5}}
+{"source_line": 1086, "t": "2026-11-05T05:35:58.056188Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 155000}, {"base_id": 22, "num": 216000}], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 25, "rest_round": 0, "reward_flag": 1, "round": 26, "status": 1, "type": 5}}
+{"source_line": 1121, "t": "2026-11-05T05:36:34.533983Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 167500}, {"base_id": 22, "num": 231000}], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 30, "rest_round": 0, "reward_flag": 1, "round": 31, "status": 1, "type": 5}}
+{"source_line": 1124, "t": "2026-11-05T05:36:35.650934Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 167500}, {"base_id": 22, "num": 231000}], "buff_list": [{"count": 5, "group_id": 1, "id": 101}], "id": 2, "max_reward_round": 5, "max_round": 30, "rest_round": 0, "reward_flag": 1, "round": 31, "status": 1, "type": 5}}
+{"source_line": 1151, "t": "2026-11-05T05:36:53.09372Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 180000}, {"base_id": 22, "num": 246000}], "buff_list": [], "id": 2, "max_reward_round": 5, "max_round": 35, "rest_round": 0, "reward_flag": 1, "round": 36, "status": 1, "type": 5}}
+{"source_line": 1155, "t": "2026-11-05T05:36:54.131617Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 180000}, {"base_id": 22, "num": 246000}], "buff_list": [{"count": 5, "group_id": 1, "id": 102}], "id": 2, "max_reward_round": 5, "max_round": 35, "rest_round": 0, "reward_flag": 1, "round": 36, "status": 1, "type": 5}}
+{"source_line": 1158, "t": "2026-11-05T05:36:56.452522Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873768030"}}
+{"source_line": 1159, "t": "2026-11-05T05:36:56.452522Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "50000"}], "source": 0}}
+{"source_line": 1160, "t": "2026-11-05T05:36:56.452522Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 3, "max_id": 35, "rewarded": [{"id": 2}, {"id": 1}], "status": 1, "type": 5}}
+{"source_line": 1161, "t": "2026-11-05T05:36:56.452522Z", "dir": "s2c", "cmd": 23904, "msg": {"code": 1, "msg": "", "type": 5}}
+{"source_line": 1162, "t": "2026-11-05T05:36:58.919451Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 108, "base_id": 10403, "quantity": 8, "pos": 9, "storage": 1}]}
+{"source_line": 1163, "t": "2026-11-05T05:36:58.919451Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 10403, "id": 0, "is_bind": 1, "move_to": 0, "num": "1"}], "source": 0}}
+{"source_line": 1164, "t": "2026-11-05T05:36:58.919451Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 4, "max_id": 35, "rewarded": [{"id": 3}, {"id": 2}, {"id": 1}], "status": 1, "type": 5}}
+{"source_line": 1165, "t": "2026-11-05T05:36:58.919451Z", "dir": "s2c", "cmd": 23904, "msg": {"code": 1, "msg": "", "type": 5}}
+{"source_line": 1167, "t": "2026-11-05T05:37:01.092377Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873768030"}}
+{"source_line": 1168, "t": "2026-11-05T05:37:01.092377Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "70000"}], "source": 0}}
+{"source_line": 1169, "t": "2026-11-05T05:37:01.092377Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 5, "max_id": 35, "rewarded": [{"id": 4}, {"id": 3}, {"id": 2}, {"id": 1}], "status": 1, "type": 5}}
+{"source_line": 1170, "t": "2026-11-05T05:37:01.092377Z", "dir": "s2c", "cmd": 23904, "msg": {"code": 1, "msg": "", "type": 5}}
+{"source_line": 1198, "t": "2026-11-05T05:37:12.212665Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "110000"}], "source": 0}}
+{"source_line": 1199, "t": "2026-11-05T05:37:12.212665Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 8, "max_id": 38, "rewarded": [{"id": 7}, {"id": 6}, {"id": 5}, {"id": 4}, {"id": 3}, {"id": 2}, {"id": 1}], "status": 0, "type": 5}}
+{"source_line": 1200, "t": "2026-11-05T05:37:12.212665Z", "dir": "s2c", "cmd": 23904, "msg": {"code": 1, "msg": "", "type": 5}}
+{"source_line": 1241, "t": "2026-11-05T05:37:42.440752Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 205000}, {"base_id": 22, "num": 276000}], "buff_list": [], "id": 8, "max_reward_round": 5, "max_round": 45, "rest_round": 0, "reward_flag": 1, "round": 46, "status": 1, "type": 5}}
+{"source_line": 1245, "t": "2026-11-05T05:37:44.61154Z", "dir": "s2c", "cmd": 23902, "msg": {"acc_reward": [{"base_id": 1, "num": 205000}, {"base_id": 22, "num": 276000}], "buff_list": [{"count": 5, "group_id": 1, "id": 104}], "id": 8, "max_reward_round": 5, "max_round": 45, "rest_round": 0, "reward_flag": 1, "round": 46, "status": 1, "type": 5}}
+{"source_line": 1254, "t": "2026-11-05T05:37:54.372366Z", "dir": "s2c", "cmd": 20008, "msg": {"code": 1, "msg": ""}}
+{"source_line": 1255, "t": "2026-11-05T05:37:54.372366Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873975530"}}
+{"source_line": 1256, "t": "2026-11-05T05:37:54.372366Z", "dir": "s2c", "cmd": 23900, "msg": {"current_round": 1, "day_pass_round": 46, "is_appoint": 0, "is_employ": 0, "is_reward": 1, "list": [], "max_round": 46, "my_idx": 24, "new_current_round": 1, "new_day_pass_round": 0, "new_max_round": 0, "new_my_idx": 0, "new_rank_list": [], "next_time": 123726, "next_type": 3, "rank_list": [{"idx": 1, "name": "龙哥", "rid": 8, "srv_id": "symlf_90", "val": 1500}, {"idx": 2, "name": "米霍克", "rid": 19, "srv_id": "symlf_90", "val": 1313}, {"idx": 3, "name": "燃烧的南宫", "rid": 6, "srv_id": "symlf_90", "val": 1017}], "select_type": 2, "type": 5}}
+{"source_line": 1257, "t": "2026-11-05T05:37:54.39315Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 8, "max_id": 46, "rewarded": [{"id": 7}, {"id": 6}, {"id": 5}, {"id": 4}, {"id": 3}, {"id": 2}, {"id": 1}], "status": 1, "type": 5}}
+{"source_line": 1258, "t": "2026-11-05T05:37:54.39315Z", "dir": "s2c", "cmd": 23906, "msg": {"list": []}}
+{"source_line": 1259, "t": "2026-11-05T05:37:54.39315Z", "dir": "s2c", "cmd": 20006, "msg": {"adventure_end_hp": 0, "best_time": 0, "combat_type": 11, "current_time": 0, "ext_list": [], "item_rewards": [{"bid": 22, "id": 0, "is_bind": 0, "num": 279000}, {"bid": 1, "id": 0, "is_bind": 0, "num": 207500}], "result": 1, "room_id": 0, "show_panel_type": 1, "target_role_name": "第47波"}}
+{"source_line": 1262, "t": "2026-11-05T05:37:54.447281Z", "dir": "s2c", "cmd": 20006, "msg": {"adventure_end_hp": 0, "best_time": 0, "combat_type": 11, "current_time": 0, "ext_list": [], "hurt_statistics": [], "item_rewards": [], "result": 1, "room_id": 0, "show_panel_type": 0, "target_role_name": ""}}
+{"source_line": 1264, "t": "2026-11-05T05:37:59.57974Z", "dir": "s2c", "cmd": 23913, "msg": {"my_idx": 15, "top3": [[1, "龙哥", 1500], [2, "米霍克", 1313], [3, "燃烧的南宫", 1017]]}}
+{"source_line": 1268, "t": "2026-11-05T05:38:17.006187Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873975530"}}
+{"source_line": 1269, "t": "2026-11-05T05:38:17.006187Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "130000"}], "source": 0}}
+{"source_line": 1270, "t": "2026-11-05T05:38:17.006187Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 9, "max_id": 46, "rewarded": [{"id": 8}, {"id": 7}, {"id": 6}, {"id": 5}, {"id": 4}, {"id": 3}, {"id": 2}, {"id": 1}], "status": 1, "type": 5}}
+{"source_line": 1271, "t": "2026-11-05T05:38:17.006187Z", "dir": "s2c", "cmd": 23904, "msg": {"code": 1, "msg": "", "type": 5}}
+{"source_line": 1274, "t": "2026-11-05T05:38:34.499713Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 108, "base_id": 10403, "quantity": 10, "pos": 9, "storage": 1}]}
+{"source_line": 1275, "t": "2026-11-05T05:38:34.499713Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 10403, "id": 0, "is_bind": 1, "move_to": 0, "num": "1"}], "source": 0}}
+{"source_line": 1276, "t": "2026-11-05T05:38:34.499713Z", "dir": "s2c", "cmd": 23903, "msg": {"id": 10, "max_id": 46, "rewarded": [{"id": 9}, {"id": 8}, {"id": 7}, {"id": 6}, {"id": 5}, {"id": 4}, {"id": 3}, {"id": 2}, {"id": 1}], "status": 0, "type": 5}}
+{"source_line": 1277, "t": "2026-11-05T05:38:34.499713Z", "dir": "s2c", "cmd": 23904, "msg": {"code": 1, "msg": "", "type": 5}}
+{"source_line": 1280, "t": "2026-11-05T05:38:42.852934Z", "dir": "s2c", "cmd": 20061, "msg": "(battle script omitted)"}
+{"source_line": 1288, "t": "2026-11-05T05:39:19.625009Z", "dir": "s2c", "cmd": 20700, "msg": {"num": 0, "time": 0}}
+{"source_line": 1289, "t": "2026-11-05T05:39:19.625009Z", "dir": "s2c", "cmd": 20701, "msg": [[1, "龙哥", 50, 176], [3, "童心灬清景", 20, 148], [4, "河狸", 30, 139], [6, "流年灬贝克", 1, 124], [2, "越战千万", 21, 148], [5, "大飞", 1, 148]]}
+{"source_line": 1310, "t": "2026-11-05T05:41:51.333241Z", "dir": "s2c", "cmd": 20702, "msg": {"code": 1, "msg": ""}}
+{"source_line": 1312, "t": "2026-11-05T05:41:51.381493Z", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 10004, "combat_type": 17}}
+{"source_line": 1313, "t": "2026-11-05T05:41:51.381493Z", "dir": "s2c", "cmd": 20027, "msg": "(battle script omitted)"}
+{"source_line": 1318, "t": "2026-11-05T05:41:59.668564Z", "dir": "s2c", "cmd": 20006, "msg": {"adventure_end_hp": 0, "best_time": 0, "combat_type": 17, "current_time": 0, "ext_list": [], "hurt_statistics": [], "item_rewards": [], "result": 1, "room_id": 0, "show_panel_type": 0, "target_role_name": ""}}
+{"source_line": 1319, "t": "2026-11-05T05:41:59.668564Z", "dir": "s2c", "cmd": 20700, "msg": {"num": 1, "time": 0}}
+{"source_line": 1320, "t": "2026-11-05T05:41:59.668564Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "战斗胜利"}}
+{"source_line": 1321, "t": "2026-11-05T05:41:59.668564Z", "dir": "s2c", "cmd": 20705, "msg": "(battle script omitted)"}
+{"source_line": 1324, "t": "2026-11-05T05:41:59.720556Z", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 234455, "power": 230965}}
+{"source_line": 1325, "t": "2026-11-05T05:41:59.720556Z", "dir": "s2c", "cmd": 20701, "msg": [[1, "流年灬贝克", 51, 124], [3, "童心灬清景", 20, 148], [4, "河狸", 30, 139], [6, "", 1, 0], [2, "越战千万", 21, 148], [5, "大飞", 1, 148]]}
+{"source_line": 1327, "t": "2026-11-05T05:41:59.775711Z", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 236433, "power": 236433}}
+{"source_line": 1328, "t": "2026-11-05T05:41:59.775711Z", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}

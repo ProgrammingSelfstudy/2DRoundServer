@@ -1,0 +1,9 @@
+{
+  "source": "cap-20261104-213019-1.pcap (outside the repository)",
+  "bytes": 484496,
+  "sha256": "29f9aa8c3579c9f096abdbc26a595f525d9e22ac54db6c6d70819c7e8b658ec3",
+  "decoded_frames": 1333,
+  "decode_errors": 0,
+  "evidence_rows": 119,
+  "note": "source_line is the 1-based line of the full decoded jsonl, kept outside the repository; 10302 keeps only gold (gems) and coin, 10512 keeps id/base_id/quantity/pos/storage, battle scripts and 20701 player rows are reduced"
+}

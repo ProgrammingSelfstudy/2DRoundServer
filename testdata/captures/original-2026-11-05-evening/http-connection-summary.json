@@ -1,0 +1,443 @@
+[
+  {
+    "connection_alias": "aux-tcp-1",
+    "directions": [
+      {
+        "bytes": 318,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "POST"
+        ],
+        "query_keys": [
+          "timestamp",
+          "username"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "Content-Type",
+          "User-Agent",
+          "Host",
+          "Connection",
+          "Content-Length"
+        ]
+      },
+      {
+        "bytes": 294,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          200
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Transfer-Encoding",
+          "Connection",
+          "Vary",
+          "Access-Control-Allow-Origin"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-2",
+    "directions": [
+      {
+        "bytes": 236,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "GET"
+        ],
+        "query_keys": [
+          "ts"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "User-Agent",
+          "Host",
+          "Connection"
+        ]
+      },
+      {
+        "bytes": 309,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          404
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Content-Length",
+          "Connection"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-3",
+    "directions": [
+      {
+        "bytes": 248,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "POST"
+        ],
+        "query_keys": [],
+        "header_names": [
+          "Accept-Encoding",
+          "Content-Type",
+          "User-Agent",
+          "Host",
+          "Connection",
+          "Content-Length"
+        ]
+      },
+      {
+        "bytes": 2497,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          200
+        ],
+        "header_names": [
+          "Content-Length",
+          "Content-Type",
+          "Server",
+          "Date"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-4",
+    "directions": [
+      {
+        "bytes": 318,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "POST"
+        ],
+        "query_keys": [
+          "timestamp",
+          "username"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "Content-Type",
+          "User-Agent",
+          "Host",
+          "Connection",
+          "Content-Length"
+        ]
+      },
+      {
+        "bytes": 294,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          200
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Transfer-Encoding",
+          "Connection",
+          "Vary",
+          "Access-Control-Allow-Origin"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-5",
+    "directions": [
+      {
+        "bytes": 236,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "GET"
+        ],
+        "query_keys": [
+          "ts"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "User-Agent",
+          "Host",
+          "Connection"
+        ]
+      },
+      {
+        "bytes": 309,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          404
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Content-Length",
+          "Connection"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-6",
+    "directions": [
+      {
+        "bytes": 318,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "POST"
+        ],
+        "query_keys": [
+          "timestamp",
+          "username"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "Content-Type",
+          "User-Agent",
+          "Host",
+          "Connection",
+          "Content-Length"
+        ]
+      },
+      {
+        "bytes": 294,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          200
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Transfer-Encoding",
+          "Connection",
+          "Vary",
+          "Access-Control-Allow-Origin"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-7",
+    "directions": [
+      {
+        "bytes": 236,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "GET"
+        ],
+        "query_keys": [
+          "ts"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "User-Agent",
+          "Host",
+          "Connection"
+        ]
+      },
+      {
+        "bytes": 309,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          404
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Content-Length",
+          "Connection"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-8",
+    "directions": [
+      {
+        "bytes": 341,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "POST"
+        ],
+        "query_keys": [
+          "money",
+          "name",
+          "productId",
+          "role_id",
+          "srv_id"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "Content-Type",
+          "User-Agent",
+          "Host",
+          "Connection",
+          "Content-Length"
+        ]
+      },
+      {
+        "bytes": 423,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          200
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Transfer-Encoding",
+          "Connection",
+          "Vary",
+          "P3P",
+          "Set-Cookie",
+          "Expires",
+          "Cache-Control",
+          "Pragma"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-9",
+    "directions": [
+      {
+        "bytes": 318,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "POST"
+        ],
+        "query_keys": [
+          "timestamp",
+          "username"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "Content-Type",
+          "User-Agent",
+          "Host",
+          "Connection",
+          "Content-Length"
+        ]
+      },
+      {
+        "bytes": 294,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          200
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Transfer-Encoding",
+          "Connection",
+          "Vary",
+          "Access-Control-Allow-Origin"
+        ]
+      }
+    ]
+  },
+  {
+    "connection_alias": "aux-tcp-10",
+    "directions": [
+      {
+        "bytes": 236,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "request",
+        "methods": [
+          "GET"
+        ],
+        "query_keys": [
+          "ts"
+        ],
+        "header_names": [
+          "Accept-Encoding",
+          "User-Agent",
+          "Host",
+          "Connection"
+        ]
+      },
+      {
+        "bytes": 309,
+        "holes": 0,
+        "conflicts": 0,
+        "protocol": "HTTP",
+        "kind": "response",
+        "status_codes": [
+          404
+        ],
+        "header_names": [
+          "Server",
+          "Date",
+          "Content-Type",
+          "Content-Length",
+          "Connection"
+        ]
+      }
+    ]
+  }
+]

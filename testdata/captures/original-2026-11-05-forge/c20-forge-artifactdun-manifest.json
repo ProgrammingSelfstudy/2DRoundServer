@@ -1,0 +1,9 @@
+{
+  "source": "cap-20261104-211001-1.pcap (outside the repository)",
+  "bytes": 287713,
+  "sha256": "2e777944d9a92da0d55da954df09eb24e684117a49e5cc082a620ad435c56a3c",
+  "decoded_frames": 627,
+  "decode_errors": 0,
+  "evidence_rows": 28,
+  "note": "source_line is the 1-based line of the full decoded jsonl, kept outside the repository; 10302 keeps only gold (gems) and coin, 20006 only the fields the dungeon reply uses, battle scripts are omitted"
+}

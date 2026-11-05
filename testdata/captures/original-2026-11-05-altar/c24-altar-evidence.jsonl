@@ -1,0 +1,69 @@
+{"source_line": 384, "t": "2026-11-05T06:13:35.284338Z", "dir": "c2s", "cmd": 11075, "msg": {"partners": 100}}
+{"source_line": 392, "t": "2026-11-05T06:14:08.46079Z", "dir": "c2s", "cmd": 11076, "msg": {"partners": 100}}
+{"source_line": 400, "t": "2026-11-05T06:14:33.871773Z", "dir": "c2s", "cmd": 11075, "msg": {"partners": 100}}
+{"source_line": 402, "t": "2026-11-05T06:14:38.716084Z", "dir": "c2s", "cmd": 11076, "msg": {"partners": 100}}
+{"source_line": 411, "t": "2026-11-05T06:15:02.27934Z", "dir": "c2s", "cmd": 23230, "msg": null}
+{"source_line": 413, "t": "2026-11-05T06:15:06.314443Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 4, "times": 10}}
+{"source_line": 440, "t": "2026-11-05T06:17:07.949471Z", "dir": "c2s", "cmd": 23234, "msg": null}
+{"source_line": 448, "t": "2026-11-05T06:17:33.484777Z", "dir": "c2s", "cmd": 23213, "msg": {"group_id": 1000}}
+{"source_line": 463, "t": "2026-11-05T06:18:34.957773Z", "dir": "c2s", "cmd": 16637, "msg": null}
+{"source_line": 469, "t": "2026-11-05T06:18:59.880048Z", "dir": "c2s", "cmd": 16642, "msg": {"type": 1}}
+{"source_line": 473, "t": "2026-11-05T06:19:07.012281Z", "dir": "c2s", "cmd": 16638, "msg": {"type": 1, "type2": 1}}
+{"source_line": 481, "t": "2026-11-05T06:19:38.723743Z", "dir": "c2s", "cmd": 16638, "msg": {"type": 1, "type2": 2}}
+{"source_line": 509, "t": "2026-11-05T06:21:42.959195Z", "dir": "c2s", "cmd": 16642, "msg": {"type": 2}}
+{"source_line": 513, "t": "2026-11-05T06:21:54.200355Z", "dir": "c2s", "cmd": 16638, "msg": {"type": 2, "type2": 1}}
+{"source_line": 517, "t": "2026-11-05T06:22:06.311495Z", "dir": "c2s", "cmd": 16638, "msg": {"type": 2, "type2": 2}}
+{"source_line": 525, "t": "2026-11-05T06:22:32.194196Z", "dir": "c2s", "cmd": 16640, "msg": {"id": 6, "type": 2}}
+{"source_line": 750, "t": "2026-11-05T06:13:35.387537Z", "dir": "s2c", "cmd": 11075, "msg": {"code": 1, "list": [{"id": 11, "num": 1000}, {"id": 10001, "num": 1000}, {"id": 22, "num": 50000}], "msg": ""}}
+{"source_line": 754, "t": "2026-11-05T06:14:08.591013Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1173975530"}}
+{"source_line": 755, "t": "2026-11-05T06:14:08.591013Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 5, "base_id": 10001, "quantity": 590602, "pos": 5, "storage": 1}]}
+{"source_line": 756, "t": "2026-11-05T06:14:08.591013Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 11, "id": 0, "is_bind": 1, "move_to": 0, "num": "1000"}, {"bid": 10001, "id": 0, "is_bind": 1, "move_to": 0, "num": "1000"}, {"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "50000"}], "source": 0}}
+{"source_line": 758, "t": "2026-11-05T06:14:08.639254Z", "dir": "s2c", "cmd": 11076, "msg": {"code": 1, "partners": 100}}
+{"source_line": 762, "t": "2026-11-05T06:14:33.95847Z", "dir": "s2c", "cmd": 11075, "msg": {"code": 1, "list": [{"id": 11, "num": 1000}, {"id": 10001, "num": 1000}, {"id": 22, "num": 50000}], "msg": ""}}
+{"source_line": 763, "t": "2026-11-05T06:14:38.842968Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1173975530"}}
+{"source_line": 764, "t": "2026-11-05T06:14:38.842968Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 5, "base_id": 10001, "quantity": 591602, "pos": 5, "storage": 1}]}
+{"source_line": 765, "t": "2026-11-05T06:14:38.842968Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 11, "id": 0, "is_bind": 1, "move_to": 0, "num": "1000"}, {"bid": 10001, "id": 0, "is_bind": 1, "move_to": 0, "num": "1000"}, {"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "50000"}], "source": 0}}
+{"source_line": 766, "t": "2026-11-05T06:14:38.889562Z", "dir": "s2c", "cmd": 11076, "msg": {"code": 1, "partners": 100}}
+{"source_line": 771, "t": "2026-11-05T06:15:02.338428Z", "dir": "s2c", "cmd": 23230, "msg": {"camp_id": 50051, "end_time": 1900079999, "free_time": 1793894400, "item_id": 3686, "item_num": 0, "lucky_bid": 29426, "must_count": 37, "reward_list": [{"id": 5}, {"id": 4}, {"id": 3}, {"id": 1}, {"id": 2}], "start_time": 1741104000, "times": 435}}
+{"source_line": 772, "t": "2026-11-05T06:15:06.373368Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1173975530"}}
+{"source_line": 773, "t": "2026-11-05T06:15:06.373368Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 10, "base_id": 10408, "quantity": 6, "pos": 10, "storage": 1}]}
+{"source_line": 784, "t": "2026-11-05T06:15:06.373368Z", "dir": "s2c", "cmd": 23201, "msg": {"flag": 3, "group_id": 50051, "must_five_num": 0, "partner_bids": 10, "partner_chips": 0, "rewards": 10, "times": 10}}
+{"source_line": 785, "t": "2026-11-05T06:15:06.373368Z", "dir": "s2c", "cmd": 23230, "msg": {"camp_id": 50051, "end_time": 1900079999, "free_time": 1793894400, "item_id": 3686, "item_num": 0, "lucky_bid": 29426, "must_count": 27, "reward_list": [{"id": 5}, {"id": 4}, {"id": 3}, {"id": 1}, {"id": 2}], "start_time": 1741104000, "times": 445}}
+{"source_line": 808, "t": "2026-11-05T06:17:33.627681Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1173975530"}}
+{"source_line": 809, "t": "2026-11-05T06:17:33.627681Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 19, "base_id": 14002, "quantity": 450, "pos": 17, "storage": 1}, {"id": 26, "base_id": 14001, "quantity": 410, "pos": 21, "storage": 1}]}
+{"source_line": 810, "t": "2026-11-05T06:17:33.627681Z", "dir": "s2c", "cmd": 10510, "msg": [{"id": 208, "base_id": 24803, "quantity": 30, "pos": 69, "storage": 1}]}
+{"source_line": 811, "t": "2026-11-05T06:17:33.627681Z", "dir": "s2c", "cmd": 23213, "msg": {"group_id": 1000, "rewards": [{"base_id": 24803, "num": 30}, {"base_id": 24, "num": 1}, {"base_id": 14002, "num": 30}, {"base_id": 39, "num": 50}]}}
+{"source_line": 822, "t": "2026-11-05T06:18:35.057833Z", "dir": "s2c", "cmd": 16637, "msg": {"count": 200, "end_time": 1792588527, "frist_type": 0, "log_list": 0, "lucky": 0, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 825, "t": "2026-11-05T06:19:00.018558Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 0, "end_time": 1793870340, "frist_type": 0, "lucky": 0, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 826, "t": "2026-11-05T06:19:00.018558Z", "dir": "s2c", "cmd": 16642, "msg": {"code": 1, "msg": "", "type": 1}}
+{"source_line": 828, "t": "2026-11-05T06:19:07.14129Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 11, "base_id": 37001, "quantity": 480, "pos": 11, "storage": 1}]}
+{"source_line": 829, "t": "2026-11-05T06:19:07.187334Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1173975530"}}
+{"source_line": 830, "t": "2026-11-05T06:19:07.187334Z", "dir": "s2c", "cmd": 10510, "msg": [{"id": 209, "base_id": 10451, "quantity": 1, "pos": 83, "storage": 1}]}
+{"source_line": 832, "t": "2026-11-05T06:19:07.187334Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 1, "end_time": 1793870340, "frist_type": 0, "lucky": 10, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 833, "t": "2026-11-05T06:19:07.187334Z", "dir": "s2c", "cmd": 16638, "msg": {"awards1": [{"bid": 18, "num": 10}], "awards2": [{"bid": 10451, "num": 1}], "awards3": [{"pos": 3}], "code": 1, "frist_awards": [], "msg": ""}}
+{"source_line": 836, "t": "2026-11-05T06:19:12.705293Z", "dir": "s2c", "cmd": 16641, "msg": {"log_list": [{"bid": 10451, "num": 1, "role_name": "流年灬贝克"}], "type": 1}}
+{"source_line": 840, "t": "2026-11-05T06:19:38.822917Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 11, "base_id": 37001, "quantity": 468, "pos": 11, "storage": 1}]}
+{"source_line": 841, "t": "2026-11-05T06:19:38.828146Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1174135530"}}
+{"source_line": 842, "t": "2026-11-05T06:19:38.828146Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 102, "base_id": 40206, "quantity": 2, "pos": 91, "storage": 3}]}
+{"source_line": 843, "t": "2026-11-05T06:19:38.828146Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 22, "base_id": 72001, "quantity": 2483, "pos": 20, "storage": 1}, {"id": 19, "base_id": 14002, "quantity": 460, "pos": 17, "storage": 1}]}
+{"source_line": 846, "t": "2026-11-05T06:19:38.868568Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 16, "end_time": 1793870340, "frist_type": 0, "lucky": 160, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 847, "t": "2026-11-05T06:19:38.868568Z", "dir": "s2c", "cmd": 16638, "msg": {"awards1": [{"bid": 18, "num": 150}], "awards2": [{"bid": 72001, "num": 2}, {"bid": 1, "num": 40000}, {"bid": 22, "num": 30000}, {"bid": 72001, "num": 2}, {"bid": 22, "num": 30000}, {"bid": 14002, "num": 5}, {"bid": 22, "num": 30000}, {"bid": 40206, "num": 1}, {"bid": 22, "num": 30000}, {"bid": 1, "num": 40000}, {"bid": 22, "num": 30000}, {"bid": 1, "num": 40000}, {"bid": 22, "num": 30000}, {"bid": 14002, "num": 5}, {"bid": 1, "num": 40000}], "awards3": [{"pos": 4}, {"pos": 2}, {"pos": 6}, {"pos": 4}, {"pos": 6}, {"pos": 4}, {"pos": 6}, {"pos": 7}, {"pos": 6}, {"pos": 2}, {"pos": 6}, {"pos": 8}, {"pos": 6}, {"pos": 4}, {"pos": 8}], "code": 1, "frist_awards": [], "msg": ""}}
+{"source_line": 850, "t": "2026-11-05T06:19:44.386194Z", "dir": "s2c", "cmd": 16641, "msg": {"log_list": [{"bid": 40206, "num": 1, "role_name": "流年灬贝克"}, {"bid": 10451, "num": 1, "role_name": "流年灬贝克"}], "type": 1}}
+{"source_line": 866, "t": "2026-11-05T06:21:43.059488Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 200, "end_time": 1793870503, "frist_type": 0, "lucky": 0, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 867, "t": "2026-11-05T06:21:43.059488Z", "dir": "s2c", "cmd": 16642, "msg": {"code": 1, "msg": "", "type": 2}}
+{"source_line": 869, "t": "2026-11-05T06:21:54.340682Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 14, "base_id": 37002, "quantity": 719, "pos": 13, "storage": 1}]}
+{"source_line": 870, "t": "2026-11-05T06:21:54.386985Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1174135530"}}
+{"source_line": 871, "t": "2026-11-05T06:21:54.386985Z", "dir": "s2c", "cmd": 10510, "msg": [{"id": 108, "base_id": 40410, "quantity": 1, "pos": 3, "storage": 3}]}
+{"source_line": 874, "t": "2026-11-05T06:21:54.386985Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 201, "end_time": 1793870503, "frist_type": 0, "lucky": 10, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 875, "t": "2026-11-05T06:21:54.386985Z", "dir": "s2c", "cmd": 16638, "msg": {"awards1": [{"bid": 18, "num": 10}], "awards2": [{"bid": 40410, "num": 1}], "awards3": [{"pos": 5}], "code": 1, "frist_awards": [], "msg": ""}}
+{"source_line": 877, "t": "2026-11-05T06:21:59.745619Z", "dir": "s2c", "cmd": 16641, "msg": {"log_list": [{"bid": 40410, "num": 1, "role_name": "流年灬贝克"}], "type": 2}}
+{"source_line": 879, "t": "2026-11-05T06:22:06.421059Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 14, "base_id": 37002, "quantity": 709, "pos": 13, "storage": 1}]}
+{"source_line": 880, "t": "2026-11-05T06:22:06.426404Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1180135530"}}
+{"source_line": 881, "t": "2026-11-05T06:22:06.426404Z", "dir": "s2c", "cmd": 10510, "msg": [{"id": 210, "base_id": 10452, "quantity": 1, "pos": 84, "storage": 1}, {"id": 211, "base_id": 10452, "quantity": 1, "pos": 85, "storage": 1}]}
+{"source_line": 882, "t": "2026-11-05T06:22:06.426404Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 30, "base_id": 72002, "quantity": 305, "pos": 25, "storage": 1}]}
+{"source_line": 885, "t": "2026-11-05T06:22:06.46555Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 211, "end_time": 1793870503, "frist_type": 0, "lucky": 110, "lucky_award": 0, "rand_lists": 8}}
+{"source_line": 886, "t": "2026-11-05T06:22:06.46555Z", "dir": "s2c", "cmd": 16638, "msg": {"awards1": [{"bid": 18, "num": 100}], "awards2": [{"bid": 72002, "num": 5}, {"bid": 1, "num": 1500000}, {"bid": 10452, "num": 1}, {"bid": 72002, "num": 5}, {"bid": 72002, "num": 5}, {"bid": 1, "num": 1500000}, {"bid": 1, "num": 1500000}, {"bid": 10452, "num": 1}, {"bid": 72002, "num": 5}, {"bid": 1, "num": 1500000}], "awards3": [{"pos": 6}, {"pos": 2}, {"pos": 4}, {"pos": 6}, {"pos": 6}, {"pos": 2}, {"pos": 2}, {"pos": 4}, {"pos": 6}, {"pos": 2}], "code": 1, "frist_awards": [], "msg": ""}}
+{"source_line": 891, "t": "2026-11-05T06:22:32.259561Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 11, "base_id": 37001, "quantity": 478, "pos": 11, "storage": 1}]}
+{"source_line": 892, "t": "2026-11-05T06:22:32.259561Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 37001, "id": 0, "is_bind": 1, "move_to": 0, "num": "10"}], "source": 0}}
+{"source_line": 893, "t": "2026-11-05T06:22:32.259561Z", "dir": "s2c", "cmd": 16639, "msg": {"count": 211, "end_time": 1793870503, "frist_type": 0, "lucky": 110, "lucky_award": 1, "rand_lists": 8}}
+{"source_line": 894, "t": "2026-11-05T06:22:32.259561Z", "dir": "s2c", "cmd": 16640, "msg": {"code": 1, "msg": "", "type": 2}}

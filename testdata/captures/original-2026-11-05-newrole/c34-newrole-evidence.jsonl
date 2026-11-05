@@ -1,0 +1,73 @@
+{"t": "2026-11-05T09:10:43.078979Z", "stream": "game", "dir": "c2s", "cmd": 10191, "msg": {"career": 0, "name": "", "playform": "symlf", "sex": 0}}
+{"t": "2026-11-05T09:10:43.274243Z", "stream": "game", "dir": "c2s", "cmd": 10192, "msg": {"rid": 21, "srv_id": "symlf_93"}}
+{"t": "2026-11-05T09:10:43.712369Z", "stream": "game", "dir": "c2s", "cmd": 10303}
+{"t": "2026-11-05T09:10:43.93456Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10008, "step_id": 1}}
+{"t": "2026-11-05T09:10:44.609405Z", "stream": "game", "dir": "c2s", "cmd": 11099, "msg": {"partner_ids": []}}
+{"t": "2026-11-05T09:11:03.968932Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10008, "step_id": 2}}
+{"t": "2026-11-05T09:11:04.122938Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10010, "step_id": 1}}
+{"t": "2026-11-05T09:11:09.421185Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10010, "step_id": 2}}
+{"t": "2026-11-05T09:11:14.44093Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10010, "step_id": 3}}
+{"t": "2026-11-05T09:11:19.461296Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10010, "step_id": 4}}
+{"t": "2026-11-05T09:11:45.557588Z", "stream": "game", "dir": "c2s", "cmd": 10343, "msg": {"name": "纯情的回忆", "sex": 1}}
+{"t": "2026-11-05T09:11:45.77565Z", "stream": "game", "dir": "c2s", "cmd": 11099, "msg": {"partner_ids": [{"partner_id": 1}]}}
+{"t": "2026-11-05T09:11:45.792263Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10012, "step_id": 1}}
+{"t": "2026-11-05T09:11:51.038372Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10012, "step_id": 2}}
+{"t": "2026-11-05T09:11:56.067957Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10012, "step_id": 3}}
+{"t": "2026-11-05T09:12:34.333847Z", "stream": "game", "dir": "c2s", "cmd": 23201, "msg": {"group_id": 100, "recruit_type": 1, "times": 1}}
+{"t": "2026-11-05T09:12:34.333847Z", "stream": "game", "dir": "c2s", "cmd": 11121, "msg": {"id": 10010, "n": 5}}
+{"t": "2026-11-05T09:14:11.713097Z", "stream": "game", "dir": "c2s", "cmd": 11122, "msg": {"id": 10010, "is_skip": 0}}
+{"t": "2026-11-05T09:15:09.735228Z", "stream": "game", "dir": "c2s", "cmd": 13003, "msg": {"is_auto": 0}}
+{"t": "2026-11-05T09:15:09.808201Z", "stream": "game", "dir": "c2s", "cmd": 11099, "msg": {"partner_ids": [{"partner_id": 1}, {"partner_id": 2}]}}
+{"t": "2026-11-05T09:15:09.950995Z", "stream": "game", "dir": "c2s", "cmd": 11122, "msg": {"id": 10030, "is_skip": 0}}
+{"t": "2026-11-05T09:15:12.216751Z", "stream": "game", "dir": "c2s", "cmd": 20001}
+{"t": "2026-11-05T09:15:21.38885Z", "stream": "game", "dir": "c2s", "cmd": 11099, "msg": {"partner_ids": [{"partner_id": 1}, {"partner_id": 2}]}}
+{"t": "2026-11-05T09:15:36.986069Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10040, "step_id": 1}}
+{"t": "2026-11-05T09:15:42.07415Z", "stream": "game", "dir": "c2s", "cmd": 11100, "msg": {"drama_bid": 10040, "step_id": 2}}
+{"t": "2026-11-05T09:10:43.240671Z", "stream": "game", "dir": "s2c", "cmd": 10191, "msg": {"code": 1, "msg": "", "name": "童心之志伟", "reg_time": 1793869843, "rid": 21, "srv_id": "symlf_93"}}
+{"t": "2026-11-05T09:10:43.580165Z", "stream": "game", "dir": "s2c", "cmd": 10192, "msg": {"code": 1, "msg": "", "timestamp": 1793869844, "world_lev": 151}}
+{"t": "2026-11-05T09:10:43.666362Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "0", "diamond": null, "acc_recruit_hero": 0}}
+{"t": "2026-11-05T09:10:43.666362Z", "stream": "game", "dir": "s2c", "cmd": 10403, "msg": "(omitted)"}
+{"t": "2026-11-05T09:10:43.772354Z", "stream": "game", "dir": "s2c", "cmd": 11101, "msg": {"drama_bid": 10008}}
+{"t": "2026-11-05T09:10:43.772354Z", "stream": "game", "dir": "s2c", "cmd": 11101, "msg": {"drama_bid": 10008}}
+{"t": "2026-11-05T09:10:43.827617Z", "stream": "game", "dir": "s2c", "cmd": 10303, "msg": {"klb": 100000}}
+{"t": "2026-11-05T09:10:44.728542Z", "stream": "game", "dir": "s2c", "cmd": 11099, "msg": {"partner_ids": []}}
+{"t": "2026-11-05T09:11:04.106293Z", "stream": "game", "dir": "s2c", "cmd": 11100}
+{"t": "2026-11-05T09:11:04.106293Z", "stream": "game", "dir": "s2c", "cmd": 11101, "msg": {"drama_bid": 10010}}
+{"t": "2026-11-05T09:11:04.106293Z", "stream": "game", "dir": "s2c", "cmd": 11101, "msg": {"drama_bid": 10010}}
+{"t": "2026-11-05T09:11:19.547593Z", "stream": "game", "dir": "s2c", "cmd": 10342}
+{"t": "2026-11-05T09:11:19.547593Z", "stream": "game", "dir": "s2c", "cmd": 11100}
+{"t": "2026-11-05T09:11:45.725373Z", "stream": "game", "dir": "s2c", "cmd": 10343, "msg": {"code": 1, "is_first_rename": 1, "msg": "", "name": "纯情的回忆", "sex": 1}}
+{"t": "2026-11-05T09:11:45.784192Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 877, "power": 877}}
+{"t": "2026-11-05T09:11:45.784192Z", "stream": "game", "dir": "s2c", "cmd": 11101, "msg": {"drama_bid": 10012}}
+{"t": "2026-11-05T09:11:45.842263Z", "stream": "game", "dir": "s2c", "cmd": 11099, "msg": {"partner_ids": [{"dower_skill": [], "partner_id": 1}]}}
+{"t": "2026-11-05T09:11:56.18777Z", "stream": "game", "dir": "s2c", "cmd": 11120, "msg": {"id": 10010, "n": 0}}
+{"t": "2026-11-05T09:11:56.18777Z", "stream": "game", "dir": "s2c", "cmd": 11120, "msg": {"id": 10010, "n": 0}}
+{"t": "2026-11-05T09:11:56.249371Z", "stream": "game", "dir": "s2c", "cmd": 11100}
+{"t": "2026-11-05T09:12:34.409627Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "0", "diamond": null, "acc_recruit_hero": 1}}
+{"t": "2026-11-05T09:12:34.409627Z", "stream": "game", "dir": "s2c", "cmd": 23201, "msg": {"flag": 0, "group_id": 100, "must_five_num": 10, "partner_bids": [{"init_star": 3, "partner_bid": 10302}], "partner_chips": [], "rewards": [{"base_id": 24201, "num": 1}], "times": 1}}
+{"t": "2026-11-05T09:12:34.409627Z", "stream": "game", "dir": "s2c", "cmd": 23202, "msg": {"free_cd_end": 1793912400, "free_times": 0, "group_id": 100}}
+{"t": "2026-11-05T09:12:34.409627Z", "stream": "game", "dir": "s2c", "cmd": 10409, "msg": {"quest_list": [{"accept_time": 0, "finish": 0, "id": 90003, "progress": [{"ext_data": [], "finish": 0, "id": 0, "target": 0, "target_val": 3, "value": 1}]}]}}
+{"t": "2026-11-05T09:12:34.471241Z", "stream": "game", "dir": "s2c", "cmd": 11121, "msg": {"id": 10010, "n": 5}}
+{"t": "2026-11-05T09:14:11.780513Z", "stream": "game", "dir": "s2c", "cmd": 11120, "msg": {"id": 10030, "n": 0}}
+{"t": "2026-11-05T09:14:11.780513Z", "stream": "game", "dir": "s2c", "cmd": 11122}
+{"t": "2026-11-05T09:15:09.708472Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 1590, "power": 1590}}
+{"t": "2026-11-05T09:15:09.792536Z", "stream": "game", "dir": "s2c", "cmd": 13003, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T09:15:09.873583Z", "stream": "game", "dir": "s2c", "cmd": 20000, "msg": {"combat_map": 20001, "combat_type": 3}}
+{"t": "2026-11-05T09:15:09.976355Z", "stream": "game", "dir": "s2c", "cmd": 11099, "msg": {"partner_ids": [{"dower_skill": [], "partner_id": 1}, {"dower_skill": [], "partner_id": 2}]}}
+{"t": "2026-11-05T09:15:10.029291Z", "stream": "game", "dir": "s2c", "cmd": 11122}
+{"t": "2026-11-05T09:15:12.34791Z", "stream": "game", "dir": "s2c", "cmd": 20001, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-05T09:15:21.340825Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "diamond": null, "acc_recruit_hero": 1}}
+{"t": "2026-11-05T09:15:21.340825Z", "stream": "game", "dir": "s2c", "cmd": 13001, "msg": {"chapter_id": 1, "cool_time": 0, "dun_id": 10010, "is_first": 1, "max_dun_id": 10010, "mode": 1, "status": 3}}
+{"t": "2026-11-05T09:15:21.340825Z", "stream": "game", "dir": "s2c", "cmd": 10528, "msg": {"minu_exp": 100, "time": 600}}
+{"t": "2026-11-05T09:15:21.340825Z", "stream": "game", "dir": "s2c", "cmd": 13001, "msg": {"chapter_id": 1, "cool_time": 1793870123, "dun_id": 10020, "is_first": 1, "max_dun_id": 10010, "mode": 1, "status": 1}}
+{"t": "2026-11-05T09:15:21.340825Z", "stream": "game", "dir": "s2c", "cmd": 23604, "msg": {"ext_reward": [{"rate": 200, "type": 2}, {"rate": 200, "type": 1}]}}
+{"t": "2026-11-05T09:15:21.340825Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "diamond": null, "acc_recruit_hero": 1}}
+{"t": "2026-11-05T09:15:21.396971Z", "stream": "game", "dir": "s2c", "cmd": 16653, "msg": {"award_list": [], "charge_id": 0, "end_time": 0, "is_buy": 0}}
+{"t": "2026-11-05T09:15:21.396971Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "4000", "diamond": null, "acc_recruit_hero": 1}}
+{"t": "2026-11-05T09:15:21.396971Z", "stream": "game", "dir": "s2c", "cmd": 11101, "msg": {"drama_bid": 10040}}
+{"t": "2026-11-05T09:15:21.396971Z", "stream": "game", "dir": "s2c", "cmd": 10344, "msg": {"lev": 2, "old_lev": 1}}
+{"t": "2026-11-05T09:15:21.458175Z", "stream": "game", "dir": "s2c", "cmd": 11099, "msg": {"partner_ids": [{"dower_skill": [], "partner_id": 1}, {"dower_skill": [], "partner_id": 2}]}}
+{"t": "2026-11-05T09:15:23.26081Z", "stream": "game", "dir": "s2c", "cmd": 13001, "msg": {"chapter_id": 1, "cool_time": 0, "dun_id": 10020, "is_first": 1, "max_dun_id": 10010, "mode": 1, "status": 2}}
+{"t": "2026-11-05T09:15:42.132556Z", "stream": "game", "dir": "s2c", "cmd": 11120, "msg": {"id": 10040, "n": 0}}
+{"t": "2026-11-05T09:15:42.132556Z", "stream": "game", "dir": "s2c", "cmd": 11120, "msg": {"id": 10040, "n": 0}}
+{"t": "2026-11-05T09:15:42.132556Z", "stream": "game", "dir": "s2c", "cmd": 11100}

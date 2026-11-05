@@ -1,0 +1,36 @@
+{"t": "2026-11-05T11:12:33.822653Z", "stream": "game", "dir": "c2s", "cmd": 10986, "msg": {"id": 2}}
+{"t": "2026-11-05T11:12:33.822653Z", "stream": "game", "dir": "c2s", "cmd": 23700, "msg": {"career": 3}}
+{"t": "2026-11-05T11:12:47.720405Z", "stream": "game", "dir": "c2s", "cmd": 23701, "msg": {"skill_id": 10012}}
+{"t": "2026-11-05T11:12:50.786434Z", "stream": "game", "dir": "c2s", "cmd": 23701, "msg": {"skill_id": 10013}}
+{"t": "2026-11-05T11:13:30.66395Z", "stream": "game", "dir": "c2s", "cmd": 13546}
+{"t": "2026-11-05T11:14:01.505179Z", "stream": "game", "dir": "c2s", "cmd": 13545}
+{"t": "2026-11-05T11:14:42.776411Z", "stream": "game", "dir": "c2s", "cmd": 21300}
+{"t": "2026-11-05T11:14:42.865316Z", "stream": "game", "dir": "c2s", "cmd": 21319, "msg": {"boss_id": 101, "end_num": 100, "start_num": 1}}
+{"t": "2026-11-05T11:14:57.254029Z", "stream": "game", "dir": "c2s", "cmd": 11211, "msg": {"type": 4}}
+{"t": "2026-11-05T11:14:57.254029Z", "stream": "game", "dir": "c2s", "cmd": 26555, "msg": {"type": 4}}
+{"t": "2026-11-05T11:15:16.536655Z", "stream": "game", "dir": "c2s", "cmd": 21308, "msg": {"boss_id": 101, "formation_type": 1, "hallows_id": 0, "pos_info": []}}
+{"t": "2026-11-05T11:17:11.676366Z", "stream": "game", "dir": "c2s", "cmd": 10397, "msg": {"status": 1}}
+{"t": "2026-11-05T11:12:33.876956Z", "stream": "game", "dir": "s2c", "cmd": 23700, "msg": {"career": 3, "group_id": 1001, "group_ids": [], "skill_ids": [{"skill_id": 10011}]}}
+{"t": "2026-11-05T11:12:47.773636Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1230648114"}}
+{"t": "2026-11-05T11:12:47.773636Z", "stream": "game", "dir": "s2c", "cmd": 12741, "msg": {"msg": "公会活跃值+10"}}
+{"t": "2026-11-05T11:12:47.773636Z", "stream": "game", "dir": "s2c", "cmd": 16902, "msg": {"list": [{"finish": 0, "id": 101, "target_val": 3, "value": 1}]}}
+{"t": "2026-11-05T11:12:47.773636Z", "stream": "game", "dir": "s2c", "cmd": 16900, "msg": {"day_exp": 20, "exp": 45, "lev": 0, "week_exp": 20}}
+{"t": "2026-11-05T11:12:47.833343Z", "stream": "game", "dir": "s2c", "cmd": 23701, "msg": {"career": 3, "code": 1, "msg": "激活成功", "skill_id": 10012}}
+{"t": "2026-11-05T11:12:47.833343Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 240406, "power": 240406}}
+{"t": "2026-11-05T11:12:47.833343Z", "stream": "game", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}
+{"t": "2026-11-05T11:12:50.854504Z", "stream": "game", "dir": "s2c", "cmd": 10302, "msg": {"coin": "1230639714"}}
+{"t": "2026-11-05T11:12:50.866184Z", "stream": "game", "dir": "s2c", "cmd": 12741, "msg": {"msg": "公会活跃值+10"}}
+{"t": "2026-11-05T11:12:50.866184Z", "stream": "game", "dir": "s2c", "cmd": 16902, "msg": {"list": [{"finish": 0, "id": 101, "target_val": 3, "value": 2}]}}
+{"t": "2026-11-05T11:12:50.866184Z", "stream": "game", "dir": "s2c", "cmd": 16900, "msg": {"day_exp": 30, "exp": 55, "lev": 0, "week_exp": 30}}
+{"t": "2026-11-05T11:12:50.912158Z", "stream": "game", "dir": "s2c", "cmd": 23701, "msg": {"career": 3, "code": 1, "msg": "激活成功", "skill_id": 10013}}
+{"t": "2026-11-05T11:12:50.912158Z", "stream": "game", "dir": "s2c", "cmd": 10306, "msg": {"max_power": 240476, "power": 240476}}
+{"t": "2026-11-05T11:12:50.912158Z", "stream": "game", "dir": "s2c", "cmd": 23402, "msg": {"code": 2}}
+{"t": "2026-11-05T11:13:30.732549Z", "stream": "game", "dir": "s2c", "cmd": 13546, "msg": {"list": []}}
+{"t": "2026-11-05T11:14:01.574331Z", "stream": "game", "dir": "s2c", "cmd": 13545, "msg": {"list": []}}
+{"t": "2026-11-05T11:14:42.836181Z", "stream": "game", "dir": "s2c", "cmd": 21300, "msg": {"buff_end_time": 0, "buff_lev": 0, "buy_count": 0, "coldtime": 0, "combat_info": [{"boss_id": 101, "dps": 0}], "count": 2, "fid": 1, "info": [{"boss_id": 101, "hp": 1000000}], "max_id": 0, "ref_time": 294317, "worship": 0}}
+{"t": "2026-11-05T11:14:42.928947Z", "stream": "game", "dir": "s2c", "cmd": 21319, "msg": {"day_worship": 0, "mydps": 0, "rank": 0, "rank_list": [], "worship": 0}}
+{"t": "2026-11-05T11:14:57.312617Z", "stream": "game", "dir": "s2c", "cmd": 11211, "msg": {"formation_type": 1, "hallows_id": 0, "pos_info": [{"id": 388, "pos": 3}], "type": 4}}
+{"t": "2026-11-05T11:14:57.312617Z", "stream": "game", "dir": "s2c", "cmd": 26555, "msg": {"team_list": [{"plan_id": 0, "sprites": [{"item_bid": 111101, "pos": 1}], "team": 1}], "type": 4}}
+{"t": "2026-11-05T11:15:16.597092Z", "stream": "game", "dir": "s2c", "cmd": 21308, "msg": {"code": 0, "msg": "至少需要上阵一个英雄"}}
+{"t": "2026-11-05T11:16:46.25219Z", "stream": "game", "dir": "s2c", "cmd": 16606, "msg": {"bid": 991050, "can_get_num": 0}}
+{"t": "2026-11-05T11:16:46.25219Z", "stream": "game", "dir": "s2c", "cmd": 21024, "msg": {"list": [{"id": 4}]}}

@@ -33,12 +33,28 @@ func TestChargeTiersAndOrders(t *testing.T) {
 	if r := c.waitFor(10947); r.Int("code") != 0 {
 		t.Fatalf("10947 not payable: %v", r)
 	}
-	c.send(10947, proto.Message{"charge_id": 4, "notify_url": ""})
+	c.send(10947, proto.Message{"charge_id": 4, "notify_url": ""}) // a diamond tier: paid in 快乐币 (pay_web), not by QR code
+	if r := c.waitFor(10947); r.Int("code") != 0 {
+		t.Fatalf("10947 for a diamond tier: %v", r)
+	}
+	c.send(10947, proto.Message{"charge_id": 30001, "notify_url": ""})
 	r = c.waitFor(10947)
 	if r.Int("code") != 1 || !strings.HasPrefix(r.Str("url"), "http://pay.test/pay/order/P") {
 		t.Fatalf("10947: %v", r)
 	}
+	if n, _ := e.st.PendingPayOrders(role.RID); n != 1 {
+		t.Fatalf("%d orders wait after the QR order", n)
+	}
 	no := strings.TrimPrefix(r.Str("url"), "http://pay.test/pay/order/")
+	if _, err := e.st.PayOrderByNo(no); err != nil {
+		t.Fatal(err)
+	}
+	// the rest checks what confirming a tier order does (the admin can still confirm one made before the tier closed)
+	if _, err := e.st.CreatePayOrder(store.PayOrder{OrderNo: no + "t", RID: role.RID, SrvID: role.SrvID, ChargeID: 4, AmountCents: 3000}); err != nil {
+		t.Fatal(err)
+	}
+	e.st.CancelPayOrder(no, "t", "")
+	no = no + "t"
 	o, err := e.st.PayOrderByNo(no)
 	if err != nil || o.RID != role.RID || o.ChargeID != 4 || o.AmountCents != 3000 || o.Status != store.PayWaiting {
 		t.Fatalf("the order: %v %+v", err, o)

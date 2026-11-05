@@ -91,6 +91,17 @@ func chargeTiers() []ChargeProduct {
 	return out
 }
 
+// IsChargeTier says whether a product is one of the diamond tiers of the top-up page. They are paid in 快乐币 (PayWebCharge); the
+// QR code orders (10947, /pay/start) refuse them.
+func IsChargeTier(p ChargeProduct) bool {
+	for _, t := range chargeTiers() {
+		if t.ID == p.ID {
+			return true
+		}
+	}
+	return false
+}
+
 // ChargeDeliverable says whether a product can be paid for: the diamond tiers, and the ones an activity module delivers.
 func ChargeDeliverable(p ChargeProduct) bool {
 	for _, t := range chargeTiers() {

@@ -139,6 +139,9 @@ func RegisterCharge(r *gateway.Router, st *store.Store, payBase string) {
 		if role == nil {
 			return nil
 		}
+		if p, ok := ChargeProductByID(req.Int("charge_id")); ok && IsChargeTier(p) {
+			return s.Send(10947, proto.Message{"code": 0, "url": ""}) // the diamond tiers are paid in 快乐币 (pay_web)
+		}
 		o, err := CreateChargeOrder(st, role, req.Int("charge_id"), s.Now())
 		switch {
 		case errors.Is(err, ErrNoProduct), errors.Is(err, ErrNotPayable), errors.Is(err, ErrTooManyOpen):

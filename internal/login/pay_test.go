@@ -30,7 +30,8 @@ func TestPayPages(t *testing.T) {
 	s.Store.SetPayConfig("notice", "备注订单号")
 
 	// the call the client's pay function makes
-	info := `{"roleId":"` + itoa(role.RID) + `","productId":4,"price":30,"amount":30}`
+	klb, _ := game.ChargeProductByID(30001) // the 快乐币 panel's 38 yuan product: the diamond tiers are paid in 快乐币, not by QR code
+	info := `{"roleId":"` + itoa(role.RID) + `","productId":30001,"price":38,"amount":38}`
 	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 	resp, err := client.Get(ts.URL + "/pay/start?info=" + url.QueryEscape(info))
 	if err != nil {
@@ -38,11 +39,14 @@ func TestPayPages(t *testing.T) {
 	}
 	resp.Body.Close()
 	loc := resp.Header.Get("Location")
+	if r0, err := client.Get(ts.URL + "/pay/start?info=" + url.QueryEscape(`{"roleId":"`+itoa(role.RID)+`","productId":4}`)); err != nil || r0.StatusCode != http.StatusUnprocessableEntity {
+		t.Fatalf("a diamond tier by QR code must be refused: %v %v", err, r0)
+	}
 	if resp.StatusCode != http.StatusFound || !strings.HasPrefix(loc, "/pay/order/P") {
 		t.Fatalf("start: %d %q", resp.StatusCode, loc)
 	}
 	code, body := get(t, "GET", ts.URL+loc)
-	if code != 200 || !strings.Contains(body, "¥30") || !strings.Contains(body, "普通充值30") || !strings.Contains(body, "付款人") || !strings.Contains(body, png) || !strings.Contains(body, "备注订单号") || !strings.Contains(body, "等待付款") {
+	if code != 200 || !strings.Contains(body, "¥38") || !strings.Contains(body, klb.Name) || !strings.Contains(body, "付款人") || !strings.Contains(body, png) || !strings.Contains(body, "备注订单号") || !strings.Contains(body, "等待付款") {
 		t.Fatalf("order page: %d %s", code, body)
 	}
 	no := strings.TrimPrefix(loc, "/pay/order/")

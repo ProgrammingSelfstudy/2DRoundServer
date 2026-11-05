@@ -220,6 +220,10 @@ func (s *Server) openOrder(w http.ResponseWriter, r *http.Request, rid, cid int6
 		http.Error(w, "role", http.StatusInternalServerError)
 		return
 	}
+	if p, ok := game.ChargeProductByID(cid); ok && game.IsChargeTier(p) {
+		http.Error(w, "the diamond tiers are paid in 快乐币 inside the game", http.StatusUnprocessableEntity)
+		return
+	}
 	o, err := game.CreateChargeOrder(s.Store, role, cid, time.Now())
 	switch {
 	case errors.Is(err, game.ErrNoProduct), errors.Is(err, game.ErrNotPayable):

@@ -1,0 +1,39 @@
+{
+  "batch": "daily-followup-20261105-082925",
+  "status": "not_started_device_unavailable",
+  "evidence_kind": "Read-only ADB connection checks; no new game runtime or packet evidence; not REA Evidence",
+  "private_artifact_directory": "/Users/mountainwalkeralliance/Documents/code/2DRoundCaptures-raw/daily-followup-20261105-082925",
+  "adb_device_list_empty_observations": 2,
+  "target_get_state": "device not found",
+  "receiver_started": false,
+  "receiver_pid": null,
+  "reverse_5123_created": false,
+  "pcap_started": false,
+  "source_capture": null,
+  "snapshot": null,
+  "decoded_file": null,
+  "new_game_actions": 0,
+  "new_claims": 0,
+  "current_phone_page": "unknown; device unavailable",
+  "last_known_phone_page_from_previous_batch": "PCAPdroid ready; original game in background at main city",
+  "capture_paused": true,
+  "work_stage": "offline_analysis",
+  "gameplay_implementation_changed": false,
+  "remaining": [
+    "One genuinely free single in each of ordinary, advanced and elite pools",
+    "One free material-dungeon transaction",
+    "One free market refresh",
+    "Completed daily tasks and first activity chest if naturally eligible"
+  ],
+  "previous_claims_not_repeated": [
+    "Daily signin day4",
+    "Daily login task90000",
+    "Online gift tier12"
+  ],
+  "limitations": [
+    "No current screen, free-state or game-stall observation possible",
+    "No PCAP was started, so no CLOSED, snapshot or frame-integrity claim applies",
+    "Previous capture evidence remains separate"
+  ],
+  "notes_sha256": "6e9c80946d25eb87959191caa24aea4381dfb49cb4e4132c6cc8d5575ef7cd4d"
+}

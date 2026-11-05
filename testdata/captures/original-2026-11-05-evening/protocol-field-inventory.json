@@ -1,0 +1,8559 @@
+[
+  {
+    "cmd": 1164,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 26,
+        "array_length_max": 26
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "least_career",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "roles",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 1169,
+    "counts": {
+      "c2s": 80,
+      "s2c": 88
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 1197,
+    "counts": {
+      "c2s": 3301
+    },
+    "c2s_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "idx",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "sign",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": []
+  },
+  {
+    "cmd": 10193,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "rid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "timestamp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "world_lev",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10300,
+    "counts": {
+      "c2s": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": []
+  },
+  {
+    "cmd": 10301,
+    "counts": {
+      "s2c": 5
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "arena_elite_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "auto_pk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "avatar_base_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "backdrop_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "buffs",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "career",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "city_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "event",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp_max",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp_total_nextlev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "face_file",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "face_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "face_update_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fans_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "gid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "gname",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "gsrv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "guild_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "guild_quit_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_first_rename",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_open_home",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_show_vip",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_vip",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "look_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "position",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "reg_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "room_bbs_set",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "sex",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "signature",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "sprite_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "sprites",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "vip_exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "vip_lev",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10302,
+    "counts": {
+      "s2c": 1018
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "acc_recruit_hero",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "activity",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "arena_cent",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "arena_guesscent",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "boss_point",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "brave_symbol",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "charge_bi",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cluster_coin",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cluster_guess_cent",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "coin",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "elite_coin",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "emzz",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "energy",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "energy_max",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "expedition_medal",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "feather_exchange",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "friend_point",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "gold",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "gold_acc",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "guild",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hallow_refine",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hero_exp",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "hero_soul",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "holy_eqm_coin",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "home_coin",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "peak_guess_cent",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "predict_point",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "recruit_hero",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "recruithigh_hero",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "red_gold",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "silver_coin",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "skin_debris",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "sky_coin",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "star_hun",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "star_point",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10303,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "klb",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10304,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "play_video",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10350,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "holiday_assets",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 10380,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "open_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "reg_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10397,
+    "counts": {
+      "c2s": 8
+    },
+    "c2s_fields": [
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": []
+  },
+  {
+    "cmd": 10400,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "quest_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 13,
+        "array_length_max": 13
+      }
+    ]
+  },
+  {
+    "cmd": 10406,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10409,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "quest_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 10500,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 26,
+        "array_length_max": 29
+      },
+      {
+        "name": "open_times",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "server_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "volume",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10501,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 5,
+        "array_length_max": 13
+      },
+      {
+        "name": "open_times",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "server_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "volume",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10503,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "open_times",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "server_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "volume",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10510,
+    "counts": {
+      "s2c": 24
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 4
+      }
+    ]
+  },
+  {
+    "cmd": 10511,
+    "counts": {
+      "s2c": 18
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 3
+      }
+    ]
+  },
+  {
+    "cmd": 10512,
+    "counts": {
+      "s2c": 186
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 4
+      }
+    ]
+  },
+  {
+    "cmd": 10515,
+    "counts": {
+      "c2s": 9,
+      "s2c": 9
+    },
+    "c2s_fields": [
+      {
+        "name": "args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 2
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "quantity",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "base_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10528,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "minu_exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10800,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "mail",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 10801,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10804,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [
+      {
+        "name": "ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10805,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_delete",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "read_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10806,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "assets",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "content",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "from_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "items",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "read_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "send_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "subject",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "time_out",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10906,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "open_day",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10907,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "sys_ban",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10922,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "act_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 10924,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "act_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 5
+      }
+    ]
+  },
+  {
+    "cmd": 10925,
+    "counts": {
+      "c2s": 8,
+      "s2c": 26
+    },
+    "c2s_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "ext_args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "int_args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10926,
+    "counts": {
+      "c2s": 5,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10950,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "board_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10985,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "id_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 10991,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_vote",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "last_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 10995,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "main_srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "srv_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 10996,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "cli_ver_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 11001,
+    "counts": {
+      "s2c": 1872
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 11002,
+    "counts": {
+      "s2c": 537
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "atk2",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "break_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def2",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "horcrux_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "horcrux_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp2",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_lock",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "resonate_break_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "resonate_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "skills",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 5
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed2",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "star",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "use_skin",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11003,
+    "counts": {
+      "c2s": 502,
+      "s2c": 502
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11004,
+    "counts": {
+      "c2s": 6,
+      "s2c": 6
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11005,
+    "counts": {
+      "c2s": 32,
+      "s2c": 32
+    },
+    "c2s_fields": [
+      {
+        "name": "expend1",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 15
+      },
+      {
+        "name": "expend2",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 9
+      },
+      {
+        "name": "item_expend",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 3
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11006,
+    "counts": {
+      "s2c": 29
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "expend2",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 15
+      }
+    ]
+  },
+  {
+    "cmd": 11007,
+    "counts": {
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "ref_partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 114
+      }
+    ]
+  },
+  {
+    "cmd": 11009,
+    "counts": {
+      "c2s": 10,
+      "s2c": 11
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buy_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11010,
+    "counts": {
+      "c2s": 3,
+      "s2c": 3
+    },
+    "c2s_fields": [
+      {
+        "name": "item_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11012,
+    "counts": {
+      "s2c": 3
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "eqms",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 4
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11016,
+    "counts": {
+      "c2s": 12,
+      "s2c": 12
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11020,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "partner_skins",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 11025,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buy_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 351
+      },
+      {
+        "name": "sort_type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11026,
+    "counts": {
+      "c2s": 9,
+      "s2c": 9
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 151
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 151
+      }
+    ]
+  },
+  {
+    "cmd": 11030,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [
+      {
+        "name": "artifact_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "pos_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11031,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "artifacts",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 2
+      },
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11037,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "lucky",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11040,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "all_star",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "decompose_partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 67
+      }
+    ]
+  },
+  {
+    "cmd": 11055,
+    "counts": {
+      "c2s": 1760
+    },
+    "c2s_fields": [
+      {
+        "name": "is_point",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": []
+  },
+  {
+    "cmd": 11056,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "is_point",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11067,
+    "counts": {
+      "c2s": 3,
+      "s2c": 3
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "day_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11075,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 14,
+        "array_length_max": 100
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11076,
+    "counts": {
+      "c2s": 162,
+      "s2c": 162
+    },
+    "c2s_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 8,
+        "array_length_max": 100
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 8,
+        "array_length_max": 100
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11086,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "be_cure",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cure",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dam",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dam_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dam_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "tenacity",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11091,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "be_cure",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cure",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dam",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dam_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dam_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "holy_eqm",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 4
+      },
+      {
+        "name": "hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "tenacity",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11092,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 351
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "partner_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 351
+      }
+    ]
+  },
+  {
+    "cmd": 11093,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "holy_eqm_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11095,
+    "counts": {
+      "s2c": 140
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "init_star",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_chips",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11099,
+    "counts": {
+      "c2s": 16,
+      "s2c": 16
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 2
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "partner_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 11211,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "formation_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hallows_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "pos_info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11212,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "formation_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hallows_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "pos_info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11213,
+    "counts": {
+      "c2s": 5,
+      "s2c": 5
+    },
+    "c2s_fields": [
+      {
+        "name": "type_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 11320,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "award_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 400,
+        "array_length_max": 400
+      },
+      {
+        "name": "buy_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_tower",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 11402,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 12741,
+    "counts": {
+      "s2c": 29
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 12742,
+    "counts": {
+      "s2c": 181
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "asset_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 8
+      },
+      {
+        "name": "source",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 12745,
+    "counts": {
+      "s2c": 5
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "need_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 12761,
+    "counts": {
+      "s2c": 104
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "channel",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "len",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "role_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      },
+      {
+        "name": "tick",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 12902,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "is_cluster",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "is_cluster",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 5,
+        "array_length_max": 5
+      }
+    ]
+  },
+  {
+    "cmd": 13000,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "auto_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "auto_num_max",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "chapter_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cool_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dun_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_first",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_dun_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "mode",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "mode_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13001,
+    "counts": {
+      "s2c": 3
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "chapter_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cool_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dun_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_first",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_dun_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "mode",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13003,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "is_auto",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13006,
+    "counts": {
+      "c2s": 4,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "auto_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "auto_num_max",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fast_combat_add_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fast_combat_free_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fast_combat_max",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fast_combat_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fast_combat_p_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "fast_combat_w_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_auto_combat",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_holiday",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13008,
+    "counts": {
+      "c2s": 4,
+      "s2c": 5
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 13011,
+    "counts": {
+      "c2s": 4,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buff_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 13016,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "auto_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hurt_statistics",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "item_rewards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 7,
+        "array_length_max": 7
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_hurt",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_total_hurt",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "target_role_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "use_skin",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13017,
+    "counts": {
+      "c2s": 4,
+      "s2c": 20
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "hook_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 4
+      }
+    ]
+  },
+  {
+    "cmd": 13300,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "draw_all",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "draw_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "friend_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "present_count",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13311,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "friend_req_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 13330,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "black_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 13401,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_half",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "item_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 13601,
+    "counts": {
+      "s2c": 18
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "charge",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cur_day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "finish_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 4
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "grow_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 84,
+        "array_length_max": 84
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "period",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "price_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 21,
+        "array_length_max": 21
+      },
+      {
+        "name": "welfare_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 7,
+        "array_length_max": 7
+      }
+    ]
+  },
+  {
+    "cmd": 14100,
+    "counts": {
+      "c2s": 8,
+      "s2c": 8
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 14101,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16400,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "feat_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 39,
+        "array_length_max": 39
+      }
+    ]
+  },
+  {
+    "cmd": 16401,
+    "counts": {
+      "s2c": 58
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "feat_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 16402,
+    "counts": {
+      "c2s": 14,
+      "s2c": 14
+    },
+    "c2s_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16601,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "holiday_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 16,
+        "array_length_max": 16
+      }
+    ]
+  },
+  {
+    "cmd": 16602,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "holiday_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 16603,
+    "counts": {
+      "c2s": 7,
+      "s2c": 225
+    },
+    "c2s_fields": [
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "aim_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 15
+      },
+      {
+        "name": "args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cli_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "client_reward",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "finish",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "item_effect_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "rank_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "remain_sec",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16604,
+    "counts": {
+      "c2s": 9,
+      "s2c": 9
+    },
+    "c2s_fields": [
+      {
+        "name": "aim",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "arg",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16606,
+    "counts": {
+      "s2c": 243
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "can_get_num",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16653,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "award_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "charge_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_buy",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16700,
+    "counts": {
+      "c2s": 1,
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 7,
+        "array_length_max": 7
+      }
+    ]
+  },
+  {
+    "cmd": 16705,
+    "counts": {
+      "c2s": 7,
+      "s2c": 9
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "card1_acc",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card1_days",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card1_end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card1_is_reward",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card2_acc",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card2_days",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card2_end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "card2_is_reward",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16706,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [
+      {
+        "name": "card_type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "card_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16707,
+    "counts": {
+      "c2s": 1,
+      "s2c": 3
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16708,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16710,
+    "counts": {
+      "c2s": 1,
+      "s2c": 3
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 3
+      }
+    ]
+  },
+  {
+    "cmd": 16711,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 16712,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "charge_sum",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 10,
+        "array_length_max": 10
+      }
+    ]
+  },
+  {
+    "cmd": 16800,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "arg_str",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "arg_uint32",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "idx",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 19906,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "like",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20000,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "combat_map",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20005,
+    "counts": {
+      "c2s": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": []
+  },
+  {
+    "cmd": 20006,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "adventure_end_hp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "best_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "current_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "ext_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "hurt_statistics",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "item_rewards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "room_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "show_panel_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "target_role_name",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20027,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "a_object_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "actor_role_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "current_wave",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "extra_args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "formation",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "hallows_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "halo_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "is_auto",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "objects",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 8
+      },
+      {
+        "name": "play_speed",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "string_ext_args",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "suppress",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "target_role_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "total_wave",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20060,
+    "counts": {
+      "c2s": 41,
+      "s2c": 41
+    },
+    "c2s_fields": [
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20061,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "b_formation_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "combat_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dun_bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "wave_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 20063,
+    "counts": {
+      "c2s": 4,
+      "s2c": 8
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "type_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 20200,
+    "counts": {
+      "c2s": 5,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buy_combat_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "can_combat_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "cont_win",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "ref_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20201,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "f_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20203,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "is_auto",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20208,
+    "counts": {
+      "c2s": 5,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "had_combat_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "num_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 20210,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "face_file",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "face_update_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "get_score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hurt_statistics",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "items",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "lose_score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "replay_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "tar_face",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "tar_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "tar_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "tar_score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "target_role_name",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20223,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20250,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round_status_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step_status_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20251,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "best_rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "can_bet",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "group",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20300,
+    "counts": {
+      "c2s": 5,
+      "s2c": 5
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "activity_box",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 20600,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "current_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_all_finish",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_kill_boss",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "map_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "pass_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "pass_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "room",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 20601,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buff_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "holiday_buff_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 20604,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "combat_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partners",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 20634,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "kill_mon",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 5,
+        "array_length_max": 5
+      }
+    ]
+  },
+  {
+    "cmd": 21002,
+    "counts": {
+      "s2c": 5
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "count",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 21005,
+    "counts": {
+      "c2s": 1,
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "gold",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "next_gold",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 21006,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "first_gift",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 21010,
+    "counts": {
+      "c2s": 1,
+      "s2c": 3
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 21011,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 21021,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 21024,
+    "counts": {
+      "s2c": 7
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 21032,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "first_gift",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 6,
+        "array_length_max": 6
+      }
+    ]
+  },
+  {
+    "cmd": 21100,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "status_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 21322,
+    "counts": {
+      "c2s": 4,
+      "s2c": 8
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23200,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "is_day_share",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_share",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "must_five_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "recruit_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 4
+      }
+    ]
+  },
+  {
+    "cmd": 23201,
+    "counts": {
+      "c2s": 194,
+      "s2c": 175
+    },
+    "c2s_fields": [
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "recruit_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "must_five_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_bids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 10
+      },
+      {
+        "name": "partner_chips",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "rewards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 10
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23202,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "free_cd_end",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "free_times",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23204,
+    "counts": {
+      "s2c": 173
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "recruit_group",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 23214,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "new_partner_bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "partner_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 23230,
+    "counts": {
+      "c2s": 2,
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "camp_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "free_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "item_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "item_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lucky_bid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "must_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "reward_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23234,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23235,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23604,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "ext_reward",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 23800,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "coin_times",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "free_times",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "order_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 6,
+        "array_length_max": 6
+      }
+    ]
+  },
+  {
+    "cmd": 23805,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23900,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "current_round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day_pass_round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_appoint",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_employ",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_reward",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "max_round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "my_idx",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_current_round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_day_pass_round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_max_round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_my_idx",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "new_rank_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "next_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "next_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "select_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 23906,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 23912,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24120,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 24124,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "is_first",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24204,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24312,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24317,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24500,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 5,
+        "array_length_max": 5
+      }
+    ]
+  },
+  {
+    "cmd": 24700,
+    "counts": {
+      "c2s": 7,
+      "s2c": 7
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 24701,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "current_day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "endtime",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24900,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "day_buy_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day_combat_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day_max_buy_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_king",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_skip",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev_reward",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 21,
+        "array_length_max": 21
+      },
+      {
+        "name": "match_cd_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "period",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "promoted_info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rmb_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "state",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "state_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "zone_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24905,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "state",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 24920,
+    "counts": {
+      "c2s": 8,
+      "s2c": 8
+    },
+    "c2s_fields": [
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "formations",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 1
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25000,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buy_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 5,
+        "array_length_max": 5
+      },
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "pr_buy_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "refresh_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25200,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "buy_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "chapter_info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_dun_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25217,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "recruit_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "recruit_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rewards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25218,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "log_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 20,
+        "array_length_max": 20
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25219,
+    "counts": {
+      "c2s": 4,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "recruit_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 25220,
+    "counts": {
+      "c2s": 4,
+      "s2c": 8
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "holy_eqm_set_cell",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "num",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25232,
+    "counts": {
+      "c2s": 5,
+      "s2c": 9
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "score",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25300,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "cur_day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "period",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rmb_status",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25605,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "formations",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25607,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "had_combat_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "num_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 25610,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25618,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "combat_code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "reward_code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "worship_code",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25810,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "feat_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 75,
+        "array_length_max": 75
+      },
+      {
+        "name": "finish_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 25811,
+    "counts": {
+      "s2c": 3
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "feat_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 25814,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "result",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 25833,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "name",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26013,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 26017,
+    "counts": {
+      "c2s": 8,
+      "s2c": 8
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "is_first",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26018,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hook_code",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26100,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "day_feed",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day_talk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "pet_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rename_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "set_item",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "state",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "vigor",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "vigor_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26105,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "evt_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 26110,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 26111,
+    "counts": {
+      "c2s": 8,
+      "s2c": 8
+    },
+    "c2s_fields": [
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26200,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_open",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round_status_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step_status_time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26201,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "best_rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "can_bet",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "group",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26213,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "rank_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 26400,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "attr",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 5
+      },
+      {
+        "name": "max_partner_lev",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26410,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "all_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "do_end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "do_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "get_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_point",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26425,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "con_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 5
+      },
+      {
+        "name": "gold_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_break",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "item_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_cystal_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "res_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 26500,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "sprite_hatchs",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 6,
+        "array_length_max": 6
+      }
+    ]
+  },
+  {
+    "cmd": 26510,
+    "counts": {
+      "c2s": 5,
+      "s2c": 5
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "atk",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "break_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "crit_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_p",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "def_s",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "dodge_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_magic",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hit_rate",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "hp_max",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "speed",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "sprites",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 26520,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "awards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 26550,
+    "counts": {
+      "c2s": 5,
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "camp_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "do_awards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "free_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lucky_ids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26551,
+    "counts": {
+      "c2s": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "recruit_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": []
+  },
+  {
+    "cmd": 26553,
+    "counts": {
+      "s2c": 1
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "group_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rewards",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "sprite_bids",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "times",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 26555,
+    "counts": {
+      "c2s": 1,
+      "s2c": 1
+    },
+    "c2s_fields": [
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "team_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "type",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 27004,
+    "counts": {
+      "s2c": 6
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 27102,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "id_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  },
+  {
+    "cmd": 27215,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "point",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      }
+    ]
+  },
+  {
+    "cmd": 27220,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "add_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "award_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "do_count",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_sign",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "state",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "team_members",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "team_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "team_power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "tid",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 27700,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_zone_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "period",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round_status_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step_status_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "zone_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 27703,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "a_avatar_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_bet",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_bet_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_defense",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "a_face",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_face_file",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "a_face_update_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "a_power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_rid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_sex",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_sprite_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "a_sprites",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 4
+      },
+      {
+        "name": "a_sprites_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "a_srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "b_avatar_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_bet",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_bet_ratio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_defense",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "b_face",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_face_file",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "b_face_update_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_name",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "b_power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_rid",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_sex",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_sprite_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "b_sprites",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 4,
+        "array_length_max": 4
+      },
+      {
+        "name": "b_sprites_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      },
+      {
+        "name": "b_srv_id",
+        "decoded_types": [
+          "str"
+        ]
+      },
+      {
+        "name": "bet_type",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "bet_val",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "group",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "result_info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      },
+      {
+        "name": "ret",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "round",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "step",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 27714,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [
+      {
+        "name": "end_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "zone_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ],
+    "s2c_fields": [
+      {
+        "name": "day_worship",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "power",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rank_list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 1,
+        "array_length_max": 1
+      },
+      {
+        "name": "score",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "start_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "worship",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "zone_id",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 27726,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "formations",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 3,
+        "array_length_max": 3
+      }
+    ]
+  },
+  {
+    "cmd": 27730,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "point_info",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 2,
+        "array_length_max": 2
+      }
+    ]
+  },
+  {
+    "cmd": 27912,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "code",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "get_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "msg",
+        "decoded_types": [
+          "str"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 28200,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "camp_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "last_red_pacekt_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "look_id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_red_packet_num",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "max_val",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "val",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 28223,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 28224,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "gold_flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "timer_flag",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 28700,
+    "counts": {
+      "c2s": 4,
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "cur_day",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "day_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "end_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "exp",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "list",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "period",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "period_lev",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "rmb_status",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "week_lev",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 29100,
+    "counts": {
+      "s2c": 2
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "flag",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "id",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "is_recombat",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "last_buy_time",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "last_unixtime",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "practise_role_rank",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      },
+      {
+        "name": "radio",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "role_rank",
+        "decoded_types": [
+          "int"
+        ]
+      },
+      {
+        "name": "time",
+        "decoded_types": [
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "cmd": 31127,
+    "counts": {
+      "s2c": 4
+    },
+    "c2s_fields": [],
+    "s2c_fields": [
+      {
+        "name": "effect",
+        "decoded_types": [
+          "list"
+        ],
+        "array_length_min": 0,
+        "array_length_max": 0
+      }
+    ]
+  }
+]

@@ -1,0 +1,252 @@
+{
+  "batch": "manual-evening-20261105-222537",
+  "source_revision": "ddc71aa89631fa41cb08602abe7af159b03b1bb6",
+  "source_capture": "cap-20261105-222537-6494b14d.pcap",
+  "source_snapshot": "session-final.pcap",
+  "decoded_file": "session-final.jsonl",
+  "private_artifact_directory": "../2DRoundCaptures-raw/analysis-20261105-222537",
+  "evidence_kind": "Ordinary local offline decoding and source review; not REA Evidence",
+  "source_bytes": 1775235,
+  "source_sha256": "d9d425fd9399021d2ebb7e968fd4808c044e6689e2706adf6cd77c475a14b32f",
+  "pcap_record_count": 10475,
+  "pcap_link_type": 101,
+  "pcap_trailing_bytes": 0,
+  "pcap_clipped_records": 0,
+  "fragmented_tcp_packets": 0,
+  "non_tcp_or_unsupported_ipv6_packets": 0,
+  "game_stream_count": 4,
+  "stream_framing": [
+    {
+      "stream_alias": "game-stream-1",
+      "c2s": {
+        "syn_seen": true,
+        "framed_bytes": 70610,
+        "stream_bytes_excluding_handshake": 70610,
+        "frames": 2358,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      },
+      "s2c": {
+        "syn_seen": true,
+        "framed_bytes": 286164,
+        "stream_bytes_excluding_handshake": 286164,
+        "frames": 1968,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      }
+    },
+    {
+      "stream_alias": "game-stream-2",
+      "c2s": {
+        "syn_seen": true,
+        "framed_bytes": 8767,
+        "stream_bytes_excluding_handshake": 8767,
+        "frames": 235,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      },
+      "s2c": {
+        "syn_seen": true,
+        "framed_bytes": 41087,
+        "stream_bytes_excluding_handshake": 41087,
+        "frames": 142,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      }
+    },
+    {
+      "stream_alias": "game-stream-3",
+      "c2s": {
+        "syn_seen": true,
+        "framed_bytes": 116716,
+        "stream_bytes_excluding_handshake": 116716,
+        "frames": 3766,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      },
+      "s2c": {
+        "syn_seen": true,
+        "framed_bytes": 576815,
+        "stream_bytes_excluding_handshake": 576815,
+        "frames": 4276,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      }
+    },
+    {
+      "stream_alias": "game-stream-4",
+      "c2s": {
+        "syn_seen": true,
+        "framed_bytes": 12136,
+        "stream_bytes_excluding_handshake": 12136,
+        "frames": 308,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      },
+      "s2c": {
+        "syn_seen": true,
+        "framed_bytes": 67641,
+        "stream_bytes_excluding_handshake": 67641,
+        "frames": 247,
+        "holes": 0,
+        "conflicting_retransmissions": 0,
+        "overlap_segments": 0,
+        "trailing_bytes": 0
+      }
+    }
+  ],
+  "decoded_frames": 13300,
+  "unique_commands": 219,
+  "decode_errors": 0,
+  "frame_counts_match_independent_reassembly": true,
+  "decoder_source_sha256": "8b644befab96189afe77cf5b882b417245844b1ff5028731bce8e61103b289b8",
+  "protocol_schema_sha256": "fcc54977c7ce0b0d703c94e796f3a3093390875b017f02e30d1ec2e8f292ce31",
+  "decoded_sha256": "949abb5019bbd1b3cc522ff9c72be26d2a626eb5d4b638831f1bdb0122fe5fd1",
+  "decoder_binary_sha256": "7868133b160499558de3890bfe4eb887592ef07f9b74a296196e02ad102d6912",
+  "observed_game_commands": 219,
+  "reviewed_game_commands": 219,
+  "unassigned_commands": 0,
+  "status_counts": {
+    "partial": 113,
+    "difference": 81,
+    "aligned": 12,
+    "unsupported": 13
+  },
+  "review_groups": {
+    "hero": 29,
+    "rewards": 35,
+    "features": 58,
+    "core": 34,
+    "baseline-hero": 5,
+    "baseline-icons": 5,
+    "baseline-late": 53
+  },
+  "all_game_frame_counts_accounted": true,
+  "all_decoded_payloads_fully_consumed": true,
+  "payload_consumption_source": "internal/proto/codec.go:215-227",
+  "non_game_network_scope": {
+    "ipv4_transport_packet_counts": {
+      "6": 10473,
+      "17": 2
+    },
+    "game_payload_directions": 8,
+    "non_game_tcp_payload_directions": 20,
+    "non_game_tcp_payload_bytes": 8137,
+    "udp_categories": {
+      "dns": 2
+    },
+    "non_ipv4_records": 0,
+    "dns_summary": {
+      "packets": [
+        {
+          "pcap_record": 467,
+          "response": false,
+          "rcode": 0,
+          "question_count": 1,
+          "answer_count": 0,
+          "authority_count": 0,
+          "additional_count": 0
+        },
+        {
+          "pcap_record": 468,
+          "response": true,
+          "rcode": 0,
+          "question_count": 1,
+          "answer_count": 1,
+          "authority_count": 0,
+          "additional_count": 0
+        }
+      ],
+      "transaction_ids_match": true,
+      "domain_names_and_addresses_exported": false
+    }
+  },
+  "stop": {
+    "user_reported_paused": true,
+    "receiver_closed": true,
+    "receiver_closed_bytes": 1775235,
+    "agent_phone_ui_actions": 0,
+    "receiver_pid": 55494,
+    "receiver_terminated_after_identity_check": true,
+    "reverse_5123_removed": true,
+    "source_stable_after_cleanup": true
+  },
+  "gameplay_implementation_changed_by_analysis": false,
+  "pcap_active": false,
+  "privacy": {
+    "auth_and_identity_values_exported": false,
+    "raw_payload_endpoints_or_broadcasts_exported": false,
+    "inventory_and_hero_instances_preserved_where_needed": true,
+    "numeric10515_args_name_is_parameter_enum": true,
+    "projections_and_array_sampling_annotated": true,
+    "raw_and_full_decode_retained_outside_repository": true
+  },
+  "evidence_rows": 654,
+  "evidence_commands": 126,
+  "files": {
+    "EVENING_NOTES.md": {
+      "bytes": 9504,
+      "sha256": "4e8fba85e1635cf34af13fc763388b77f97a7497e8666712c2d34ccd201db3d7"
+    },
+    "FEATURES_REVIEW.md": {
+      "bytes": 21101,
+      "sha256": "75200ed97773c2b95caa49dc7083876b1cc7f278da4866c4f98f9a48759a1e70"
+    },
+    "HERO_REVIEW.md": {
+      "bytes": 13060,
+      "sha256": "1f2e95d505dbfed14b263dc49abb2439b30d51d3edf8b3785850ab7c442e652b"
+    },
+    "HTTP_AUDIT.md": {
+      "bytes": 5159,
+      "sha256": "8a877db8255be64d9d0cffcb321c4f1804f0eeba0581c568b6eb228d8bdd341e"
+    },
+    "PROTOCOL_COVERAGE.md": {
+      "bytes": 93120,
+      "sha256": "0edab9cb6b1105f4624e2203256755983e46e55e5cdd538437f5da9747ec45c5"
+    },
+    "REWARDS_REVIEW.md": {
+      "bytes": 15384,
+      "sha256": "47f5c0e250ab85ad75bcad46b2957e27dc284e1415486c4c7a1f232fc1e189db"
+    },
+    "evening-evidence.jsonl": {
+      "bytes": 482193,
+      "sha256": "17da62126b48069f0e8bdacb47586821e38759ccaf9733a4cbd91b3594389528"
+    },
+    "http-connection-summary.json": {
+      "bytes": 8646,
+      "sha256": "f1067ed13830c43da3a2c8654373f4ab351a9a25e471054c0aba2a0bfcf5c842"
+    },
+    "protocol-coverage.json": {
+      "bytes": 166607,
+      "sha256": "ec076abee76ddf79358e49555149318ed9ed069cc9c4881a121a2eeefdd4f52a"
+    },
+    "protocol-field-inventory.json": {
+      "bytes": 136841,
+      "sha256": "7719e7985c80e56f170a71fde90682ece9b8fb8da73bf5c2f273b818c2d80602"
+    }
+  },
+  "limitations": [
+    "本批只有协议记录，没有本次截图和逐步UI动作日志；按钮名称、操作者意图及每个提示的界面表现只能保持未确认。",
+    "本批没有跨日/05:00连续边界，重置周期和额外签到资格公式仍未知；当前代码未据此修改。",
+    "本批未出现10927在线领取、20301活跃宝箱、13030/13031/13032材料副本或13403/13404市场刷新事务，不能把已有旧包或计划算作本批补齐。",
+    "本批虽有一个HTTP支付入口请求及购买相关游戏状态，仍不能由单批数据确定真实外部支付完成、金额单位或额外签到资格。抽取概率/保底及未捕获失败分支亦不能据此确定。",
+    "内部完整的PCAP/TCP流证明已保存数据可连续解码，不证明采集范围之外的网络完全无损。",
+    "本次未修复、部署或做本地服务端真机验收；当前结论针对源码ddc71aa及本批已观察路径。",
+    "REA MCP仍缺席，保留已有config_drift诊断，没有改配置/安装引擎；本报告是普通本地离线工具和源码核对结果，不是REA Evidence。",
+    "原包、完整JSONL、原始接收日志和身份/广播原文留在仓库外私有目录。公开证据仅保留字段投影与代表性事务，列表抽样长度有单独标注。"
+  ]
+}

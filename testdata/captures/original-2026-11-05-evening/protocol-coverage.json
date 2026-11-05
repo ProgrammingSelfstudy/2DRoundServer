@@ -1,0 +1,5281 @@
+{
+  "scope": "All observed game command IDs, not every unobserved game feature",
+  "source_capture": "cap-20261105-222537-6494b14d.pcap",
+  "source_sha256": "d9d425fd9399021d2ebb7e968fd4808c044e6689e2706adf6cd77c475a14b32f",
+  "decoded_file": "session-final.jsonl",
+  "decoded_sha256": "949abb5019bbd1b3cc522ff9c72be26d2a626eb5d4b638831f1bdb0122fe5fd1",
+  "source_line_base": 1,
+  "source_order_caveat": "Decoder groups TCP connections and directions; use timestamps across directions, source order only within a direction of the same connection.",
+  "counts_by_status": {
+    "partial": 113,
+    "difference": 81,
+    "aligned": 12,
+    "unsupported": 13
+  },
+  "review_groups": {
+    "hero": 29,
+    "rewards": 35,
+    "features": 58,
+    "core": 34,
+    "baseline-hero": 5,
+    "baseline-icons": 5,
+    "baseline-late": 53
+  },
+  "coverage": [
+    {
+      "cmd": 1164,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次code1角色列表与26项登录参数均可解码；认证值不导出，仅确认登录结构及后续10193成功，不能离线验证原服凭证规则。",
+      "source_lines": [
+        2,
+        2360,
+        4328,
+        4563,
+        4705,
+        8471
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login.go:51",
+        "internal/game/login.go:74"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 1169,
+      "status": "difference",
+      "counts": {
+        "c2s": 80,
+        "s2c": 88
+      },
+      "finding": "80个请求、88个时间通知；四条连接首个s2c均是1169且早于角色列表。本地仅请求handler发送，缺少本批登录前主动时间通知。",
+      "source_lines": [
+        226,
+        344,
+        348,
+        2359,
+        2495,
+        2633
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login.go:298",
+        "internal/game/login.go:51"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 1197,
+      "status": "aligned",
+      "counts": {
+        "c2s": 3301
+      },
+      "finding": "3301个预签名均与紧随请求的摘要及混淆code规则相符，另65个请求符合免签组；不导出签名值。",
+      "source_lines": [
+        1,
+        3,
+        6
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/gateway/presign.go:15",
+        "internal/gateway/server.go:253"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10193,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次重连均code1并进入同一匿名角色；RID/服名和凭证不导出，断线/禁封/失效失败仍无样本。",
+      "source_lines": [
+        4,
+        2361,
+        4330,
+        4564,
+        4707,
+        8472
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login.go:170"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10300,
+      "status": "partial",
+      "counts": {
+        "c2s": 4
+      },
+      "finding": "四次空请求后均形成角色/资产/场景初始化链；可确认成功初始化骨架，不能据此核对所有新号赠礼或错误登录分支。",
+      "source_lines": [
+        5,
+        4331,
+        4708
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/roledata.go:84"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10301,
+      "status": "partial",
+      "counts": {
+        "s2c": 5
+      },
+      "finding": "5次角色基线覆盖四流且为同一匿名角色；仅核对字段/重登持续状态，属性公式、VIP/公会等数据需独立事务，身份字段不导出。",
+      "source_lines": [
+        2363,
+        4566,
+        8474
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/roledata.go:62",
+        "internal/game/roledata.go:252"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10302,
+      "status": "partial",
+      "counts": {
+        "s2c": 1018
+      },
+      "finding": "1018次资产推送已完整解码；升级、突破、召唤等已按事务核对实扣，其他货币来源和所有资产计算不能由单一基线推断。",
+      "source_lines": [
+        2364,
+        2660,
+        2664
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/assets.go:44",
+        "internal/game/sell.go:143"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10303,
+      "status": "partial",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "购买相关状态窗口出现一次klb=99902；本地存在相同uint32余额推送，缺少该余额前态及支付请求，不能倒推实际扣款或支付途径。",
+      "source_lines": [
+        9350
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/rolemisc.go:53",
+        "internal/game/charge_proto.go:46"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10304,
+      "status": "aligned",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "四次场景初始化均play_video0的纯服务端推送，本地角色初始化发送同值。",
+      "source_lines": [
+        2372,
+        4575,
+        8483
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/roledata.go:122"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10350,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "四次登录holiday_assets均空；本地有活动资产推送，未出现活动资产变化，不能验证活动兑换/扣除。",
+      "source_lines": [
+        2365,
+        4568,
+        8476
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/yearmonster.go:435",
+        "internal/game/animate.go:154"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10380,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次reg_time/open_time稳定；本地取角色/服务器时间同形。只用作本批时间锚点，不确认日界公式。",
+      "source_lines": [
+        7,
+        2376,
+        4333,
+        4579,
+        4710,
+        8487
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/rolemisc.go:64",
+        "internal/game/rolemisc.go:77"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10397,
+      "status": "aligned",
+      "counts": {
+        "c2s": 8
+      },
+      "finding": "8条观看状态通知含status0/1，无同号响应；本地按单向通知处理，不等待回复。",
+      "source_lines": [
+        96,
+        98,
+        2358
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/battle.go:18"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10400,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次完整列表均13任务；accept_time=0、progress.id=0；已领90003在末次为finish2/progress=[]。本地accept_time填日界、progress.id=1、已领仍保留progress。",
+      "source_lines": [
+        2430,
+        4631,
+        8538,
+        13124
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/quest.go:75",
+        "internal/game/quest.go:156"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10406,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次领取90003成功：10302(+20钻/+10活跃)→12761/12741奖励文字→10406 flag1/msg空；本地先回领取成功，再10403、10302和全量背包。奖励表数额相同。",
+      "source_lines": [
+        5125,
+        8896
+      ],
+      "context_source_lines": [
+        8893,
+        8894,
+        8895
+      ],
+      "local_sources": [
+        "internal/game/quest.go:177",
+        "internal/game/data/quests.json:1"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10409,
+      "status": "difference",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "召唤90003达到3/3和竞技场90005达到1/3由10409增量推进；本地questEvent发10403而非10409。",
+      "source_lines": [
+        2891,
+        8968
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/quest.go:116",
+        "internal/game/quest.go:150"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10500,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次背包头volume9999/open_times0，所列29/26/26/29种物品均bind1；实例号与基础号不同且重登保持。本地volume100、普通实例号=base，仅两种物品bind1；缓存时间模型也不同，精确算法未知。",
+      "source_lines": [
+        2390,
+        4592,
+        8500,
+        13085
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/bag.go:85",
+        "internal/game/bag.go:105",
+        "internal/game/bag.go:161",
+        "internal/game/bag.go:196"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10501,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次装备背包volume9999、件数5/7/7/13，所见bind1；本地沿用volume100和普通装备bind0/合成实例ID策略。普通装备堆叠形态可由英雄域继续核对。",
+      "source_lines": [
+        2391,
+        4594,
+        8501,
+        13086
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/equipment.go:50",
+        "internal/game/bag.go:161"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10503,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次精灵背包均item_list=[]但volume9999；本地空列表可匹配，头部容量100/缓存时间模型不同。未见本批精灵背包物品使用闭环。",
+      "source_lines": [
+        2392,
+        4595,
+        8503,
+        13087
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/bag.go:138",
+        "internal/game/bag.go:161",
+        "internal/game/bag.go:177"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10510,
+      "status": "partial",
+      "counts": {
+        "s2c": 24
+      },
+      "finding": "24个新增推送，包含storage1普通物品与storage3装备/神装；本地sendBagDelta支持新增，但开礼包、邮件、召唤仍用旧全量刷新路径。原服实例需从实际背包追踪，不能硬编码为base。",
+      "source_lines": [
+        4310,
+        4315,
+        4323,
+        8879,
+        9430
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/bag_delta.go:51",
+        "internal/game/use.go:109",
+        "internal/game/mail.go:202",
+        "internal/game/summon.go:305"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10511,
+      "status": "partial",
+      "counts": {
+        "s2c": 18
+      },
+      "finding": "18个删除推送，storage1/3各有，包含id/pos/storage；本地delta协议形态已支持，但并非所有业务调用且实例建模仍不同。",
+      "source_lines": [
+        4308,
+        4314,
+        4322
+      ],
+      "context_source_lines": [
+        12631
+      ],
+      "local_sources": [
+        "internal/game/bag_delta.go:51",
+        "internal/game/bag_delta.go:75"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10512,
+      "status": "partial",
+      "counts": {
+        "s2c": 186
+      },
+      "finding": "186个绝对状态推送，均storage1，226个条目；明确礼包、召唤券、邮件和培养材料的最终余额更新。本地delta生成器支持绝对状态，礼包/召唤/邮件调用路径尚不统一。",
+      "source_lines": [
+        2684,
+        4311,
+        8874,
+        13191
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/bag_delta.go:51",
+        "internal/game/use.go:109",
+        "internal/game/mail.go:202",
+        "internal/game/summon.go:305"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10515,
+      "status": "difference",
+      "counts": {
+        "c2s": 9,
+        "s2c": 9
+      },
+      "finding": "9次成功均msg空，按实例id使用；641236三次64/42/34自选共140英雄；99955内容与本地表8项相同；88828/39528/39179自选成功但不在本地giftTable，args被本地忽略。原服先扣包/新增或余额/12742后确认，本地先“使用成功”再资产/全包。",
+      "source_lines": [
+        228,
+        2346,
+        2348,
+        2354,
+        2626,
+        4313,
+        4317,
+        4325,
+        5183,
+        5187,
+        5189,
+        8273,
+        8359,
+        9000,
+        9005,
+        9009,
+        12628,
+        12700
+      ],
+      "context_source_lines": [
+        2625,
+        4308,
+        4312
+      ],
+      "local_sources": [
+        "internal/game/use.go:75",
+        "internal/game/use.go:83",
+        "internal/game/use.go:99",
+        "internal/game/data/gifts.json:1"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10528,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "出现一次minu_exp100/time600推送；本地game源码未发现10528生产路径。触发与其他域进程推进相关，需由根审阅对应上下文，不将其归因到使用礼包。",
+      "source_lines": [
+        2691
+      ],
+      "context_source_lines": [],
+      "local_sources": [],
+      "limitations": "有完整结构样本，但触发条件、效果与本地对应路径未确认。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10800,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次邮件列表，前三次空、末次1封未读；本地具有同形列表/归属校验。邮件正文、发送者和服务器标识属于私有身份/内容，不导出也不以模板文本推断业务。",
+      "source_lines": [
+        2442,
+        4640,
+        8548,
+        13135
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/mail.go:74"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10801,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次附件10001×1000000领取：10512余额293308→1293308→活动通知→12742→10801 code1/msg收取附件成功；本地先“领取成功”确认，再无条件10302和全包，缺12742。",
+      "source_lines": [
+        12972,
+        13194
+      ],
+      "context_source_lines": [
+        13189,
+        13191,
+        13193
+      ],
+      "local_sources": [
+        "internal/game/mail.go:124",
+        "internal/game/mail.go:141",
+        "internal/game/mail.go:200"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10804,
+      "status": "difference",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "两次删除：空ids也回复删除成功，1个已领取邮件删除同文案；本地非空成功一致，但空完成列表回没有可删除的邮件。",
+      "source_lines": [
+        4556,
+        4700,
+        12974,
+        13195
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/mail.go:175",
+        "internal/game/mail.go:190"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10805,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "读取成功code1/msg读取邮件成功、is_delete0及read_time有值；本地成功msg为空，状态字段结构一致。",
+      "source_lines": [
+        12970,
+        13190
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/mail.go:90",
+        "internal/game/mail.go:100"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10806,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次详情给出未读status0/read_time0、assets空、10001×1000000附件；本地同形详情结构支持。其余邮件身份/文本/超时属于该邮件状态，非通用已确认规则。",
+      "source_lines": [
+        12968,
+        13189
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/mail.go:44",
+        "internal/game/mail.go:108"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10906,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次open_day395；可与本批open_time及观察日期比对，但没有跨日边界，不能据单点确认精确重置时间。",
+      "source_lines": [
+        48,
+        2399,
+        4374,
+        4602,
+        4751,
+        8510
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/openday.go:28"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10907,
+      "status": "aligned",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次sys_ban0与本地无系统禁用的固定回复一致；非零禁用场景未出现。",
+      "source_lines": [
+        24,
+        2386,
+        4350,
+        4589,
+        4727,
+        8497
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/role_extra.go:28"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10922,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次登录列表只返回id1002/status1，参数数组均空；本地与10924共用icons函数且始终只返回id508，混淆了本批两个列表的实际内容。这里只确认目录/字段差异，id1002完整业务及开放条件未验证。",
+      "source_lines": [
+        28,
+        2388,
+        4590,
+        8498,
+        13083
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/loginday.go:30",
+        "internal/game/loginday.go:96",
+        "internal/game/loginday.go:111",
+        "internal/game/loginday.go:115"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-icons"
+    },
+    {
+      "cmd": 10924,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "前3次返回5图标[508,503,524,501,507]，最后一次为4图标[508,503,524,507]；图标507带int_args[{val:1794067199}]。本地只返回508且所有参数为空，缺多图标和参数状态；不能据一次移除501确认全部日期/领取规则。",
+      "source_lines": [
+        30,
+        2389,
+        4591,
+        8499,
+        13084
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/loginday.go:96",
+        "internal/game/loginday.go:111",
+        "internal/game/loginday.go:116"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-icons"
+    },
+    {
+      "cmd": 10925,
+      "status": "partial",
+      "counts": {
+        "c2s": 8,
+        "s2c": 26
+      },
+      "finding": "8次请求均为615/616，8个同id/status0/空参数回复与本地未知id分支相容；另18条无对应请求的主动通知涉及507/908/1101/1102/513/807/501。507为status1并带截止值1794067199，501在9438推status0后最后10924列表移除；本地只对508或请求id回包，不具这些主动状态与参数。通知因果、图标含义和完整资格规则仍未证实。",
+      "source_lines": [
+        15,
+        17,
+        2380,
+        2381,
+        2440,
+        9360,
+        9361,
+        9362,
+        9363,
+        9370,
+        9419,
+        9438,
+        13132
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/loginday.go:117",
+        "internal/game/loginday.go:119",
+        "internal/game/loginday.go:126"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-icons"
+    },
+    {
+      "cmd": 10926,
+      "status": "partial",
+      "counts": {
+        "c2s": 5,
+        "s2c": 6
+      },
+      "finding": "5请求6响应，累计812→840→855→1038→1072→1692秒、已领150/60保持降序；源2634无请求主动推送，本地只在进度请求或10927成功后推送。无10927领取，本批不补证奖励/重置周期。",
+      "source_lines": [
+        2404,
+        2634,
+        2643,
+        4607,
+        8515,
+        13100
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/onlinegift.go:87",
+        "internal/game/onlinegift.go:136",
+        "internal/game/onlinegift.go:158"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 10950,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次公告列表为空/type0；本地支持公告存储推送，未有公告新增/读取事务，只确认空态。",
+      "source_lines": [
+        126,
+        2443,
+        4450,
+        4641,
+        4827,
+        8549
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/notice.go:64"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10985,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次id_list空；本地有已领取称号/提示状态读取，未有相应领取操作，仅为基线。",
+      "source_lines": [
+        218,
+        2489,
+        4542,
+        4687,
+        4919,
+        8595
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/rolemisc.go:318"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10991,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "4条登录主动状态均status3/is_vote0/flag0/last_time0；本地关闭占位status固定0，其余字段为0。确认状态码字面差异，但本批无10992/10993投票事务，不能推出合服投票日期/状态枚举的完整含义。",
+      "source_lines": [
+        2424,
+        4690,
+        8598,
+        13185
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:33",
+        "internal/game/cross_closed.go:78"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-icons"
+    },
+    {
+      "cmd": 10995,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "四次单主服列表初始化；身份仅私下对照。本地构造当前服单列表同形，合服/多服列表仍未验证。",
+      "source_lines": [
+        2373,
+        4576,
+        8484
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/roledata.go:157"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 10996,
+      "status": "aligned",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "四次客户端版本列表均空，与本地初始化固定空表相符；不表示今天有热更新。",
+      "source_lines": [
+        2374,
+        4577,
+        8485
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/roledata.go:158"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 11001,
+      "status": "partial",
+      "counts": {
+        "s2c": 1872
+      },
+      "finding": "1872条新增英雄通知，partners结构可解码；本地也生成英雄通知，但本批属性/战力公式不能视作已对齐，且原服部分新增英雄旁有11095图鉴通知（见11095）。",
+      "source_lines": [
+        2498,
+        2500,
+        2502
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/partner.go:114",
+        "internal/game/summon.go:296"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11002,
+      "status": "difference",
+      "counts": {
+        "s2c": 537
+      },
+      "finding": "537条英雄增量。培养成功确认前的11002位置相符；但全部537条均def>0、def_p=def_s=0，本地partnerMessage令def_p/def_s都等于def，是明确字段映射差异；其他属性/战力仍属本地近似模型。",
+      "source_lines": [
+        2661,
+        2665,
+        2685,
+        4298
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/partner.go:72",
+        "internal/game/partner.go:126",
+        "internal/game/partner_growth.go:160"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11003,
+      "status": "difference",
+      "counts": {
+        "c2s": 502,
+        "s2c": 502
+      },
+      "finding": "502次均result1/msg空；11次+5级、1次+4级、490次+1级，最高550。逐次核对coin/hero_exp实扣502/502匹配partner_growth表。原服货币升级不发全量包，本地成功后仍sendBackpack，属于多发10500/10501。",
+      "source_lines": [
+        375,
+        379,
+        2662,
+        2666
+      ],
+      "context_source_lines": [
+        2660,
+        2661,
+        2664,
+        2665
+      ],
+      "local_sources": [
+        "internal/game/partner_growth.go:77",
+        "internal/game/partner_growth.go:139",
+        "internal/game/partner_growth.go:152",
+        "internal/game/partner_growth.go:155",
+        "internal/game/partner_growth.go:174"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11004,
+      "status": "difference",
+      "counts": {
+        "c2s": 6,
+        "s2c": 6
+      },
+      "finding": "6次突破全成功/空msg，级别30/40/50/60/80/100，break0→6；六次coin与突破卡10001实扣均匹配本地表（卡50/100/200/500/1000/2000）。原服10302→10512→11002→11004；本地仍发全量背包。",
+      "source_lines": [
+        395,
+        405,
+        419,
+        429,
+        477,
+        2686,
+        4943,
+        8627
+      ],
+      "context_source_lines": [
+        2683,
+        2684,
+        2685,
+        8625,
+        8626
+      ],
+      "local_sources": [
+        "internal/game/partner_growth.go:152",
+        "internal/game/partner_growth.go:155",
+        "internal/game/partner_growth.go:199"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11005,
+      "status": "difference",
+      "counts": {
+        "c2s": 32,
+        "s2c": 32
+      },
+      "finding": "32次：29成功、3失败；其中19次携item_expend成功，覆盖7至25星及20→21的融合材料形式；本地hasItems一律拒绝且拒绝self非目标前一星的融合路径。19次携魂石成功均带空asset_list的12742，本地sendGainList跳过空通知。三次缺卡失败是空msg确认→12745(10001,need400000,num293308)，本地仅文字失败。",
+      "source_lines": [
+        2331,
+        2337,
+        4290,
+        4303,
+        8431,
+        8459,
+        8463,
+        8465,
+        12707,
+        12736,
+        12740,
+        12742,
+        12981,
+        13204
+      ],
+      "context_source_lines": [
+        4295,
+        4296,
+        4297,
+        4298,
+        4302,
+        12737,
+        12741,
+        12743,
+        13200
+      ],
+      "local_sources": [
+        "internal/game/partner_star.go:20",
+        "internal/game/partner_star.go:28",
+        "internal/game/partner_star.go:31",
+        "internal/game/partner_star.go:168",
+        "internal/game/partner_star.go:205",
+        "internal/game/drama_milestones.go:131"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11006,
+      "status": "aligned",
+      "counts": {
+        "s2c": 29
+      },
+      "finding": "29次成功升星各有一条消耗英雄通知；逐笔返回的expend2英雄集合与请求expend1+expend2所选实体集合完全相符（29/29），本地也用实际consumed集合发送该结构。魂石替代支持另见11005。",
+      "source_lines": [
+        4289,
+        4302,
+        8833
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/partner_star.go:248",
+        "internal/game/partner_star.go:252"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11007,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 6
+      },
+      "finding": "6条ref_partners批量属性刷新：首条2英雄，后续5条均114英雄；其中4条位于神装穿戴11091之后、11093确认之前。源码未找到11007发送路径；现有共鸣刷新按英雄发11002，神装路径也遗漏此批量刷新。",
+      "source_lines": [
+        2646,
+        9410,
+        10569,
+        10576,
+        10583,
+        10592
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/resonance.go:170",
+        "internal/game/resonance.go:183",
+        "internal/game/holyeqm.go:407"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11009,
+      "status": "difference",
+      "counts": {
+        "c2s": 10,
+        "s2c": 11
+      },
+      "finding": "10个扩容请求全部成功，原服每次10302→11009且文字“扩容成功”，buy_num1..10对应容量365..410。此前基线300/0，源9408无本次11009请求的自推已变360/0，额外60来源待核对；本地只有300+5*buy_num、文字“购买成功”且先回后资产，不能直接把初始容量改成360。",
+      "source_lines": [
+        8218,
+        9408,
+        12487,
+        12489,
+        12506
+      ],
+      "context_source_lines": [
+        9406,
+        9407,
+        12486,
+        13097
+      ],
+      "local_sources": [
+        "internal/game/partner.go:139",
+        "internal/game/partner.go:145",
+        "internal/game/partner.go:150",
+        "internal/game/partner.go:282",
+        "internal/game/partner.go:294"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11010,
+      "status": "difference",
+      "counts": {
+        "c2s": 3,
+        "s2c": 3
+      },
+      "finding": "3次item_id0一键穿戴都成功/空msg。原服包增量(10511，替换时10510)→11012→11010；本地先回“穿戴成功”，后11012及全量10501，通知顺序、文案及包更新方式不同。",
+      "source_lines": [
+        373,
+        2659,
+        4935,
+        8616
+      ],
+      "context_source_lines": [
+        2657,
+        2658,
+        8613,
+        8614,
+        8615,
+        9489
+      ],
+      "local_sources": [
+        "internal/game/equipment.go:105",
+        "internal/game/equipment.go:123",
+        "internal/game/equipment.go:246"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11012,
+      "status": "difference",
+      "counts": {
+        "s2c": 3
+      },
+      "finding": "3条普通装备穿戴后的英雄属性/eqms增量，均早于11010确认；本地有同号消息但在确认后发送，且def_p/def_s映射和属性模型存在前述差异。",
+      "source_lines": [
+        2658,
+        8615,
+        9489
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/equipment.go:105",
+        "internal/game/equipment.go:111",
+        "internal/game/partner.go:126"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11016,
+      "status": "partial",
+      "counts": {
+        "c2s": 12,
+        "s2c": 12
+      },
+      "finding": "12条突破属性预览均可按现有字段解码；本地有下一break步的partnerMessage预览路径。只捕获成功预览，不能据此确认上限/缺英雄/条件失败，属性公式差异仍待建模。",
+      "source_lines": [
+        391,
+        393,
+        2681,
+        2682
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/partner_growth.go:85",
+        "internal/game/partner_growth.go:99",
+        "internal/game/partner.go:72"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11020,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次皮肤列表均为空，与本地无皮肤角色的空列表形状一致；本批没有皮肤获取/穿戴/升级，不能确认非空分支及加成。",
+      "source_lines": [
+        2415,
+        4618,
+        8527,
+        13112
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/skin.go:76",
+        "internal/game/skin.go:82"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11025,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次简表包含sort_type/num/buy_num/partners，前三次容量300/0，末次410/10；本地简表形状存在，但仅300+5*buys会在末次给350而非410，未建模额外容量来源；英雄属性/图鉴等也非整体对齐。",
+      "source_lines": [
+        2402,
+        4605,
+        8513,
+        13097
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/partner.go:139",
+        "internal/game/partner.go:150",
+        "internal/game/partner.go:190"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11026,
+      "status": "partial",
+      "counts": {
+        "c2s": 9,
+        "s2c": 9
+      },
+      "finding": "9次按partner_ids取英雄详细装备/战技和属性，字段与本地按请求ID选择并编码partnerMessage路径相符；真实属性公式及本批装备参数尚不代表本地数值验收。",
+      "source_lines": [
+        2413,
+        2635,
+        4616
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/partner.go:255",
+        "internal/game/partner.go:261",
+        "internal/game/partner.go:268"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11030,
+      "status": "difference",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "两次战技穿戴成功：10511(storage1)→11031→11030，确认空msg。当前本地也空msg且11031在确认前，但先sendBackpack全量刷新，未用10511删除实例增量。",
+      "source_lines": [
+        4937,
+        4939,
+        8619,
+        8622
+      ],
+      "context_source_lines": [
+        8617,
+        8618,
+        8620,
+        8621
+      ],
+      "local_sources": [
+        "internal/game/artifact.go:411",
+        "internal/game/artifact.go:472",
+        "internal/game/artifact.go:473",
+        "internal/game/artifact.go:479"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11031,
+      "status": "partial",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "两条战技穿戴后的属性/artifacts消息，本地有sendHero的对应结构；其先于11030确认已一致，但其前背包增量与属性公式未对齐，见11030/11002。",
+      "source_lines": [
+        8618,
+        8621
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/artifact.go:476",
+        "internal/game/partner.go:114"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11037,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次战技幸运值查询均lucky空，本地读取ArtifactsOf.Lucky形状对应；本包没有11036合成事务，不能确认合成消耗/成功率/非空幸运值。",
+      "source_lines": [
+        2410,
+        4623,
+        8521,
+        13117
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/artifact.go:735",
+        "internal/game/artifact.go:744"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11040,
+      "status": "unsupported",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "图鉴快照4条，all_star为15/877/877/1243，partners图鉴条目3/61/61/67；本地仍固定all_star0/partners空的stub，图鉴积累/属性效果未实现。",
+      "source_lines": [
+        2409,
+        4612,
+        8520,
+        13105
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/hero_stubs.go:40",
+        "internal/game/hero_stubs.go:48"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11055,
+      "status": "difference",
+      "counts": {
+        "c2s": 1760
+      },
+      "finding": "1760个红点写入请求（is_point1有1759次、0有1次），本包无任何同号响应。本地fixed空消息会每次回11055且不保存值，是应答/状态行为差异；本批不足以确认红点重置或业务触发规则。",
+      "source_lines": [
+        230,
+        232,
+        234
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/hero_stubs.go:11",
+        "internal/game/hero_stubs.go:18",
+        "internal/game/hero_stubs.go:46"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11056,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次融合红点查询全is_point1，本地固定is_point0；仅结构可解码，不是业务对齐。",
+      "source_lines": [
+        2451,
+        4649,
+        8557,
+        13144
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/hero_stubs.go:47"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11067,
+      "status": "partial",
+      "counts": {
+        "c2s": 3,
+        "s2c": 3
+      },
+      "finding": "3次重生状态查询均day_num0/end_time0，本地无使用记录时返回相同结构；本批无11068，不确认每天次数/冷却/重生奖励。",
+      "source_lines": [
+        377,
+        2663,
+        4696,
+        8612
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/reset.go:95",
+        "internal/game/reset.go:106"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11075,
+      "status": "difference",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "两次预览分别选100名1级英雄(99三星+1四星)和14名1级四星；奖励分别11/10001/22=1015/1015/50500与350/350/14000。当前refund仅累计培养/装备成本，1级无培养时不给这些星级基础献祭奖励，预览将漏发。",
+      "source_lines": [
+        5167,
+        5175,
+        8974,
+        8989
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/reset.go:20",
+        "internal/game/reset.go:34",
+        "internal/game/reset.go:43",
+        "internal/game/reset.go:198",
+        "internal/game/reset.go:210"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11076,
+      "status": "difference",
+      "counts": {
+        "c2s": 162,
+        "s2c": 162
+      },
+      "finding": "162次均有响应：132成功/空msg、30失败“找不到该英雄”。132次成功累计献祭1346名1级英雄(1108三星、238四星)，全部奖励吻合三星=魂11×10+卡10001×10+经验22×500、四星=25/25/1000。原服10302→10512→12742→(偶有任务/活动通知)→空msg11076；本地缺星级基础奖励和12742，发全量包并回“献祭成功”，不存在英雄文案也不同。",
+      "source_lines": [
+        576,
+        602,
+        732,
+        2924,
+        2945,
+        3060
+      ],
+      "context_source_lines": [
+        2920,
+        2921,
+        2922,
+        2942,
+        2943,
+        2944,
+        5167,
+        5175,
+        8974,
+        8989
+      ],
+      "local_sources": [
+        "internal/game/reset.go:23",
+        "internal/game/reset.go:179",
+        "internal/game/reset.go:212",
+        "internal/game/reset.go:232",
+        "internal/game/reset.go:235",
+        "internal/game/reset.go:242"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11086,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "1条英雄高级总属性：dam_s12/res_s17等非零，而本地11086直接编码partnerMessage，未给dam/res/cure等高级字段赋值，这些字段默认0；本地数值/效果仍不完整。",
+      "source_lines": [
+        6080,
+        10595
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/holyeqm.go:649",
+        "internal/game/holyeqm.go:660",
+        "internal/game/partner.go:126"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11091,
+      "status": "difference",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "4条神装穿戴后属性/holy_eqm增量，原服res50及后续res_s17等；本地同号结构存在，但partnerMessage未填这些高级属性，且后续批量11007遗漏。",
+      "source_lines": [
+        10566,
+        10573,
+        10580,
+        10588
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/holyeqm.go:414",
+        "internal/game/partner.go:126"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11092,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次按请求英雄列表读取holy_eqm，空/穿戴实例结构能解码，本地逐请求ID生成相同形状。真实实例身份和全部装备属性仍需本地真机验收。",
+      "source_lines": [
+        2419,
+        4622,
+        8531,
+        13116
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/holyeqm.go:631",
+        "internal/game/holyeqm.go:636",
+        "internal/game/holyeqm.go:646"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11093,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次神装穿戴都type1、result1/msg空，原服10511→11091→11007(114英雄)→11093，无10306（全包也未出现10306）。本地增量/空msg已部分对齐，但缺11007且确认后固定sendRolePower，多发10306。没有本批卸下样本。",
+      "source_lines": [
+        6070,
+        6072,
+        6074,
+        6078,
+        10570,
+        10577,
+        10584,
+        10593
+      ],
+      "context_source_lines": [
+        10565,
+        10566,
+        10569,
+        10572,
+        10573,
+        10576,
+        10579,
+        10580,
+        10583,
+        10587,
+        10588,
+        10592
+      ],
+      "local_sources": [
+        "internal/game/holyeqm.go:407",
+        "internal/game/holyeqm.go:414",
+        "internal/game/holyeqm.go:417",
+        "internal/game/holyeqm.go:420"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11095,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 140
+      },
+      "finding": "140条图鉴/英雄获取提示，含partner_bid/init_star/status/is_chips，常伴高星新增11001。源码没有找到此号发送路径，11040仍stub；只确认捕获字段和关联，不能由此断言所有触发/去重规则。",
+      "source_lines": [
+        2497,
+        2499,
+        12697
+      ],
+      "context_source_lines": [
+        2498,
+        2500
+      ],
+      "local_sources": [
+        "internal/game/hero_stubs.go:40",
+        "internal/game/hero_stubs.go:48",
+        "internal/game/partner.go:197"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11099,
+      "status": "partial",
+      "counts": {
+        "c2s": 16,
+        "s2c": 16
+      },
+      "finding": "16次查询合计21个英雄的dower_skill均为空；本地按请求heroIDs返回talentMessages结构一致，但无学习/升级/非空天赋样本，不能确认天赋加成（本地注释仍未加到战斗属性）。",
+      "source_lines": [
+        2436,
+        2655
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/talent.go:78",
+        "internal/game/talent.go:82",
+        "internal/game/talent.go:98"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "hero"
+    },
+    {
+      "cmd": 11211,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次读取type28阵型，均formation_type1/hallows_id0，两名英雄位于pos1和pos6；本地有按type读取及campaign回落的同形路径。仅已有阵型状态，不能据此确认新角色默认站位或其他type保存条件。",
+      "source_lines": [
+        160,
+        2460,
+        4484,
+        4658,
+        4861,
+        8566,
+        12906,
+        13153
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/formation.go:39",
+        "internal/game/formation.go:50",
+        "internal/game/formation.go:71",
+        "internal/game/formation.go:83",
+        "internal/game/formation.go:92"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-hero"
+    },
+    {
+      "cmd": 11212,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "1次保存type0、formation_type1、hallows_id0、两英雄pos1/6成功，返回code1/type0/msg“阵法设置成功”；本地同路径保存成功文字为“保存成功”，属确定文案差异。无非法阵型/缺英雄等失败样本。",
+      "source_lines": [
+        363,
+        2647
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/formation.go:109",
+        "internal/game/formation.go:118",
+        "internal/game/formation.go:134",
+        "internal/game/formation.go:140"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-hero"
+    },
+    {
+      "cmd": 11213,
+      "status": "partial",
+      "counts": {
+        "c2s": 5,
+        "s2c": 5
+      },
+      "finding": "5次批量读取均请求type_list[0,1]，回复info中同样包含type0、type1两项；本地逐请求type拼装formationMessage的结构与此对应。只有状态/一次保存后的重查，无足够证据确认全部阵型业务规则。",
+      "source_lines": [
+        90,
+        365,
+        2420,
+        2648,
+        4418,
+        4624,
+        4795,
+        8532,
+        12840,
+        13118
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/formation.go:71",
+        "internal/game/formation.go:94",
+        "internal/game/formation.go:100",
+        "internal/game/formation.go:107"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-hero"
+    },
+    {
+      "cmd": 11320,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次塔状态均result1/msg空、max_tower0/count2/buy_count0，award_list400项且全部status0；本地有开放判断、次数和里程碑状态生成路径。仅状态基线，本批无爬塔/扫荡/购买次数/领奖，不确认这些规则或重置周期。",
+      "source_lines": [
+        144,
+        2452,
+        4468,
+        4650,
+        4845,
+        8558,
+        12890,
+        13145
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/star_tower.go:129",
+        "internal/game/star_tower.go:142",
+        "internal/game/star_tower.go:177",
+        "internal/game/star_tower.go:189"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-hero"
+    },
+    {
+      "cmd": 11402,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "1次魂器觉醒请求，末帧result0/msg“道具不足”。捕获状态为受支持BID70501、25星、horcrux_status0，最新完整背包无10051且后续没有补入；本地觉醒需10051×20、仅检查英雄星级>=5，按现有实现会进入finish资源不足分支并回“资产不足”，故本次错误文字不同。表中还有star_tower1门槛而本地未检查，本批塔max0，不能由此确认原服门槛顺序/是否执行或觉醒成功行为。",
+      "source_lines": [
+        13051,
+        13300
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/horcrux.go:59",
+        "internal/game/horcrux.go:105",
+        "internal/game/horcrux.go:113",
+        "internal/game/horcrux.go:119",
+        "internal/game/horcrux.go:125",
+        "internal/game/horcrux.go:175",
+        "internal/game/horcrux.go:179",
+        "internal/game/horcrux.go:185"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-hero"
+    },
+    {
+      "cmd": 12741,
+      "status": "difference",
+      "counts": {
+        "s2c": 29
+      },
+      "finding": "29次通用提示：16次英雄包满、1次未通关解锁、11次任务/成就奖励文字、1次购买成功；本地召唤拒绝静默、任务/成就确认文字内嵌，因此调用路径缺少这些独立提示。",
+      "source_lines": [
+        2639,
+        8895,
+        8900,
+        9399,
+        12153,
+        12481
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/summon.go:222",
+        "internal/game/quest.go:202",
+        "internal/game/feat.go:145"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 12742,
+      "status": "partial",
+      "counts": {
+        "s2c": 181
+      },
+      "finding": "181次source0、451条num均字符串；19次asset_list为空，6条奖励条目id非0（唯一实例/特殊物品）。本地sendGainList强制id0并跳过空列表，不能当作本批所有12742的完整通用模型。活动四件神装与外层四盒子展示不可双计入账。",
+      "source_lines": [
+        2625,
+        4312,
+        4324,
+        8880,
+        8882,
+        8884,
+        8886,
+        8887,
+        9473,
+        13200
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/drama_milestones.go:118",
+        "internal/game/drama_milestones.go:131"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 12745,
+      "status": "difference",
+      "counts": {
+        "s2c": 5
+      },
+      "finding": "5次缺材料通知：召唤券10401需10有0、10403需10有1；另三次10001需400000有293308归培养域。当前只在共鸣缺料路径发送，本地召唤缺券静默。",
+      "source_lines": [
+        2638,
+        10628,
+        12737,
+        12741,
+        12743
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/empower.go:254",
+        "internal/game/summon.go:261",
+        "internal/game/summon.go:283"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 12761,
+      "status": "partial",
+      "counts": {
+        "s2c": 104
+      },
+      "finding": "104条广播已解析，包含其他玩家信息，原文和role_list均不导出；只确认广播结构，未有本角色聊天发送/限频事务。",
+      "source_lines": [
+        2898,
+        3065,
+        3264
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/chat.go:245",
+        "internal/game/chat.go:295"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 12902,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次排行查询返回5个榜单；玩家身份不导出。与本地rank查询字段同形，跨服排名算法/排序规则不能由此确认。",
+      "source_lines": [
+        4554,
+        4699
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/rank.go:320"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13000,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "四次主线登录状态从可挑战10020持续至10030；字段结构完整，进度变化另见13001/13016，其他章节未验证。",
+      "source_lines": [
+        2375,
+        4578,
+        8486
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/drama.go:77"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13001,
+      "status": "difference",
+      "counts": {
+        "s2c": 3
+      },
+      "finding": "结算先推已通过10020/status3，再下关10030/status1及cool_time，之后才13016，稍后再status2/cool0；本地13016后只推无冷却的下一状态，缺这段阶段顺序。",
+      "source_lines": [
+        2690,
+        2692,
+        2704
+      ],
+      "context_source_lines": [
+        367,
+        370,
+        2649,
+        2651,
+        2652,
+        2653,
+        2654,
+        2687,
+        2688,
+        2689,
+        2690,
+        2691,
+        2692,
+        2693,
+        2694,
+        2695,
+        2696,
+        2697,
+        2704
+      ],
+      "local_sources": [
+        "internal/game/drama_battle.go:209",
+        "internal/game/drama_battle.go:214"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13003,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次请求is_auto0，回复code1/msg空，开场20027却is_auto1；本地把请求auto传入战斗模板。原包本事务有20005结束，不把它与竞技场无逐回合确认路径混为一谈。",
+      "source_lines": [
+        367,
+        2651
+      ],
+      "context_source_lines": [
+        367,
+        370,
+        2649,
+        2651,
+        2652,
+        2653,
+        2654,
+        2687,
+        2688,
+        2689,
+        2690,
+        2691,
+        2692,
+        2693,
+        2694,
+        2695,
+        2696,
+        2697,
+        2704
+      ],
+      "local_sources": [
+        "internal/game/drama_battle.go:88",
+        "internal/game/fight.go:867",
+        "internal/game/fight.go:807"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13006,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 6
+      },
+      "finding": "四次问询及两次主动状态均显示免费快速1、上限3等；没有快速战斗领取/购买请求，不能确认次数和价格的事务规则。",
+      "source_lines": [
+        40,
+        2395,
+        2650,
+        4364,
+        4596,
+        4741
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/drama_extras.go:185"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13008,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 5
+      },
+      "finding": "四次请求及两次推送包含里程碑列表；没有13009领奖，不能确认该领奖路径。",
+      "source_lines": [
+        42,
+        2396,
+        2696,
+        4366,
+        4597,
+        4743
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/drama_milestones.go:55"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13011,
+      "status": "aligned",
+      "counts": {
+        "c2s": 4,
+        "s2c": 6
+      },
+      "finding": "4个问询加2个推送均buff_list空，本地固定空buff表与该基线一致。",
+      "source_lines": [
+        44,
+        2397,
+        2649,
+        4370,
+        4600,
+        4747
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login_init.go:17"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13016,
+      "status": "difference",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "唯一主线胜利result1携7项奖励、148级及真实exp前后值；前置10302/10512/10510及13001/10528/23604后才结果。本地结果先发、等级经验置0并在后面全包刷新，顺序和字段有差异。",
+      "source_lines": [
+        2694
+      ],
+      "context_source_lines": [
+        367,
+        370,
+        2649,
+        2651,
+        2652,
+        2653,
+        2654,
+        2687,
+        2688,
+        2689,
+        2690,
+        2691,
+        2692,
+        2693,
+        2694,
+        2695,
+        2696,
+        2697,
+        2704
+      ],
+      "local_sources": [
+        "internal/game/drama_battle.go:175",
+        "internal/game/drama_battle.go:209",
+        "internal/game/drama_battle.go:228"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13017,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 20
+      },
+      "finding": "4次问询和20次挂机收益状态，hook_time随时间增长；本批无13018领取/快速收益事务，不能确认收益公式或领取上限。",
+      "source_lines": [
+        46,
+        2398,
+        2428,
+        2711,
+        4372,
+        4749
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/drama_extras.go:118"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13300,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次好友列表为空，未发生赠送/添加；本地列表结构可承载此状态，不验证好友上限或友情点规则。",
+      "source_lines": [
+        214,
+        2487,
+        4538,
+        4685,
+        4915,
+        8593
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/friendgift.go:38"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13311,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次好友申请列表为空；没有申请/处理事务，身份不导出。",
+      "source_lines": [
+        220,
+        2490,
+        4544,
+        4688,
+        4921,
+        8596
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/friend.go:123"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13330,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "四次登录黑名单均空，未发生拉黑/解除；本地有黑名单推送路径。",
+      "source_lines": [
+        2362,
+        4565,
+        8473
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/friend_black.go:19"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13401,
+      "status": "aligned",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "两次type31/28均code1/msg空/is_half0/item_list空；本地仅回传已买次数，未购买时空列表与样本相符，不能将其解释为商品目录为空。",
+      "source_lines": [
+        5100,
+        6091,
+        8845,
+        10605
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/shop.go:78",
+        "internal/game/shop.go:99"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 13601,
+      "status": "partial",
+      "counts": {
+        "s2c": 18
+      },
+      "finding": "18条全部主动完整状态，flag1/msg空/period1/cur_day1/num2/charge0，含84条grow、7条welfare、21条price、4条finish；end_time524026→523503，grow条件/进度多次变化。当前本地只是flag0、“活动未开启”、零状态与空列表，未实现本批状态模型/进度推送。没有13602领取请求，只能确认状态和进度，不能据此推断领奖、收费、持续天数或重置公式。",
+      "source_lines": [
+        2627,
+        2861,
+        2892,
+        4285,
+        8688,
+        9037,
+        9403
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:39",
+        "internal/game/cross_closed.go:59",
+        "internal/game/cross_closed.go:78"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "baseline-icons"
+    },
+    {
+      "cmd": 14100,
+      "status": "difference",
+      "counts": {
+        "c2s": 8,
+        "s2c": 8
+      },
+      "finding": "8次状态：前7次day1/status1，额外领取后重登day1/status2。当前本地已领状态只有1，缺少第二阶段已领2。",
+      "source_lines": [
+        2387,
+        4593,
+        8502,
+        8839,
+        9343,
+        9414,
+        9418,
+        13082
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/checkin.go:30",
+        "internal/game/checkin.go:68"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 14101,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "唯一请求是额外领取：day保持1、status1→2、code1/msg空，10510新增99955×1→12742→确认。当前本地today即拒绝，成功只count+1/status1，无法表达此路径。资格条件需结合购买/charge_sum域，不推断免费可无限重领。",
+      "source_lines": [
+        5308,
+        9432
+      ],
+      "context_source_lines": [
+        9418,
+        9430,
+        9431,
+        13082
+      ],
+      "local_sources": [
+        "internal/game/checkin.go:94",
+        "internal/game/checkin.go:107",
+        "internal/game/checkin.go:122"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 16400,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次均39个阶段性成就；领取后的已完成档由下一档替换，progress.id0。当前本地枚举全部199个表项、progress.id1，列表与状态计算范围不同。",
+      "source_lines": [
+        2431,
+        4632,
+        8540,
+        13125
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/feat.go:59",
+        "internal/game/feat.go:80",
+        "internal/game/feat.go:95"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 16401,
+      "status": "difference",
+      "counts": {
+        "s2c": 58
+      },
+      "finding": "58次增量覆盖培养/招募等进度；领取11010后推下一档11020、领取18060后后续显示18070。当前领奖推已领同档，progress.id1；evt_partner等列表计算未覆盖本批阶段链。",
+      "source_lines": [
+        2628,
+        2632,
+        8901,
+        8907,
+        8931
+      ],
+      "context_source_lines": [
+        13125
+      ],
+      "local_sources": [
+        "internal/game/feat.go:80",
+        "internal/game/feat.go:148",
+        "internal/game/feat.go:158"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 16402,
+      "status": "difference",
+      "counts": {
+        "c2s": 14,
+        "s2c": 14
+      },
+      "finding": "14请求=10成功（空msg）+4重复拒绝奖励已领取；10次合计900000贝里和72001×90。原服资产/背包→通用奖励文字→下一档16401→确认；本地先领取成功→同档16401→资产/全包，重复拒绝文字一致。",
+      "source_lines": [
+        5127,
+        8902,
+        8932,
+        8933,
+        8939,
+        8940,
+        8946,
+        8947,
+        8953,
+        8954,
+        8960
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/feat.go:115",
+        "internal/game/feat.go:139",
+        "internal/game/feat.go:145"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 16601,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次活动目录可完整解码；本批包含991037召唤豪礼、993014升星有礼，两者panel_type16/cli_type15。目录成员和开放时间依赖服务端活动配置，未与同配置本地环境逐值复现。",
+      "source_lines": [
+        2382,
+        4585,
+        8493,
+        13077
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/activity.go:312",
+        "internal/game/activity.go:325"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16602,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次活动红点列表字段bid/can_get_num由本地具备；仅登录/读取状态，不据此确认全部活动目标规则。",
+      "source_lines": [
+        38,
+        2394,
+        12783,
+        13089
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/activity.go:328",
+        "internal/game/activity.go:337"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16603,
+      "status": "difference",
+      "counts": {
+        "c2s": 7,
+        "s2c": 225
+      },
+      "finding": "原服991037 finish为累计次数701，非布尔；993014领奖后目标status1→0，而本地finish仅0/1、所有已领目标统一status2。本地activityEvent不主动推16603详情，原包225次详情远多于7次请求和9次领奖，另有进度驱动详情推送。",
+      "source_lines": [
+        8848,
+        8854,
+        8890,
+        9461,
+        9470,
+        9477,
+        9484
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/activity.go:213",
+        "internal/game/activity.go:247",
+        "internal/game/activity.go:363",
+        "internal/game/activity.go:441"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16604,
+      "status": "difference",
+      "counts": {
+        "c2s": 9,
+        "s2c": 9
+      },
+      "finding": "9次领取均code1/msg空。原服背包增量/必要资产→12742→16606红点递减→16604→16603；本地强刷资产和全包、没有12742，16606在确认和详情之后。500档还出现实际神装与原盒子两层通知，需统一发奖展开语义，不可双算。",
+      "source_lines": [
+        5109,
+        5119,
+        5337,
+        5341,
+        8853,
+        8889,
+        9465
+      ],
+      "context_source_lines": [
+        8850,
+        8851,
+        8852,
+        8854,
+        8879,
+        8880,
+        8887,
+        8888,
+        9462,
+        9463,
+        9464
+      ],
+      "local_sources": [
+        "internal/game/activity.go:390",
+        "internal/game/activity.go:426"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16606,
+      "status": "difference",
+      "counts": {
+        "s2c": 243
+      },
+      "finding": "领奖红点从5/4/3/2/1/0或2/1/0在16604之前推送；本地claim最后才推。243个推送包含被动进度更新，不能只按本地主动查询或ready计数增长解释。",
+      "source_lines": [
+        8852,
+        8858,
+        8864,
+        8870,
+        8876,
+        8888,
+        9464,
+        9474,
+        9481
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/activity.go:285",
+        "internal/game/activity.go:438",
+        "internal/game/activity.go:475"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16653,
+      "status": "partial",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "仅见两次is_buy0/end_time0/charge_id0/award_list空，与本地关闭窗口字面值一致；不证明购买/到期规则。",
+      "source_lines": [
+        9376,
+        9395
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:41"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16700,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 2
+      },
+      "finding": "2次只读返回7个充值档位；need_rmb/首充额外钻石字段可解码，本地按产品表生成。游戏帧未见10947订单请求，但辅助HTTP存在pay_web请求200；不能据charge状态或该HTTP响应证明外部支付、金额单位或资格公式，见aux-review。",
+      "source_lines": [
+        9413,
+        9440
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/charge_proto.go:15",
+        "internal/game/charge_proto.go:106"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16705,
+      "status": "difference",
+      "counts": {
+        "c2s": 7,
+        "s2c": 9
+      },
+      "finding": "两张卡激活及单领后card*_acc均0，本地激活期间view返回98/30；原服单领后未逐次推16705，后续查询9442才显示两卡days1/is_reward2。本地单领即时推窗口。",
+      "source_lines": [
+        9353,
+        9357,
+        9421,
+        9422,
+        9442
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/monthcard.go:29",
+        "internal/game/monthcard.go:56",
+        "internal/game/monthcard.go:145"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16706,
+      "status": "difference",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "card1/2分别奖励200/120钻；原服10302→12742→16706(code1/msg空)，不强刷背包。本地先16706“领取成功”→16705→10302，无12742。金额表本身与观察一致。",
+      "source_lines": [
+        5304,
+        5306,
+        9426,
+        9429
+      ],
+      "context_source_lines": [
+        9424,
+        9425,
+        9427,
+        9428
+      ],
+      "local_sources": [
+        "internal/game/monthcard.go:18",
+        "internal/game/monthcard.go:105",
+        "internal/game/monthcard.go:129"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16707,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 3
+      },
+      "finding": "两张16706都单领且16705已显示两卡reward2之后，原服16707仍status1；16708成功后才变2。本地用两张月卡聚合推导status，不能解释这个额外可领状态。",
+      "source_lines": [
+        9443,
+        9457
+      ],
+      "context_source_lines": [
+        9442
+      ],
+      "local_sources": [
+        "internal/game/monthcard.go:153"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16708,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "在两张月卡已单领之后另获40钻+37001×1，原服10302→10512→12742→16707(status2)→16708空msg成功。本地将其实现为两卡take-all，此时会直接code0无奖，属于业务含义差异，不是仅文字/顺序。",
+      "source_lines": [
+        5330,
+        9458
+      ],
+      "context_source_lines": [
+        9454,
+        9455,
+        9456,
+        9457
+      ],
+      "local_sources": [
+        "internal/game/monthcard.go:168",
+        "internal/game/monthcard.go:181"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16710,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 3
+      },
+      "finding": "列表从[0]→[2,0]→[1,2,0]，新领取等级在头部；本地VIPGiftLevels按lev升序。成员集合相同但序列与本批不一致。",
+      "source_lines": [
+        9444,
+        9448,
+        9452
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/vip.go:17",
+        "internal/store/vip.go:4"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16711,
+      "status": "difference",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "lev2扣688/lev1扣238，各奖励200000钻（净增199312/199762），价格和奖励表一致。原服10302→12742→16710→空msg16711；本地先list/reply再资产/全包，无12742。",
+      "source_lines": [
+        5326,
+        5328,
+        9449,
+        9453
+      ],
+      "context_source_lines": [
+        9446,
+        9447,
+        9448,
+        9450,
+        9451,
+        9452
+      ],
+      "local_sources": [
+        "internal/game/vip.go:54",
+        "internal/game/vip.go:69",
+        "internal/game/data/vip.json:1"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16712,
+      "status": "partial",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "仅有一次charge_sum980及10→1降序累计充值礼包状态，列表构造方式与本地具备；没有16713领取或完整支付链，资格/重置未确认。",
+      "source_lines": [
+        9352
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/chargeacc.go:15",
+        "internal/game/chargeacc.go:19",
+        "internal/game/chargeacc.go:53"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 16800,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "观察到type1/idx0/两个arg数组为空的主动推送；在internal/**/*.go中未找到16800发送或业务处理，语义未知。",
+      "source_lines": [
+        13134
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/proto/protocols.json:1"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 19906,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "四次like0，只有录像点赞状态查询，无本次点赞/收藏变化；本地按持久化录像点赞读取，规则仍未验证。",
+      "source_lines": [
+        116,
+        2437,
+        4440,
+        4635,
+        4817,
+        8543
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/vedio.go:410"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 20000,
+      "status": "difference",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "剧情开场combat_type3/map20001，本地相符；竞技场combat_type2/map0，本地通用begin仍用fightMap20001。",
+      "source_lines": [
+        2653,
+        8970
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/fight.go:140",
+        "internal/game/fight.go:916"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20005,
+      "status": "partial",
+      "counts": {
+        "c2s": 1
+      },
+      "finding": "仅一次剧情段客户端确认，无同号回复；竞技场段没有此请求。不能按本地20001→20019→20005推进链假定本批也有这些确认。",
+      "source_lines": [
+        370
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/drama_battle.go:102",
+        "internal/game/fight.go:1011"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20006,
+      "status": "difference",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "竞技场实际胜负在20210(result2)，其后20006为result1/combat_type2/空奖空伤害，只是结束通知；本地settleArena不发送该20006，不能把该result1当获胜或二次派奖。",
+      "source_lines": [
+        8985
+      ],
+      "context_source_lines": [
+        8984
+      ],
+      "local_sources": [
+        "internal/game/arena.go:673",
+        "internal/game/arena.go:750",
+        "internal/game/fight.go:1020"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20027,
+      "status": "difference",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "竞技场请求is_auto0但开场is_auto1；全包无20001/20019/20062，原服约18.877秒后自动结算。本地沿用请求is_auto，并必须等20001/19/05才settle，存在推进/等待差异。剧情和竞技场均仅开场，无逐回合20002/20004样本。",
+      "source_lines": [
+        2654,
+        8971
+      ],
+      "context_source_lines": [
+        5162,
+        8985
+      ],
+      "local_sources": [
+        "internal/game/arena.go:642",
+        "internal/game/fight.go:916",
+        "internal/game/fight.go:989"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20060,
+      "status": "aligned",
+      "counts": {
+        "c2s": 41,
+        "s2c": 41
+      },
+      "finding": "41组请求/回包：combat_type3时type2并有20061；其他所见类型返回type0，和本地combatType分支一致。只能确认窗口/挂机场景路由，不能证明战斗公式。",
+      "source_lines": [
+        22,
+        221,
+        355,
+        2385,
+        2641,
+        8962,
+        10598,
+        13098,
+        13196
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/battle.go:75",
+        "internal/game/battle.go:86"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20061,
+      "status": "partial",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "仅一条挂机战斗配置，含战斗类型3、关卡、阵型、伙伴及HP10怪物；本地hookBattle具备同种结构。伤害公式/单位完整配置不能由一条配置样本证明。",
+      "source_lines": [
+        2642
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/battle.go:95",
+        "internal/game/battle.go:102",
+        "internal/game/battle.go:136"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20063,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 8
+      },
+      "finding": "原服开战时type_list包含3或2，完成后为空；本地查询和通用begin始终发送空列表，不能表示这两次活跃战斗。",
+      "source_lines": [
+        2384,
+        2652,
+        2697,
+        8969,
+        8987
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/guide.go:20",
+        "internal/game/fight.go:928"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20200,
+      "status": "difference",
+      "counts": {
+        "c2s": 5,
+        "s2c": 6
+      },
+      "finding": "免费次数3→2、积分1000且失败不扣分，与本地部分数值策略一致；原服结算在20210之前推送20200，当前settleArena没有推送此窗口。",
+      "source_lines": [
+        2467,
+        8982,
+        8988
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arena.go:310",
+        "internal/game/arena.go:673",
+        "internal/game/arena.go:747"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20201,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次返回3名候选及5人阵容字段，可映射本地sendList结构；本批没有刷新/胜后列表更新，不能确认匹配或机器人公式。已隐去对手身份。",
+      "source_lines": [
+        8964
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arena.go:328",
+        "internal/game/arena.go:590"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20203,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次is_auto0挑战成功，13011→空msg20203→10409顺序与本地已有路径相符；但后续自动开场/结算链和本地需要逐回合确认不同，详见20027/20210/20006。",
+      "source_lines": [
+        5162,
+        8967
+      ],
+      "context_source_lines": [
+        8966,
+        8968,
+        8971,
+        8984,
+        8985
+      ],
+      "local_sources": [
+        "internal/game/arena.go:575",
+        "internal/game/arena.go:649"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20208,
+      "status": "difference",
+      "counts": {
+        "c2s": 5,
+        "s2c": 6
+      },
+      "finding": "had_combat_num0→1，num_list空；本地次数字段具备，但原服结算时在20210之前主动推20208，本地settleArena未推。没有20209领取样本。",
+      "source_lines": [
+        2466,
+        8963,
+        8983
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arena.go:418",
+        "internal/game/arena.go:673"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20210,
+      "status": "difference",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "本场失败result2，奖励10001×6，积分/增减积分均不变，双边伤害统计；本地失败固定发12000贝里并sendAssets，只生成单侧统计，且缺邻接20200/20208/20006收尾。未据单场推断全失败奖励分布。",
+      "source_lines": [
+        8984
+      ],
+      "context_source_lines": [
+        8981,
+        8982,
+        8983,
+        8985
+      ],
+      "local_sources": [
+        "internal/game/arena.go:28",
+        "internal/game/arena.go:685",
+        "internal/game/arena.go:695",
+        "internal/game/arena.go:747"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20223,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次flag0，与本地固定未读战报标志一致；没有读取/新增战报的闭环。",
+      "source_lines": [
+        178,
+        2469,
+        4667,
+        8575,
+        12924,
+        13162
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login_init.go:17"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20250,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "仅step0/round0预告状态和服务器给定时间字段；本地冠军赛视图具备字段。没有阶段跨界/竞猜/战斗，本批不足以验证本地日程与赛制。",
+      "source_lines": [
+        176,
+        2468,
+        4666,
+        8574,
+        12922,
+        13161
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenachampion.go:307",
+        "internal/game/arenachampion_view.go:49"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20251,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次rank0/best_rank0/group0/can_bet60；本地roleInfo可生成这些字段，但额度依赖活动阶段/历史状态，不能只按登录值确认分配周期。",
+      "source_lines": [
+        2483,
+        4681,
+        8589,
+        13173
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenachampion_view.go:269"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20300,
+      "status": "partial",
+      "counts": {
+        "c2s": 5,
+        "s2c": 5
+      },
+      "finding": "5次activity_box均空；领取日常后活跃由5→15，未出现20301。仅空列表形态与本地匹配，宝箱领奖、拒绝和重置未证实。",
+      "source_lines": [
+        2434,
+        4633,
+        8541,
+        8891,
+        13127
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/activitybox.go:67",
+        "internal/game/activitybox.go:78"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 20600,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次均为空/关闭样式：id/current_id/map_id/start/end全0、is_all_finish1。字段结构具备，但本地loader通常newRound；需要开启/关闭规则，不能把这批当完成空岛玩法。",
+      "source_lines": [
+        2405,
+        4608,
+        8516,
+        13101
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/adventure.go:237",
+        "internal/game/adventure.go:263"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20601,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次buff_list与holiday_buff_list均空，和本地空状态编码一致；不证明获得或到期buff行为。",
+      "source_lines": [
+        2406,
+        4609,
+        8517,
+        13102
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/adventure.go:272"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20604,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次空阵容/id0/combat_num0，本地字段结构具备；没有选人/布阵/闯关，状态及战斗机制未确认。",
+      "source_lines": [
+        2407,
+        4610,
+        8518,
+        13103
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/adventure.go:297",
+        "internal/game/adventure.go:315"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 20634,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次kill_mon0、5档宝箱status0；与本地初始列表结构一致，没有20635，不能验证击杀阈值/领取及重置。",
+      "source_lines": [
+        2408,
+        4611,
+        8519,
+        13104
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/adventure.go:1075"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21002,
+      "status": "difference",
+      "counts": {
+        "s2c": 5
+      },
+      "finding": "原服充值相关状态推送count0→1且重登仍1；本地welfare固定count0，无动态计数。该变化不证明支付方式。",
+      "source_lines": [
+        2366,
+        9404,
+        13061
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/welfare.go:17"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21005,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 2
+      },
+      "finding": "两次count0/gold0/next_gold1；本地占位固定next_gold0，字段含义仍待补证。",
+      "source_lines": [
+        9405,
+        9441
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/hero_stubs.go:62"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21006,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次first_gift空列表；本地dailyGiftList无条件枚举配置礼包及count，缺当前原服空列表的过滤/开关语义；本批没有每日礼包购买。",
+      "source_lines": [
+        118,
+        2438,
+        4636,
+        12864,
+        13130
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/dailygift.go:145",
+        "internal/game/dailygift.go:153"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21010,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 3
+      },
+      "finding": "num980/status1→2，和本地每日首充状态字段/已领标志结构相容；没有阈值边界或跨日，不能确认980产生方式或重置。",
+      "source_lines": [
+        9358,
+        9433,
+        9437
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/daycharge.go:51",
+        "internal/game/daycharge.go:88"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21011,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "奖励200钻、72003×1、10403×1、39089×1；原服10302→10510→12742→21010(2)→10925→空msg21011。本地先“领取成功”确认，再状态、资产和全包，无12742。奖励对应本地开服151天以上表项，但未获同配置本地服时间，不确认年龄条件。",
+      "source_lines": [
+        5312,
+        9439
+      ],
+      "context_source_lines": [
+        9434,
+        9435,
+        9436,
+        9437,
+        9438
+      ],
+      "local_sources": [
+        "internal/game/daycharge.go:95",
+        "internal/game/daycharge.go:132",
+        "internal/game/data/charge.json:1"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21021,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次flag0；本地RegisterLoginInit固定flag1，属于确定的基线字面差异，标志完整业务含义未知。",
+      "source_lines": [
+        2403,
+        4606,
+        8514,
+        13099
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login_init.go:18"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21024,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 7
+      },
+      "finding": "7条通知始终list=[{id:4}]；未找到internal/**/*.go中的21024发送实现，语义未确认。",
+      "source_lines": [
+        2426,
+        3445,
+        4692,
+        8600,
+        9033,
+        11227,
+        13187
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/proto/protocols.json:1"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21032,
+      "status": "partial",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "两条first_gift六档均status0且end_time非0；本地firstSet.window对于该窗口无条件end_time0，期限字段不一致。没有21033领取。",
+      "source_lines": [
+        9397,
+        9401
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/firstcharge.go:49",
+        "internal/game/firstcharge.go:86"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 21100,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次仅包含day1/status3、type1；当前本地固定输出8天（未达/可领/已领全列）。这里只补列表形态，未出现21101，不能据此改日期/开服天数规则。",
+      "source_lines": [
+        2383,
+        4586,
+        8494,
+        13078
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/loginday.go:81",
+        "internal/game/loginday.go:128"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 21322,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 8
+      },
+      "finding": "登录请求及主动推送均code0，与本地双倍奖励关闭常量一致；不证明开启周期。",
+      "source_lines": [
+        13,
+        2367,
+        2379,
+        4339,
+        4570
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/battle.go:19"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 23200,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次状态：初次must_five_num10，之后0；普通免费剩0且key5给次日05:00；高级剩1即使先前免费已用后重登仍报1。本地must_five_num恒0、全组key5恒0。不能从本批快照矛盾推断实际免费重置周期。",
+      "source_lines": [
+        2429,
+        4629,
+        8537,
+        13123
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/summon.go:154",
+        "internal/game/summon.go:176",
+        "internal/game/summon.go:202"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23201,
+      "status": "difference",
+      "counts": {
+        "c2s": 194,
+        "s2c": 175
+      },
+      "finding": "194请求=175成功（173十连+2单抽，共1732英雄）+19独立拒绝；19=16包满12741+2缺券12745+1解锁门槛12741。成功167钻十连/6券十连/1免费/1券单抽；原服扣费/逐英雄11001/资产→23201→23204，本地先23201→聚合11001→资产/全包且拒绝静默。1732个hero-card映射均与本地公式一致，概率/保底未证明。",
+      "source_lines": [
+        351,
+        353,
+        530,
+        2887,
+        4923,
+        6103,
+        6129,
+        7787,
+        8213,
+        8604,
+        10743
+      ],
+      "context_source_lines": [
+        2638,
+        2639,
+        2875,
+        2888,
+        10628,
+        10731,
+        12153,
+        12481
+      ],
+      "local_sources": [
+        "internal/game/summon.go:216",
+        "internal/game/summon.go:222",
+        "internal/game/summon.go:243",
+        "internal/game/summon.go:288",
+        "internal/game/summon.go:322"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23202,
+      "status": "aligned",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "免费高级单抽后主动推送group300/free_times0/free_cd_end1793912400（次日05:00），字段及推送条件与本地freeState相符。未捕获跨界重置，23200后续快照仍有差异。",
+      "source_lines": [
+        8605
+      ],
+      "context_source_lines": [
+        4923,
+        8604
+      ],
+      "local_sources": [
+        "internal/game/summon.go:183",
+        "internal/game/summon.go:308"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23204,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 173
+      },
+      "finding": "173次付费/券十连成功后推recruit_group单组更新；当前本地普通召唤未发送23204，也无其他显式生产路径。",
+      "source_lines": [
+        2888,
+        2912,
+        2938,
+        12465
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/summon.go:288",
+        "internal/game/summon.go:308"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23214,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "空置换状态partner_id0/new_partner_bid0，但partner_ids=[{id:1}]；本地总为空数组。id1的业务含义本批未证明，不能自动解读为可置换英雄列表。",
+      "source_lines": [
+        5102,
+        8846
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/seerchange.go:20",
+        "internal/game/seerchange.go:29"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23230,
+      "status": "difference",
+      "counts": {
+        "c2s": 2,
+        "s2c": 2
+      },
+      "finding": "两次camp50051/times1/must_count149；本地elitePity110使状态must最大110，无法表达149。其余静态时段/item3686/lucky29400/空reward_list与表面状态相符；无23231抽取，不能完整确认为150保底算法。",
+      "source_lines": [
+        5104,
+        5332,
+        8847,
+        9459
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elite_summon.go:29",
+        "internal/game/elite_summon.go:157",
+        "internal/game/elite_summon.go:177"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23234,
+      "status": "aligned",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次打开先23235再23234，均flag1/msg空，与本地显式实现一致。",
+      "source_lines": [
+        5098,
+        8844
+      ],
+      "context_source_lines": [
+        8843
+      ],
+      "local_sources": [
+        "internal/game/seerpalace.go:141",
+        "internal/game/seerpalace.go:149"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23235,
+      "status": "aligned",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "对应23234的先行标志通知，flag1/msg空；本批未见登录主动推该号，日界策略不受此样本证明。",
+      "source_lines": [
+        8843
+      ],
+      "context_source_lines": [
+        8844
+      ],
+      "local_sources": [
+        "internal/game/seerpalace.go:149",
+        "internal/game/login_init.go:19"
+      ],
+      "limitations": "只核对本批出现的路径，未证明未采集规则。",
+      "review_group": "rewards"
+    },
+    {
+      "cmd": 23604,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "主线结算源2693含ext_reward两项type2/type1且rate200；当前源码未找到对应发送路径，不能由单包推断倍率资格或所有奖励公式。",
+      "source_lines": [
+        2693
+      ],
+      "context_source_lines": [
+        367,
+        370,
+        2649,
+        2651,
+        2652,
+        2653,
+        2654,
+        2687,
+        2688,
+        2689,
+        2690,
+        2691,
+        2692,
+        2693,
+        2694,
+        2695,
+        2696,
+        2697,
+        2704
+      ],
+      "local_sources": [
+        "internal/game/drama_battle.go:175"
+      ],
+      "limitations": "Only the captured branch or baseline was reviewed; decoding does not validate unobserved rules.",
+      "review_group": "core"
+    },
+    {
+      "cmd": 23800,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次只读订单列表各6项，free_times=0、coin_times=0；本地由订单及次数状态发送同一结构。未采集接单/刷新，不能验证费用、周期或6项是否固定。",
+      "source_lines": [
+        186,
+        2473,
+        4510,
+        4671,
+        4887,
+        8579,
+        12932,
+        13166
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/voyage.go:234",
+        "internal/game/voyage.go:239"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 23805,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服所有响应flag=1；本地activity无条件flag=0，无法表示本次已开启的折扣/活动标志。开启资格与时间未验证。",
+      "source_lines": [
+        188,
+        2474,
+        4512,
+        4672,
+        4889,
+        8580,
+        12934,
+        13167
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/voyage.go:246",
+        "internal/game/voyage.go:248"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 23900,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服只读基线max_round=0/start_round=1、select_type=2/next_type=3，next_time随实时时间递减；本地sendSelect也使用轮换倒计时，不能把该字段误当Unix时间。未采集战斗和轮换。",
+      "source_lines": [
+        180,
+        2470,
+        4504,
+        4668,
+        4881,
+        8576,
+        12926,
+        13163
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/endless.go:236",
+        "internal/game/endless.go:362",
+        "internal/game/endless.go:379"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 23906,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次雇佣列表均为空；本地hired按已存雇佣记录组装同一list结构。空态仅验证解码和空集合，未验证雇佣/归还。",
+      "source_lines": [
+        184,
+        2472,
+        4508,
+        4670,
+        4885,
+        8578,
+        12930,
+        13165
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/endless_run.go:434",
+        "internal/game/endless_run.go:446"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 23912,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服flag=0；本地注册的固定flag=0与该基线一致，未覆盖flag=1及其触发条件。",
+      "source_lines": [
+        182,
+        2471,
+        4506,
+        4669,
+        4883,
+        8577,
+        12928,
+        13164
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/endless.go:154"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24120,
+      "status": "partial",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "仅一次无对应请求的list=[]推送；本地tasks在未解锁时也能发空list，解锁后按任务组装。未采集解锁过程，登录/解锁推送触发仍未证明。",
+      "source_lines": [
+        2695
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/hallows.go:269",
+        "internal/game/hallows.go:472",
+        "internal/game/hallows.go:480"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24124,
+      "status": "difference",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "原服4次is_first=0；本地唯一sign发送点固定is_first=1并设置Seen=true，缺少本批0态表达。未证明0/1完整业务语义或首次触发周期。",
+      "source_lines": [
+        2368,
+        4571,
+        8479,
+        13063
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/hallows.go:272",
+        "internal/game/hallows.go:449",
+        "internal/game/hallows.go:452"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24204,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服status=1、flag=0并带本批活动起止时间；本地status根据状态/配对及时间线生成字段。只有本期基线，未验证分段转换或匹配规则。",
+      "source_lines": [
+        52,
+        2401,
+        4378,
+        4604,
+        4755,
+        8512,
+        12797,
+        13096
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/guildwar.go:573",
+        "internal/game/guildwar.go:591"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24312,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服code=0；本地isOpen使用ladderWeek动态开关，该状态可表达。未观察开服窗口，不能验证周期开关算法。",
+      "source_lines": [
+        94,
+        2422,
+        4426,
+        4628,
+        4799,
+        8534,
+        12848,
+        13122
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/ladder.go:878",
+        "internal/game/ladder.go:880"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24317,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "原服code=0；本地依据open/rank/剩余次数计算红点，可表达本次关闭态。无挑战或开榜样本。",
+      "source_lines": [
+        2370,
+        4573,
+        8481,
+        13065
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/ladder.go:366",
+        "internal/game/ladder.go:379"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24500,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "原服5类特权效果状态列表；本地同为5种effect_type并按持有/到期状态填值，登录入口也发送。未采集购买、续期或到期，不能验证状态转换。",
+      "source_lines": [
+        2369,
+        4572,
+        8480,
+        13064
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/privilege.go:160",
+        "internal/game/roledata.go:145",
+        "internal/game/roledata.go:161"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24700,
+      "status": "difference",
+      "counts": {
+        "c2s": 7,
+        "s2c": 7
+      },
+      "finding": "原服ids101/102起初status3，之后status0；本地view只生成0/1/2，无status3。未捕获24702，不能将状态3自行解释为已领。",
+      "source_lines": [
+        2441,
+        9420
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/monthfund.go:51",
+        "internal/game/monthfund.go:129"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 24701,
+      "status": "partial",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "两条主动详情id101/group6、id102/group8，均inactive/current_day0/endtime0；本地基金组硬编码1/3，与捕获6/8不同。不能据此推出购买或选组公式。",
+      "source_lines": [
+        9355,
+        9356
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/monthfund.go:36",
+        "internal/game/monthfund.go:72",
+        "internal/game/charge_proto.go:86"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 24900,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服包含段位/积分/次数、period=13/state=1/zone_id=2及21项段位奖励状态；本地infoMessage按角色、表和赛期组装对应结构。不同期数/区服配置不能作为角色逻辑差异，未采集排位交易。",
+      "source_lines": [
+        74,
+        2412,
+        4398,
+        4614,
+        4777,
+        8523,
+        12818,
+        13107
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elitematch.go:312",
+        "internal/game/elitematch.go:319",
+        "internal/game/elitematch.go:330"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24905,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服state=1且end_time为递减倒计时；本地openTime也返回state与剩余秒数，不能误作绝对时间。只覆盖本期一个阶段。",
+      "source_lines": [
+        72,
+        2411,
+        4396,
+        4613,
+        4775,
+        8522,
+        12816,
+        13106
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elitematch.go:333",
+        "internal/game/elitematch.go:343"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 24920,
+      "status": "difference",
+      "counts": {
+        "c2s": 8,
+        "s2c": 8
+      },
+      "finding": "原服同批type1有1套formations、type2为空；本地任何type的空存档都会从基础阵容补出1套，不能返回观测到的type2空formations。只确认空列表边界，不推断多队/赛制规则。",
+      "source_lines": [
+        106,
+        108,
+        2432,
+        2433,
+        4422,
+        4626,
+        12846,
+        13121
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elitematch.go:697",
+        "internal/game/elitematch.go:708",
+        "internal/game/elitematch.go:710",
+        "internal/game/elitematch.go:729"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25000,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服day=4/num=10、5个元素分组；本地按开放配置及角色日状态组装同一结构。未采集挑战/购买/跨日，角色与配置数量差别不记作bug。",
+      "source_lines": [
+        50,
+        2400,
+        4376,
+        4603,
+        4753,
+        8511,
+        12795,
+        13095
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/element.go:185",
+        "internal/game/element.go:201"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25200,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次count2/buy_count0/max_dun_id0及一章信息；本地天界章节协议结构具备，没有25205/25208，不能评价挑战/扫荡奖励。",
+      "source_lines": [
+        2377,
+        4580,
+        8488,
+        13072
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/heaven.go:325"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 25217,
+      "status": "difference",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "group2/recruit_type1/times1成功，先10510再25217，reward.id23与新增装备实例23一致，然后主动25219和25218。本地group2永远拒绝，gain强刷资产/全包，reward.id用抽次序号i+1，且不主动推两个状态。",
+      "source_lines": [
+        6089,
+        10602
+      ],
+      "context_source_lines": [
+        10601,
+        10603,
+        10604
+      ],
+      "local_sources": [
+        "internal/game/heaven_fight.go:295",
+        "internal/game/heaven_fight.go:388",
+        "internal/game/heaven_fight.go:445",
+        "internal/game/heaven.go:219"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 25218,
+      "status": "difference",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "没有同号请求，却在抽取后收到type2/group2/20条日志主动推送；本地仅log请求时回复，pull不发该包。日志身份未导出。",
+      "source_lines": [
+        10604
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/heaven_fight.go:462",
+        "internal/game/heaven_fight.go:466"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 25219,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 6
+      },
+      "finding": "group2在评分提高后由未开变开；一次group2免费抽使两个group的free_times1→0，日计day_count仍0，baodi_count20→19，reset_time0→次日0点值。本地免费按组独立、day_count每次+1、baodi按已用计、group2永不开放；本批不能证明实际重置触发时刻。",
+      "source_lines": [
+        2378,
+        10590,
+        10603
+      ],
+      "context_source_lines": [
+        10567,
+        10574,
+        10581,
+        10589
+      ],
+      "local_sources": [
+        "internal/game/heaven_fight.go:295",
+        "internal/game/heaven_fight.go:303",
+        "internal/game/heaven_fight.go:403",
+        "internal/game/heaven_fight.go:458"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 25220,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 8
+      },
+      "finding": "登录及状态推送为num3/空holy_eqm_set_cell，和本地免费方案格数/空方案结构相容；没有保存/扩容请求，其他规则未确认。",
+      "source_lines": [
+        78,
+        2414,
+        4617,
+        12826,
+        13111
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/holyeqm.go:663",
+        "internal/game/holyeqm.go:684"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 25232,
+      "status": "difference",
+      "counts": {
+        "c2s": 5,
+        "s2c": 9
+      },
+      "finding": "原服score0→1960→6061→8026→10287；本地固定0，不能正确驱动group2解锁或分数显示。精确评分公式未由这些状态单独证明。",
+      "source_lines": [
+        2488,
+        10567,
+        10574,
+        10581,
+        10589,
+        10599
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/heaven.go:173"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 25300,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服全部关闭/零值、任务与奖励列表为空；本地战令信息按表和角色时间生成，可存在关闭分支。只覆盖关闭基线，未验证周期、购买或领奖。",
+      "source_lines": [
+        92,
+        2421,
+        4420,
+        4625,
+        4797,
+        8533,
+        12842,
+        13119
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/warorder.go:255",
+        "internal/game/warorder.go:283"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25605,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服type=2、3套formations；本地forms取该类型保存的teams并转同一结构。没有保存阵容命令，不能证明多阵容写回及战斗选择。",
+      "source_lines": [
+        154,
+        2457,
+        4478,
+        4655,
+        4855,
+        8563,
+        12900,
+        13150
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/crossarena.go:652",
+        "internal/game/crossarena.go:662"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25607,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服had_combat_num=0、num_list=[]；本地根据Used/Taken生成，能表示尚未挑战/领取的空态。未采集挑战或宝箱领取。",
+      "source_lines": [
+        150,
+        2455,
+        4474,
+        4653,
+        4851,
+        8561,
+        12896,
+        13148
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/crossarena.go:749",
+        "internal/game/crossarena.go:754"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25610,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服code=1；本地按等级门槛与caOpen计算动态code，能表达该开放基线。开放时段及资格规则没有交易样本验证。",
+      "source_lines": [
+        148,
+        2454,
+        4472,
+        4652,
+        4849,
+        8560,
+        12894,
+        13147
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/crossarena.go:723",
+        "internal/game/crossarena.go:724"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25618,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服worship/reward/combat三个code均0；本地动态红点函数存在三字段，但本批未做对应行为，不能仅凭原服静态0推断本地动态条件错误。",
+      "source_lines": [
+        152,
+        2456,
+        4476,
+        4654,
+        4853,
+        8562,
+        12898,
+        13149
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/crossarena.go:865",
+        "internal/game/crossarena.go:878"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25810,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次列表均75项feat、已领集合空；所有观测progress.id=0，本地expTaskMessage固定progress.id=1。只标硬编码编号差异，75项开放范围和目标进度需按同一角色配置另验。",
+      "source_lines": [
+        112,
+        2435,
+        4438,
+        4634,
+        4815,
+        8542,
+        12860,
+        13128
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/exptask.go:88",
+        "internal/game/exptask.go:95",
+        "internal/game/exptask.go:128",
+        "internal/game/exptask.go:160"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25811,
+      "status": "difference",
+      "counts": {
+        "s2c": 3
+      },
+      "finding": "3次运行中单项feat_list增量，progress.id均0；本地复用expTaskMessage固定id=1，并在OnEnter遍历未领任务批量发25811。增量事件触发范围未覆盖，不把未捕获事件补成规则。",
+      "source_lines": [
+        9049,
+        9402,
+        9476
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/exptask.go:88",
+        "internal/game/exptask.go:95",
+        "internal/game/exptask.go:103",
+        "internal/game/exptask.go:107",
+        "internal/game/exptask.go:126"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25814,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服所有result=1；本地role_extra固定result=0，无法返回本批状态。分享/资格业务语义未知。",
+      "source_lines": [
+        140,
+        2450,
+        4464,
+        4648,
+        4841,
+        8556,
+        12886,
+        13143
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/role_extra.go:38"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 25833,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服id=0且name为空；本地login_init固定同一空态。这里只验证无关联对象，未采集非空分享/关联状态。",
+      "source_lines": [
+        146,
+        2453,
+        4470,
+        4651,
+        4847,
+        8559,
+        12892,
+        13146
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/login_init.go:22",
+        "internal/game/login_init.go:26",
+        "internal/game/login_init.go:31"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26013,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服list=[]；本地suits根据套装配置/存档生成。未采集套装收集/领奖，不能把配置行数或角色收集差别直接判作错误。",
+      "source_lines": [
+        194,
+        2477,
+        4518,
+        4675,
+        4895,
+        8583,
+        12940,
+        13170
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homeworld.go:932",
+        "internal/game/homeworld.go:952"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26017,
+      "status": "partial",
+      "counts": {
+        "c2s": 8,
+        "s2c": 8
+      },
+      "finding": "8次请求/响应均is_first=0；本地first根据Opened状态返回，已打开可为0。未观察首次打开边界及是否跨会话保存。",
+      "source_lines": [
+        128,
+        190,
+        2444,
+        2475,
+        4452,
+        4642,
+        12936,
+        13168
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homeworld.go:1020",
+        "internal/game/homeworld.go:1026"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26018,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服code=0/hook_code=0；本地red按保存状态及挂机阈值计算，可表达该基线。没有领奖/挂机计时边界样本。",
+      "source_lines": [
+        192,
+        2476,
+        4516,
+        4674,
+        4893,
+        8582,
+        12938,
+        13169
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homeworld.go:1031",
+        "internal/game/homeworld.go:1037"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26100,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服4次pet_id=0、state=0/vigor=20、vigor_time=0，未出行；本地info无条件pet_id=1。只标pet_id硬编码差异，不从静态体力推断恢复周期。",
+      "source_lines": [
+        130,
+        2445,
+        4454,
+        4643,
+        4831,
+        8551,
+        12876,
+        13138
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homepet.go:414",
+        "internal/game/homepet.go:417"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26105,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服evt_list=[]；本地events按已到达事件组装。只覆盖无事件空态，旅行到达/事件消费均未验证。",
+      "source_lines": [
+        132,
+        2446,
+        4456,
+        4644,
+        4833,
+        8552,
+        12878,
+        13139
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homepet.go:545",
+        "internal/game/homepet.go:551"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26110,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服list=[]；本地treasures按已有收藏构造。只覆盖未收藏空态，获得来源/重复处理未知。",
+      "source_lines": [
+        134,
+        2447,
+        4458,
+        4645,
+        4835,
+        8553,
+        12880,
+        13140
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homepet.go:718",
+        "internal/game/homepet.go:735"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26111,
+      "status": "partial",
+      "counts": {
+        "c2s": 8,
+        "s2c": 8
+      },
+      "finding": "每次按type34/35分别请求，响应type对应且list=[]；本地album回显类型并过滤收藏。仅验证空态和type回显。",
+      "source_lines": [
+        136,
+        138,
+        2448,
+        2449,
+        4460,
+        4646,
+        12884,
+        13142
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/homepet.go:740",
+        "internal/game/homepet.go:746"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26200,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服is_open=0、step/round=0但保留本期起止字段；本地跨服命令复用champSvc动态阶段映射。未采集赛段转换，不推原服跨服赛制/时间线。",
+      "source_lines": [
+        196,
+        2478,
+        4520,
+        4677,
+        4897,
+        8585,
+        12942,
+        13171
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenachampion.go:264",
+        "internal/game/arenachampion.go:271",
+        "internal/game/arenachampion_view.go:50",
+        "internal/game/arenachampion_view.go:58"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26201,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服rank/best/group=0、can_bet=60；本地roleInfo从赛事资格和可下注状态返回同名字段。只有单角色快照，不能把初始下注额度直接推成全局常量或规则。",
+      "source_lines": [
+        210,
+        2485,
+        4534,
+        4683,
+        4911,
+        8591,
+        12960,
+        13180
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenachampion.go:264",
+        "internal/game/arenachampion_view.go:269",
+        "internal/game/arenachampion_view.go:286"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26213,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服rank_list=[]；本地statues遍历上届排行，空存档可为空。未覆盖有排名或膜拜行为。",
+      "source_lines": [
+        198,
+        2479,
+        4522,
+        4676,
+        4899,
+        8584,
+        12944,
+        13172
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenachampion.go:264",
+        "internal/game/arenachampion_view.go:545",
+        "internal/game/arenachampion_view.go:553"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26400,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服lev=1、3种属性、孔位列表从4到5、max_partner_lev随本角色成长；本地infoMessage按共鸣状态和英雄等级计算。仅结构及同角色成长关联，未直接操作共鸣升阶。",
+      "source_lines": [
+        82,
+        2416,
+        4408,
+        4619,
+        4787,
+        8528,
+        12830,
+        13113
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/resonance_stone.go:65",
+        "internal/game/resonance_stone.go:85"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26410,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服all_num/do_num/get_num/do_end_time均0且is_point=1；本地无提取存档分支明确返回完全相同组合，不是矛盾。不从普通提取分支的point条件反推该空态为bug。未观察提取/领取计时。",
+      "source_lines": [
+        84,
+        2417,
+        4410,
+        4620,
+        4789,
+        8529,
+        12832,
+        13114
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/resonance_stone.go:140",
+        "internal/game/resonance_stone.go:145",
+        "internal/game/resonance_stone.go:146",
+        "internal/game/resonance_stone.go:164"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26425,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服共鸣核心列表4到5、resonate_lev=1、max_cystal_lev随本角色最高英雄变化；本地crystalMessage/handler按状态组装。未采集共鸣升阶或材料扣减，不能验证等级公式。",
+      "source_lines": [
+        86,
+        2418,
+        4412,
+        4621,
+        4791,
+        8530,
+        12834,
+        13115
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/resonance.go:191",
+        "internal/game/resonance.go:238",
+        "internal/game/resonance.go:250"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 26500,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "6个幽地状态可解码，其中id1/do_id10601/state1/end_time非0，其他未开；仅4次登录读取，没有26503/26505等孵化/领取事务。",
+      "source_lines": [
+        200,
+        2480,
+        4678,
+        8586,
+        12948,
+        13174
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elfin.go:311"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 26510,
+      "status": "partial",
+      "counts": {
+        "c2s": 5,
+        "s2c": 5
+      },
+      "finding": "原服lev1/def210但def_p0/def_s0；本地treeMessage把def_p和def_s都赋给def，确定字段表示不同。其余属性/战力公式仍未证明。",
+      "source_lines": [
+        2481,
+        2867
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elfin.go:639",
+        "internal/game/elfin.go:672"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 26520,
+      "status": "unsupported",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "单抽成功后推awards=[{item_bid:112003}]；本地未找到26520发送，只有图鉴查询26509，缺少对应新增图鉴通知。",
+      "source_lines": [
+        2872
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elfin.go:630",
+        "internal/proto/protocols.json:1"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 26550,
+      "status": "difference",
+      "counts": {
+        "c2s": 5,
+        "s2c": 6
+      },
+      "finding": "单抽前free_time0/times0/day_count0，之后free_time变次日0点/times1/day_count0并主动推送；本地kind1扣券且不会更新FreeAt、DayCount必+1，summon不发26550。这是已确认样本分支差异，不推断整套收费映射。",
+      "source_lines": [
+        2482,
+        2868,
+        2871
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elfin_team.go:22",
+        "internal/game/elfin_team.go:93",
+        "internal/game/elfin_team.go:162"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 26551,
+      "status": "difference",
+      "counts": {
+        "c2s": 1
+      },
+      "finding": "一次请求recruit_type1/times1，无同号成功确认；相邻响应为10510(112003)→26553→26550→26520，无相邻资产/票券扣减，初始背包亦无10415。本地kind1只走票券分支、刷新全包并额外回26551(flag1)，不能复现本例。",
+      "source_lines": [
+        525
+      ],
+      "context_source_lines": [
+        2390,
+        2869,
+        2870,
+        2871,
+        2872
+      ],
+      "local_sources": [
+        "internal/game/elfin_team.go:76",
+        "internal/game/elfin_team.go:93",
+        "internal/game/elfin_team.go:164"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 26553,
+      "status": "partial",
+      "counts": {
+        "s2c": 1
+      },
+      "finding": "单次返回group110、112003×1、quality3/jie1；本地结果字段和固定group110具备，但其邻接通知/收费分支见26551。单样本不验证概率/保底。",
+      "source_lines": [
+        2870
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elfin.go:25",
+        "internal/game/elfin_team.go:143",
+        "internal/game/elfin_team.go:167"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 26555,
+      "status": "partial",
+      "counts": {
+        "c2s": 1,
+        "s2c": 1
+      },
+      "finding": "一次type0请求，返回team1/plan_id0/pos1空精灵；本地teams结构具备，没有改队/方案操作，不确认保存与切换。",
+      "source_lines": [
+        361,
+        2645
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/elfin_team.go:230"
+      ],
+      "limitations": "Only the observed branch or baseline was reviewed; unobserved rules remain unknown.",
+      "review_group": "features"
+    },
+    {
+      "cmd": 27004,
+      "status": "partial",
+      "counts": {
+        "s2c": 6
+      },
+      "finding": "原服4次无请求关闭通知code=0/msg=活动未开启；本地找到的显式发送是有新红包时code=1/msg空的广播。已确认观测与该发送路径不同，但关闭登录推送触发尚未定位，不以不同阶段的广播直接判完整业务不支持。",
+      "source_lines": [
+        2423,
+        4689,
+        8597,
+        13184
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/petard.go:269"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27102,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服id_list=[]；本地library按Done记录构造。仅未完成图鉴空态，遭遇/战斗/入库未验证。",
+      "source_lines": [
+        208,
+        2484,
+        4532,
+        4682,
+        4909,
+        8590,
+        12954,
+        13177
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/encounter.go:199",
+        "internal/game/encounter.go:205"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27215,
+      "status": "difference",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服4次point仅一项type2/state0；本地points无条件返回四项types1/2/3/4（不是三项），额外项并非本次原服包的结构。各红点非0条件未验证。",
+      "source_lines": [
+        158,
+        2459,
+        4482,
+        4657,
+        4859,
+        8565,
+        12904,
+        13152
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenateam.go:1317",
+        "internal/game/arenateam.go:1336",
+        "internal/game/arenateam.go:1337"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27220,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服未组队基线，state=0、队伍/次数为零，end_time为递减倒计时；本地mainMessage按赛期和团队状态构造同一结构。无组队/报名/战斗请求，未验证团队赛制。",
+      "source_lines": [
+        156,
+        2458,
+        4480,
+        4656,
+        4857,
+        8564,
+        12902,
+        13151
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/arenateam.go:690",
+        "internal/game/arenateam.go:700",
+        "internal/game/arenateam.go:703"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27700,
+      "status": "unsupported",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服有活跃巅峰赛信息step=8/step_status=2、period=10/zone_id=1及非零时间；本地closedReplies固定全零、无赛区。缺少已观测到的活动状态支持；不据此推完整赛程。",
+      "source_lines": [
+        162,
+        2462,
+        4486,
+        4660,
+        4863,
+        8568,
+        12908,
+        13155
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:17",
+        "internal/game/cross_closed.go:19",
+        "internal/game/cross_closed.go:78"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27703,
+      "status": "unsupported",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服返回已存在的对战/结果、两段result_info及投注信息；本地closedReplies为{}，无法表达这批活跃详情。玩家身份与队伍细节不导出；未采集投注/战斗。",
+      "source_lines": [
+        164,
+        2463,
+        4488,
+        4661,
+        4865,
+        8569,
+        12910,
+        13156
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:21",
+        "internal/game/cross_closed.go:78"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27714,
+      "status": "unsupported",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服rank_list包含1项排行（身份不导出）；本地closedReplies固定空rank_list，只实现闭服占位。未验证有榜时排序/奖励。",
+      "source_lines": [
+        170,
+        2465,
+        4494,
+        4663,
+        4871,
+        8571,
+        12916,
+        13158
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:23",
+        "internal/game/cross_closed.go:78"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27726,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服返回3套formations；本地保留峰赛阵容状态并输出。无保存阵容命令，只有读取结构，不能据此认为峰赛完整实现。",
+      "source_lines": [
+        168,
+        2461,
+        4492,
+        4659,
+        4869,
+        8567,
+        12914,
+        13154
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:112",
+        "internal/game/cross_closed.go:129"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27730,
+      "status": "unsupported",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "原服point_info为2项有效分段信息；本地closedReplies固定空point_info，缺少本次已观测活跃数据。含义/变化规则未验证。",
+      "source_lines": [
+        166,
+        2464,
+        4490,
+        4662,
+        4867,
+        8570,
+        12912,
+        13157
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/cross_closed.go:24",
+        "internal/game/cross_closed.go:78"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 27912,
+      "status": "difference",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "原服4次关闭通知code=0/get_num=0/max_num=5/msg=活动未开启；本地retRedbagMsg的msg无条件为空，无法生成该确认文字。通知触发时机及开启规则仍未知，不从关闭态推红包规则。",
+      "source_lines": [
+        2427,
+        4693,
+        8601,
+        13188
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/returnaction.go:324",
+        "internal/game/returnaction.go:331",
+        "internal/game/returnaction.go:400",
+        "internal/game/returnaction.go:705"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 28200,
+      "status": "difference",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "两次活动关闭空态camp_id=0/max_val=0且其余字段零/空；本地即便!open仍回max_val=ymMaxVal=1800。只确认关闭状态max_val硬编码不同，未确认开启后满条数值。",
+      "source_lines": [
+        9373,
+        9392
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/yearmonster.go:28",
+        "internal/game/yearmonster.go:459",
+        "internal/game/yearmonster.go:461"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 28223,
+      "status": "partial",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "两次关闭推送flag=0；本地handler关闭时同为0。没有同期开启及领奖样本，不能验证红点和阶段重置。",
+      "source_lines": [
+        9371,
+        9390
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/yearmonster.go:870",
+        "internal/game/yearmonster.go:876"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 28224,
+      "status": "partial",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "两次关闭推送gold_flag=0/timer_flag=0；本地关闭分支也零。未覆盖唤醒、定时或领奖。",
+      "source_lines": [
+        9372,
+        9391
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/yearmonster.go:879",
+        "internal/game/yearmonster.go:890"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 28700,
+      "status": "partial",
+      "counts": {
+        "c2s": 4,
+        "s2c": 4
+      },
+      "finding": "4次新战令关闭/零值且list为空；本地按角色日历、表与状态生成。未采集开启期任务或奖励，不验证重置周期。",
+      "source_lines": [
+        212,
+        2486,
+        4536,
+        4684,
+        4913,
+        8592,
+        12956,
+        13178
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/newwarorder.go:135",
+        "internal/game/newwarorder.go:163"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 29100,
+      "status": "difference",
+      "counts": {
+        "s2c": 2
+      },
+      "finding": "原服两次flag=0、活动字段全零/排行空；本地sendInfo固定flag=1且last_unixtime固定现在加活动天数，无法表示该关闭空态。活动重置周期未确认，不建议据此改周期。",
+      "source_lines": [
+        9377,
+        9396
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/practisetower.go:216",
+        "internal/game/practisetower.go:231",
+        "internal/game/practisetower.go:232"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    },
+    {
+      "cmd": 31127,
+      "status": "partial",
+      "counts": {
+        "s2c": 4
+      },
+      "finding": "4次effect=[]；本地pushEffects从effects(st)生成。只验证无效果空态，未覆盖获取/替换/到期或效果叠加。",
+      "source_lines": [
+        10568,
+        10575,
+        10582,
+        10591
+      ],
+      "context_source_lines": [],
+      "local_sources": [
+        "internal/game/emoguoshi.go:279",
+        "internal/game/emoguoshi.go:309",
+        "internal/game/emoguoshi.go:310"
+      ],
+      "limitations": "仅本批已观察路径；结构解码不等于玩法/资格/赛期/重置规则已经验证。不同角色状态或配置数值不单独视作差异。",
+      "review_group": "baseline-late"
+    }
+  ]
+}

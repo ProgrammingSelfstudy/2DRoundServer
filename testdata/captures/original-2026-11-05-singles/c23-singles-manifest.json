@@ -1,0 +1,9 @@
+{
+  "source": "cap-20261104-214915-1.pcap (outside the repository)",
+  "bytes": 316642,
+  "sha256": "1e3874750092652ef3905af8499f13c7f0f84504ab153b2391f99fc62ce0ad11",
+  "decoded_frames": 946,
+  "decode_errors": 0,
+  "evidence_rows": 54,
+  "note": "source_line is the 1-based line of the full decoded jsonl, kept outside the repository; 10302 keeps only gold (gems) and coin, 10512 keeps id/base_id/quantity/pos/storage, 16688 keeps the row count"
+}

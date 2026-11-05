@@ -1,0 +1,54 @@
+{"source_line": 363, "t": "2026-11-05T05:51:40.543314Z", "dir": "c2s", "cmd": 10806, "msg": {"id": 11217, "srv_id": "symlf_90"}}
+{"source_line": 365, "t": "2026-11-05T05:51:40.629219Z", "dir": "c2s", "cmd": 10805, "msg": {"id": 11217, "srv_id": "symlf_90"}}
+{"source_line": 391, "t": "2026-11-05T05:53:42.150974Z", "dir": "c2s", "cmd": 10806, "msg": {"id": 11217, "srv_id": "symlf_90"}}
+{"source_line": 393, "t": "2026-11-05T05:53:42.26113Z", "dir": "c2s", "cmd": 10805, "msg": {"id": 11217, "srv_id": "symlf_90"}}
+{"source_line": 401, "t": "2026-11-05T05:54:12.727419Z", "dir": "c2s", "cmd": 10806, "msg": {"id": 11241, "srv_id": "symlf_90"}}
+{"source_line": 403, "t": "2026-11-05T05:54:12.818932Z", "dir": "c2s", "cmd": 10805, "msg": {"id": 11241, "srv_id": "symlf_90"}}
+{"source_line": 409, "t": "2026-11-05T05:54:27.184602Z", "dir": "c2s", "cmd": 10801, "msg": {"id": 11241, "srv_id": "symlf_90"}}
+{"source_line": 415, "t": "2026-11-05T05:54:52.323062Z", "dir": "c2s", "cmd": 10806, "msg": {"id": 11151, "srv_id": "symlf_90"}}
+{"source_line": 417, "t": "2026-11-05T05:54:52.513154Z", "dir": "c2s", "cmd": 10805, "msg": {"id": 11151, "srv_id": "symlf_90"}}
+{"source_line": 423, "t": "2026-11-05T05:55:06.566006Z", "dir": "c2s", "cmd": 10801, "msg": {"id": 11151, "srv_id": "symlf_90"}}
+{"source_line": 431, "t": "2026-11-05T05:55:36.997999Z", "dir": "c2s", "cmd": 16688, "msg": null}
+{"source_line": 459, "t": "2026-11-05T05:57:52.1671Z", "dir": "c2s", "cmd": 16689, "msg": {"id": 1, "num": 3}}
+{"source_line": 472, "t": "2026-11-05T05:58:38.805157Z", "dir": "c2s", "cmd": 23230, "msg": null}
+{"source_line": 480, "t": "2026-11-05T05:59:07.353711Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 1, "times": 1}}
+{"source_line": 482, "t": "2026-11-05T05:59:07.487752Z", "dir": "c2s", "cmd": 11055, "msg": {"is_point": 1}}
+{"source_line": 488, "t": "2026-11-05T05:59:32.604382Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 4, "times": 10}}
+{"source_line": 496, "t": "2026-11-05T05:59:57.894332Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 4, "times": 10}}
+{"source_line": 502, "t": "2026-11-05T06:00:20.339148Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 4, "times": 10}}
+{"source_line": 510, "t": "2026-11-05T06:00:49.010575Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 4, "times": 10}}
+{"source_line": 512, "t": "2026-11-05T06:00:55.097089Z", "dir": "c2s", "cmd": 23231, "msg": {"recruit_type": 4, "times": 10}}
+{"source_line": 515, "t": "2026-11-05T06:01:00.336053Z", "dir": "c2s", "cmd": 16603, "msg": {"bid": 93022}}
+{"source_line": 517, "t": "2026-11-05T06:01:00.336053Z", "dir": "c2s", "cmd": 16670, "msg": null}
+{"source_line": 519, "t": "2026-11-05T06:01:00.336053Z", "dir": "c2s", "cmd": 16674, "msg": {"type": 2}}
+{"source_line": 525, "t": "2026-11-05T06:01:22.263717Z", "dir": "c2s", "cmd": 16671, "msg": {"count": 1, "flag": 1}}
+{"source_line": 587, "t": "2026-11-05T06:06:21.954167Z", "dir": "c2s", "cmd": 16673, "msg": {"id": 1}}
+{"source_line": 595, "t": "2026-11-05T06:06:46.916011Z", "dir": "c2s", "cmd": 10397, "msg": {"status": 1}}
+{"source_line": 823, "t": "2026-11-05T05:54:27.235229Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873975530"}}
+{"source_line": 824, "t": "2026-11-05T05:54:27.235229Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 6, "base_id": 10450, "quantity": 621370, "pos": 6, "storage": 1}]}
+{"source_line": 825, "t": "2026-11-05T05:54:27.235229Z", "dir": "s2c", "cmd": 16606, "msg": {"bid": 93042, "can_get_num": 0}}
+{"source_line": 826, "t": "2026-11-05T05:54:27.284454Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 22, "id": 0, "is_bind": 1, "move_to": 0, "num": "150000"}, {"bid": 10450, "id": 0, "is_bind": 1, "move_to": 0, "num": "100"}], "source": 0}}
+{"source_line": 836, "t": "2026-11-05T05:55:06.626021Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "873975530"}}
+{"source_line": 837, "t": "2026-11-05T05:55:06.626021Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 171, "base_id": 99899, "quantity": 2350, "pos": 41, "storage": 1}, {"id": 170, "base_id": 37004, "quantity": 278, "pos": 40, "storage": 1}]}
+{"source_line": 838, "t": "2026-11-05T05:55:06.626021Z", "dir": "s2c", "cmd": 16606, "msg": {"bid": 93042, "can_get_num": 0}}
+{"source_line": 839, "t": "2026-11-05T05:55:06.67966Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 43, "id": 0, "is_bind": 1, "move_to": 0, "num": "100000"}, {"bid": 37004, "id": 0, "is_bind": 1, "move_to": 0, "num": "20"}, {"bid": 99899, "id": 0, "is_bind": 1, "move_to": 0, "num": "200"}], "source": 0}}
+{"source_line": 844, "t": "2026-11-05T05:55:37.056183Z", "dir": "s2c", "cmd": 16688, "msg": {"buy_info_rows": 26}}
+{"source_line": 859, "t": "2026-11-05T05:57:52.311189Z", "dir": "s2c", "cmd": 10302, "msg": {"gold": "90503", "coin": "1173975530"}}
+{"source_line": 860, "t": "2026-11-05T05:57:52.311189Z", "dir": "s2c", "cmd": 10512, "msg": [{"id": 171, "base_id": 99899, "quantity": 2050, "pos": 41, "storage": 1}]}
+{"source_line": 861, "t": "2026-11-05T05:57:52.311189Z", "dir": "s2c", "cmd": 12742, "msg": {"asset_list": [{"bid": 1, "id": 0, "is_bind": 1, "move_to": 0, "num": "300000000"}], "source": 0}}
+{"source_line": 862, "t": "2026-11-05T05:57:52.362334Z", "dir": "s2c", "cmd": 16688, "msg": {"buy_info_rows": 26}}
+{"source_line": 863, "t": "2026-11-05T05:57:52.362334Z", "dir": "s2c", "cmd": 16689, "msg": {"code": 1, "id": 1, "msg": "", "num": 3}}
+{"source_line": 870, "t": "2026-11-05T05:58:38.866525Z", "dir": "s2c", "cmd": 23230, "msg": {"camp_id": 50051, "end_time": 1900079999, "free_time": 0, "item_id": 3686, "item_num": 0, "lucky_bid": 29426, "must_count": 38, "reward_list": [{"id": 5}, {"id": 4}, {"id": 3}, {"id": 1}, {"id": 2}], "start_time": 1741104000, "times": 434}}
+{"source_line": 876, "t": "2026-11-05T05:59:07.431563Z", "dir": "s2c", "cmd": 23201, "msg": {"flag": 3, "group_id": 50051, "must_five_num": 0, "partner_bids": [{"init_star": 3, "partner_bid": 20304}], "partner_chips": [], "rewards": [{"base_id": 25203, "num": 1}], "times": 1}}
+{"source_line": 877, "t": "2026-11-05T05:59:07.431563Z", "dir": "s2c", "cmd": 23230, "msg": {"camp_id": 50051, "end_time": 1900079999, "free_time": 1793894400, "item_id": 3686, "item_num": 0, "lucky_bid": 29426, "must_count": 37, "reward_list": [{"id": 5}, {"id": 4}, {"id": 3}, {"id": 1}, {"id": 2}], "start_time": 1741104000, "times": 435}}
+{"source_line": 881, "t": "2026-11-05T05:59:32.707361Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "英雄背包已满, 不能召唤英雄"}}
+{"source_line": 887, "t": "2026-11-05T05:59:57.987002Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "英雄背包已满, 不能召唤英雄"}}
+{"source_line": 891, "t": "2026-11-05T06:00:20.466771Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "英雄背包已满, 不能召唤英雄"}}
+{"source_line": 895, "t": "2026-11-05T06:00:49.106534Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "英雄背包已满, 不能召唤英雄"}}
+{"source_line": 896, "t": "2026-11-05T06:00:55.191741Z", "dir": "s2c", "cmd": 12741, "msg": {"msg": "英雄背包已满, 不能召唤英雄"}}
+{"source_line": 899, "t": "2026-11-05T06:01:00.402575Z", "dir": "s2c", "cmd": 16670, "msg": {"award_list": [{"id": 1, "status": 0}, {"id": 2, "status": 0}, {"id": 3, "status": 0}, {"id": 4, "status": 0}, {"id": 5, "status": 0}, {"id": 6, "status": 0}, {"id": 7, "status": 0}, {"id": 8, "status": 0}, {"id": 9, "status": 0}, {"id": 10, "status": 0}], "gold": 10000, "holiday_lev": 10, "is_free": 0, "num": 5}}
+{"source_line": 900, "t": "2026-11-05T06:01:00.402575Z", "dir": "s2c", "cmd": 16674, "msg": {"log_list": [], "type": 2}}
+{"source_line": 904, "t": "2026-11-05T06:01:22.323976Z", "dir": "s2c", "cmd": 16670, "msg": {"award_list": [{"id": 10, "status": 0}, {"id": 9, "status": 0}, {"id": 8, "status": 0}, {"id": 7, "status": 0}, {"id": 6, "status": 0}, {"id": 5, "status": 0}, {"id": 4, "status": 0}, {"id": 3, "status": 0}, {"id": 2, "status": 0}, {"id": 1, "status": 0}], "gold": 10000, "holiday_lev": 10, "is_free": 1, "num": 6}}
+{"source_line": 906, "t": "2026-11-05T06:01:22.323976Z", "dir": "s2c", "cmd": 16671, "msg": {"flag": 1, "id": 6, "msg": "", "result": 1}}
+{"source_line": 907, "t": "2026-11-05T06:01:22.376666Z", "dir": "s2c", "cmd": 16672, "msg": {"awards2": [{"bid": 10450, "num": 1000}], "count": 1}}
+{"source_line": 943, "t": "2026-11-05T06:06:22.067324Z", "dir": "s2c", "cmd": 16673, "msg": {"msg": "奖励不可领取", "result": 0}}

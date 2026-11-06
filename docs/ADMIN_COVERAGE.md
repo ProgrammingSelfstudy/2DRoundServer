@@ -103,7 +103,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `presage` | 预知召唤/松果宝藏（16690–16694） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [presage.go](../internal/game/presage.go) |
 | role | `primus` | 霸气修炼（20700–20706） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [primus.go](../internal/game/primus.go) |
 | role | `recruithero` | 新人招募（25100/25101） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [recruithero.go](../internal/game/recruithero.go) |
-| role | `redbagday` | 公会红包每日领取（13534–13546） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [guild_redbag.go](../internal/game/guild_redbag.go) |
+| role | `redbagday` | 公会红包每日领取（13534–13546） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [guild_redbag.go](../internal/game/guild_redbag.go), [redbag_pay.go](../internal/game/redbag_pay.go) |
 | role | `returnaction` | 回归活动（27900–27915） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [returnaction.go](../internal/game/returnaction.go) |
 | role | `role_power` | 角色历史战力峰值（10306） | 原始JSON查看（read）；无重置/编辑 | 已接只读模块页签 | 卸下神装保留历史峰值，不开放修改峰值的写权限 | [role_power.go](../internal/game/role_power.go) |
 | role | `sandybeach` | 沙滩Boss（25400–25405） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [sandybeach.go](../internal/game/sandybeach.go) |
@@ -145,7 +145,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | global | `endless_rank` | 无尽试炼排行榜（23903/23907） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [endless.go](../internal/game/endless.go) |
 | global | `escort_board` | 护送共享记录/劫掠（24000–24020） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [escort.go](../internal/game/escort.go) |
 | global | `guildmarket:*` | 公会宝库共享库存（26900–26903） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guildmarket.go](../internal/game/guildmarket.go) |
-| global | `guildredbag` | 公会红包簿（13534–13546） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guild_redbag.go](../internal/game/guild_redbag.go) |
+| global | `guildredbag` | 公会红包簿（13534–13546） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [guild_redbag.go](../internal/game/guild_redbag.go), [redbag_pay.go](../internal/game/redbag_pay.go) |
 | global | `guildwar` | 公会战（24200–24223） | Gateway-owned read/season/rank; manage: due-only catch-up | Implemented in 3b; no early settlement | Shared native service lock; mail/state/audit in one admin transaction; repeat is idempotent | [guildwar.go](../internal/game/guildwar.go)、[adminops_settle.go](../internal/game/adminops_settle.go) |
 | global | `homeworld_board` | 家园共享人气榜（26020/26021） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [homeworld.go](../internal/game/homeworld.go) |
 | global | `ladder` | 天梯（24300–24318） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [ladder.go](../internal/game/ladder.go) |

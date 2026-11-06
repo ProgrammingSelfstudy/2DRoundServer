@@ -130,8 +130,12 @@ func redbagShare(left, shares int64) int64 {
 }
 
 func (g *GuildService) loadRedbags(now time.Time) (*redbagBook, error) {
+	return loadRedbagBook(g.Store, g.SrvID, now)
+}
+
+func loadRedbagBook(st *store.Store, srvID string, now time.Time) (*redbagBook, error) {
 	b := &redbagBook{}
-	if _, err := g.Store.LoadGlobal(g.SrvID, redbagModule, b); err != nil {
+	if _, err := st.LoadGlobal(srvID, redbagModule, b); err != nil {
 		return nil, err
 	}
 	keep := b.Bags[:0]
@@ -145,8 +149,12 @@ func (g *GuildService) loadRedbags(now time.Time) (*redbagBook, error) {
 }
 
 func (g *GuildService) redbagDay(rid int64, now time.Time) (*redbagDay, error) {
+	return loadRedbagDay(g.Store, rid, now)
+}
+
+func loadRedbagDay(st *store.Store, rid int64, now time.Time) (*redbagDay, error) {
 	d := &redbagDay{}
-	if _, err := g.Store.LoadState(rid, redbagDayMod, d); err != nil {
+	if _, err := st.LoadState(rid, redbagDayMod, d); err != nil {
 		return nil, err
 	}
 	if day := dayKey(now); d.Day != day {

@@ -62,6 +62,10 @@ func (s *Server) payWeb(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "快乐币不足")
 		return
 	case errors.Is(err, game.ErrNoProduct), errors.Is(err, game.ErrNotPayable), errors.Is(err, game.ErrPriceMoney):
+		if why, ok := game.PayMsg(err); ok {
+			fmt.Fprint(w, why) // e.g. a red bag without a guild
+			return
+		}
 		fmt.Fprint(w, "该商品暂时无法购买")
 		return
 	case err != nil && res == nil:
@@ -71,7 +75,7 @@ func (s *Server) payWeb(w http.ResponseWriter, r *http.Request) {
 	case err != nil:
 		s.Log.Printf("pay_web: role %d product %d delivered, but: %v", rid, pid, err) // e.g. only the 充值返利 mail failed
 	}
-	s.pushCharge(rid, res.Gold, res.MailID)
+	s.pushCharge(rid, res.Gold, res.MailID, res.Redbag)
 	fmt.Fprint(w, res.KlbLeft)
 }
 
@@ -100,7 +104,7 @@ func (s *Server) roleOnline(rid int64) (online, known bool) {
 }
 
 // pushCharge has the gateway send an online role what the payment changed.
-func (s *Server) pushCharge(rid, diamonds, mailID int64) {
+func (s *Server) pushCharge(rid, diamonds, mailID, redbag int64) {
 	base := s.gatewayURL()
 	if base == "" {
 		return
@@ -111,6 +115,9 @@ func (s *Server) pushCharge(rid, diamonds, mailID int64) {
 	}
 	if mailID > 0 {
 		v.Set("mail", strconv.FormatInt(mailID, 10))
+	}
+	if redbag > 0 {
+		v.Set("redbag", strconv.FormatInt(redbag, 10))
 	}
 	if err := s.gatewayCall("POST", base+"/push/charge?"+v.Encode(), nil); err != nil {
 		s.Log.Printf("pay_web: push to role %d: %v", rid, err) // delivered all the same: the role sees it when it logs in

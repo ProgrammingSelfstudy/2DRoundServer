@@ -33,7 +33,7 @@ func AssetLabelNames() []string {
 //	POST /push/notice/remove?id=N  tell the online roles notice N was deleted (10951)
 //	POST /push/broadcast?msg=TEXT  scroll TEXT across the top of every online player's screen
 //	POST /push/refresh?rid=N[&heroes=1,2][&skins=1]  resend the currencies (10302) and backpack (10500) of an online role, the heroes with those partner ids (11001) and, with skins=1, its skins (11020)
-//	POST /push/charge?rid=N[&paid=D][&mail=ID]  resend the diamonds, backpack, VIP (10301) and the top-up page (16700) of an online role after an order was paid
+//	POST /push/charge?rid=N[&paid=D][&mail=ID][&redbag=ID]  resend the diamonds, backpack, VIP (10301) and the top-up page (16700) of an online role after an order was paid
 //	POST /kick?rid=N       disconnect an online role (used after a ban)
 //	GET  /online           number of roles online
 //	GET  /online?rid=N     whether role N is online
@@ -143,6 +143,12 @@ func (m *MailService) AdminHandler() http.Handler {
 			if err := SendChargePaid(sess, m.Store, rid, paid); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
+			}
+			if id, _ := strconv.ParseInt(r.URL.Query().Get("redbag"), 10, 64); id > 0 {
+				if _, err := m.PushRedbagSent(id); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
 			}
 			if id, _ := strconv.ParseInt(r.URL.Query().Get("mail"), 10, 64); id > 0 {
 				if _, err := m.PushMail(id); err != nil {

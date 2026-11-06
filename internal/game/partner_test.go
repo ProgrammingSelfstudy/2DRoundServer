@@ -405,7 +405,9 @@ func TestHeroPowerMatchesCaptures(t *testing.T) {
 // Hero souls (item_expend) stand in for the heroes of a camp slot of their own camp and star (captures of 2026-11-05 evening:
 // 70501 went from 7 to 25 stars, from 21 stars with expend1 = the fodder heroes and 91000 x20 + 90900 x30 for the any-camp slots).
 func TestStarPlanSouls(t *testing.T) {
-	hero := func(id int64, bid int64, star int) store.Partner { return store.Partner{PartnerID: id, BID: bid, Star: star} }
+	hero := func(id int64, bid int64, star int) store.Partner {
+		return store.Partner{PartnerID: id, BID: bid, Star: star}
+	}
 
 	// 70501 star 6 -> 7 wants two star-5 heroes of camp 4 and two of camp 5; a soul replaces one hero of its camp
 	p := hero(1, 70501, 6)

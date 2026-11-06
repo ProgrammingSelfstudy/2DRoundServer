@@ -23,6 +23,7 @@ type PayWebResult struct {
 	Extra   int64 // diamonds of the 充值返利 mail (the first-purchase or later extra); 0 = no mail
 	MailID  int64
 	KlbLeft int64
+	Redbag  int64 // id of the red bag the payment put into the guild (products 501 to 503); 0 = none
 }
 
 // PayWebCharge pays a product with 快乐币: money is the yuan the client sent and must be the product's price. The 快乐币 products
@@ -57,7 +58,7 @@ func PayWebCharge(st *store.Store, role *store.Role, productID, money int64, now
 		}
 		return nil, err
 	}
-	res := &PayWebResult{Order: o, Gold: p.Gold, Extra: extra}
+	res := &PayWebResult{Order: o, Gold: p.Gold, Extra: extra, Redbag: RedbagOfPayment(st, role, productID, now)}
 	if extra > 0 {
 		m, err := st.CreateMail(store.Mail{
 			SrvID: role.SrvID, Type: 1, Subject: "充值返利", FromName: "", CreatedBy: "pay_web", ExpireAt: now.Unix() + payWebMailExpire,

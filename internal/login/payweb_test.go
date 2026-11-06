@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"2droundserver/internal/store"
 )
 
 // The client's iceBirdOnPay1 (capture 2026-11-05): POST pay_web on the server list's `host`; the body is the 快乐币 left.
@@ -99,5 +101,50 @@ func TestServerListHostIsThePayAddress(t *testing.T) {
 	_, body := get(t, "GET", ts.URL+"/api/serverlist?account=a")
 	if !strings.Contains(body, `host="192.168.1.9:8080"`) || !strings.Contains(body, `ip="127.0.0.1"`) {
 		t.Fatalf("server list: %s", body)
+	}
+}
+
+// A red bag (products 501 to 503) goes through pay_web: refused with the reason without a guild; with one it is sent and the push
+// carries the bag's id (capture 2026-11-06).
+func TestPayWebRedbag(t *testing.T) {
+	s, ts := newTestServer(t)
+	if err := s.Store.EnsureServer(s.Cfg.DefaultServer()); err != nil {
+		t.Fatal(err)
+	}
+	acc, _ := s.Store.CreateAccount("symlf", "bagger", "x", "")
+	role, err := s.Store.CreateRole(acc.ID, "symlf_1", "发包人", 1, 1, 10401)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Store.Exchange(role.RID, nil, nil, map[int64]int64{41: 100}, nil); err != nil {
+		t.Fatal(err)
+	}
+	var pushes []string
+	gw := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/online":
+			w.Write([]byte(`{"online":true}`))
+		case "/push/charge":
+			pushes = append(pushes, r.URL.RawQuery)
+			w.Write([]byte(`{"refreshed":true}`))
+		}
+	}))
+	defer gw.Close()
+	s.Cfg.Gateway.AdminAddr = strings.TrimPrefix(gw.URL, "http://")
+	q := "srv_id=symlf_1&role_id=" + itoa(role.RID) + "&name=bagger&money=12&productId=501"
+	if code, body := get(t, "POST", ts.URL+"/api.php/pf/sygame/pay_web/?"+q); code != 200 || body != "你还没有加入公会" {
+		t.Fatalf("without a guild: %d %q", code, body)
+	}
+	if _, err := s.Store.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "红包联盟", LeaderRID: role.RID}, 1, nil, nil); err != nil {
+		t.Fatal(err)
+	}
+	if code, body := get(t, "POST", ts.URL+"/api.php/pf/sygame/pay_web/?"+q); code != 200 || body != "88" {
+		t.Fatalf("with a guild: %d %q", code, body)
+	}
+	if len(pushes) != 1 || !strings.Contains(pushes[0], "redbag=1") {
+		t.Fatalf("pushes: %v", pushes)
+	}
+	if a, _ := s.Store.RoleAssets(role.RID); a[3] != 120 || a[10] != 550 || a[41] != 88 {
+		t.Fatalf("assets: %v", a)
 	}
 }

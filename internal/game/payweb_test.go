@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"2droundserver/internal/proto"
 	"2droundserver/internal/store"
 )
 
@@ -121,5 +122,120 @@ func TestPayWebGift(t *testing.T) {
 	}
 	if m, _ := st.MailsForRole(role); len(m) != 0 {
 		t.Fatalf("a gift sends no mail: %+v", m)
+	}
+}
+
+// The red bag products 501 to 503 (capture 2026-11-06): paid with 快乐币, the bag goes into the guild, the sender gets the reward at once.
+func TestPayWebRedbag(t *testing.T) {
+	st, role := payWebEnv(t)
+	now := actNow
+	old := chargeClock
+	chargeClock = func() time.Time { return actNow }
+	t.Cleanup(func() { chargeClock = old })
+	if err := st.Exchange(role.RID, nil, nil, map[int64]int64{klbLabel: 1000}, nil); err != nil {
+		t.Fatal(err)
+	}
+	// without a guild: refused with a reason, nothing taken
+	_, err := PayWebCharge(st, role, 501, 12, now)
+	if why, ok := PayMsg(err); !ok || why != "你还没有加入公会" || !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("no guild: %v", err)
+	}
+	if a, _ := st.RoleAssets(role.RID); a[klbLabel] != 1000 || a[3] != 0 {
+		t.Fatalf("a refusal changed the assets: %v", a)
+	}
+	if n, _ := st.PendingPayOrders(role.RID); n != 0 {
+		t.Fatalf("%d orders wait", n)
+	}
+
+	gid, err := st.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "红包联盟", LeaderRID: role.RID}, 1, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res, err := PayWebCharge(st, role, 501, 12, now)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.Redbag == 0 || res.Extra != 0 || res.MailID != 0 || res.KlbLeft != 988 {
+		t.Fatalf("12 yuan bag: %+v", res)
+	}
+	a, _ := st.RoleAssets(role.RID)
+	if a[3] != 120 || a[10] != 550 || a[klbLabel] != 988 {
+		t.Fatalf("the sender's reward (120 diamonds, 550 contribution): %v", a)
+	}
+	if rc, _ := st.RoleCharge(role.RID); rc.VIPExp != 120 || rc.Bought["501"] != 1 {
+		t.Fatalf("totals: %+v", rc)
+	}
+	book, _ := loadRedbagBook(st, "symlf_1", now)
+	if len(book.Bags) != 1 || book.Bags[0].ID != res.Redbag || book.Bags[0].GID != gid || book.Bags[0].Val != 600000 || book.Bags[0].Max != 10 || book.Bags[0].Kind != 1 {
+		t.Fatalf("the bag: %+v", book.Bags)
+	}
+	if d, _ := loadRedbagDay(st, role.RID, now); d.Sent != 1 || d.Kind[1] != 1 {
+		t.Fatalf("today's count: %+v", d)
+	}
+
+	// the daily number of bags a role may send (red_packet_send, 10 of any kind) stops the 11th; it is checked before the kind's own limit
+	send := int(guildCfg.Const["red_packet_send"])
+	for i := 1; i < send; i++ {
+		if _, err := PayWebCharge(st, role, 501, 12, now); err != nil {
+			t.Fatalf("bag %d: %v", i+1, err)
+		}
+	}
+	before, _ := st.RoleAssets(role.RID)
+	_, err = PayWebCharge(st, role, 501, 12, now)
+	if why, ok := PayMsg(err); !ok || why != "今日发红包次数已达上限" {
+		t.Fatalf("bag %d: %v", send+1, err)
+	}
+	if after, _ := st.RoleAssets(role.RID); after[klbLabel] != before[klbLabel] || after[3] != before[3] {
+		t.Fatalf("a refused bag changed the assets: %v -> %v", before, after)
+	}
+}
+
+// PushRedbagSent shows the bag to the online members: 13534 (type 1), the guild's call on channel 256 and the log line.
+func TestPushRedbagSent(t *testing.T) {
+	e := newEnv(t, 1000*time.Hour)
+	e.setNow(actNow)
+	old := chargeClock
+	chargeClock = func() time.Time { return actNow }
+	t.Cleanup(func() { chargeClock = old })
+	a, ra := e.enter("pa", "发包人")
+	b, rb := e.enter("pb", "领包人")
+	gid, err := e.st.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "红包联盟", LeaderRID: ra.RID}, 1, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.JoinGuild(gid, rb.RID, 2, 30); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.Exchange(ra.RID, nil, nil, map[int64]int64{klbLabel: 20}, nil); err != nil {
+		t.Fatal(err)
+	}
+	role, _ := e.st.RoleByID(ra.RID)
+	res, err := PayWebCharge(e.st, role, 501, 12, actNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	mail := &MailService{Store: e.st, SrvID: "symlf_1", Hub: e.gw.Hub, Now: func() time.Time { return actNow }}
+	if n, err := mail.PushRedbagSent(res.Redbag); err != nil || n != 2 {
+		t.Fatalf("push: %d %v", n, err)
+	}
+	push := b.waitFor(13534)
+	if push.Int("type") != 1 || len(push.Arr("list")) != 1 || push.Arr("list")[0].Int("max_num") != 10 || push.Arr("list")[0].Int("flag") != 0 {
+		t.Fatalf("13534: %v", push)
+	}
+	say := b.waitFor(12761)
+	if say.Int("channel") != 256 || !strings.Contains(say.Str("msg"), "小清新红包") || !strings.Contains(say.Str("msg"), "href=7|") {
+		t.Fatalf("12761: %v", say)
+	}
+	if lg := b.waitFor(13578); len(lg.Arr("guild_log_info_list")) != 1 || !strings.Contains(lg.Arr("guild_log_info_list")[0].Str("msg"), "发出了一个小清新红包") {
+		t.Fatalf("13578: %v", lg)
+	}
+	if n := a.waitFor(13546); len(n.Arr("list")) != 1 || n.Arr("list")[0].Int("num") != 1 {
+		t.Fatalf("13546: %v", n)
+	}
+	// the bag can be opened like one sent with the token
+	id := push.Arr("list")[0].Int("id")
+	b.send(13536, proto.Message{"id": id})
+	if r := b.waitFor(13536); r.Int("code") != 1 || r.Int("val") < 1 {
+		t.Fatalf("open: %v", r)
 	}
 }

@@ -372,6 +372,10 @@ func TestFirstCharge3GivesTheHeroOnDayOne(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	c.send(21002, proto.Message{})
+	if r := c.waitFor(21002); r.Int("count") != 2 {
+		t.Fatalf("21002 after two orders: %v", r)
+	}
 	c.send(21032, proto.Message{})
 	if r := c.waitFor(21032); r.Arr("first_gift")[0].Int("status") != 1 {
 		t.Fatalf("21032: %v", r)

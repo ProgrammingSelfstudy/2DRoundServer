@@ -90,6 +90,13 @@ func sendChargeState(s *gateway.Session, st *store.Store, rid, diamonds int64) e
 	if err := sendPrivileges(s, st, rid); err != nil {
 		return err
 	}
+	count, err := chargeCountMessage(st, rid)
+	if err != nil {
+		return err
+	}
+	if err := s.Send(21002, count); err != nil {
+		return err
+	}
 	// the 每日礼包 tab shows how many of each gift were bought today
 	gifts, err := dailyGiftList(st, rid, s.Now())
 	if err != nil {

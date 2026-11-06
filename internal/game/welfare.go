@@ -9,12 +9,22 @@ import (
 // RegisterWelfare registers the welfare window's paid and account parts as the state of a
 // player who bought and bound nothing, since there is no payment, phone or wechat here:
 // (16705 / 16706 the month cards are monthcard.go) 21002 the recharge
-// count (0), 21007 (cyclegift.go) 21008 the daily award (not open), 24703 the red dots (none), 10987 the
+// count (every paid order), 21007 (cyclegift.go) 21008 the daily award (not open), 24703 the red dots (none), 10987 the
 // subscription red dot (none), 16633 / 16634 / 16635 / 16636 the wechat and phone binding
 // (told as done, so the window does not nag; a new binding is refused) and 24600-24604 the
 // survey (not open). The sign-in (14100, 14101) is checkin.go.
 func RegisterWelfare(r *gateway.Router, st *store.Store) {
-	r.Handle(21002, func(s *gateway.Session, _ proto.Message) error { return s.Send(21002, proto.Message{"count": 0}) })
+	r.Handle(21002, func(s *gateway.Session, _ proto.Message) error {
+		role := s.Role()
+		if role == nil {
+			return nil
+		}
+		m, err := chargeCountMessage(st, role.RID)
+		if err != nil {
+			return err
+		}
+		return s.Send(21002, m)
+	})
 	r.Handle(21008, func(s *gateway.Session, _ proto.Message) error { return s.Send(21008, proto.Message{"status": 0}) })
 	r.Handle(24703, func(s *gateway.Session, req proto.Message) error {
 		return s.Send(24703, proto.Message{"ids": []proto.Message{{"id": req.Int("id"), "status": 0}}})
@@ -46,4 +56,18 @@ func RegisterWelfare(r *gateway.Router, st *store.Store) {
 			return s.Send(cmd, proto.Message{"code": 0, "msg": "问卷未开放"})
 		})
 	}
+}
+
+// chargeCountMessage is 21002: how many orders the role paid (the client shows it as the number of top-ups; the capture counted
+// the 1 yuan daily gift too).
+func chargeCountMessage(st *store.Store, rid int64) (proto.Message, error) {
+	rc, err := st.RoleCharge(rid)
+	if err != nil {
+		return nil, err
+	}
+	var n int64
+	for _, c := range rc.Bought {
+		n += c
+	}
+	return proto.Message{"count": n}, nil
 }

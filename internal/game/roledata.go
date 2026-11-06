@@ -150,13 +150,17 @@ func pushEnterState(s *gateway.Session, st *store.Store, role *store.Role) error
 		return err
 	}
 	entries := privilegeList24500(p, s.Now())
+	count, err := chargeCountMessage(st, role.RID)
+	if err != nil {
+		return err
+	}
 	for _, p := range []struct {
 		cmd uint16
 		msg proto.Message
 	}{
 		{10995, proto.Message{"main_srv_id": role.SrvID, "srv_list": []proto.Message{{"srv_id": role.SrvID}}}},
 		{10996, proto.Message{"cli_ver_list": []proto.Message{}}},
-		{21002, proto.Message{"count": 0}},
+		{21002, count},
 		{21322, proto.Message{"code": 0}},
 		{24500, proto.Message{"list": entries}},
 	} {

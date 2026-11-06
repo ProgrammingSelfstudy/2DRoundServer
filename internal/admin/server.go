@@ -163,6 +163,11 @@ func (s *Server) Handler() http.Handler {
 	route("GET /api/tickets", levRead, s.listTickets)
 	route("POST /api/tickets/{id}/reply", levWrite, s.replyTicket)
 
+	route("GET /api/client", levRead, s.clientSettings)
+	route("PUT /api/client/config", levManage, s.setClientSetting)
+	route("POST /api/client/releases", levManage, s.createClientRelease)
+	route("PUT /api/client/releases/{id}", levManage, s.setClientReleaseState)
+
 	route("GET /api/mails", levRead, s.listMails)
 	route("POST /api/mails", levWrite, s.sendMail)
 

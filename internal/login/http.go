@@ -44,6 +44,8 @@ func (s *Server) Handler() http.Handler {
 			}
 		case strings.Contains(p, "/update/config/"):
 			s.urlConfig(w, r)
+		case p == "/client/config":
+			s.clientConfig(w, r)
 		case p == "/api/serverlist":
 			s.serverList(w, r)
 		case strings.HasSuffix(p, "/userlogin/yxmmdasba"):

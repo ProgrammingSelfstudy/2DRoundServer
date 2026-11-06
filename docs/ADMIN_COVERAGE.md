@@ -232,6 +232,8 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `pay_config` | 支付收款配置/充值页 | 收款码/说明查看、修改（read/manage）；有专用页：支付配置 | 保留专用入口/不提供通用表视图 | 有专用页：支付配置 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
 | table | `pay_orders` | 充值订单/充值页 | 全局订单及角色充值汇总的真实分页订单（read）；创建/确认/取消（manage）；有专用页：角色charge接口真实分页订单及全局支付页 | 保留专用入口/不提供通用表视图 | 有专用页：角色charge接口真实分页订单及全局支付页 | [050_pay.sql](../internal/store/migrations/050_pay.sql) |
 | table | `pay_proofs` | 付款截图 | 订单表“查看截图”按订单号取单张图（read）；有专用页：支付页 | 保留专用入口/不提供通用表视图 | 有专用页：支付页；图片是二进制，不适合表浏览，玩家自传不能当收款证据 | [051_pay_proof.sql](../internal/store/migrations/051_pay_proof.sql) |
+| table | `client_config` | 客户端启动配置 | 资源与版本页：CDN地址、公告、最低版本、功能开关（read/write）；有专用页：客户端资源与版本 | 保留专用入口/不提供通用表视图 | 有专用页：客户端资源与版本；键固定，避免写出没人读的设置 | [053_client_release.sql](../internal/store/migrations/053_client_release.sql) |
+| table | `client_release` | 客户端资源版本 | 资源与版本页：登记草稿、发布、回滚、测试白名单（read/write）；有专用页：客户端资源与版本 | 保留专用入口/不提供通用表视图 | 有专用页：客户端资源与版本；发布与回滚要审计，不走通用表 | [053_client_release.sql](../internal/store/migrations/053_client_release.sql) |
 | table | `redeem_codes` | 兑换码配置/兑换码页 | 列表/创建/删除及已用次数（read/write）；有专用页：兑换码管理 | 保留专用入口/不提供通用表视图 | 有专用页：兑换码管理 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `redeem_uses` | 兑换码领取明细 | 仅兑换码已用次数汇总，无逐角色明细（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `replay_collects` | 录像收藏关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [046_replays.sql](../internal/store/migrations/046_replays.sql) |

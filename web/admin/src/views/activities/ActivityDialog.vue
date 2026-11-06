@@ -32,8 +32,8 @@
         <el-form-item label="标题" label-for="activity-title"
           ><el-input id="activity-title" v-model="form.title" maxlength="40"
         /></el-form-item>
-        <el-form-item label="面板类型 panel_type（1–145）" label-for="activity-panel"
-          ><IntegerInput id="activity-panel" v-model="form.panel_type" :min="1" :max="145" :precision="0"
+        <el-form-item label="面板类型 panel_type（1–153）" label-for="activity-panel"
+          ><IntegerInput id="activity-panel" v-model="form.panel_type" :min="1" :max="153" :precision="0"
         /></el-form-item>
         <el-form-item label="排序" label-for="activity-sort"
           ><IntegerInput id="activity-sort" v-model="form.sort_val" :precision="0"

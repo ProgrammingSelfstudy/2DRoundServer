@@ -332,7 +332,7 @@ export function activityPayload(form: ActivityForm, original?: Activity) {
   const spec: ActivitySpec = {
     ...extra,
     title,
-    panel_type: int(form.panel_type, 1, 145, "面板类型"),
+    panel_type: int(form.panel_type, 1, 153, "面板类型"),
     sort_val: int(form.sort_val, -Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, "排序"),
     cli_type: int(form.cli_type, -Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, "主界面图标"),
     type_ico: int(form.type_ico, -Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, "图标类型"),

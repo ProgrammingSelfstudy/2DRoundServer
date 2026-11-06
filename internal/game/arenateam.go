@@ -627,6 +627,16 @@ func (a *atSvc) begin(s *gateway.Session) (*atCtx, string, error) {
 
 // forming is the reason a team cannot be changed now, empty when it can: the arena is forming teams or challenging, and
 // a team that signed up stays as it is.
+// formingOpen is forming for the actions the original lets a signed-up team do too (leave, kick, hand over the lead; the
+// sign-up is cancelled by a leave or a kick, 11-06 capture).
+func (a *atSvc) formingOpen(c *atCtx, needTeam, leader bool) string {
+	if c.t != nil && c.t.Signed {
+		c.t.Signed = false
+		defer func() { c.t.Signed = true }()
+	}
+	return a.forming(c, needTeam, leader)
+}
+
 func (a *atSvc) forming(c *atCtx, needTeam, leader bool) string {
 	if _, state, _ := atSeason(c.now); state != 1 && state != 2 {
 		return "组队竞技场未开启"
@@ -1253,10 +1263,11 @@ func (a *atSvc) leave(s *gateway.Session, _ proto.Message) error {
 	if err != nil {
 		return err
 	}
-	if m := a.forming(c, true, false); m != "" {
+	if m := a.formingOpen(c, true, false); m != "" {
 		return a.refuse(s, 27211, m)
 	}
 	t := c.t
+	t.Signed = false
 	a.remove(c, t, c.role.RID)
 	if err := a.save(c.role.SrvID, c.b); err != nil {
 		return err
@@ -1275,23 +1286,13 @@ func (a *atSvc) kick(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	rid := req.Int("rid")
-	// the original lets the leader kick a member of a signed-up team (11-06 capture); the sign-up is gone with the member
-	wasSigned := c.t != nil && c.t.Signed
-	if wasSigned {
-		c.t.Signed = false
-	}
-	if m := a.forming(c, true, true); m != "" {
-		if wasSigned {
-			c.t.Signed = true
-		}
+	if m := a.formingOpen(c, true, true); m != "" {
 		return a.refuse(s, 27212, m)
 	}
 	if _, in := c.t.member(rid); !in || rid == c.role.RID {
-		if wasSigned {
-			c.t.Signed = true
-		}
 		return a.refuse(s, 27212, "队伍里没有这个玩家")
 	}
+	c.t.Signed = false
 	a.remove(c, c.t, rid)
 	if err := a.save(c.role.SrvID, c.b); err != nil {
 		return err
@@ -1309,7 +1310,7 @@ func (a *atSvc) transfer(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	rid := req.Int("rid")
-	if m := a.forming(c, true, true); m != "" {
+	if m := a.formingOpen(c, true, true); m != "" {
 		return a.refuse(s, 27213, m)
 	}
 	i, in := c.t.member(rid)

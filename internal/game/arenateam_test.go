@@ -352,6 +352,21 @@ func TestArenateamMembers(t *testing.T) {
 	}
 }
 
+func TestArenateamLeaveOfSignedTeamCancelsTheSignUp(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(atFriday)
+	c, _ := e.atRole("队长")
+	atTeamOfRobots(t, c, "退队队")
+	c.send(27211, proto.Message{})
+	if r := c.waitFor(27211); r.Int("code") != 1 {
+		t.Fatalf("a leave of a signed-up team (the original allows it): %v", r)
+	}
+	c.send(27220, proto.Message{})
+	if r := c.waitFor(27220); r.Int("tid") != 0 || r.Int("is_sign") != 0 {
+		t.Fatalf("no team and no sign-up after the leave: %v", r)
+	}
+}
+
 func TestArenateamKickOfSignedTeamCancelsTheSignUp(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
 	e.setNow(atFriday)
@@ -383,9 +398,9 @@ func TestArenateamLocksAfterSignAndSettles(t *testing.T) {
 	e.setNow(atFriday)
 	c, role := e.atRole("队长")
 	atTeamOfRobots(t, c, "锁定队")
-	c.send(27211, proto.Message{})
-	if r := c.waitFor(27211); r.Int("code") != 0 {
-		t.Fatalf("left after the sign-up: %v", r)
+	c.send(27225, proto.Message{"is_check": 1, "limit_lev": 0, "limit_power": 0})
+	if r := c.waitFor(27225); r.Int("code") != 0 {
+		t.Fatalf("changed the conditions after the sign-up: %v", r)
 	}
 	c.send(27241, proto.Message{})
 	if r := c.waitFor(27241); r.Int("code") != 1 {

@@ -220,7 +220,7 @@ func (e *endSvc) chooseBuff(s *gateway.Session, req proto.Message) error {
 			}
 			st.Run.Buffs = []endBuffHold{{ID: pick, Group: o.Group, Count: lasts}}
 			st.Run.Choosing, st.Run.Opts, st.Run.Rest = false, nil, endCfg.num("buffchoice_interval")
-			if err := s.Send(23911, proto.Message{"code": 1, "msg": ""}); err != nil {
+			if err := s.Send(23911, proto.Message{"code": 1, "msg": "选择成功"}); err != nil {
 				return err
 			}
 			if err := e.pushBattle(s, role, st); err != nil {

@@ -150,7 +150,7 @@ func main() {
 		game.RegisterCharge(gw.Router, st, cfg.LoginHTTP.PublicBase)
 		game.RegisterChargeAcc(gw.Router, st)
 		game.RegisterMonthCard(gw.Router, st)
-		game.RegisterFirstCharge(gw.Router, st)
+		game.RegisterFirstCharge(gw.Router, st, gw.Hub)
 		game.RegisterCycleGifts(gw.Router, st)
 		game.RegisterMonthFund(gw.Router, st)
 		game.RegisterLimitGift(gw.Router, st)

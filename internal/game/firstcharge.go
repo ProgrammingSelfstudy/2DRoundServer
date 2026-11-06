@@ -53,6 +53,19 @@ var firstSets = func() []*firstSet {
 	return []*firstSet{mk("first", 21000, 21001, 0), mk("first_new", 21012, 21013, 21014), mk("first_lwt", 21030, 21031, 0), mk("first_3", 21032, 21033, 0)}
 }()
 
+// firstHeroBanner is the 12761 the original scrolled over the top (channel 48) to everyone when a role took the hero of the
+// window; the text says 300 yuan for both tiers, the client's own template. Without a hub only the role itself sees it.
+func firstHeroBanner(s *gateway.Session, hub *gateway.Hub, role *store.Role, bid int64) {
+	msg := proto.Message{"role_list": []proto.Message{}, "channel": 48, "len": 0, "tick": s.Now().Unix(), "msg": fmt.Sprintf(
+		"<div fontcolor=#13a5e2>%s</div>激活价值300元首充礼包，获得强力5星英雄<div click=4|%d|%d|%s|%d|0|3 fontcolor=#c26706>[%s]</div>相伴，推图起飞啦！<div href=37| fontcolor=#289b14>【我要充值】</div>",
+		role.Name, bid, role.RID, role.SrvID, firstChooseStar, partnerTable[bid].Name)}
+	if hub == nil {
+		_ = s.Send(12761, msg)
+		return
+	}
+	hub.Each(func(_ int64, o *gateway.Session) { _ = o.Send(12761, msg) })
+}
+
 // firstChargeState is kept per tier (fid 1 and 2 are the indexes 0 and 1).
 type firstChargeState struct {
 	Start  [2]int64 // day number of the day the paid sum reached the tier, 0 = not yet
@@ -111,7 +124,7 @@ func (fs *firstSet) window(d *firstChargeState, today int64) proto.Message {
 
 // RegisterFirstCharge registers the first top-up windows. A tier opens when the paid sum (VIP experience) reaches it, the gifts
 // come one a day from that day.
-func RegisterFirstCharge(r *gateway.Router, st *store.Store) {
+func RegisterFirstCharge(r *gateway.Router, st *store.Store, hub *gateway.Hub) {
 	for _, fs := range firstSets {
 		fs := fs
 		load := func(s *gateway.Session) (*store.Role, *firstChargeState, int64, error) {
@@ -187,6 +200,7 @@ func RegisterFirstCharge(r *gateway.Router, st *store.Store) {
 				if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
 					return err
 				}
+				firstHeroBanner(s, hub, role, firstDayHeroes[g.ID])
 			}
 			if err := s.Send(fs.take, proto.Message{"code": 1, "msg": "领取成功"}); err != nil {
 				return err

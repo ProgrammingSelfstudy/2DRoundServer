@@ -155,7 +155,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterCharge(gw.Router, st, "http://pay.test")
 	RegisterChargeAcc(gw.Router, st)
 	RegisterMonthCard(gw.Router, st)
-	RegisterFirstCharge(gw.Router, st)
+	RegisterFirstCharge(gw.Router, st, gw.Hub)
 	RegisterCycleGifts(gw.Router, st)
 	RegisterMonthFund(gw.Router, st)
 	RegisterLimitGift(gw.Router, st)

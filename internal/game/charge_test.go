@@ -385,6 +385,9 @@ func TestFirstCharge3GivesTheHeroOnDayOne(t *testing.T) {
 		t.Fatalf("11095: %v", r)
 	}
 	c.waitFor(11001)
+	if r := c.waitFor(12761); r.Int("channel") != 48 || !strings.Contains(r.Str("msg"), "[狼邢]") {
+		t.Fatalf("12761: %v", r)
+	}
 	if r := c.waitFor(21033); r.Int("code") != 1 {
 		t.Fatalf("21033: %v", r)
 	}

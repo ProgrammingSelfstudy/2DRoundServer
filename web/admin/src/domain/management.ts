@@ -7,6 +7,7 @@ export const managementPages = [
   ["reports", "举报记录", "read", null],
   ["guilds", "公会管理", "read", "write"],
   ["notices", "公告管理", "read", "write"],
+  ["client", "客户端资源与版本", "read", "manage"],
   ["audit", "审计日志", "manage", null],
   ["backups", "数据库备份", "manage", "manage"],
   ["admins", "管理员", "manage", "manage"],

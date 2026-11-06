@@ -34,3 +34,13 @@ B 点“公会秘境”：`20060 {combat_type 34}` → `26800 {bid 0, boss_list 
 - e04 秘境：被拒样本是客户端静默拦；开启/挑战要活跃 1500，还没攒到。
 - e05 宝库兑换、e06 技能重置预览和 Boss `award_list`、e03 公会战（日期）仍缺。
 - 50 元（502？）和 648 元（503？）红包档、红包榜页签、同一红包的余下 9 份（A 之外没有第三个号领）、红包 24 小时过期没测。
+
+## 11-06 成员入会和公会副本（c52，模拟器 C，北京 14:05~14:07）
+
+C = 老号 93 服角色“王者之单身”（rid 22，148 级，战力 1643），公会是 B（niuniu，rid 23）建的“niuniu”（gid 4，1 级，本来 2 人，申请方式“直接加入”，15 人上限）。证据 `c52-member-join-boss-evidence.jsonl`（去掉心跳、战斗回合和英雄属性）。
+
+- **入会** 公会列表 `13501 {flag 1, name "", num 0, page 0}` → `{all_count 4, flag 1, guilds [{gid, gsrv_id, name, lev, leader_name, members_num, members_max, apply_type, apply_lev, apply_power, is_apply}]}`；`13503 {gid 4, gsrv_id "symlf_93", type 1}` 直接入会，随后一次性推：`10301`、`13534`（公会红包列表）、`16401`（成就 13010 完成）、`11007`、`21320`（副本章节奖励 fid 1~4 status 1）、`12741 “王者之单身成功加入公会”`、`10803`（邮件“公会通知”）；客户端接着请求 `24204`（公会战状态 `{status 4, start_time, end_time}`）、`24220`、`13523`（`{boxes [], day_recv_num 0, day_send_num 0, donate_exp 50, donate_list []}`）、`13518`（公会信息）、`16900`（`{day_exp 0, exp 0, lev 0, week_exp 0}`）、`26807`、`26800`（公会秘境：boss 91001~95001，`button 1`，其余 0）、`23703`（技能列表 career 5/4/2/3 的 skill_id 40011/30011/20011/10011）、`23711`。主城飘字“王者之单身成功加入公会”，成就“船长集合！”。
+- **公会副本窗口** 点“公会副本”：`20060 {combat_type 9}`、`21300 null` → `{buff_end_time 0, buff_lev 0, buy_count 0, coldtime 0, combat_info [{boss_id 501, dps 0}], count 2, fid 5, info [{boss_id 501, hp 8000000}], max_id 4, ref_time 226461, worship 0}`、`21319 {boss_id 501, start_num 1, end_num 100}` → `{rank_list [], mydps 0, rank 0, day_worship 0, worship 0}`。窗口显示第 5 章（章节 1~4 已通，6~10 锁），“全公会成员攻击力+0% 激活”“剩余购买次数 4”“剩余次数 2”，伤害奖励 贡献币 18 + 贝里 2.8 万，击杀奖励 贡献币 200 + EXP 100；扫荡灰（要先通关该 Boss）。
+- **挑战** 点“挑战”→ 布阵 `11211 {type 4}`、`26555 {type 4}`；开战 `21308 {boss_id 501, formation_type 1, hallows_id 0, pos_info [{id 1, pos 1}, {id 2, pos 6}]}` → 先推 `10409`（任务 90013 进度 1/3）、`16401`（成就 27010 1/5）、**`12741 “公会活跃值+5”`、`16902 {list [{id 102, target_val 3, value 1}]}`、`16900 {day_exp 5, exp 5, week_exp 5}`**（公会活跃，本地没有，16900 恒空），再 `21308 {code 1, msg ""}` → `20063`/`20000 {combat_type 9}`/`20027`；打完 `10302` → `21300`（count 2→1）→ `21309 {award_list [{bid 10, num 18}, {bid 1, num 28000}], best_partner 1, bossid 501, all_dps 0, hurt_statistics [...]}` → `20006 {combat_type 9, result 1}` → `13578`（日志“攻击第5章公会BOSS1次，共造成0伤害。”）→ `21320` → `21319`（排行 rank 1，`mydps 0`）→ `21024 {list [{id 4}]}`。**奖励贡献币 18 和贝里 2.8 万是固定的，与伤害无关**（总伤害 0 也给），回包总伤害 0 但英雄 dps 1378。
+- **和本地的差异**：本地 `21308` 的顺序和字段基本一致（`guild_boss.go`）；差在公会活跃值（12741、16902、16900）本地没有，因为本地没有公会活跃目标；伤害奖励是否固定（本地按伤害算？没核对）没改；第 5 章 Boss 血量 800 万是原服数，本地表里的数没核对。
+- 没做：扫荡、购买次数、点“激活”（攻击力加成）、排行奖励、集结号角、公会商城、公会技能。

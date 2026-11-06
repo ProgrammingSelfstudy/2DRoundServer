@@ -233,6 +233,10 @@ func TestStarPlanCost(t *testing.T) {
 	if _, _, msg := starPlan(p, owned, []int64{2, 3, 4}, nil); msg == "" {
 		t.Fatal("surplus hero accepted")
 	}
+	// a row the client's table gives no materials for (the 蛋头岛 heroes) must not be free
+	if _, _, msg := starPlan(store.Partner{PartnerID: 1, BID: 70533, Star: 5}, nil, nil, nil); msg == "" {
+		t.Fatal("a hero whose star rows are empty went up for free")
+	}
 	// the top star and the fusion path are refused
 	if _, _, msg := starPlan(store.Partner{BID: 10101, Star: 1}, nil, nil, nil); msg == "" {
 		t.Fatal("10101 has no star 2")

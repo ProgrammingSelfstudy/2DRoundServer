@@ -31,6 +31,10 @@ func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, so
 	if !ok {
 		return nil, nil, "已升至最高星级"
 	}
+	if len(row.Self)+len(row.Fodder)+len(row.CampFodder)+len(row.Cost) == 0 {
+		// the client's table has no materials for this row (the 蛋头岛 heroes 70533 to 70540 have empty rows from star 6 to 25): do not hand out stars for free
+		return nil, nil, "该英雄暂不可升星"
+	}
 	for _, sf := range row.Self {
 		if sf[0] != p.BID || (sf[2] == 1 && sf[1] != int64(p.Star)) {
 			return nil, nil, "该升星方式暂未开放"

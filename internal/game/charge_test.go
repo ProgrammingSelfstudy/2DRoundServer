@@ -359,6 +359,41 @@ func TestFirstChargeWindows(t *testing.T) {
 	}
 }
 
+func TestFirstCharge3GivesTheHeroOnDayOne(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(actNow)
+	c, role := e.enter("fc3", "首充三")
+	for i := 0; i < 2; i++ { // 2 x 648 yuan reaches the 10000 experience of the first tier
+		o, err := CreateChargeOrder(e.st, role, 8, actNow)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "t", ""); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c.send(21032, proto.Message{})
+	if r := c.waitFor(21032); r.Arr("first_gift")[0].Int("status") != 1 {
+		t.Fatalf("21032: %v", r)
+	}
+	c.send(21033, proto.Message{"id": 1})
+	if r := c.waitFor(11095); r.Int("partner_bid") != 90527 || r.Int("init_star") != 5 {
+		t.Fatalf("11095: %v", r)
+	}
+	c.waitFor(11001)
+	if r := c.waitFor(21033); r.Int("code") != 1 {
+		t.Fatalf("21033: %v", r)
+	}
+	ps, _ := e.st.PartnersOf(role.RID)
+	found := false
+	for _, p := range ps {
+		found = found || p.BID == 90527
+	}
+	if !found {
+		t.Fatalf("the hero was not given: %v", ps)
+	}
+}
+
 func TestCycleGifts(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
 	e.setNow(actNow)

@@ -31,6 +31,10 @@ var firstChooseHeroes = [3]int64{20501, 30506, 10505}
 
 const firstChooseStar = 5
 
+// firstDayHeroes are the 5-star heroes the first day of each tier of the 21032/21033 window gives besides the items (gift id to
+// hero), as the original server did in the 11-05 capture: 狼邢 for the 10 yuan tier, 索隆(鬼岛) for the 50 yuan one.
+var firstDayHeroes = map[int64]int64{1: 90527, 4: 70532}
+
 // firstSets: 21000 is the plain window (data_first_charge_data), 21012~21014 the new one that also gives one hero of three,
 // 21030/21031 and 21032/21033 two more windows with their own tables (the second one asks for 10000 and 50000 experience).
 var firstSets = func() []*firstSet {
@@ -162,9 +166,27 @@ func RegisterFirstCharge(r *gateway.Router, st *store.Store) {
 			if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
 				return err
 			}
+			var given []store.Partner
+			if bid := firstDayHeroes[g.ID]; fs.key == "first_3" && bid != 0 {
+				if given, err = st.Summon(role.RID, store.SummonResult{Seeds: []store.PartnerSeed{{BID: bid, Star: firstChooseStar}}}); err != nil {
+					return err
+				}
+			}
 			d.Taken[g.Fid-1], d.Last[g.Fid-1] = g.Day, today
 			if err := st.SaveState(role.RID, "firstcharge_"+fs.key, d); err != nil {
 				return err
+			}
+			if len(given) > 0 {
+				msgs := make([]proto.Message, 0, len(given))
+				for _, h := range given {
+					msgs = append(msgs, partnerMessage(h))
+				}
+				if err := s.Send(11095, proto.Message{"init_star": firstChooseStar, "partner_bid": firstDayHeroes[g.ID]}); err != nil {
+					return err
+				}
+				if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
+					return err
+				}
 			}
 			if err := s.Send(fs.take, proto.Message{"code": 1, "msg": "领取成功"}); err != nil {
 				return err

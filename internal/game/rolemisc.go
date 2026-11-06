@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -139,10 +140,14 @@ func RegisterRoleMisc(r *gateway.Router, st *store.Store) {
 			if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
 				return err
 			}
-			if err := reply(1, "膜拜成功"); err != nil {
+			// the original's order (11-06 capture): the assets, the toast, then the reply with an empty message
+			if err := sendAssets(s, st, role.RID); err != nil {
 				return err
 			}
-			return sendAssets(s, st, role.RID)
+			if err := s.Send(12741, proto.Message{"msg": fmt.Sprintf("膜拜成功，获得<assets=%d/><div fontcolor=#289b14>%d</div>", like[0], like[1])}); err != nil {
+				return err
+			}
+			return reply(1, "")
 		}
 		return reply(1, "膜拜成功")
 	})

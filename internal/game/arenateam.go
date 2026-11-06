@@ -788,7 +788,7 @@ func (a *atSvc) create(s *gateway.Session, req proto.Message) error {
 	if err := a.save(c.role.SrvID, c.b); err != nil {
 		return err
 	}
-	return s.Send(27201, proto.Message{"code": 1, "msg": "创建成功"})
+	return s.Send(27201, proto.Message{"code": 1, "msg": "创建队伍成功"})
 }
 
 // canJoin says why a role cannot join a team, empty when it can.
@@ -841,7 +841,7 @@ func (a *atSvc) apply(s *gateway.Session, req proto.Message) error {
 			return err
 		}
 		a.notifyTeam(t, 2, c.role.RID)
-		if err := s.Send(27202, proto.Message{"code": 1, "msg": "加入队伍成功", "tid": t.ID, "srv_id": t.SrvID}); err != nil {
+		if err := s.Send(27202, proto.Message{"code": 1, "msg": "已加入队伍", "tid": t.ID, "srv_id": t.SrvID}); err != nil {
 			return err
 		}
 		return s.Send(27222, proto.Message{"type": 1})
@@ -856,7 +856,7 @@ func (a *atSvc) apply(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	a.notify(t.Leader, 3)
-	return s.Send(27202, proto.Message{"code": 1, "msg": "申请成功，请等待队长审核", "tid": t.ID, "srv_id": t.SrvID})
+	return s.Send(27202, proto.Message{"code": 1, "msg": "入队申请已提交，请耐心等待审核", "tid": t.ID, "srv_id": t.SrvID})
 }
 
 // keyApply (27216) asks several teams at once.
@@ -1000,7 +1000,7 @@ func (a *atSvc) answerApply(s *gateway.Session, req proto.Message) error {
 		if err := a.save(c.role.SrvID, c.b); err != nil {
 			return err
 		}
-		return reply(1, "已拒绝")
+		return reply(1, "")
 	}
 	who, err := a.st.RoleByID(rid)
 	if err != nil {
@@ -1018,7 +1018,7 @@ func (a *atSvc) answerApply(s *gateway.Session, req proto.Message) error {
 	}
 	a.notify(rid, 1)
 	a.notifyTeam(c.t, 2, rid)
-	return reply(1, "已同意")
+	return reply(1, "")
 }
 
 // robotFor makes the robot teammate of a leader that stands on the recommended list at place idx: a copy of the
@@ -1384,7 +1384,7 @@ func (a *atSvc) setLimits(s *gateway.Session, req proto.Message) error {
 	if err := a.save(c.role.SrvID, c.b); err != nil {
 		return err
 	}
-	return s.Send(27225, proto.Message{"code": 1, "msg": "设置成功"})
+	return s.Send(27225, proto.Message{"code": 1, "msg": ""})
 }
 
 func (a *atSvc) rename(s *gateway.Session, req proto.Message) error {

@@ -457,6 +457,13 @@ func TestStarPlanSouls(t *testing.T) {
 	if got[91000] != 20 || got[90900] != 30 || got[10090] != 180 || got[10001] != 200000 {
 		t.Fatalf("fusion cost: %v", got)
 	}
+	// the same-hero slots (fodder) take real heroes only: souls cannot stand in for them, whatever their camp and star
+	if _, _, msg := starPlan(p, map[int64]store.Partner{1: p}, nil, map[int64]int64{91000: 20, 90900: 30, 90500: 10}); msg == "" {
+		t.Fatal("souls filled the slots of the hero itself")
+	}
+	if _, _, msg := starPlan(p, map[int64]store.Partner{1: p}, nil, map[int64]int64{91000: 20, 90900: 30}); msg == "" {
+		t.Fatal("the same-hero slots stayed empty and the star-up went through")
+	}
 	// without the souls the any-camp slots stay empty, and another hero's fusion is not this one's
 	if _, _, msg := starPlan(p, owned, chosen, nil); msg == "" {
 		t.Fatal("fusion without the camp slots accepted")

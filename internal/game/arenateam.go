@@ -435,6 +435,18 @@ func (a *atSvc) send(rid int64, cmd uint16, msg proto.Message) {
 // 6 a fight was made.
 func (a *atSvc) notify(rid, typ int64) { a.send(rid, 27222, proto.Message{"type": typ}) }
 
+// atChatTeam is the channel of the team's own chat (12761 channel 512), where the original says who joined and left.
+const atChatTeam = 512
+
+// say tells the human members of a team a line of the team channel (11-06 capture: "<name>加入队伍", "<name>退出队伍").
+func (a *atSvc) say(t *atTeam, now time.Time, text string) {
+	for _, m := range t.Members {
+		if !m.Robot {
+			a.send(m.RID, 12761, proto.Message{"role_list": []proto.Message{}, "channel": atChatTeam, "len": 0, "msg": text, "tick": now.Unix()})
+		}
+	}
+}
+
 func (a *atSvc) notifyTeam(t *atTeam, typ int64, except int64) {
 	for _, m := range t.Members {
 		if !m.Robot && m.RID != except {
@@ -659,6 +671,7 @@ func (a *atSvc) newMember(role *store.Role, pos int64) atMember {
 
 func (a *atSvc) join(c *atCtx, t *atTeam, role *store.Role) {
 	t.Members = append(t.Members, a.newMember(role, int64(len(t.Members)+1)))
+	a.say(t, c.now, role.Name+"加入队伍")
 	// asks and invitations of the role to other teams are void now
 	keep := c.b.Applies[:0]
 	for _, r := range c.b.Applies {
@@ -1219,6 +1232,7 @@ func (a *atSvc) remove(c *atCtx, t *atTeam, rid int64) {
 	if !ok {
 		return
 	}
+	name := t.Members[i].Name
 	t.Members = append(t.Members[:i], t.Members[i+1:]...)
 	var humans []atMember
 	for _, m := range t.Members {
@@ -1254,6 +1268,7 @@ func (a *atSvc) remove(c *atCtx, t *atTeam, rid int64) {
 		t.Leader = best.RID
 	}
 	t.renumber()
+	a.say(t, c.now, name+"退出队伍")
 }
 
 func (a *atSvc) leave(s *gateway.Session, _ proto.Message) error {

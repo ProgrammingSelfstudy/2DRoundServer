@@ -352,6 +352,27 @@ func TestArenateamMembers(t *testing.T) {
 	}
 }
 
+func TestArenateamTeamChannelSaysWhoJoinsAndLeaves(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(atFriday)
+	a, _ := e.atRole("队长丙")
+	b, _ := e.atRole("队员丁")
+	a.send(27201, proto.Message{"name": "丙队", "is_check": 0, "limit_lev": 0, "limit_power": 0})
+	a.waitFor(27201)
+	b.send(27200, proto.Message{})
+	tid := b.waitFor(27200).Arr("team_list")[0].Int("tid")
+	b.send(27202, proto.Message{"tid": tid, "srv_id": "symlf_1"})
+	for _, who := range []*client{a, b} {
+		if r := who.waitFor(12761); r.Int("channel") != 512 || r.Str("msg") != "队员丁加入队伍" {
+			t.Fatalf("join line: %v", r)
+		}
+	}
+	b.send(27211, proto.Message{})
+	if r := a.waitFor(12761); r.Int("channel") != 512 || r.Str("msg") != "队员丁退出队伍" {
+		t.Fatalf("leave line: %v", r)
+	}
+}
+
 func TestArenateamLeaveOfSignedTeamCancelsTheSignUp(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
 	e.setNow(atFriday)

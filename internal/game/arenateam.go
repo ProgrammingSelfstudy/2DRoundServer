@@ -1287,7 +1287,7 @@ func (a *atSvc) kick(s *gateway.Session, req proto.Message) error {
 	}
 	a.notify(rid, 5)
 	a.notifyTeam(c.t, 2, c.role.RID)
-	return s.Send(27212, proto.Message{"code": 1, "msg": "已将该玩家移出队伍"})
+	return s.Send(27212, proto.Message{"code": 1, "msg": "已踢出该玩家"})
 }
 
 func (a *atSvc) transfer(s *gateway.Session, req proto.Message) error {
@@ -1410,7 +1410,7 @@ func (a *atSvc) rename(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	a.notifyTeam(c.t, 2, c.role.RID)
-	return s.Send(27226, proto.Message{"code": 1, "msg": ""})
+	return s.Send(27226, proto.Message{"code": 1, "msg": "已修改"})
 }
 
 // recommend (27228) lists roles a team could ask: real ones of the level without a team, then robots.

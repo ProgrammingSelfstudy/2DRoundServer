@@ -146,3 +146,9 @@
 {"t": "2026-11-06T05:16:28.189057Z", "emu": "C", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 1, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
 {"t": "2026-11-06T05:16:55.275596Z", "emu": "C", "dir": "s2c", "cmd": 27222, "msg": {"type": 5}}
 {"t": "2026-11-06T05:16:55.369713Z", "emu": "C", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 0, "state": 1, "team_name": "", "tid": 0}}
+{"t": "2026-11-06T05:20:25.369031Z", "emu": "B", "dir": "c2s", "cmd": 27242, "msg": {"pos_info": [{"is_hide": 1, "pos": 1, "rid": 23, "sid": "symlf_93"}, {"is_hide": 0, "pos": 2, "rid": 21, "sid": "symlf_93"}, {"is_hide": 0, "pos": 3, "rid": 22, "sid": "symlf_93"}]}}
+{"t": "2026-11-06T05:20:08.550223Z", "emu": "B", "dir": "s2c", "cmd": 27243, "msg": {"rids": [22, 23, 21], "keys": ["avatar_bid", "ext", "face_file", "face_id", "face_update_time", "formation_type", "hallows_id", "is_hide", "lev", "name", "pos", "power", "rid", "sid", "sprite_lev", "sprites", "team_partner"]}}
+{"t": "2026-11-06T05:20:25.399173Z", "emu": "B", "dir": "s2c", "cmd": 27242, "msg": {"code": 1, "msg": "设置成功"}}
+{"t": "2026-11-06T05:20:49.136248Z", "emu": "B", "dir": "s2c", "cmd": 27240, "msg": {"code": 1, "msg": "报名成功，等待正式开赛"}}
+{"t": "2026-11-06T05:20:53.480817Z", "emu": "B", "dir": "s2c", "cmd": 27241, "msg": {"code": 1, "msg": "取消报名成功"}}
+{"t": "2026-11-06T05:21:11.003402Z", "emu": "B", "dir": "s2c", "cmd": 27240, "msg": {"code": 1, "msg": "报名成功，等待正式开赛"}}

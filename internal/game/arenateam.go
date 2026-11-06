@@ -1525,7 +1525,7 @@ func (a *atSvc) unsign(s *gateway.Session, _ proto.Message) error {
 		return err
 	}
 	a.notifyTeam(c.t, 2, c.role.RID)
-	return s.Send(27241, proto.Message{"code": 1, "msg": "已取消报名"})
+	return s.Send(27241, proto.Message{"code": 1, "msg": "取消报名成功"})
 }
 
 // saveOrder (27242) sets who fights first and who is hidden; the leader only, also after the sign-up.
@@ -1564,7 +1564,7 @@ func (a *atSvc) saveOrder(s *gateway.Session, req proto.Message) error {
 	if err := a.save(c.role.SrvID, c.b); err != nil {
 		return err
 	}
-	return s.Send(27242, proto.Message{"code": 1, "msg": ""})
+	return s.Send(27242, proto.Message{"code": 1, "msg": "设置成功"})
 }
 
 func (a *atSvc) ranking(s *gateway.Session, req proto.Message) error {

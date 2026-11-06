@@ -1095,7 +1095,7 @@ func (a *atSvc) invite(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	a.notify(rid, 4)
-	return reply(1, "邀请已发送")
+	return reply(1, "邀请成功")
 }
 
 func (a *atSvc) inviteList(s *gateway.Session, _ proto.Message) error {
@@ -1140,7 +1140,7 @@ func (a *atSvc) answerInvite(s *gateway.Session, req proto.Message) error {
 		if err := a.save(c.role.SrvID, c.b); err != nil {
 			return err
 		}
-		return s.Send(27207, proto.Message{"code": 1, "msg": "已拒绝"})
+		return s.Send(27207, proto.Message{"code": 1, "msg": ""})
 	}
 	if m := a.forming(c, false, false); m != "" {
 		return a.refuse(s, 27207, m)
@@ -1155,7 +1155,7 @@ func (a *atSvc) answerInvite(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	a.notifyTeam(t, 2, c.role.RID)
-	if err := s.Send(27207, proto.Message{"code": 1, "msg": "加入队伍成功"}); err != nil {
+	if err := s.Send(27207, proto.Message{"code": 1, "msg": "已加入队伍"}); err != nil {
 		return err
 	}
 	return s.Send(27222, proto.Message{"type": 1})

@@ -152,3 +152,45 @@
 {"t": "2026-11-06T05:20:49.136248Z", "emu": "B", "dir": "s2c", "cmd": 27240, "msg": {"code": 1, "msg": "报名成功，等待正式开赛"}}
 {"t": "2026-11-06T05:20:53.480817Z", "emu": "B", "dir": "s2c", "cmd": 27241, "msg": {"code": 1, "msg": "取消报名成功"}}
 {"t": "2026-11-06T05:21:11.003402Z", "emu": "B", "dir": "s2c", "cmd": 27240, "msg": {"code": 1, "msg": "报名成功，等待正式开赛"}}
+{"t": "2026-11-06T05:24:17.634175Z", "emu": "A", "dir": "c2s", "cmd": 27229, "msg": {"n": 0, "keys": []}}
+{"t": "2026-11-06T05:24:32.683627Z", "emu": "A", "dir": "c2s", "cmd": 27205, "msg": {"rid": 23, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:26:18.557152Z", "emu": "A", "dir": "c2s", "cmd": 27229, "msg": {"n": 0, "keys": []}}
+{"t": "2026-11-06T05:26:31.679307Z", "emu": "A", "dir": "c2s", "cmd": 27205, "msg": {"rid": 23, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:22:46.492279Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:23:20.252957Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:23:20.252957Z", "emu": "A", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:23:37.332954Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:23:37.332954Z", "emu": "A", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:23:37.332954Z", "emu": "A", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:23:37.332954Z", "emu": "A", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "niuniu退出队伍", "role_list": [], "tick": 1793942617}}
+{"t": "2026-11-06T05:24:17.670572Z", "emu": "A", "dir": "s2c", "cmd": 27229, "msg": {"n": 1, "keys": ["avatar_bid", "ext", "face_file", "face_id", "face_update_time", "is_hide", "lev", "name", "pos", "power", "rid", "sid", "team_partner"]}}
+{"t": "2026-11-06T05:24:32.712658Z", "emu": "A", "dir": "s2c", "cmd": 27205, "msg": {"code": 1, "msg": "邀请成功", "rid": 23, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:24:44.926707Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:25:20.986132Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:26:18.587532Z", "emu": "A", "dir": "s2c", "cmd": 27229, "msg": {"n": 1, "keys": ["avatar_bid", "ext", "face_file", "face_id", "face_update_time", "is_hide", "lev", "name", "pos", "power", "rid", "sid", "team_partner"]}}
+{"t": "2026-11-06T05:26:31.708976Z", "emu": "A", "dir": "s2c", "cmd": 27205, "msg": {"code": 1, "msg": "邀请成功", "rid": 23, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:26:40.022519Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:26:40.022519Z", "emu": "A", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:26:40.022519Z", "emu": "A", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "niuniu加入队伍", "role_list": [], "tick": 1793942800}}
+{"t": "2026-11-06T05:27:06.128074Z", "emu": "A", "dir": "s2c", "cmd": 27240, "msg": {"code": 1, "msg": "报名成功，等待正式开赛"}}
+{"t": "2026-11-06T05:27:06.128074Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:23:20.224009Z", "emu": "B", "dir": "c2s", "cmd": 27213, "msg": {"rid": 21, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:24:49.910501Z", "emu": "B", "dir": "c2s", "cmd": 27207, "msg": {"srv_id": "symlf_93", "tid": 1, "type": 0}}
+{"t": "2026-11-06T05:26:39.971564Z", "emu": "B", "dir": "c2s", "cmd": 27207, "msg": {"srv_id": "symlf_93", "tid": 1, "type": 1}}
+{"t": "2026-11-06T05:22:46.492872Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:23:20.252962Z", "emu": "B", "dir": "s2c", "cmd": 27213, "msg": {"code": 1, "msg": "已移交队长"}}
+{"t": "2026-11-06T05:23:20.281636Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:23:20.281636Z", "emu": "B", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:23:37.332949Z", "emu": "B", "dir": "s2c", "cmd": 27211, "msg": {"code": 1, "msg": "已退出队伍"}}
+{"t": "2026-11-06T05:24:32.715046Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 4}}
+{"t": "2026-11-06T05:24:36.183608Z", "emu": "B", "dir": "s2c", "cmd": 27206, "msg": {"n": 1, "keys": ["srv_id", "team_is_check", "team_limit_lev", "team_limit_power", "team_members", "team_name", "team_power", "tid"]}}
+{"t": "2026-11-06T05:24:49.942071Z", "emu": "B", "dir": "s2c", "cmd": 27207, "msg": {"code": 1, "msg": ""}}
+{"t": "2026-11-06T05:24:49.981893Z", "emu": "B", "dir": "s2c", "cmd": 27206, "msg": {"n": 0, "keys": []}}
+{"t": "2026-11-06T05:26:31.710734Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 4}}
+{"t": "2026-11-06T05:26:31.780995Z", "emu": "B", "dir": "s2c", "cmd": 27206, "msg": {"n": 1, "keys": ["srv_id", "team_is_check", "team_limit_lev", "team_limit_power", "team_members", "team_name", "team_power", "tid"]}}
+{"t": "2026-11-06T05:26:36.917955Z", "emu": "B", "dir": "s2c", "cmd": 27206, "msg": {"n": 1, "keys": ["srv_id", "team_is_check", "team_limit_lev", "team_limit_power", "team_members", "team_name", "team_power", "tid"]}}
+{"t": "2026-11-06T05:26:40.024782Z", "emu": "B", "dir": "s2c", "cmd": 27207, "msg": {"code": 1, "msg": "已加入队伍"}}
+{"t": "2026-11-06T05:26:40.024782Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 1}}
+{"t": "2026-11-06T05:26:40.053764Z", "emu": "B", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "niuniu加入队伍", "role_list": [], "tick": 1793942800}}
+{"t": "2026-11-06T05:26:40.109668Z", "emu": "B", "dir": "s2c", "cmd": 27206, "msg": {"n": 0, "keys": []}}
+{"t": "2026-11-06T05:27:06.128066Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}

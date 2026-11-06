@@ -1275,10 +1275,21 @@ func (a *atSvc) kick(s *gateway.Session, req proto.Message) error {
 		return err
 	}
 	rid := req.Int("rid")
+	// the original lets the leader kick a member of a signed-up team (11-06 capture); the sign-up is gone with the member
+	wasSigned := c.t != nil && c.t.Signed
+	if wasSigned {
+		c.t.Signed = false
+	}
 	if m := a.forming(c, true, true); m != "" {
+		if wasSigned {
+			c.t.Signed = true
+		}
 		return a.refuse(s, 27212, m)
 	}
 	if _, in := c.t.member(rid); !in || rid == c.role.RID {
+		if wasSigned {
+			c.t.Signed = true
+		}
 		return a.refuse(s, 27212, "队伍里没有这个玩家")
 	}
 	a.remove(c, c.t, rid)
@@ -1490,7 +1501,7 @@ func (a *atSvc) sign(s *gateway.Session, _ proto.Message) error {
 		return err
 	}
 	a.notifyTeam(c.t, 2, c.role.RID)
-	return s.Send(27240, proto.Message{"code": 1, "msg": "报名成功"})
+	return s.Send(27240, proto.Message{"code": 1, "msg": "报名成功，等待正式开赛"})
 }
 
 func (a *atSvc) unsign(s *gateway.Session, _ proto.Message) error {

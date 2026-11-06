@@ -101,3 +101,48 @@
 {"t": "2026-11-06T04:48:49.779282Z", "emu": "B", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
 {"t": "2026-11-06T04:48:49.779282Z", "emu": "B", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
 {"t": "2026-11-06T04:48:49.89747Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"add_time": 0, "award_list": [], "count": 3, "do_count": 0, "end_time": 40269, "is_sign": 0, "rank": 0, "score": 1000, "srv_id": "symlf_93", "state": 1, "team_members": [{"avatar_bid": 1000, "ext": [{"extra_key": 5, "extra_val": 0}, {"extra_key": 1, "extra_val": 1}, {"extra_key": 2, "extra_val": 1793937997}, {"extra_key": 6, "extra_val": 1}], "face_file": "", "face_id": 10401, "face_update_time": 0, "lev": 148, "pos": 2, "rid": 23, "sid": "symlf_93"}], "team_name": "TeamB2", "team_power": 1644, "tid": 1}}
+{"t": "2026-11-06T05:16:06.592057Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:06.737382Z", "emu": "A", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:10.259461Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:10.259461Z", "emu": "A", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "王者之单身加入队伍", "role_list": [], "tick": 1793942170}}
+{"t": "2026-11-06T05:16:10.286952Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:10.363736Z", "emu": "A", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:10.363736Z", "emu": "A", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:28.099316Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:28.268224Z", "emu": "A", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 1, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:55.278197Z", "emu": "A", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:55.304249Z", "emu": "A", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:16:55.304249Z", "emu": "A", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "王者之单身退出队伍", "role_list": [], "tick": 1793942215}}
+{"t": "2026-11-06T05:16:55.372751Z", "emu": "A", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:10.229379Z", "emu": "B", "dir": "c2s", "cmd": 27204, "msg": {"rid": 22, "srv_id": "symlf_93", "type": 1}}
+{"t": "2026-11-06T05:16:55.248796Z", "emu": "B", "dir": "c2s", "cmd": 27212, "msg": {"rid": 22, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:15:44.585931Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:06.592024Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:06.736858Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:07.21537Z", "emu": "B", "dir": "s2c", "cmd": 27203, "msg": {"rids": [22]}}
+{"t": "2026-11-06T05:16:10.255355Z", "emu": "B", "dir": "s2c", "cmd": 27204, "msg": {"code": 1, "msg": "", "rid": 22, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:16:10.280526Z", "emu": "B", "dir": "s2c", "cmd": 27204, "msg": {"code": 1, "msg": "", "rid": 22, "srv_id": "symlf_93"}}
+{"t": "2026-11-06T05:16:10.280526Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:10.280526Z", "emu": "B", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:16:10.280526Z", "emu": "B", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "王者之单身加入队伍", "role_list": [], "tick": 1793942170}}
+{"t": "2026-11-06T05:16:10.280526Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:10.358438Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:10.427668Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:28.099267Z", "emu": "B", "dir": "s2c", "cmd": 27240, "msg": {"code": 1, "msg": "报名成功，等待正式开赛"}}
+{"t": "2026-11-06T05:16:28.099267Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:28.274822Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 1, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:55.278373Z", "emu": "B", "dir": "s2c", "cmd": 27212, "msg": {"code": 1, "msg": "已踢出该玩家"}}
+{"t": "2026-11-06T05:16:55.278373Z", "emu": "B", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:55.278373Z", "emu": "B", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:16:55.278373Z", "emu": "B", "dir": "s2c", "cmd": 27215, "msg": {"point": [{"state": 0, "type": 2}]}}
+{"t": "2026-11-06T05:16:55.278373Z", "emu": "B", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "王者之单身退出队伍", "role_list": [], "tick": 1793942215}}
+{"t": "2026-11-06T05:16:55.376245Z", "emu": "B", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:10.259223Z", "emu": "C", "dir": "s2c", "cmd": 27222, "msg": {"type": 1}}
+{"t": "2026-11-06T05:16:10.259223Z", "emu": "C", "dir": "s2c", "cmd": 12761, "msg": {"channel": 512, "len": 0, "msg": "王者之单身加入队伍", "role_list": [], "tick": 1793942170}}
+{"t": "2026-11-06T05:16:10.285601Z", "emu": "C", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:10.344141Z", "emu": "C", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:10.450305Z", "emu": "C", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:28.099299Z", "emu": "C", "dir": "s2c", "cmd": 27222, "msg": {"type": 2}}
+{"t": "2026-11-06T05:16:28.189057Z", "emu": "C", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 1, "count": 3, "state": 1, "team_name": "TeamB2", "tid": 1}}
+{"t": "2026-11-06T05:16:55.275596Z", "emu": "C", "dir": "s2c", "cmd": 27222, "msg": {"type": 5}}
+{"t": "2026-11-06T05:16:55.369713Z", "emu": "C", "dir": "s2c", "cmd": 27220, "msg": {"is_sign": 0, "count": 0, "state": 1, "team_name": "", "tid": 0}}

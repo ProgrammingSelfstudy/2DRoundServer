@@ -352,6 +352,32 @@ func TestArenateamMembers(t *testing.T) {
 	}
 }
 
+func TestArenateamKickOfSignedTeamCancelsTheSignUp(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	e.setNow(atFriday)
+	c, _ := e.atRole("队长")
+	atTeamOfRobots(t, c, "踢人队")
+	c.send(27220, proto.Message{})
+	r := c.waitFor(27220)
+	var robot int64
+	for _, m := range r.Arr("team_members") {
+		if m.Int("rid") != 0 && m.Int("pos") != 1 {
+			robot = m.Int("rid")
+		}
+	}
+	if r.Int("is_sign") != 1 || robot == 0 {
+		t.Fatalf("signed team: %v", r)
+	}
+	c.send(27212, proto.Message{"rid": robot, "srv_id": "symlf_1"})
+	if r := c.waitFor(27212); r.Int("code") != 1 {
+		t.Fatalf("kick of a signed team (the original allows it): %v", r)
+	}
+	c.send(27220, proto.Message{})
+	if r := c.waitFor(27220); r.Int("is_sign") != 0 {
+		t.Fatalf("the sign-up is gone with the member: %v", r)
+	}
+}
+
 func TestArenateamLocksAfterSignAndSettles(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
 	e.setNow(atFriday)

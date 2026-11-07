@@ -1075,7 +1075,7 @@ func (c *caSvc) challenge(s *gateway.Session, cx *caCtx, req proto.Message) erro
 		}
 	}
 	if countTeams(mine) < 2 {
-		return refuse("至少需2个队伍有英雄上阵")
+		return refuse("请布阵两个队伍以上")
 	}
 	theirs, err := c.oppTeams(cx.b, *foe)
 	if err != nil {

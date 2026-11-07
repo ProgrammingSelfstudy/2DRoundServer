@@ -50,6 +50,10 @@ func TestChallengeAdvancesTheCampaign(t *testing.T) {
 	if res.Int("result") != 1 || res.Int("combat_type") != 3 || len(res.Arr("item_rewards")) != 4 {
 		t.Fatalf("13016: %v", res)
 	}
+	// the window's exp bar: the role's exp before and after the win (the level does not move, a role levels up in its own window)
+	if res.Int("lev") != int64(role.Lev) || res.Int("new_lev") != int64(role.Lev) || res.Int("exp") != 0 || res.Int("new_exp") != 10*clearRewardMin {
+		t.Fatalf("13016 level and exp: %v", res)
+	}
 	for _, it := range res.Arr("item_rewards") { // every reward of both captures is bound
 		if it.Int("is_bind") != 1 {
 			t.Fatalf("item_rewards is_bind: %v", it)

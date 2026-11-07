@@ -187,7 +187,15 @@ func settleDrama(s *gateway.Session, st *store.Store) error {
 	}
 	assets, items := map[int64]int64{}, map[int64]int64{}
 	splitGains(reward, 1, assets, items)
+	before, err := st.RoleAssets(role.RID)
+	if err != nil {
+		return err
+	}
 	if err := st.ClearDungeon(next, assets, items); err != nil {
+		return err
+	}
+	after, err := st.RoleAssets(role.RID)
+	if err != nil {
 		return err
 	}
 	if rec, ok := fightServiceOf(st).takePass(role.RID); ok {
@@ -203,11 +211,12 @@ func settleDrama(s *gateway.Session, st *store.Store) error {
 	if err != nil {
 		return err
 	}
-	// The result window shows the MVP hero and its share of the team's damage
+	// The result window draws the exp bar from the role's exp before and after; a role levels up in its own window (not on exp), so the level
+	// does not change here. The window shows the MVP hero and its share of the team's damage
 	// (partner_bid / partner_hurt / partner_total_hurt in the capture); all zero
 	// gives "0(nan%)". The numbers are our power, not real damage.
 	if err := s.Send(13016, proto.Message{"result": 1, "item_rewards": rewards, "combat_type": fightTypeDrama,
-		"partner_bid": mvpBID, "partner_hurt": mvpHurt, "partner_total_hurt": totalHurt, "lev": 0, "exp": 0, "new_lev": 0, "new_exp": 0, "auto_num": 0,
+		"partner_bid": mvpBID, "partner_hurt": mvpHurt, "partner_total_hurt": totalHurt, "lev": role.Lev, "exp": before[5], "new_lev": role.Lev, "new_exp": after[5], "auto_num": 0,
 		"target_role_name": "", "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "use_skin": 0}); err != nil {
 		return err
 	}

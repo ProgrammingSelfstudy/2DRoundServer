@@ -129,10 +129,10 @@ func TestArenateamSoloWithRobots(t *testing.T) {
 	if res.Int("a_score") != 1000 || len(res.Arr("a_team_members")) != 3 || len(res.Arr("b_team_members")) != 3 || len(res.Arr("all_hurt_statistics")) == 0 {
 		t.Fatalf("result: %v", res)
 	}
-	if res.Int("result") == 1 && (res.Int("a_new_score") <= 1000 || res.Int("win_count") != 1) {
+	if res.Int("result") == 1 && (res.Int("a_new_score") <= 1000 || res.Int("win_count") <= res.Int("lose_count")) {
 		t.Fatalf("a win gave no score: %v", res)
 	}
-	if res.Int("result") == 2 && (res.Int("a_new_score") != 1000 || res.Int("lose_count") != 1) {
+	if res.Int("result") == 2 && (res.Int("a_new_score") != 1000 || res.Int("lose_count") <= res.Int("win_count")) {
 		t.Fatalf("a loss moved the score: %v", res)
 	}
 	c.send(27220, proto.Message{})

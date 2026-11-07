@@ -2071,7 +2071,7 @@ func (a *atSvc) settle(s *gateway.Session, tid int64, foe *atTeam, robot bool, p
 			}
 		}
 	}
-	return s.Send(27253, proto.Message{"result": result, "win_count": t.Wins, "lose_count": t.Loses, "a_score": oldScore, "a_new_score": t.Score,
+	return s.Send(27253, proto.Message{"result": result, "win_count": plan.wins, "lose_count": plan.loses, "a_score": oldScore, "a_new_score": t.Score,
 		"a_rank": oldRank, "a_new_rank": newRank, "a_team_name": t.Name, "a_team_members": mineSnap.members(a), "b_score": foeScore, "b_new_score": foeScore,
 		"b_rank": foeRank, "b_new_rank": foeRank, "b_team_name": foe.Name, "b_team_members": foeSnap.members(a), "all_hurt_statistics": plan.hurts})
 }

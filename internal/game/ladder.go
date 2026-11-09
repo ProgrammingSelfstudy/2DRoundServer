@@ -333,7 +333,7 @@ func (l *ladderSvc) view(s *gateway.Session) (*ladderView, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, err := l.st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+	if _, err := starterGrant(l.st, role); err != nil {
 		return nil, err
 	}
 	_, open := ladderWeek(now)

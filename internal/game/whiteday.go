@@ -194,7 +194,7 @@ func RegisterWhiteDay(r *gateway.Router, st *store.Store) {
 			return refuse("挑战次数不足")
 		}
 		def := wdCfg.Camps[strconv.FormatInt(c.camp, 10)]
-		if _, err := st.GrantStarterPartners(c.role.RID, starterSeeds(c.role.Sex)); err != nil {
+		if _, err := starterGrant(st, c.role); err != nil {
 			return err
 		}
 		formType := req.Int("formation_type")

@@ -750,7 +750,7 @@ func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRo
 func (f *FightService) teamSide(role *store.Role) ([]fightUnit, []proto.Message, store.Formation, error) {
 	// the starter hero is normally granted when the hero list is first opened; a
 	// role that fights before that gets it now (granted once, never twice)
-	if _, err := f.Store.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+	if _, err := starterGrant(f.Store, role); err != nil {
 		return nil, nil, store.Formation{}, err
 	}
 	form, err := formationOf(f.Store, role.RID, formDrama)

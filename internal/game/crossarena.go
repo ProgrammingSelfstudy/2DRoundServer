@@ -215,7 +215,7 @@ func (c *caSvc) wrap(cmd uint16, fn func(*gateway.Session, *caCtx, proto.Message
 			cx := &caCtx{role: role, now: now, b: b, me: &caRole{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Score: caInitScore}, low: true}
 			return fn(s, cx, req)
 		}
-		if _, err := c.st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+		if _, err := starterGrant(c.st, role); err != nil {
 			return err
 		}
 		cx := &caCtx{role: role, now: now, b: b, me: b.touch(role, now)}

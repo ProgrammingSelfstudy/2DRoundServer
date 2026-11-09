@@ -70,6 +70,11 @@ func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
 // GrantStarterPartners gives the role the seeds once: it does nothing when the
 // role already got them (roles.partners_init). It reports whether it granted.
 func (s *Store) GrantStarterPartners(rid int64, seeds []PartnerSeed) (bool, error) {
+	return s.GrantStarterPartnersBy(rid, func(string) []PartnerSeed { return seeds })
+}
+
+// GrantStarterPartnersBy is GrantStarterPartners with the seeds chosen by the platform of the role's account; pick runs only when it grants.
+func (s *Store) GrantStarterPartnersBy(rid int64, pick func(platform string) []PartnerSeed) (bool, error) {
 	tx, err := s.db.Begin()
 	if err != nil {
 		return false, err
@@ -82,7 +87,11 @@ func (s *Store) GrantStarterPartners(rid int64, seeds []PartnerSeed) (bool, erro
 	if n, _ := res.RowsAffected(); n == 0 {
 		return false, nil
 	}
-	for _, sd := range seeds {
+	var platform string
+	if err := tx.QueryRow(`SELECT a.platform FROM roles r JOIN accounts a ON a.id=r.account_id WHERE r.rid=?`, rid).Scan(&platform); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return false, err
+	}
+	for _, sd := range pick(platform) {
 		if _, err := tx.Exec(`INSERT INTO partners(rid,bid,lev,star,created_at) VALUES(?,?,1,?,?)`, rid, sd.BID, sd.Star, s.unix()); err != nil {
 			return false, err
 		}

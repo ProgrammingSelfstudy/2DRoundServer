@@ -267,7 +267,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if len(slots) > 0 && !force {
 			return slots, nil
 		}
-		if _, err := st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+		if _, err := starterGrant(st, role); err != nil {
 			return nil, err
 		}
 		opps, err := newOpponents(st, role, a.Score, rngOf())

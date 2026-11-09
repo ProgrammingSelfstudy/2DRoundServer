@@ -57,10 +57,24 @@ var partnerTable = func() map[int64]partnerInfo {
 const (
 	starterMale   = 10401
 	starterFemale = 20402
+	starterH5     = 70501 // 索隆(和之国), a 5-star hero: what every new H5 account starts with, whatever its sex
 )
 
-// starterSeeds is the hero list a new role starts with. Which sex value is the
-// female one is read from the client's creation window: 2.
+// starterSeedsFor is the hero list a new role starts with. An H5 account (store.PlatformH5) starts with starterH5 whatever the sex; the original
+// client's accounts keep the starterSeeds below.
+func starterSeedsFor(platform string, sex int) []store.PartnerSeed {
+	if platform == store.PlatformH5 {
+		return []store.PartnerSeed{{BID: starterH5, Star: partnerTable[starterH5].InitStar}}
+	}
+	return starterSeeds(sex)
+}
+
+// starterGrant gives the role its starter hero once, chosen by the platform of its account.
+func starterGrant(st *store.Store, role *store.Role) (bool, error) {
+	return st.GrantStarterPartnersBy(role.RID, func(platform string) []store.PartnerSeed { return starterSeedsFor(platform, role.Sex) })
+}
+
+// starterSeeds is the original client's starter list: by sex. Which sex value is the female one is read from the client's creation window: 2.
 func starterSeeds(sex int) []store.PartnerSeed {
 	bid := int64(starterMale)
 	if sex == 2 {
@@ -173,7 +187,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 			if role == nil {
 				return nil
 			}
-			if _, err := st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+			if _, err := starterGrant(st, role); err != nil {
 				return err
 			}
 			if err := expireEmpowered(st, role.RID, s.Now()); err != nil { // an empowered hero whose day is over is gone

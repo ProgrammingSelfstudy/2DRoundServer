@@ -395,7 +395,7 @@ func (e *eliteSvc) match(s *gateway.Session, req proto.Message) error {
 		return s.Send(24901, e.pendingMessage(er, now))
 	}
 	if er.Pending == nil {
-		if _, err := e.st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+		if _, err := starterGrant(e.st, role); err != nil {
 			return err
 		}
 		opps, err := newOpponents(e.st, role, 0, e.rng())

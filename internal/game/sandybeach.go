@@ -364,7 +364,7 @@ func RegisterSandybeach(r *gateway.Router, st *store.Store) {
 			if !ok {
 				return refuse("关卡数据缺失")
 			}
-			if _, err := st.GrantStarterPartners(c.role.RID, starterSeeds(c.role.Sex)); err != nil {
+			if _, err := starterGrant(st, c.role); err != nil {
 				return false, err
 			}
 			form, err := formationOf(st, c.role.RID, sbForm)

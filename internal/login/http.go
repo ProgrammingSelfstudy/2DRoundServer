@@ -28,6 +28,15 @@ type Server struct {
 
 const platform = "symlf" // PLATFORM_NAME in the client's config.lua
 
+// platformOf is the platform an account endpoint works on: the H5 client adds client=h5 to its login, register and token calls and gets its
+// own accounts (store.PlatformH5); every other client keeps "symlf".
+func platformOf(r *http.Request) string {
+	if r.URL.Query().Get("client") == "h5" {
+		return store.PlatformH5
+	}
+	return platform
+}
+
 func (s *Server) Handler() http.Handler {
 	// A plain HandlerFunc (not ServeMux) so odd client paths are not redirected.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +160,7 @@ func (s *Server) makeToken(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `{code=0, msg="missing username"}`)
 		return
 	}
-	acc, err := s.Store.FindOrCreateAccount(platform, user)
+	acc, err := s.Store.FindOrCreateAccount(platformOf(r), user)
 	if err != nil || acc.Status != 1 {
 		fmt.Fprint(w, `{code=0, msg="account unavailable"}`)
 		return
@@ -173,7 +182,7 @@ func (s *Server) makeToken(w http.ResponseWriter, r *http.Request) {
 func (s *Server) userLogin(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	user, pass := q.Get("username"), q.Get("password")
-	acc, err := s.Store.AccountByName(platform, user)
+	acc, err := s.Store.AccountByName(platformOf(r), user)
 	switch {
 	case errors.Is(err, store.ErrNotFound):
 		if !s.Cfg.LoginHTTP.AutoRegister || user == "" {
@@ -181,7 +190,7 @@ func (s *Server) userLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-		if acc, err = s.Store.CreateAccount(platform, user, string(h), ""); err != nil {
+		if acc, err = s.Store.CreateAccount(platformOf(r), user, string(h), ""); err != nil {
 			http.Error(w, "create", http.StatusInternalServerError)
 			return
 		}
@@ -226,7 +235,7 @@ func (s *Server) userReg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-	if _, err := s.Store.CreateAccount(platform, user, string(h), ""); errors.Is(err, store.ErrConflict) {
+	if _, err := s.Store.CreateAccount(platformOf(r), user, string(h), ""); errors.Is(err, store.ErrConflict) {
 		fmt.Fprint(w, `{msg="200"}`)
 		return
 	} else if err != nil {

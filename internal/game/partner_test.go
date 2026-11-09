@@ -527,3 +527,47 @@ func TestHeroStarUpWithSouls(t *testing.T) {
 		t.Fatalf("heroes after: %v", left)
 	}
 }
+
+// An H5 account (the login service puts the H5 client's accounts on store.PlatformH5) starts with the 5-star 索隆(和之国) whatever its sex;
+// the original client's accounts keep the hero by sex, and the grant still happens once.
+func TestStarterHeroOfAnH5AccountIsLegendaryZoro(t *testing.T) {
+	st, err := store.Open(":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { st.Close() }) // the in-memory database is shared by the process: left open it would hand its accounts to the next test
+	if err := st.EnsureServer(store.Server{SrvID: "symlf_1", Name: "s1", Platform: "symlf", ZoneID: 1, Host: "127.0.0.1", Port: 8800, Status: 1, GroupID: 1}); err != nil {
+		t.Fatal(err)
+	}
+	info := partnerTable[starterH5]
+	if info.InitStar != 5 || len(info.Stars[itoa(int64(info.InitStar))].Skills) == 0 {
+		t.Fatalf("starterH5 %d: init star %d, skills %v", starterH5, info.InitStar, info.Stars[itoa(int64(info.InitStar))].Skills)
+	}
+	for _, c := range []struct {
+		platform string
+		sex      int
+		want     int64
+	}{
+		{store.PlatformH5, 1, starterH5}, {store.PlatformH5, 2, starterH5}, {store.PlatformH5, 0, starterH5},
+		{"symlf", 1, starterMale}, {"symlf", 2, starterFemale},
+	} {
+		acc, err := st.CreateAccount(c.platform, "acc"+c.platform+itoa(int64(c.sex)), "", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		role, err := st.CreateRoleAutoName(acc.ID, "symlf_1", "玩家", c.sex, 1, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if granted, err := starterGrant(st, role); err != nil || !granted {
+			t.Fatalf("%s sex %d: granted %v, %v", c.platform, c.sex, granted, err)
+		}
+		if granted, _ := starterGrant(st, role); granted {
+			t.Fatalf("%s sex %d: granted twice", c.platform, c.sex)
+		}
+		ps, err := st.PartnersOf(role.RID)
+		if err != nil || len(ps) != 1 || ps[0].BID != c.want || ps[0].Star != partnerTable[c.want].InitStar {
+			t.Fatalf("%s sex %d: %+v, %v (want %d)", c.platform, c.sex, ps, err, c.want)
+		}
+	}
+}

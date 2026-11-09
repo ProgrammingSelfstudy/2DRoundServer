@@ -195,7 +195,7 @@ func (a *amSvc) wrap(cmd uint16, refuse bool, fn func(s *gateway.Session, c *amC
 			}
 			return nil
 		}
-		if _, err := a.st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+		if _, err := starterGrant(a.st, role); err != nil {
 			return err
 		}
 		c.me = b.touch(role, now)

@@ -264,7 +264,7 @@ func (l *Login) rename(s *gateway.Session, req proto.Message) error {
 // the original follows the rename reply with 11099, which is answered on request here.
 // A role that already has heroes is left alone (GrantStarterPartners grants once).
 func (l *Login) giveStarter(s *gateway.Session, role *store.Role) error {
-	granted, err := l.Store.GrantStarterPartners(role.RID, starterSeeds(role.Sex))
+	granted, err := starterGrant(l.Store, role)
 	if err != nil || !granted {
 		return err
 	}

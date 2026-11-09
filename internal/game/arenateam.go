@@ -627,7 +627,7 @@ func (a *atSvc) begin(s *gateway.Session) (*atCtx, string, error) {
 	if err != nil {
 		return nil, "", err
 	}
-	if _, err := a.st.GrantStarterPartners(role.RID, starterSeeds(role.Sex)); err != nil {
+	if _, err := starterGrant(a.st, role); err != nil {
 		return nil, "", err
 	}
 	c := &atCtx{role: role, now: now, b: b, t: b.teamOf(role.RID)}
@@ -1954,7 +1954,7 @@ func (a *atSvc) challenge(s *gateway.Session, req proto.Message) error {
 	if foe == nil || (!rival.Robot && !foe.Signed) {
 		return refuse("该队伍已不能挑战")
 	}
-	if _, err := a.st.GrantStarterPartners(c.role.RID, starterSeeds(c.role.Sex)); err != nil {
+	if _, err := starterGrant(a.st, c.role); err != nil {
 		a.mu.Unlock()
 		return err
 	}

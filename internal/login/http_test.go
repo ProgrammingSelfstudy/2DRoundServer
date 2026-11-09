@@ -1,6 +1,7 @@
 package login
 
 import (
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -106,6 +107,45 @@ func TestPlatformLoginAndRegister(t *testing.T) {
 	}
 	if b := reg("player01", "123456"); b != `{msg="200"}` {
 		t.Fatal(b)
+	}
+}
+
+// The H5 client adds client=h5 to its account calls and gets accounts of its own (store.PlatformH5); the same name under the original
+// client's platform is another account, and a call without client=h5 never sees the H5 ones.
+func TestH5AccountsLiveOnTheirOwnPlatform(t *testing.T) {
+	s, ts := newTestServer(t)
+	post := func(path, q string) string {
+		_, b := get(t, "POST", ts.URL+path+"?&&&"+q)
+		return b
+	}
+	if b := post("/index.php/userlogin/userRegs", "username=h5player&password=123456&client=h5"); b != `{msg="205"}` {
+		t.Fatal(b)
+	}
+	if a, err := s.Store.AccountByName(store.PlatformH5, "h5player"); err != nil || a.Platform != store.PlatformH5 {
+		t.Fatalf("not registered on the H5 platform: %v %v", a, err)
+	}
+	if _, err := s.Store.AccountByName("symlf", "h5player"); !errors.Is(err, store.ErrNotFound) {
+		t.Fatalf("the H5 account leaked onto the original platform: %v", err)
+	}
+	// the same name is free on the original platform, and the H5 one is still taken
+	if b := post("/index.php/userlogin/userRegs", "username=h5player&password=123456"); b != `{msg="205"}` {
+		t.Fatal(b)
+	}
+	if b := post("/index.php/userlogin/userRegs", "username=h5player&password=123456&client=h5"); b != `{msg="200"}` {
+		t.Fatal(b)
+	}
+	// a login with client=h5 reaches the H5 account (and its password), an auto-registered unknown name lands on the H5 platform too
+	if b := post("/index.php/userlogin/userLogins2", "username=h5player&password=wrongpw&client=h5"); b != `{msg="207"}` {
+		t.Fatal(b)
+	}
+	if b := post("/index.php/userlogin/userLogins2", "username=newbie01&password=123456&client=h5"); !strings.HasPrefix(b, "{code=1, msg=") {
+		t.Fatal(b)
+	}
+	if a, err := s.Store.AccountByName(store.PlatformH5, "newbie01"); err != nil || a.Platform != store.PlatformH5 {
+		t.Fatalf("auto-registered on the wrong platform: %v %v", a, err)
+	}
+	if _, err := s.Store.AccountByName("symlf", "newbie01"); !errors.Is(err, store.ErrNotFound) {
+		t.Fatalf("auto-registered H5 account on the original platform: %v", err)
 	}
 }
 

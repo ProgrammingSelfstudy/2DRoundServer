@@ -20,6 +20,10 @@ type Account struct {
 	LastLoginAt  int64  `json:"last_login_at"`
 }
 
+// PlatformH5 is the platform of the accounts the H5 client registers (it sends client=h5 to the login service). They live apart from the
+// original client's accounts (platform "symlf"), so a rule meant for H5 players only can tell them by it.
+const PlatformH5 = "symlf_h5"
+
 const accountCols = `id,platform,account,password_hash,open_id,union_id,status,ban_reason,created_at,last_login_at`
 
 func scanAccount(sc interface{ Scan(...any) error }) (*Account, error) {

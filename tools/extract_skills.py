@@ -109,6 +109,28 @@ for f in sorted(glob.glob(lua_dir + "/skill_data[0-9].lua")):
             rows[bid] = lua_row(m.group(2).replace('\\"', '"').replace("\\\\", "\\"))
 
 
+def damage_pct(des):
+    """The damage percent of an attack skill from its description. "造成77%魔法伤害" first; the other ways the text says it, when that finds none:
+    "造成189%的物理伤害", "造成伤害340%的物理伤害", "造成自身攻击力100%的真实伤害", "造成目标生命上限13%+自身攻击力250%的魔法伤害" (the percent of the
+    attack), "两段共计(388%+...)" (the first percent)."""
+    m = re.search(r"造成(\d+)%(?:物理|魔法)?(?:伤害|物害|真实伤害)", des)
+    if m:
+        return int(m.group(1))
+    m = re.search(r"造成([^，。；]*?\d+%[^，。；]*?)(?:物理|魔法|法术|真实)?(?:伤害|物害)", des)
+    if not m:
+        return 0
+    seg = m.group(1)
+    if "生命" in seg and "攻击" not in seg:
+        return 0  # a share of the max hit points (武赖贯): the script has no such damage, the skill stays as it is
+    both = re.search(r"(\d+)%(?:加|附加|\+)自身攻击(?:力)?(\d+)%", seg)  # "148%加自身攻击力20%": the two add up
+    if both:
+        return int(both.group(1)) + int(both.group(2))
+    atk = re.search(r"攻击(?:力)?(\d+)%", seg)
+    if atk:
+        return int(atk.group(1))
+    return int(re.search(r"(\d+)%", seg).group(1))
+
+
 def pct(rx, text):
     m = re.search(rx, text)
     return int(m.group(1)) if m else 0
@@ -117,7 +139,7 @@ def pct(rx, text):
 out, kinds = {}, {}
 for bid, r in sorted(rows.items()):
     name, is_normal, cd, typ, best, side, des, fire_cd = r[1], r[6], r[7], r[8], r[10], r[11], r[16], r[26]
-    dmg = pct(r"造成(\d+)%(?:物理|魔法)?(?:伤害|物害|真实伤害)", des)
+    dmg = damage_pct(des)
     heal = 0
     if side == 2:  # an ally skill that heals: "回复等同自身攻击117%的生命值", "回复其等同自身攻击力60%的生命"
         heal = pct(r"(?:回复|恢复)[^，。；]*?(?:等同)?自身攻击(?:力)?(\d+)%", des)

@@ -709,3 +709,25 @@ func TestSkipFight(t *testing.T) {
 		t.Fatalf("stored: %+v", d)
 	}
 }
+
+// A skill whose text says "造成自身攻击力100%的真实伤害" (索隆(和之国)'s 阿修罗·炼狱鬼斩) has its percent read from the text, so the fight picks it
+// first: round 1 casts it, rounds 2 and 3 are inside its cooldown of 2 and use the normal attack, round 4 casts it again.
+func TestAsuraSkillFiresFirstAndEveryThirdRound(t *testing.T) {
+	r, ok := skillTable[541101]
+	if !ok || r.Dmg != 100 || r.How != "all" {
+		t.Fatalf("541101 = %+v, want 100%% damage to all", r)
+	}
+	u := fightUnit{pos: 9, atk: 100, skills: []int64{541001, 541101}, ours: true, lastCast: map[int64]int{}}
+	var got []int64
+	for round := 1; round <= 4; round++ {
+		sid := u.pickSkill(round, false)
+		u.lastCast[sid] = round
+		got = append(got, sid)
+	}
+	want := []int64{541101, 541001, 541001, 541101}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Fatalf("rounds 1..4 cast %v, want %v", got, want)
+		}
+	}
+}

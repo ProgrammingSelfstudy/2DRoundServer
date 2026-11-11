@@ -1,11 +1,77 @@
 package game
 
 import (
+	"strings"
 	"testing"
 	"time"
 
 	"2droundserver/internal/proto"
 )
+
+func TestTicketOperationLog(t *testing.T) {
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("ops", "甲")
+	file := func(phoneInfo string) proto.Message {
+		c.send(10810, proto.Message{"issue_type": 1, "title": "操作反馈", "content": "进入战斗后卡住", "phone_info": phoneInfo})
+		return c.waitFor(10810)
+	}
+
+	attachment := "2dround-h5-ops/v1\n打开英雄\n"
+	attachment += strings.Repeat("x", 4096-len(attachment))
+	for _, input := range []string{attachment + "x", "2dround-h5-ops/v1\n\xff"} {
+		if r := file(input); r.Int("code") != 0 || r.Int("id") != 0 {
+			t.Fatalf("accepted invalid attachment: %v", r)
+		}
+	}
+	// the original client's device info has no tag but the same size limit, and invalid text is refused too
+	legacyInfo := "原版机型\n"
+	legacyInfo += strings.Repeat("x", 4096-len(legacyInfo))
+	for _, input := range []string{legacyInfo + "x", "原版机型\xff"} {
+		if r := file(input); r.Int("code") != 0 || r.Int("id") != 0 {
+			t.Fatalf("accepted invalid device info: %v", r)
+		}
+	}
+	var filed int64
+	for _, input := range []string{attachment, legacyInfo} {
+		r := file(input)
+		if r.Int("code") != 1 || r.Int("id") == 0 {
+			t.Fatalf("file: %v", r)
+		}
+		filed = r.Int("id")
+		ticket, err := e.st.TicketByID(filed)
+		if err != nil || ticket.PhoneInfo != input {
+			t.Fatalf("phone_info did not round-trip: %v", err)
+		}
+	}
+
+	// phone and email are bounded as well
+	for _, extra := range []proto.Message{{"phone": strings.Repeat("1", 65)}, {"email": strings.Repeat("a", 255)}} {
+		extra["issue_type"], extra["title"], extra["content"] = 1, "联系方式", "x"
+		c.send(10810, extra)
+		if r := c.waitFor(10810); r.Int("code") != 0 || r.Int("id") != 0 {
+			t.Fatalf("accepted a long contact: %v", r)
+		}
+	}
+
+	// a follow-up keeps the device info as filed: a too long or broken log there neither blocks
+	// the question nor replaces what was stored
+	for _, input := range []string{attachment + "x", "2dround-h5-ops/v1\n\xff", "new log"} {
+		c.send(10810, proto.Message{"id": filed, "content": "还是不行", "phone_info": input})
+		if r := c.waitFor(10810); r.Int("code") != 1 || r.Int("id") != filed {
+			t.Fatalf("follow-up with %.20q: %v", input, r)
+		}
+	}
+	if ticket, err := e.st.TicketByID(filed); err != nil || ticket.PhoneInfo != legacyInfo {
+		t.Fatalf("follow-up changed phone_info: %v", err)
+	}
+	if msgs, err := e.st.TicketMsgs(filed); err != nil || len(msgs) != 4 {
+		t.Fatalf("expected the question and three follow-ups, got %d: %v", len(msgs), err)
+	}
+
+	if tickets, err := e.st.TicketsOf(role.RID); err != nil || len(tickets) != 2 {
+		t.Fatalf("expected only two valid tickets, got %d: %v", len(tickets), err)
+	}
+}
 
 func TestTickets(t *testing.T) {
 	e := newEnv(t, time.Minute)

@@ -11,10 +11,35 @@ import (
 )
 
 const (
-	ticketTitleRunes   = 50
-	ticketContentRunes = 500
-	ticketMaxOpen      = 5 // tickets not yet answered at one time
+	ticketTitleRunes        = 50
+	ticketContentRunes      = 500
+	ticketMaxOpen           = 5 // tickets not yet answered at one time
+	ticketOperationLogTag   = "2dround-h5-ops/v1\n"
+	ticketOperationLogBytes = 4096 // phone_info: the H5 operation log, or the original client's device info
+	ticketPhoneBytes        = 64
+	ticketEmailBytes        = 254
 )
+
+// ticketAttachmentError checks what a new ticket carries besides its text; "" when it is fine.
+// phone_info starting with ticketOperationLogTag is the H5 client's operation log.
+func ticketAttachmentError(phone, email, phoneInfo string) string {
+	logged := strings.HasPrefix(phoneInfo, ticketOperationLogTag)
+	switch {
+	case len(phoneInfo) > ticketOperationLogBytes && logged:
+		return "操作日志太长"
+	case len(phoneInfo) > ticketOperationLogBytes:
+		return "机型信息太长"
+	case len(phone) > ticketPhoneBytes:
+		return "手机号太长"
+	case len(email) > ticketEmailBytes:
+		return "邮箱太长"
+	case !utf8.ValidString(phoneInfo) && logged:
+		return "操作日志格式错误"
+	case !utf8.ValidString(phone) || !utf8.ValidString(email) || !utf8.ValidString(phoneInfo):
+		return "请输入内容"
+	}
+	return ""
+}
 
 func ticketLine(t store.Ticket) proto.Message {
 	return proto.Message{"id": t.ID, "state": t.State, "status2": b2i(t.Read), "end_msg_time": t.AnsweredAt,
@@ -44,7 +69,7 @@ func RegisterTicket(r *gateway.Router, st *store.Store) {
 			return reply(0, "请输入内容")
 		}
 		now := s.Now().Unix()
-		if id != 0 {
+		if id != 0 { // a follow-up stores only the question: the contact data and the device info stay as filed
 			err := st.AskTicket(role.RID, id, content, now)
 			if errors.Is(err, store.ErrNotFound) {
 				return reply(0, "工单不存在")
@@ -53,6 +78,10 @@ func RegisterTicket(r *gateway.Router, st *store.Store) {
 				return err
 			}
 			return reply(1, "提交成功")
+		}
+		phone, email, phoneInfo := req.Str("phone"), req.Str("email"), req.Str("phone_info")
+		if msg := ticketAttachmentError(phone, email, phoneInfo); msg != "" {
+			return reply(0, msg)
 		}
 		mine, err := st.TicketsOf(role.RID)
 		if err != nil {
@@ -68,7 +97,7 @@ func RegisterTicket(r *gateway.Router, st *store.Store) {
 			return reply(0, "还有未回复的问题，请稍后再提交")
 		}
 		id, err = st.FileTicket(store.Ticket{RID: role.RID, SrvID: role.SrvID, IssueType: int(req.Int("issue_type")), Title: title,
-			Phone: req.Str("phone"), Email: req.Str("email"), PhoneInfo: req.Str("phone_info")}, content, now)
+			Phone: phone, Email: email, PhoneInfo: phoneInfo}, content, now)
 		if err != nil {
 			return err
 		}

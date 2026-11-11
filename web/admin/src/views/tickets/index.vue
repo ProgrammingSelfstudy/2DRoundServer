@@ -25,8 +25,8 @@
       :show-close="!busy"
       ><template v-if="selected"
         ><p>
-          角色 {{ selected.rid }}（{{ selected.srv_id }}） · 手机 {{ selected.phone || "—" }} · 邮箱 {{ selected.email || "—" }} ·
-          机型 {{ selected.phone_info || "—" }}
+          角色 {{ selected.rid }}（{{ selected.srv_id }}） · 手机 {{ selected.phone || "—" }} · 邮箱 {{ selected.email || "—" }}
+          <template v-if="operationLog === undefined"> · 机型 {{ selected.phone_info || "—" }}</template>
         </p>
         <p>状态 {{ ticketStates[selected.state] || "未知" }} · 评分 {{ selected.score || "—" }}</p>
         <div class="thread">
@@ -40,6 +40,10 @@
             <strong>客服：</strong>{{ answer }}
           </p>
         </div>
+        <section v-if="operationLog !== undefined" class="operation-log">
+          <h3>操作日志</h3>
+          <pre>{{ operationLog }}</pre>
+        </section>
         <el-form v-if="auth.hasPermission('write')" :disabled="busy || uncertain" @submit.prevent="send"
           ><el-form-item label="回复内容"
             ><el-input
@@ -79,6 +83,11 @@ const auth = useAuthStore(),
 const { rows, loading, error, load } = useCollection<Ticket>("/tickets", 100, false);
 const { busy, uncertain, error: commandError, execute, reviewed } = useCommand("write", true);
 const visibleRows = computed(() => (onlyOpen.value ? rows.value.filter(t => t.state === 1) : rows.value));
+const operationLogTag = "2dround-h5-ops/v1\n";
+const operationLog = computed(() => {
+  const info = selected.value?.phone_info;
+  return info?.startsWith(operationLogTag) ? info.slice(operationLogTag.length) : undefined;
+});
 const columns: Column[] = [
   { key: "id", label: "ID" },
   { key: "rid", label: "角色" },
@@ -126,5 +135,16 @@ onMounted(() => load());
   padding: 16px;
   background: var(--el-fill-color-light);
   margin: 16px 0;
+}
+.operation-log {
+  margin: 16px 0;
+}
+.operation-log pre {
+  max-height: 16rem;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  white-space: pre-wrap;
+  background: var(--el-fill-color-light);
 }
 </style>

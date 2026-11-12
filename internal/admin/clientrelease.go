@@ -13,7 +13,8 @@ import (
 var (
 	clientPlatforms = map[string]bool{"*": true, "wechat": true, "douyin": true, "h5": true, "android": true, "ios": true}
 	reVersion       = regexp.MustCompile(`^[0-9A-Za-z._-]{1,32}$`)
-	reCfgKey        = regexp.MustCompile(`^(cdn_base|notice|min_version|update_url|switch\.[a-z0-9_]{1,32})$`)
+	reCfgKey        = regexp.MustCompile(`^(cdn_base|ws_url|notice|min_version|update_url|switch\.[a-z0-9_]{1,32})$`)
+	reWSURL         = regexp.MustCompile(`^wss?://[^\s/]+(/\S*)?$`)
 )
 
 // clientSettings lists the settings of one platform ("*" when none is given) and its releases.
@@ -47,6 +48,10 @@ func (s *Server) setClientSetting(w http.ResponseWriter, r *http.Request, p *pri
 	}
 	if !clientPlatforms[q.Platform] || !reCfgKey.MatchString(q.Key) || len([]rune(q.Value)) > 500 {
 		fail(w, http.StatusUnprocessableEntity, "platform or key is not known, or the value is longer than 500 characters")
+		return
+	}
+	if q.Key == "ws_url" && q.Value != "" && !reWSURL.MatchString(q.Value) {
+		fail(w, http.StatusUnprocessableEntity, "ws_url must be a ws:// or wss:// address")
 		return
 	}
 	if err := s.Store.SetClientConfig(q.Platform, q.Key, q.Value); err != nil {

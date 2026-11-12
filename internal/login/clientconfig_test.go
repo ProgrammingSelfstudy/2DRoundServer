@@ -14,6 +14,7 @@ func TestClientConfigServesLiveRelease(t *testing.T) {
 	}
 	s.Store.SetClientConfig("*", "cdn_base", "https://cdn.example/res")
 	s.Store.SetClientConfig("wechat", "switch.pay", "off")
+	s.Store.SetClientConfig("h5", "ws_url", "wss://gw.example/ws")
 	s.Store.SetClientConfig("wechat", "min_version", "1.2.10")
 	rel, err := s.Store.CreateClientRelease(store.ClientRelease{Platform: "wechat", Version: "7", ManifestURL: "https://cdn.example/m7.json", Whitelist: "tester1"}, 100)
 	if err != nil {
@@ -35,6 +36,10 @@ func TestClientConfigServesLiveRelease(t *testing.T) {
 	}
 	if m["release"] != nil {
 		t.Fatalf("a whitelisted release must be hidden from others: %v", m["release"])
+	}
+	// the gateway address is a setting of its platform: H5 gets it, a platform without one gets "" and works it out itself
+	if h5 := read("platform=h5"); h5["ws_url"] != "wss://gw.example/ws" || m["ws_url"] != "" {
+		t.Fatalf("ws_url: h5 %v, wechat %v", h5["ws_url"], m["ws_url"])
 	}
 	m = read("platform=wechat&ver=1.2.10&account=tester1")
 	if m["force_update"] != false || m["release"].(map[string]any)["version"] != "7" {

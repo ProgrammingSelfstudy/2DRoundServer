@@ -1,0 +1,47 @@
+# A server on the internet reached by its IP address (no domain yet). Copy to configs/prod.yaml on the server and replace
+# YOUR-SERVER-IP and the jwt_secret. deploy/README.md has the steps.
+# Holds a private random jwt_secret: CHANGE-ME-random-at-least-32-characters
+db_path: data/2droundserver.db
+log_dir: data/logs
+log_max_mb: 20
+log_keep: 5
+
+login_http:
+  # loopback: players reach it through Caddy (http://YOUR-SERVER-IP:8767/loginapi/...)
+  addr: 127.0.0.1:8081
+  # true lets anyone who has the link create an account by logging in. Set false once your testers have their accounts.
+  auto_register: true
+  token_ttl_hours: 24
+  public_base: http://YOUR-SERVER-IP:8767/loginapi
+
+gateway:
+  # the original client's TCP port: not used by the H5 page, so it stays on loopback
+  tcp_addr: 127.0.0.1:8800
+  # the H5 page connects here itself (ws://YOUR-SERVER-IP:8802/ws): open this port in the firewall
+  ws_addr: 0.0.0.0:8802
+  # the page's address as the browser sends it in Origin (host:port of the Caddy entry)
+  ws_origins: ["YOUR-SERVER-IP:8767"]
+  srv_id: symlf_1
+  idle_seconds: 120
+  login_timeout_seconds: 20
+  max_conns_per_ip: 50
+  # the control endpoint has no authentication: it must stay on loopback
+  admin_addr: 127.0.0.1:8801
+  empty_replies: true
+  new_role_flow: false
+
+admin:
+  # loopback only: the connection is not encrypted without a domain, so the admin site is not opened to the internet.
+  # From your own machine:  ssh -L 8080:127.0.0.1:8080 root@YOUR-SERVER-IP   then open http://127.0.0.1:8080
+  addr: 127.0.0.1:8080
+  jwt_secret: CHANGE-ME-random-at-least-32-characters
+  ttl_hours: 12
+  backup_every_hours: 24
+  backup_keep: 14
+
+codec:
+  byte_order: big
+  str_len_bytes: 2
+  arr_len_bytes: 2
+  str_null_term: false
+  confirmed: true

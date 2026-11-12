@@ -1,0 +1,18 @@
+[Unit]
+Description=2DRound loginhttp
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=2dround
+WorkingDirectory=/opt/2dround
+ExecStart=/opt/2dround/bin/loginhttp -config configs/prod.yaml
+Restart=always
+RestartSec=2
+# the gateway finishes its sessions and writes its counters when it is asked to stop
+TimeoutStopSec=30
+NoNewPrivileges=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

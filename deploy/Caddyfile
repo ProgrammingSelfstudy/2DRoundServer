@@ -1,0 +1,33 @@
+# The player's entry on a server reached by its IP address (no domain yet): one plain-HTTP port for the H5 page, its resources and
+# the login service. It does what mini/serve.py does on the LAN. The game connection does not pass here: the page connects to the
+# gateway's WebSocket port (8802) itself.
+#
+# With a domain later: replace ":8767" by the domain name (Caddy then gets a certificate and serves https), add
+#     handle /ws { reverse_proxy 127.0.0.1:8802 }
+# set gateway.ws_addr back to 127.0.0.1:8802, and set the client setting ws_url to wss://<domain>/ws in the admin.
+:8767 {
+	encode gzip
+
+	# login service: /loginapi/x -> 127.0.0.1:8081/x
+	handle_path /loginapi/* {
+		reverse_proxy 127.0.0.1:8081
+	}
+
+	# resources of a release (2DRoundAssets/build/<version>): files named by content hash never change
+	handle_path /cdn/* {
+		root * /opt/2dround/cdn
+		header Access-Control-Allow-Origin *
+		@hashed path /f/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		@manifest not path /f/*
+		header @manifest Cache-Control "no-cache"
+		file_server
+	}
+
+	# the Creator build (mini/build/web-mobile): its file names do not change between builds, so the browser must ask every time
+	handle {
+		root * /opt/2dround/h5
+		header Cache-Control "no-cache"
+		file_server
+	}
+}

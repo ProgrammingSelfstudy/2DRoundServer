@@ -79,6 +79,7 @@ const platforms = [
 ];
 const fields = [
   { key: "cdn_base", label: "资源 CDN 地址", hint: "https://cdn.example.com/res" },
+  { key: "ws_url", label: "网关 WebSocket 地址", hint: "wss://gw.example.com/ws，留空则客户端连页面所在主机的 8802 端口" },
   { key: "update_url", label: "App 下载页地址", hint: "强制更新时跳转到这里" },
   { key: "min_version", label: "最低客户端版本", hint: "低于此版本会被要求更新，如 1.2.0" },
   { key: "notice", label: "启动公告", hint: "留空则不显示" }
@@ -92,7 +93,7 @@ const loading = ref(false);
 const error = ref("");
 const releases = ref<Release[]>([]);
 const saved = ref<Record<string, string>>({});
-const draft = reactive<Record<string, string>>({ cdn_base: "", update_url: "", min_version: "", notice: "" });
+const draft = reactive<Record<string, string>>({ cdn_base: "", ws_url: "", update_url: "", min_version: "", notice: "" });
 const switchText = ref("");
 const form = reactive({ version: "", manifest_url: "", manifest_hash: "", note: "" });
 const columns: Column[] = [

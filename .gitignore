@@ -26,3 +26,8 @@
 !/internal/admin/ui/assets/*.png
 /internal/admin/ui.staging/
 /bin/
+
+# server deployment: the real config holds a private jwt_secret; build output of deploy/build.sh
+/configs/prod.yaml
+/deploy/out/
+/deploy/*.tar.gz

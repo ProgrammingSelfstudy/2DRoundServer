@@ -32,6 +32,7 @@ func (s *Server) clientConfig(w http.ResponseWriter, r *http.Request) {
 	}
 	out := map[string]any{
 		"cdn_base":     cfg["cdn_base"],
+		"ws_url":       cfg["ws_url"], // the gateway's WebSocket address for a browser client; "" = the client works it out itself (LAN development)
 		"notice":       cfg["notice"],
 		"min_version":  cfg["min_version"],
 		"update_url":   cfg["update_url"],

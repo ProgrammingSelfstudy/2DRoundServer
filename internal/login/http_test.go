@@ -178,3 +178,49 @@ func TestServerListComesFromDatabase(t *testing.T) {
 		t.Fatalf("admin edit not visible: %s", body)
 	}
 }
+
+// The token call (yxmmdasba) creates the account on first use too: with client=h5 it is an H5 account
+// and the token belongs to it, without the parameter it is the original client's account of the same
+// name. Both hand out distinct tokens that resolve to their own account.
+func TestH5TokenBelongsToTheH5Account(t *testing.T) {
+	s, ts := newTestServer(t)
+	token := func(q string) string {
+		t.Helper()
+		_, b := get(t, "POST", ts.URL+"/index.php/userlogin/yxmmdasba?a=&username=tokuser&timestamp=1"+q)
+		const head, tail = `{code=1, msg="`, `"}`
+		if !strings.HasPrefix(b, head) || !strings.HasSuffix(b, tail) {
+			t.Fatalf("no token in %q (query %q)", b, q)
+		}
+		return strings.TrimSuffix(strings.TrimPrefix(b, head), tail)
+	}
+
+	h5 := token("&client=h5")
+	acc, err := s.Store.AccountByToken(h5)
+	if err != nil || acc.Platform != store.PlatformH5 || acc.Account != "tokuser" {
+		t.Fatalf("the H5 token resolves to %+v, %v", acc, err)
+	}
+	// no original account yet: the call with client=h5 must not have created one
+	if _, err := s.Store.AccountByName("symlf", "tokuser"); !errors.Is(err, store.ErrNotFound) {
+		t.Fatalf("an H5 token call created an original-platform account: %v", err)
+	}
+
+	orig := token("")
+	oacc, err := s.Store.AccountByToken(orig)
+	if err != nil || oacc.Platform != "symlf" || oacc.ID == acc.ID {
+		t.Fatalf("the plain token resolves to %+v, %v (H5 account %d)", oacc, err, acc.ID)
+	}
+	// a second call finds the account again instead of creating another, a token per call
+	if again := token("&client=h5"); again == h5 {
+		t.Fatal("the same token was issued twice")
+	} else if a2, err := s.Store.AccountByToken(again); err != nil || a2.ID != acc.ID {
+		t.Fatalf("second H5 token resolves to %+v, %v", a2, err)
+	}
+	// an H5 account that is banned gets no token, and that does not touch the original one
+	if err := s.Store.SetAccountStatus(acc.ID, 0, "test"); err != nil {
+		t.Fatal(err)
+	}
+	if _, b := get(t, "POST", ts.URL+"/index.php/userlogin/yxmmdasba?a=&username=tokuser&client=h5"); b != `{code=0, msg="account unavailable"}` {
+		t.Fatalf("banned H5 account: %s", b)
+	}
+	token("")
+}

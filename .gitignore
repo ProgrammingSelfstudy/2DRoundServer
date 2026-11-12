@@ -31,3 +31,4 @@
 /configs/prod.yaml
 /deploy/out/
 /deploy/*.tar.gz
+/deploy/server.local

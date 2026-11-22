@@ -1,5 +1,7 @@
 package store
 
+import "database/sql"
+
 // ShopBought sums a role's purchases of each good between two days (inclusive, YYYYMMDD).
 // A zero from means from the beginning.
 func (s *Store) ShopBought(rid, from, to int64) (map[int64]int64, error) {
@@ -29,13 +31,23 @@ func (s *Store) ShopBuy(rid, eid, day, num, fromDay, toDay, limit int64, spendAs
 		return err
 	}
 	defer tx.Rollback()
+	if err := shopBuyTx(tx, rid, eid, day, num, fromDay, toDay, limit, spendAssets, spendItems, gainAssets, gainItems); err != nil {
+		if err == ErrShopLimit {
+			return ErrConflict
+		}
+		return err
+	}
+	return tx.Commit()
+}
+
+func shopBuyTx(tx *sql.Tx, rid, eid, day, num, fromDay, toDay, limit int64, spendAssets, spendItems, gainAssets, gainItems map[int64]int64) error {
 	if limit > 0 {
 		var have int64
 		if err := tx.QueryRow(`SELECT COALESCE(SUM(num),0) FROM shop_buys WHERE rid=? AND eid=? AND day>=? AND day<=?`, rid, eid, fromDay, toDay).Scan(&have); err != nil {
 			return err
 		}
 		if have+num > limit {
-			return ErrConflict
+			return ErrShopLimit
 		}
 	}
 	if _, err := tx.Exec(`INSERT INTO shop_buys(rid,eid,day,num) VALUES(?,?,?,?) ON CONFLICT(rid,eid,day) DO UPDATE SET num=num+excluded.num`, rid, eid, day, num); err != nil {
@@ -44,8 +56,5 @@ func (s *Store) ShopBuy(rid, eid, day, num, fromDay, toDay, limit int64, spendAs
 	if err := spendTx(tx, rid, spendAssets, spendItems); err != nil {
 		return err
 	}
-	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
-		return err
-	}
-	return tx.Commit()
+	return creditTx(tx, rid, gainAssets, gainItems)
 }

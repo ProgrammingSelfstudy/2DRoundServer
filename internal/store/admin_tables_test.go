@@ -74,7 +74,7 @@ func TestAdminTableRegistrySchemaCoverageAndSafety(t *testing.T) {
 	if len(seen) != 0 {
 		t.Fatal("undocumented tables", seen)
 	}
-	for _, name := range []string{"admins", "accounts", "audit_logs", "login_tokens", "schema_migrations", "module_state", "global_state", "pay_orders"} {
+	for _, name := range []string{"admins", "accounts", "audit_logs", "login_tokens", "schema_migrations", "module_state", "global_state", "pay_orders", "h5_shop_purchases"} {
 		for _, scope := range []string{"role", "guild", "server"} {
 			if _, err := s.AdminTableRows(scope, name, 1, 50, 0); err != ErrNotFound {
 				t.Fatal("excluded accessible", name)

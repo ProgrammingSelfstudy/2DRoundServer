@@ -14,12 +14,13 @@ import (
 )
 
 // intoCity reads what follows 10300 up to the main city push, so the next frame
-// is whatever comes after it.
+// is whatever comes after it. An H5 session also gets the power push (10306)
+// before the city, so the city is read with until.
 func intoCity(c *client) {
 	c.recv(10301)
 	c.recv(10302)
 	c.recv(13000)
-	c.recv(10304)
+	c.until(10304)
 }
 
 func TestPrivateChatBetweenOnlineRoles(t *testing.T) {

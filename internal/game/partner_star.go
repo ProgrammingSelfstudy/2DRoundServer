@@ -26,6 +26,10 @@ import (
 // more than one (the fusion rows; the capture of 2026-11-05 evening raised a hero from 7 to 25 stars with
 // expend1 equal to `fodder` and no extra hero for `self`), so there only the base id has to match.
 func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, souls map[int64]int64) (consumed []int64, cost []sellGain, msg string) {
+	return planStar(p, owned, chosen, souls, false)
+}
+
+func planStar(p store.Partner, owned map[int64]store.Partner, chosen []int64, souls map[int64]int64, h5 bool) (consumed []int64, cost []sellGain, msg string) {
 	info := partnerTable[p.BID]
 	row, ok := info.Stars[strconv.Itoa(p.Star+1)]
 	if !ok {
@@ -39,6 +43,12 @@ func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, so
 		if sf[0] != p.BID || (sf[2] == 1 && sf[1] != int64(p.Star)) {
 			return nil, nil, "该升星方式暂未开放"
 		}
+	}
+	if h5 {
+		if p.ResSlot > 0 || p.EndTime > 0 {
+			return nil, nil, "共鸣或临时英雄不可升星"
+		}
+		row = h5StarRecipe(row)
 	}
 	// the camp slots the souls fill first; what is left of each slot is for heroes
 	camps := append([][3]int64(nil), row.CampFodder...)
@@ -76,11 +86,15 @@ func starPlan(p store.Partner, owned map[int64]store.Partner, chosen []int64, so
 	}
 	used := map[int64]bool{p.PartnerID: true}
 	for _, id := range chosen {
-		if _, ok := owned[id]; !ok || used[id] {
+		h, ok := owned[id]
+		if !ok || used[id] || (h5 && !visiblePartner(h, true)) {
 			return nil, nil, "所需材料不足"
 		}
-		if owned[id].Locked {
+		if h.Locked {
 			return nil, nil, "英雄已锁定"
+		}
+		if h5 && (h.ResSlot > 0 || h.EndTime > 0) {
+			return nil, nil, "共鸣或临时英雄不可作为材料"
 		}
 		used[id] = true
 	}
@@ -150,10 +164,13 @@ func heroSoul(id int64) (camp, star int64, ok bool) {
 	return 0, 0, false
 }
 
-// releaseWorn takes the artifacts and holy equipment off the heroes that are about to be used
-// up and returns what went back to the bag, by base id. The consumed heroes' ordinary
-// equipment is released by the star-up transaction itself.
-func releaseWorn(st *store.Store, rid int64, gone map[int64]bool) (map[int64]int64, error) {
+// releaseWorn is the native star-up's post-ascension return of artifacts and
+// holy equipment, with the usual reconciliation of each module's bag state.
+func releaseWorn(st *store.Store, rid int64, consumed []int64) (map[int64]int64, error) {
+	gone := make(map[int64]bool, len(consumed))
+	for _, id := range consumed {
+		gone[id] = true
+	}
 	back := map[int64]int64{}
 	arts, err := loadArtifacts(st, rid)
 	if err != nil {
@@ -191,8 +208,9 @@ func releaseWorn(st *store.Store, rid int64, gone map[int64]bool) (map[int64]int
 // what their levels, break steps, talents and worn gear cost. The order follows the captures
 // of 2026-11-02 and 2026-11-03: the resources (10302, only when they changed), the bag
 // changes (10510/10511/10512), the refund notice (12742), the hero (11002) and the heroes of
-// the resonance slots that followed the crystal, the consumed heroes (11006), the answer with
-// an empty msg and, when the total power set a new high, 10306.
+// the resonance slots that followed the crystal, and the consumed heroes (11006).
+// H5 receives its current role power before the answer. Native sessions keep the
+// captured 10306 push after the answer when a new high is reached.
 func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 	r.Handle(11005, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -204,7 +222,8 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return reply(0, "英雄不存在")
 		}
-		if _, known := partnerTable[p.BID]; !known {
+		h5 := isH5Session(s)
+		if !visiblePartner(*p, h5) {
 			return reply(0, "英雄不存在")
 		}
 		all, err := st.PartnersOf(role.RID)
@@ -225,7 +244,7 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		for _, a := range req.Arr("item_expend") {
 			souls[a.Int("item_id")] += a.Int("num")
 		}
-		consumed, cost, msg := starPlan(*p, owned, chosen, souls)
+		consumed, cost, msg := planStar(*p, owned, chosen, souls, h5)
 		if msg != "" {
 			return reply(0, msg)
 		}
@@ -234,9 +253,7 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		// what the consumed heroes give back: shown in full, but the worn ordinary equipment is
 		// credited by the transaction that releases it
 		shown, gainAssets, gainItems := map[int64]int64{}, map[int64]int64{}, map[int64]int64{}
-		gone := map[int64]bool{}
 		for _, id := range consumed {
-			gone[id] = true
 			h := owned[id]
 			a, i := refund(h)
 			for k, v := range a {
@@ -262,15 +279,23 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if err := st.AscendPartner(role.RID, p.PartnerID, p.Star, consumed, assets, items, gainAssets, gainItems); err != nil {
+		var worn map[int64]int64
+		if h5 {
+			worn, err = st.AscendH5Partner(role.RID, p.PartnerID, p.Star, consumed, assets, items, gainAssets, gainItems, owned)
+		} else {
+			err = st.AscendPartner(role.RID, p.PartnerID, p.Star, consumed, assets, items, gainAssets, gainItems)
+		}
+		if err != nil {
 			if errors.Is(err, store.ErrConflict) {
 				return reply(0, "所需材料不足")
 			}
 			return err
 		}
-		worn, err := releaseWorn(st, role.RID, gone)
-		if err != nil {
-			return err
+		if !h5 {
+			worn, err = releaseWorn(st, role.RID, consumed)
+			if err != nil {
+				return err
+			}
 		}
 		for k, v := range worn {
 			shown[k] += v
@@ -318,11 +343,18 @@ func RegisterPartnerStar(r *gateway.Router, st *store.Store) {
 		if err := s.Send(11006, proto.Message{"expend2": goneList}); err != nil {
 			return err
 		}
+		if h5 {
+			if err := sendRolePower(s, st, role.RID, rolePower(all)); err != nil {
+				return err
+			}
+		}
 		if err := reply(1, ""); err != nil {
 			return err
 		}
-		if err := sendPowerIfHigh(s, st, role.RID, rolePower(all)); err != nil {
-			return err
+		if !h5 {
+			if err := sendPowerIfHigh(s, st, role.RID, rolePower(all)); err != nil {
+				return err
+			}
 		}
 		return CheckLimitGifts(s, st, s.Now()) // a star that opens a limited gift
 	})

@@ -216,6 +216,9 @@ func TestH5MailWelfareAcrossReconnect(t *testing.T) {
 	if heroes := call(11000, proto.Message{}).Arr("partners"); len(heroes) != 1 || heroes[0].Int("bid") != starterH5 || heroes[0].Int("star") != 5 {
 		t.Fatalf("H5 roster after welfare claims: %v", heroes)
 	}
+	// The first roster request grants the starter and pushes its power. Read
+	// that push before writing the next request over the unbuffered pipe.
+	c.recv(10306)
 	bag := call(10500, proto.Message{}).Arr("item_list")
 	counts := map[int64]int64{}
 	for _, item := range bag {

@@ -176,12 +176,23 @@ func partnerMessages(heroes []store.Partner, only map[int64]bool) []proto.Messag
 	return msgs
 }
 
+// visiblePartners drops the heroes an H5 session must not see.
+func visiblePartners(heroes []store.Partner, h5 bool) []store.Partner {
+	out := make([]store.Partner, 0, len(heroes))
+	for _, p := range heroes {
+		if visiblePartner(p, h5) {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
 func sendPartnerRoster(s *gateway.Session, st *store.Store, rid int64, cmd uint16, heroes []store.Partner) error {
 	buys, err := st.HeroSlotBuys(rid)
 	if err != nil {
 		return err
 	}
-	return s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": partnerMessages(heroes, nil)})
+	return s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": partnerMessages(visiblePartners(heroes, isH5Session(s)), nil)})
 }
 
 // RegisterPartner registers the hero list (11000 full, 11025 brief) and the
@@ -189,23 +200,49 @@ func sendPartnerRoster(s *gateway.Session, st *store.Store, rid int64, cmd uint1
 // the starter heroes. The encoder sends only the fields a command's table has,
 // so one full message serves all three.
 func RegisterPartner(r *gateway.Router, st *store.Store) {
+	registerH5RosterPushFilters(r)
+	messages := func(rid int64, only map[int64]bool, h5 bool) ([]proto.Message, error) {
+		ps, err := st.PartnersOf(rid)
+		if err != nil {
+			return nil, err
+		}
+		msgs := make([]proto.Message, 0, len(ps))
+		for _, p := range ps {
+			if visiblePartner(p, h5) && (only == nil || only[p.PartnerID]) {
+				msgs = append(msgs, partnerMessage(p))
+			}
+		}
+		return msgs, nil
+	}
 	list := func(cmd uint16) gateway.Handler {
 		return func(s *gateway.Session, _ proto.Message) error {
 			role := s.Role()
 			if role == nil {
 				return nil
 			}
-			if _, err := starterGrant(st, role); err != nil {
+			granted, err := starterGrant(st, role)
+			if err != nil {
 				return err
 			}
 			if err := expireEmpowered(st, role.RID, s.Now()); err != nil { // an empowered hero whose day is over is gone
 				return err
 			}
-			heroes, err := st.PartnersOf(role.RID)
+			h5 := isH5Session(s)
+			msgs, err := messages(role.RID, nil, h5)
 			if err != nil {
 				return err
 			}
-			return sendPartnerRoster(s, st, role.RID, cmd, heroes)
+			buys, err := st.HeroSlotBuys(role.RID)
+			if err != nil {
+				return err
+			}
+			if err := s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": msgs}); err != nil {
+				return err
+			}
+			if h5 && granted {
+				return sendRolePower(s, st, role.RID, 0)
+			}
+			return nil
 		}
 	}
 	r.Handle(11000, list(11000))
@@ -256,7 +293,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if _, ok := partnerTable[p.BID]; !ok {
+		if !visiblePartner(*p, isH5Session(s)) {
 			return nil
 		}
 		m := partnerMessage(*p)
@@ -279,11 +316,11 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 		for _, a := range req.Arr("partner_ids") {
 			only[a.Int("partner_id")] = true
 		}
-		heroes, err := st.PartnersOf(role.RID)
+		msgs, err := messages(role.RID, only, isH5Session(s))
 		if err != nil {
 			return err
 		}
-		return s.Send(11026, proto.Message{"partners": partnerMessages(heroes, only)})
+		return s.Send(11026, proto.Message{"partners": msgs})
 	})
 }
 

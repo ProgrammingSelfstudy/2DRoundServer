@@ -34,7 +34,7 @@ func RegisterLook(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if _, ok := partnerTable[p.BID]; !ok {
+		if !visiblePartner(*p, isH5Session(s)) {
 			return empty("英雄不存在")
 		}
 		m := partnerMessage(*p)

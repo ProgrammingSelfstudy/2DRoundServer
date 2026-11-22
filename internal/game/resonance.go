@@ -159,12 +159,16 @@ func resonanceSnapshot(st *store.Store, rid int64) (map[int64][2]int, error) {
 	if err != nil {
 		return nil, err
 	}
-	out := map[int64][2]int{}
+	return resonanceLevels(ps), nil
+}
+
+func resonanceLevels(ps []store.Partner) map[int64][2]int {
+	out := make(map[int64][2]int, len(ps))
 	for _, p := range ps {
 		l, b := shownLevBreak(p)
 		out[p.PartnerID] = [2]int{l, b}
 	}
-	return out, nil
+	return out
 }
 
 // pushResonanceShifts sends 11002 for every hero whose shown level or break step differs from

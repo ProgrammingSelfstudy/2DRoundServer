@@ -21,7 +21,7 @@ type brachStep struct {
 	Add    [4]int64   `json:"add"`
 	Expend [][2]int64 `json:"expend"`
 	Get    [][2]int64 `json:"get"`   // what a reset gives back of the steps before this one
-	Limit  bool       `json:"limit"` // the step has an extra condition the client does not spell out
+	Limit  bool       `json:"limit"` // the step has an additional star requirement
 }
 
 type growthTables struct {
@@ -93,10 +93,12 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return nil
 		}
-		if _, ok := partnerTable[p.BID]; !ok {
+		h5 := isH5Session(s)
+		if !visiblePartner(*p, h5) {
 			return nil
 		}
-		if _, next := growth.Brach[brachKey(partnerTable[p.BID], p.BreakLev+1)]; next {
+		if next, ok := growth.Brach[brachKey(partnerTable[p.BID], p.BreakLev+1)]; ok &&
+			(!h5 || breakDenial(*p, next, true) == "") {
 			p.BreakLev++
 		}
 		return s.Send(11016, partnerMessage(*p))
@@ -104,7 +106,7 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 	// do runs one growth step. plan(p, n) gives the step for the n-th attempt (0 = the
 	// biggest one): the new level and break, the cost, or a refusal message. An attempt
 	// the role cannot pay falls through to the next one, up to tries attempts.
-	do := func(cmd uint16, tries int, plan func(p store.Partner, n int) (toLev, toBreak int, cost []sellGain, msg string)) gateway.Handler {
+	do := func(cmd uint16, tries int, plan func(p store.Partner, n int, h5 bool) (toLev, toBreak int, cost []sellGain, msg string)) gateway.Handler {
 		return func(s *gateway.Session, req proto.Message) error {
 			role := s.Role()
 			if role == nil {
@@ -115,19 +117,21 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 			if err != nil {
 				return reply(0, "英雄不存在")
 			}
-			if _, known := partnerTable[p.BID]; !known {
+			h5 := isH5Session(s)
+			if !visiblePartner(*p, h5) {
 				return reply(0, "英雄不存在")
 			}
-			before, err := resonanceSnapshot(st, role.RID)
+			heroes, err := st.PartnersOf(role.RID)
 			if err != nil {
 				return err
 			}
+			before := resonanceLevels(heroes)
 			var toLev, toBreak int
 			paid := false
 			for n := 0; n < tries && !paid; n++ {
 				var cost []sellGain
 				var msg string
-				toLev, toBreak, cost, msg = plan(*p, n)
+				toLev, toBreak, cost, msg = plan(*p, n, h5)
 				if msg != "" {
 					if n == 0 {
 						return reply(0, msg)
@@ -164,6 +168,11 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 			if err := pushResonanceShifts(s, st, role.RID, before, p.PartnerID); err != nil {
 				return err
 			}
+			if h5 {
+				if err := sendRolePower(s, st, role.RID, rolePower(heroes)); err != nil {
+					return err
+				}
+			}
 			return reply(1, "")
 		}
 	}
@@ -171,7 +180,7 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 	// each of them, the way the client's button ("升5级", HeroMainTabTrainPanel) counts it;
 	// from level heroSingleLevelFrom on it is one level. Confirmed by the capture of
 	// 2026-10-21b: 16 -> 21 -> 26 -> 30 (the cap) with the costs of our table.
-	r.Handle(11003, do(11003, heroLevelsAtOnce, func(p store.Partner, n int) (int, int, []sellGain, string) {
+	r.Handle(11003, do(11003, heroLevelsAtOnce, func(p store.Partner, n int, _ bool) (int, int, []sellGain, string) {
 		max, _ := levelCap(p)
 		if p.Lev >= max || p.Lev > len(growth.Costs) {
 			return 0, 0, nil, "已达到等级上限"
@@ -196,7 +205,7 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 		}
 		return p.Lev + levels, p.BreakLev, cost, ""
 	}))
-	r.Handle(11004, do(11004, 1, func(p store.Partner, _ int) (int, int, []sellGain, string) {
+	r.Handle(11004, do(11004, 1, func(p store.Partner, _ int, h5 bool) (int, int, []sellGain, string) {
 		info := partnerTable[p.BID]
 		cur, ok := growth.Brach[brachKey(info, p.BreakLev)]
 		next, hasNext := growth.Brach[brachKey(info, p.BreakLev+1)]
@@ -205,8 +214,9 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 			return 0, 0, nil, "已突破到最高阶段"
 		case p.Lev < cur.LevMax:
 			return 0, 0, nil, "等级未达到突破要求"
-		case next.Limit:
-			return 0, 0, nil, "该突破暂未开放" // an extra condition the client does not spell out
+		}
+		if reason := breakDenial(p, next, h5); reason != "" {
+			return 0, 0, nil, reason
 		}
 		var cost []sellGain
 		for _, e := range cur.Expend {

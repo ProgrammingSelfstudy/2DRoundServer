@@ -203,40 +203,81 @@ func spendTx(tx *sql.Tx, rid int64, assets, items map[int64]int64) error {
 // when the hero is no longer at fromStar, a consumed hero is gone (or is the
 // hero itself) or the role cannot pay.
 func (s *Store) AscendPartner(rid, partnerID int64, fromStar int, consumed []int64, assets, items, gainAssets, gainItems map[int64]int64) error {
+	_, err := s.ascendPartner(rid, partnerID, fromStar, consumed, assets, items, gainAssets, gainItems, nil)
+	return err
+}
+
+// AscendH5Partner verifies the planned heroes and also refunds artifacts and
+// holy equipment in the transaction. It returns their counts for the notice.
+func (s *Store) AscendH5Partner(rid, partnerID int64, fromStar int, consumed []int64, assets, items, gainAssets, gainItems map[int64]int64, roster map[int64]Partner) (map[int64]int64, error) {
+	if _, ok := roster[partnerID]; !ok {
+		return nil, ErrConflict
+	}
+	return s.ascendPartner(rid, partnerID, fromStar, consumed, assets, items, gainAssets, gainItems, roster)
+}
+
+func (s *Store) ascendPartner(rid, partnerID int64, fromStar int, consumed []int64, assets, items, gainAssets, gainItems map[int64]int64, roster map[int64]Partner) (map[int64]int64, error) {
 	tx, err := s.db.Begin()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer tx.Rollback()
-	res, err := tx.Exec(`UPDATE partners SET star=star+1 WHERE partner_id=? AND rid=? AND star=?`, partnerID, rid, fromStar)
+	const notResonating = ` AND NOT EXISTS (SELECT 1 FROM resonance_slots WHERE partner_id=partners.partner_id)`
+	update := `UPDATE partners SET star=star+1 WHERE partner_id=? AND rid=? AND star=?`
+	updateArgs := []any{partnerID, rid, fromStar}
+	if roster != nil {
+		update += ` AND bid=?` + notResonating
+		updateArgs = append(updateArgs, roster[partnerID].BID)
+	}
+	res, err := tx.Exec(update, updateArgs...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if n, _ := res.RowsAffected(); n == 0 {
-		return ErrConflict
+		return nil, ErrConflict
 	}
 	for _, id := range consumed {
 		if id == partnerID {
-			return ErrConflict
+			return nil, ErrConflict
 		}
 		if err := releaseEquipsTx(tx, rid, id); err != nil {
-			return err
+			return nil, err
 		}
-		res, err := tx.Exec(`DELETE FROM partners WHERE partner_id=? AND rid=?`, id, rid)
+		del := `DELETE FROM partners WHERE partner_id=? AND rid=?`
+		delArgs := []any{id, rid}
+		if roster != nil {
+			planned := roster[id]
+			del += ` AND locked=0 AND bid=? AND star=? AND lev=? AND break_lev=?` + notResonating
+			delArgs = append(delArgs, planned.BID, planned.Star, planned.Lev, planned.BreakLev)
+		}
+		res, err := tx.Exec(del, delArgs...)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if n, _ := res.RowsAffected(); n == 0 {
-			return ErrConflict
+			return nil, ErrConflict
 		}
 	}
 	if err := spendTx(tx, rid, assets, items); err != nil {
-		return err
+		return nil, err
 	}
 	if err := creditTx(tx, rid, gainAssets, gainItems); err != nil {
-		return err
+		return nil, err
 	}
-	return tx.Commit()
+	var worn map[int64]int64
+	if roster != nil {
+		worn, err = releaseAscensionGear(tx, rid, consumed)
+		if err != nil {
+			return nil, err
+		}
+		if err := creditTx(tx, rid, nil, worn); err != nil {
+			return nil, err
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return worn, nil
 }
 
 // FreeSummonUsed reports whether the role already used the group's free summon on that day.

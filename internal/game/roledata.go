@@ -116,6 +116,11 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 	if err := pushDrama(s, l.Store, fresh.RID); err != nil {
 		return err
 	}
+	if isH5Session(s) {
+		if err := sendRolePower(s, l.Store, fresh.RID, 0); err != nil {
+			return err
+		}
+	}
 	// 10304 is a pure server push (the client never requests it): on receipt the
 	// client creates the main city scene (main_scene_controller.lua handle10304).
 	// play_video=0 skips the intro video.

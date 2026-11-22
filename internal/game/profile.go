@@ -37,8 +37,9 @@ func (f *FriendService) profile(s *gateway.Session, req proto.Message) error {
 	}
 	shown := []proto.Message{}
 	known := make([]proto.Message, 0, len(heroes))
+	h5 := isH5Session(s)
 	for _, h := range heroes {
-		if _, ok := partnerTable[h.BID]; ok {
+		if visiblePartner(h, h5) {
 			known = append(known, partnerMessage(h))
 		}
 	}

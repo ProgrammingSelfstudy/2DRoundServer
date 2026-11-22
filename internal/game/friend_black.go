@@ -14,7 +14,7 @@ const maxBlack = 50
 
 // registerBlack registers the black list: 13330 the list, 13332 add (which ends a friendship with the role),
 // 13333 take off, 13315 whether a role has a team (always no: there is no friend team). The roles on the list
-// cannot send a friend request to the one who listed them. The chat is not filtered. Our rules, not captured.
+// cannot exchange friend requests with the one who listed them; H5 pairs cannot exchange private messages either.
 func (f *FriendService) registerBlack(r *gateway.Router) {
 	r.Handle(13330, f.blackList)
 	r.OnEnter(f.blackList)
@@ -85,6 +85,15 @@ func (f *FriendService) blackRemove(s *gateway.Session, req proto.Message) error
 		return nil
 	}
 	rid, srvID := req.Int("rid"), req.Str("srv_id")
+	if srvID != f.SrvID {
+		h5, err := h5SocialViewer(f.Store, s, me)
+		if err != nil {
+			return err
+		}
+		if h5 {
+			return s.Send(13333, proto.Message{"code": 0, "msg": "暂不支持跨服好友", "rid": rid, "srv_id": srvID})
+		}
+	}
 	gone, err := f.Store.RemoveBlack(me.RID, rid)
 	if err != nil {
 		return err

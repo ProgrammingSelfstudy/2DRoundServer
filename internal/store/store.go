@@ -30,6 +30,7 @@ type Store struct {
 	db          sqlStoreDB
 	now         func() time.Time
 	chargeLocks [64]sync.Mutex // bounded per-Store stripes, shared by confirms and admin resets
+	chatLocks   [64]sync.Mutex // serialize offline delivery per recipient
 
 	cmdMu sync.Mutex // guards cmds, the command counts not yet written (analytics.go)
 	cmds  map[cmdKey]int64

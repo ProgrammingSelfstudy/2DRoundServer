@@ -14,7 +14,8 @@ func TestGuildBossFight(t *testing.T) {
 	if err := e.st.SetRoleLevel(role.RID, 20); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := e.st.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "海贼联盟", LeaderRID: role.RID}, 1, nil, nil); err != nil {
+	gid, err := e.st.CreateGuild(store.Guild{SrvID: "symlf_1", Name: "海贼联盟", LeaderRID: role.RID}, 1, nil, nil)
+	if err != nil {
 		t.Fatal(err)
 	}
 	c.send(21300, proto.Message{})
@@ -35,6 +36,10 @@ func TestGuildBossFight(t *testing.T) {
 	intro := c.waitFor(20027)
 	if intro.Int("combat_type") != combatGuildDun || intro.Str("target_role_name") == "" {
 		t.Fatalf("intro: %v", intro)
+	}
+	state, _, err := e.st.BossStateOf(gid)
+	if err != nil || state.HP != 1000000 {
+		t.Fatalf("native boss settled before playback: %+v, %v", state, err)
 	}
 	c.send(20062, proto.Message{})
 	c.waitFor(20062)

@@ -226,6 +226,20 @@ func pvpInfoMessage(st *store.GuildSkills, career int) proto.Message {
 	return proto.Message{"attr_formation": attrs, "skill_id": gskillCfg.pvp[[2]int{career, lev}].SkillID, "skill_lev": lev, "career": career}
 }
 
+func (g *GuildService) refreshH5GuildSkillStats(s *gateway.Session, rid, previousPower int64) error {
+	if !isH5Client(s) {
+		return nil
+	}
+	heroes, err := g.Store.PartnersOf(rid)
+	if err != nil {
+		return err
+	}
+	if err := sendRolePowerValue(s, g.Store, rid, previousPower, rolePower(heroes)); err != nil {
+		return err
+	}
+	return sendPartnerRoster(s, g.Store, rid, 11025, heroes)
+}
+
 func (g *GuildService) registerSkills(r *gateway.Router) {
 	valid := func(career int64) bool { return career >= 2 && career <= 5 }
 	pay := func(s *gateway.Session) error { return sendAssets(s, g.Store, s.Role().RID) }
@@ -306,7 +320,10 @@ func (g *GuildService) registerSkills(r *gateway.Router) {
 		if err != nil {
 			return err
 		}
-		var next int64
+		var next, previousPower int64
+		if isH5Client(s) {
+			previousPower = g.guildPower(role.RID)
+		}
 		err = g.Store.UpdateGuildSkills(role.RID, func(st *store.GuildSkills) (a, i, ga, gi map[int64]int64, err error) {
 			done := st.PveDone[career]
 			active := st.PveActive[career]
@@ -335,6 +352,9 @@ func (g *GuildService) registerSkills(r *gateway.Router) {
 			return err
 		}
 		if err := bag(s); err != nil {
+			return err
+		}
+		if err := g.refreshH5GuildSkillStats(s, role.RID, previousPower); err != nil {
 			return err
 		}
 		if err := s.Send(23701, proto.Message{"code": 1, "msg": "激活成功", "career": career, "skill_id": sk.ID}); err != nil {
@@ -368,6 +388,10 @@ func (g *GuildService) registerSkills(r *gateway.Router) {
 			return nil
 		}
 		career := int(req.Int("career"))
+		var previousPower int64
+		if isH5Client(s) {
+			previousPower = g.guildPower(role.RID)
+		}
 		err := g.Store.UpdateGuildSkills(role.RID, func(st *store.GuildSkills) (a, i, ga, gi map[int64]int64, err error) {
 			levels := gskillPveLevel(st, career)
 			if levels == 0 {
@@ -385,6 +409,9 @@ func (g *GuildService) registerSkills(r *gateway.Router) {
 			return err
 		}
 		if err := pay(s); err != nil {
+			return err
+		}
+		if err := g.refreshH5GuildSkillStats(s, role.RID, previousPower); err != nil {
 			return err
 		}
 		return s.Send(23705, proto.Message{"code": 1, "msg": "重置成功", "career": career})

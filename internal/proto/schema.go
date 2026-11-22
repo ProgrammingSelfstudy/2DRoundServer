@@ -91,6 +91,7 @@ func LoadSchema() (*Schema, error) {
 		if s.Recv, schemaErr = conv(raw.Recv); schemaErr != nil {
 			return
 		}
+		registerH5GuildSchema(s)
 		schema = s
 	})
 	return schema, schemaErr

@@ -19,6 +19,7 @@ type Partner struct {
 	Holy                 []HolyPiece  // worn holy equipment (神装), by slot
 	Horcrux              HorcruxState // the hero's horcrux (魂器)
 	EndTime              int64        // when an empowered hero ends (0 = it stays)
+	GuildSkillLevels     map[int]int  // ordinary guild skill steps by career for an H5 role
 }
 
 // Equip is one worn piece of equipment.
@@ -62,6 +63,9 @@ func (s *Store) PartnersOf(rid int64) ([]Partner, error) {
 		out[i].Talents = tl[out[i].PartnerID]
 	}
 	if err := s.attachArtifacts(rid, out); err != nil {
+		return nil, err
+	}
+	if err := s.attachGuildSkills(map[int64][]Partner{rid: out}, "r.rid=?", rid); err != nil {
 		return nil, err
 	}
 	return out, s.applyResonance(rid, out)
@@ -133,20 +137,23 @@ func (s *Store) PartnerByID(rid, partnerID int64) (*Partner, error) {
 	if err := s.attachArtifacts(rid, one); err != nil {
 		return &p, err
 	}
-	p.Artifacts, p.Holy, p.Horcrux, p.EndTime = one[0].Artifacts, one[0].Holy, one[0].Horcrux, one[0].EndTime
 	if slots, err := s.slotsOf(rid); err != nil || slots[partnerID] == 0 {
-		return &p, err
+		if err != nil {
+			return &one[0], err
+		}
+		err = s.attachGuildSkills(map[int64][]Partner{rid: one}, "r.rid=?", rid)
+		return &one[0], err
 	}
 	all, err := s.PartnersOf(rid) // a hero in a slot: the crystal level comes from all of them
 	if err != nil {
-		return &p, err
+		return &one[0], err
 	}
 	for _, q := range all {
 		if q.PartnerID == partnerID {
 			return &q, nil
 		}
 	}
-	return &p, nil
+	return &one[0], nil
 }
 
 // UpgradePartner pays for a hero's new level / break step and stores it, in one
@@ -326,7 +333,7 @@ func (s *Store) PartnersOfServer(srvID string) (map[int64][]Partner, error) {
 		}
 		out[rid] = ps
 	}
-	return out, nil
+	return out, s.attachGuildSkills(out, "r.srv_id=?", srvID)
 }
 
 // RankRole is a role with what the rankings sort on.

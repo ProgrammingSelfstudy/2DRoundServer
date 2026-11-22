@@ -341,6 +341,7 @@ func (g *GuildService) Register(r *gateway.Router) {
 	g.registerDonate(r)
 	g.registerSkills(r)
 	g.registerBoss(r)
+	g.registerH5Guild(r)
 	g.registerSecret(r)
 	g.registerRedbag(r)
 }

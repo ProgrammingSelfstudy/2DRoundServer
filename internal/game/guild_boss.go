@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"math/bits"
 	"math/rand"
 	"time"
 
@@ -49,10 +50,14 @@ type gbossConf struct {
 	Chapters    []gbossChapter
 	RankRewards []gbossRank `json:"rank_rewards"`
 	Buys        []struct {
-		Count, VipLev int64
-		Expend        []int64
+		Count  int64
+		VipLev int64 `json:"vip_lev"`
+		Expend []int64
 	}
-	Buffs []struct{ Lev, AtkPer int64 }
+	Buffs []struct {
+		Lev    int64
+		AtkPer int64 `json:"atk_per"`
+	}
 
 	boss  map[int64]gbossRow
 	ranks map[int64][]gbossRank
@@ -81,10 +86,15 @@ func (c *gbossConf) chapter(fid int64) gbossChapter {
 // the hp fields of the protocol are 32 bit: a boss with more hp than that is shown scaled down
 func gbossWire(hp, full int64) int64 {
 	const top = 1<<32 - 1
+	if hp <= 0 {
+		return 0
+	}
 	if full <= top {
 		return hp
 	}
-	return hp * top / full
+	hi, lo := bits.Mul64(uint64(hp), top)
+	scaled, _ := bits.Div64(hi, lo, uint64(full))
+	return max(1, int64(scaled)) // keep a living boss visible on the last point of health
 }
 
 func pairsOf(list [][]int64) [][2]int64 {
@@ -112,28 +122,32 @@ func attachmentsOf(list [][2]int64) []store.Attachment {
 // bossState is the guild's boss as of now: a new day puts it back to full hp on the chapter the reset picks
 // (the next one after the highest killed, or with the leader's rollback the highest itself).
 func (g *GuildService) bossState(gid int64, now time.Time) (*store.BossState, error) {
-	st, found, err := g.Store.BossStateOf(gid)
-	if err != nil {
-		return nil, err
-	}
 	day := dayKey(now)
-	if found && st.Day == day {
-		return st, nil
+	for {
+		st, found, err := g.Store.BossStateOf(gid)
+		if err != nil || (found && st.Day >= day) {
+			return st, err
+		}
+		switch {
+		case !found:
+			st.Fid = 1
+		case st.ResetType == 1:
+			st.Fid = max(1, st.MaxID)
+		default:
+			st.Fid = min(st.MaxID+1, int64(len(guildBossCfg.Chapters)))
+		}
+		previousReset := st.ResetType
+		st.ResetType, st.Day = 0, day
+		st.HP = guildBossCfg.boss[guildBossCfg.chapter(st.Fid).Boss].HP
+		if st.BuffEnd <= now.Unix() {
+			st.BuffLev, st.BuffEnd = 0, 0
+		}
+		ok, err := g.Store.ResetBossDay(st, previousReset)
+		if err != nil || ok {
+			return st, err
+		}
+		// Read again when a concurrent reset or kill changed the chapter.
 	}
-	switch {
-	case !found:
-		st.Fid = 1
-	case st.ResetType == 1:
-		st.Fid = max(1, st.MaxID)
-	default:
-		st.Fid = min(st.MaxID+1, int64(len(guildBossCfg.Chapters)))
-	}
-	st.ResetType, st.Day = 0, day
-	st.HP = guildBossCfg.boss[guildBossCfg.chapter(st.Fid).Boss].HP
-	if st.BuffEnd <= now.Unix() {
-		st.BuffLev, st.BuffEnd = 0, 0
-	}
-	return st, g.Store.SaveBossState(st)
 }
 
 // bossCount is how many challenges a role has left today.
@@ -192,76 +206,8 @@ func (g *GuildService) pushBossInfo(gid int64, now time.Time) {
 
 // bossOutcome is what one challenge (a fight or a mop-up) came to.
 type bossOutcome struct {
-	damage, applied int64
-	killed          bool
-	rewards         [][2]int64
-}
-
-// bossSettle puts a challenge's damage on the boss and pays: the challenge reward to the member, and when it
-// kills the boss, the kill reward (once per member and boss), the guild's exp and the damage ranking by mail.
-func (g *GuildService) bossSettle(role *store.Role, gd *store.Guild, st *store.BossState, boss gbossRow, damage int64, now time.Time) (bossOutcome, error) {
-	chap := guildBossCfg.chapter(st.Fid)
-	applied, _, killed, err := g.Store.BossHit(gd.GID, st.Day, boss.BossID, role.RID, damage)
-	if err != nil {
-		return bossOutcome{}, err
-	}
-	out := bossOutcome{damage: damage, applied: applied, killed: killed, rewards: pairsOf(chap.Challenge)}
-	if err := g.Store.AddGuildVitality(gd.GID, vitalityBoss); err != nil {
-		return out, err
-	}
-	if killed {
-		first, err := g.Store.ClaimBossKill(role.RID, boss.BossID)
-		if err != nil {
-			return out, err
-		}
-		if first {
-			out.rewards = append(out.rewards, pairsOf(chap.Kill)...)
-		}
-	}
-	ga, gi := map[int64]int64{}, map[int64]int64{}
-	splitGains(guildGains(out.rewards), 1, ga, gi)
-	if err := g.Store.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
-		return out, err
-	}
-	if killed {
-		if chap.GuildExp > 0 {
-			if err := g.Store.AddGuildExp(gd.GID, chap.GuildExp, guildLevelExp()); err != nil {
-				return out, err
-			}
-		}
-		if err := g.bossRankMails(gd, st, boss, now); err != nil {
-			return out, err
-		}
-		g.pushLog(gd.GID, guildLogGeneral, role.RID, role.Name, "击败了公会副本的"+boss.Name, now.Unix())
-		g.pushInfo(gd.GID, dayKey(now))
-	}
-	return out, nil
-}
-
-// bossRankMails mails the damage ranking rewards of a killed boss to the members who made the list.
-func (g *GuildService) bossRankMails(gd *store.Guild, st *store.BossState, boss gbossRow, now time.Time) error {
-	list, err := g.Store.BossDamages(gd.GID, st.Day, boss.BossID)
-	if err != nil {
-		return err
-	}
-	rows := guildBossCfg.ranks[boss.BossID]
-	for i, d := range list {
-		if d.Total < guildBossCfg.Const["rank_dam"] {
-			continue
-		}
-		rank := int64(i + 1)
-		for _, r := range rows {
-			if rank >= r.Rank1 && rank <= r.Rank2 {
-				m := store.Mail{SrvID: gd.SrvID, Subject: "公会副本排名奖励", Content: "你在公会副本" + boss.Name + "的伤害排名第" + itoa64(rank) + "，这是排名奖励。",
-					FromName: "公会副本", CreatedBy: "guildboss", Attachments: attachmentsOf(pairsOf(r.Award))}
-				if _, err := g.Store.CreateMail(m, []int64{d.RID}); err != nil {
-					return err
-				}
-				break
-			}
-		}
-	}
-	return nil
+	damage  int64
+	rewards [][2]int64
 }
 
 func itoa64(n int64) string { return string(appendInt(nil, n)) }
@@ -324,12 +270,17 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
+		h5, now := isH5Client(s), s.Now()
 		typ := req.Int("type")
 		refuse := func(msg string) error { return s.Send(21312, proto.Message{"code": 0, "msg": msg, "type": typ}) }
-		if _, _, err := g.mine(s); errors.Is(err, errNoGuild) {
+		gd, _, err := g.mine(s)
+		if errors.Is(err, errNoGuild) {
 			return refuse("你还没有加入公会")
 		}
-		br, count, err := g.bossCount(role.RID, s.Now())
+		if err != nil {
+			return err
+		}
+		br, count, err := g.bossCount(role.RID, now)
 		if err != nil {
 			return err
 		}
@@ -340,21 +291,28 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 			return refuse("当前购买次数已到达本日上限")
 		}
 		price := guildBossCfg.Buys[br.Bought]
-		if fresh, err := g.Store.RoleByID(role.RID); err != nil {
-			return err
-		} else if int64(fresh.VIPLev) < price.VipLev {
-			return refuse("VIP等级不足")
+		if h5 && price.VipLev > 0 {
+			fresh, err := g.Store.RoleByID(role.RID)
+			if err != nil {
+				return err
+			}
+			if int64(fresh.VIPLev) < price.VipLev {
+				return refuse("VIP等级不足")
+			}
 		}
 		spendA, spendI := g.payFor([][2]int64{{price.Expend[0], price.Expend[1]}})
-		if err := g.Store.Exchange(role.RID, spendA, spendI, map[int64]int64{}, map[int64]int64{}); errors.Is(err, store.ErrConflict) {
+		if h5 && dayKey(s.Now()) != br.Day {
+			return refuse("Boss已重置，请刷新")
+		}
+		if err := g.Store.BuyGuildBossAttempt(gd.GID, br, guildBossCfg.Const["free_time"], h5, spendA, spendI); errors.Is(err, store.ErrConflict) {
+			if h5 {
+				return refuse("钻石不足或Boss状态已变化，请刷新")
+			}
 			return refuse("钻石不足")
 		} else if err != nil {
 			return err
 		}
 		br.Bought++
-		if err := g.Store.SaveBossRole(br); err != nil {
-			return err
-		}
 		if err := sendAssets(s, g.Store, role.RID); err != nil {
 			return err
 		}
@@ -365,6 +323,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
+		h5, now := isH5Client(s), s.Now()
 		refuse := func(msg string) error { return s.Send(21305, proto.Message{"code": 0, "msg": msg}) }
 		gd, _, err := g.mine(s)
 		if errors.Is(err, errNoGuild) {
@@ -373,31 +332,28 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if err != nil {
 			return err
 		}
-		st, err := g.bossState(gd.GID, s.Now())
+		st, err := g.bossState(gd.GID, now)
 		if err != nil {
 			return err
 		}
 		lev := st.BuffLev
-		if st.BuffEnd <= s.Now().Unix() {
+		if st.BuffEnd <= now.Unix() {
 			lev = 0
 		}
 		if int(lev) >= len(guildBossCfg.Buffs) {
 			return refuse("增幅已达最高等级")
 		}
-		// the booster item first, else gems
-		spendA, spendI := map[int64]int64{}, map[int64]int64{guildBossCfg.Const["buff_item"]: 1}
-		if err := g.Store.Exchange(role.RID, spendA, spendI, map[int64]int64{}, map[int64]int64{}); errors.Is(err, store.ErrConflict) {
-			spendA, spendI = g.payFor([][2]int64{{3, guildBossCfg.Const["buff_cost"]}})
-			if err := g.Store.Exchange(role.RID, spendA, spendI, map[int64]int64{}, map[int64]int64{}); errors.Is(err, store.ErrConflict) {
-				return refuse("钻石不足")
-			} else if err != nil {
-				return err
-			}
-		} else if err != nil {
-			return err
+		if h5 && dayKey(s.Now()) != st.Day {
+			return refuse("Boss已重置，请刷新")
 		}
-		st.BuffLev, st.BuffEnd = lev+1, nextMidnight(s.Now())
-		if err := g.Store.SaveBossState(st); err != nil {
+		// the booster item first, else gems
+		if err := g.Store.BuyGuildBossBuff(st, role.RID, lev+1, nextMidnight(now),
+			guildBossCfg.Const["buff_item"], guildBossCfg.Const["buff_cost"], h5); errors.Is(err, store.ErrConflict) {
+			if h5 {
+				return refuse("钻石不足或增幅状态已变化，请刷新")
+			}
+			return refuse("钻石不足")
+		} else if err != nil {
 			return err
 		}
 		if err := sendAssets(s, g.Store, role.RID); err != nil {
@@ -433,11 +389,15 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if st.MusterAt > s.Now().Unix() {
 			return s.Send(21323, proto.Message{"code": 0, "msg": "集结冷却中"})
 		}
-		st.MusterAt = s.Now().Unix() + guildBossCfg.Const["concentrate_cd"]
-		if err := g.Store.SaveBossState(st); err != nil {
+		next := s.Now().Unix() + guildBossCfg.Const["concentrate_cd"]
+		ok, err := g.Store.MusterGuildBoss(gd.GID, s.Role().RID, st.Day, s.Now().Unix(), next)
+		if err != nil {
 			return err
 		}
-		if err := s.Send(21323, proto.Message{"code": 1, "msg": "", "coldtime": st.MusterAt}); err != nil {
+		if !ok {
+			return s.Send(21323, proto.Message{"code": 0, "msg": "集结冷却中"})
+		}
+		if err := s.Send(21323, proto.Message{"code": 1, "msg": "", "coldtime": next}); err != nil {
 			return err
 		}
 		g.pushBossInfo(gd.GID, s.Now())
@@ -449,6 +409,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
+		h5, now := isH5Client(s), s.Now()
 		refuse := func(msg string) error { return s.Send(21308, proto.Message{"code": 0, "msg": msg}) }
 		gd, _, err := g.mine(s)
 		if errors.Is(err, errNoGuild) {
@@ -462,7 +423,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		} else if int64(fresh.Lev) < guildBossCfg.Const["join_lev"] {
 			return refuse("等级不足，需要达到10级才能参与公会副本")
 		}
-		st, err := g.bossState(gd.GID, s.Now())
+		st, err := g.bossState(gd.GID, now)
 		if err != nil {
 			return err
 		}
@@ -476,34 +437,16 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		case boss.Monster == nil:
 			return refuse("Boss数据缺失")
 		}
-		br, count, err := g.bossCount(role.RID, s.Now())
+		_, count, err := g.bossCount(role.RID, now)
 		if err != nil {
 			return err
 		}
 		if count <= 0 {
 			return refuse("挑战次数不足")
 		}
-		// the heroes: the places the client sent, else the campaign line-up
-		formType := req.Int("formation_type")
-		var slots []store.FormationSlot
-		seen := map[int64]bool{}
-		for _, p := range req.Arr("pos_info") {
-			if id := p.Int("id"); id != 0 && !seen[id] && p.Int("pos") >= 1 {
-				seen[id] = true
-				slots = append(slots, store.FormationSlot{Pos: p.Int("pos"), PartnerID: id})
-			}
-		}
-		var team []fightUnit
-		var objects []proto.Message
-		if len(slots) > 0 {
-			if formType < 1 {
-				formType = 1
-			}
-			team, objects, err = fights.teamFor(role, formType, slots)
-		} else {
-			var form store.Formation
-			team, objects, form, err = fights.teamSide(role)
-			formType = form.FormationType
+		team, objects, formType, err := fights.guildBossTeam(role, req, h5)
+		if errors.Is(err, errGuildBossFormation) {
+			return refuse("公会副本阵容不合法")
 		}
 		if err != nil {
 			return err
@@ -511,12 +454,11 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if len(team) == 0 {
 			return refuse("没有可以出战的英雄")
 		}
-		boost := int64(1000)
-		if st.BuffEnd > s.Now().Unix() && st.BuffLev > 0 {
-			boost += guildBossCfg.Buffs[st.BuffLev-1].AtkPer
-		}
-		for i := range team {
-			team[i].atk = team[i].atk * boost / 1000
+		if h5 && st.BuffEnd > now.Unix() && st.BuffLev > 0 && st.BuffLev <= int64(len(guildBossCfg.Buffs)) {
+			boost := guildBossCfg.Buffs[st.BuffLev-1].AtkPer
+			for i := range team {
+				team[i].atk += team[i].atk * boost / 1000
+			}
 		}
 		unit, obj := monsterOf(*boss.Monster, 0)
 		fightHP := min(st.HP, 1<<32-1)
@@ -524,27 +466,49 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		obj["hp"], obj["hp_max"] = fightHP, fightHP
 		rounds, _, sim := playFightOpts(team, []fightUnit{unit}, rngOf(), int(guildBossCfg.Const["action_time"]), true)
 		damage := max(0, fightHP-sim.units[len(team)].hp)
-		br.Used++
-		if err := g.Store.SaveBossRole(br); err != nil {
-			return err
-		}
 		intro := proto.Message{
 			"combat_type": combatGuildDun, "formation": []proto.Message{{"group": 1, "formation_type": formType, "formation_lev": 1}, {"group": 2, "formation_type": 1, "formation_lev": 1}},
 			"objects": append(objects, obj), "is_auto": 0, "current_wave": 1, "total_wave": 1, "play_speed": 1,
 			"extra_args": []proto.Message{}, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name, "target_role_name": boss.Name,
 			"suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 		}
-		if err := questEvent(s, g.Store, role.RID, evtGuildBoss, 1); err != nil {
+		var out bossOutcome
+		if h5 {
+			if dayKey(s.Now()) != st.Day {
+				return refuse("Boss已重置，请刷新")
+			}
+			out, err = g.bossSettle(role, gd, st, boss, damage, now, false)
+			if errors.Is(err, store.ErrConflict) {
+				return refuse("Boss状态或挑战次数已变化，请刷新")
+			}
+			if err != nil {
+				return err
+			}
+			defer func() { g.pushBossInfo(gd.GID, s.Now()) }()
+			lifeCount(g.Store, role.RID, "evt_guild_dun_fight", 1)
+		} else if err := g.Store.SpendGuildBossAttempt(gd.GID, role.RID, st.Day, guildBossCfg.Const["free_time"]); err != nil {
+			if errors.Is(err, store.ErrConflict) {
+				return refuse("挑战次数不足")
+			}
 			return err
+		}
+		if err := questEvent(s, g.Store, role.RID, evtGuildBoss, 1); err != nil {
+			if !h5 {
+				return err
+			}
+			g.Log.Printf("guild boss: record challenge quest: %v", err)
 		}
 		if err := s.Send(21308, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
 		return fights.begin(s, role, combatGuildDun, intro, rounds, damage >= fightHP, func(s *gateway.Session, _ bool) error {
-			lifeCount(g.Store, role.RID, "evt_guild_dun_fight", 1)
-			out, err := g.bossSettle(role, gd, st, boss, damage, s.Now())
-			if err != nil {
-				return err
+			if !h5 {
+				lifeCount(g.Store, role.RID, "evt_guild_dun_fight", 1)
+				var err error
+				out, err = g.bossSettle(role, gd, st, boss, damage, s.Now(), true)
+				if err != nil {
+					return err
+				}
 			}
 			if err := sendAssets(s, g.Store, role.RID); err != nil {
 				return err
@@ -557,7 +521,9 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 			if err := s.Send(21309, body); err != nil {
 				return err
 			}
-			g.pushBossInfo(gd.GID, s.Now())
+			if !h5 {
+				g.pushBossInfo(gd.GID, s.Now())
+			}
 			return nil
 		})
 	})
@@ -567,6 +533,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
+		h5, now := isH5Client(s), s.Now()
 		refuse := func(msg string) error { return s.Send(21317, proto.Message{"code": 0, "msg": msg}) }
 		gd, _, err := g.mine(s)
 		if errors.Is(err, errNoGuild) {
@@ -575,7 +542,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if err != nil {
 			return err
 		}
-		st, err := g.bossState(gd.GID, s.Now())
+		st, err := g.bossState(gd.GID, now)
 		if err != nil {
 			return err
 		}
@@ -590,18 +557,20 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if last <= 0 {
 			return refuse("还没有挑战记录，不能扫荡")
 		}
-		br, count, err := g.bossCount(role.RID, s.Now())
+		_, count, err := g.bossCount(role.RID, now)
 		if err != nil {
 			return err
 		}
 		if count <= 0 {
 			return refuse("挑战次数不足")
 		}
-		br.Used++
-		if err := g.Store.SaveBossRole(br); err != nil {
-			return err
+		if h5 && dayKey(s.Now()) != st.Day {
+			return refuse("Boss已重置，请刷新")
 		}
-		out, err := g.bossSettle(role, gd, st, boss, last, s.Now())
+		out, err := g.bossSettle(role, gd, st, boss, last, now, false)
+		if errors.Is(err, store.ErrConflict) {
+			return refuse("Boss状态或挑战次数已变化，请刷新")
+		}
 		if err != nil {
 			return err
 		}

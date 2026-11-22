@@ -7,11 +7,15 @@ import (
 	"2droundserver/internal/store"
 )
 
-// extraStats adds up the attributes of a hero's worn artifacts, holy equipment (and its suits) and horcrux that are not the four main ones:
-// the hit, dodge and crit numbers a hero entry carries (per mille, like the client's attribute values). They go into the hero entry, which
-// is also what the fight reads, so they work in battle. dam / res / tenacity / cure and the like have no place in the entry and are left.
+// extraStats adds the hit, dodge and crit rates from equipment, horcrux and guild
+// training that the hero entry carries. The values are per mille.
 func extraStats(p store.Partner) map[string]int64 {
 	out := map[string]int64{}
+	for _, key := range []string{"crit_rate", "crit_ratio", "hit_magic", "dodge_magic"} {
+		if bonus := guildSkillBonus(p, key); bonus != 0 {
+			out[key] = bonus
+		}
+	}
 	add := func(key string, v int64) {
 		switch key {
 		case "crit_rate", "crit_ratio", "hit_rate", "dodge_rate", "hit_magic", "dodge_magic":

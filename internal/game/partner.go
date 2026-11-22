@@ -114,6 +114,9 @@ func partnerStats(p store.Partner) (hp, atk, def, speed int64) {
 	hp, atk, def, speed = artifactBonus(p.Artifacts, hp, atk, def, speed) // worn artifacts
 	hp, atk, def, speed = holyBonus(p.Holy, hp, atk, def, speed)          // worn holy equipment
 	hp, atk, def, speed = horcruxBonus(p.BID, p.Horcrux, hp, atk, def, speed)
+	hp += hp * guildSkillBonus(p, "hp_max_per") / 1000
+	atk += atk * guildSkillBonus(p, "atk_per") / 1000
+	speed += guildSkillBonus(p, "speed")
 	return
 }
 
@@ -163,24 +166,29 @@ const heroSlotsPerBuy = 5
 // heroSlotCapacity is how many heroes a role may hold after `buys` purchases.
 func heroSlotCapacity(buys int) int { return heroListMax + heroSlotsPerBuy*buys }
 
+func partnerMessages(heroes []store.Partner, only map[int64]bool) []proto.Message {
+	msgs := make([]proto.Message, 0, len(heroes))
+	for _, p := range heroes {
+		if _, ok := partnerTable[p.BID]; ok && (only == nil || only[p.PartnerID]) {
+			msgs = append(msgs, partnerMessage(p))
+		}
+	}
+	return msgs
+}
+
+func sendPartnerRoster(s *gateway.Session, st *store.Store, rid int64, cmd uint16, heroes []store.Partner) error {
+	buys, err := st.HeroSlotBuys(rid)
+	if err != nil {
+		return err
+	}
+	return s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": partnerMessages(heroes, nil)})
+}
+
 // RegisterPartner registers the hero list (11000 full, 11025 brief) and the
 // details by id (11026). The first time a role asks for the list it receives
 // the starter heroes. The encoder sends only the fields a command's table has,
 // so one full message serves all three.
 func RegisterPartner(r *gateway.Router, st *store.Store) {
-	messages := func(rid int64, only map[int64]bool) ([]proto.Message, error) {
-		ps, err := st.PartnersOf(rid)
-		if err != nil {
-			return nil, err
-		}
-		msgs := make([]proto.Message, 0, len(ps))
-		for _, p := range ps {
-			if _, ok := partnerTable[p.BID]; ok && (only == nil || only[p.PartnerID]) {
-				msgs = append(msgs, partnerMessage(p))
-			}
-		}
-		return msgs, nil
-	}
 	list := func(cmd uint16) gateway.Handler {
 		return func(s *gateway.Session, _ proto.Message) error {
 			role := s.Role()
@@ -193,15 +201,11 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 			if err := expireEmpowered(st, role.RID, s.Now()); err != nil { // an empowered hero whose day is over is gone
 				return err
 			}
-			msgs, err := messages(role.RID, nil)
+			heroes, err := st.PartnersOf(role.RID)
 			if err != nil {
 				return err
 			}
-			buys, err := st.HeroSlotBuys(role.RID)
-			if err != nil {
-				return err
-			}
-			return s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": msgs})
+			return sendPartnerRoster(s, st, role.RID, cmd, heroes)
 		}
 	}
 	r.Handle(11000, list(11000))
@@ -262,7 +266,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 			out[k] = m[k]
 		}
 		for _, k := range []string{"dam", "res", "cure", "be_cure", "tenacity", "dam_p", "dam_s", "res_p", "res_s"} {
-			out[k] = a[k]
+			out[k] = a[k] + guildSkillBonus(*p, k)
 		}
 		return s.Send(11063, out)
 	})
@@ -275,11 +279,11 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 		for _, a := range req.Arr("partner_ids") {
 			only[a.Int("partner_id")] = true
 		}
-		msgs, err := messages(role.RID, only)
+		heroes, err := st.PartnersOf(role.RID)
 		if err != nil {
 			return err
 		}
-		return s.Send(11026, proto.Message{"partners": msgs})
+		return s.Send(11026, proto.Message{"partners": partnerMessages(heroes, only)})
 	})
 }
 

@@ -33,6 +33,7 @@ func setup() { c := newMatch(); c.module = aliasModule; d := &match{module: "cro
 func (c *match) load() { st.LoadState(1,c.module,nil); st.SaveGlobal("s",c.module,nil) }
 func guildKey(gid int) string { return "guild:" + strconv.Itoa(gid) }
 func load(suffix string) { st.LoadState(1,"literal",nil); st.SaveState(1,"first_"+suffix,nil); st.LoadGlobal("s",guildKey(1),nil) }
+func commit() { st.CommitModuleState("transaction", one, two, three) }
 // st.LoadState(1,"comment_only",nil)
 `)
 	if err := os.WriteFile(filepath.Join(root, "internal/game/ignored_test.go"), []byte(`package game;func test(){st.LoadState(1,"test_only",nil)}`), 0600); err != nil {
@@ -46,9 +47,9 @@ func load(suffix string) { st.LoadState(1,"literal",nil); st.SaveState(1,"first_
 	for _, e := range i.Modules {
 		keys = append(keys, e.Scope+":"+e.Key)
 	}
-	want := []string{"global:base", "global:cross", "global:guild:*", "role:base", "role:cross", "role:first_*", "role:literal"}
-	if !slices.Equal(keys, want) || i.StateCalls != 5 {
-		t.Fatalf("got %v (%d calls), want %v (5 calls)", keys, i.StateCalls, want)
+	want := []string{"global:base", "global:cross", "global:guild:*", "role:base", "role:cross", "role:first_*", "role:literal", "role:transaction"}
+	if !slices.Equal(keys, want) || i.StateCalls != 6 {
+		t.Fatalf("got %v (%d calls), want %v (6 calls)", keys, i.StateCalls, want)
 	}
 }
 

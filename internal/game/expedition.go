@@ -3,6 +3,7 @@ package game
 import (
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"time"
 
@@ -90,6 +91,8 @@ type expState struct {
 	Sent     int64 // the hero dispatched to the friends
 	Borrowed int64 // times the dispatched hero was hired today
 	Prev     expPrev
+	previous json.RawMessage
+	saved    bool
 }
 
 type expSvc struct {
@@ -155,15 +158,24 @@ func (e *expSvc) with(s *gateway.Session, fn func(role *store.Role, st *expState
 	if fresh, err := e.st.RoleByID(role.RID); err == nil {
 		role = fresh
 	}
-	st := &expState{}
-	if _, err := e.st.LoadState(role.RID, expModule, st); err != nil {
+	h5 := dungeonH5(s)
+	now := s.Now()
+	if h5 {
+		now = now.In(dayZone)
+	}
+	st, err := e.load(role.RID, now)
+	if err != nil {
 		return err
 	}
-	st.roll(s.Now())
-	if err := fn(role, st); err != nil {
+	if err := fn(role, st); err != nil || h5 || st.saved {
 		return err
 	}
-	return e.st.SaveState(role.RID, expModule, st)
+	// The original client's reads also persist the daily reset. A newer write
+	// may already have saved today's state while the response was being sent.
+	if err := e.save(role.RID, st, nil); !errors.Is(err, store.ErrConflict) {
+		return err
+	}
+	return nil
 }
 
 // pointID is the map point of a floor: a box sits after every third.
@@ -187,37 +199,6 @@ func expShare(diff int64) [][2]int64 {
 		}
 	}
 	return out
-}
-
-func (e *expSvc) gain(s *gateway.Session, role *store.Role, items [][2]int64) error {
-	ga, gi := map[int64]int64{}, map[int64]int64{}
-	splitGains(guildGains(items), 1, ga, gi)
-	if err := e.st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
-		return err
-	}
-	if s == nil {
-		return nil
-	}
-	if err := sendAssets(s, e.st, role.RID); err != nil {
-		return err
-	}
-	return sendBackpack(s, e.st)
-}
-
-// pay gives the rewards and writes them on the day's account.
-func (e *expSvc) pay(s *gateway.Session, role *store.Role, st *expState, items [][2]int64, times int64) ([]proto.Message, error) {
-	var total [][2]int64
-	out := []proto.Message{}
-	if st.Got == nil {
-		st.Got = map[string]int64{}
-	}
-	for _, it := range items {
-		n := it[1] * times
-		total = append(total, [2]int64{it[0], n})
-		st.Got[strconv.FormatInt(it[0], 10)] += n
-		out = append(out, proto.Message{"bid": it[0], "num": n})
-	}
-	return out, e.gain(s, role, total)
 }
 
 func (e *expSvc) todayRewards(st *expState) []proto.Message {
@@ -278,7 +259,7 @@ func (e *expSvc) floor(s *gateway.Session, req proto.Message) error {
 		if err != nil {
 			return err
 		}
-		best := bestHeroes(all, 5)
+		best := bestHeroes(dungeonHeroes(all, dungeonH5(s)), 5)
 		own := rolePower(best)
 		p := expCfg.Points[id-1]
 		status := int64(0)
@@ -287,11 +268,7 @@ func (e *expSvc) floor(s *gateway.Session, req proto.Message) error {
 		}
 		body := proto.Message{"id": id, "rid": role.RID, "srv_id": role.SrvID, "name": role.Name, "face": role.FaceID, "lev": role.Lev, "power": own,
 			"guards": []proto.Message{}, "is_holiday": 0, "status": status}
-		rewards := []proto.Message{}
-		for _, it := range expShare(st.Diff) {
-			rewards = append(rewards, proto.Message{"bid": it[0], "num": it[1]})
-		}
-		body["rewards"] = rewards
+		body["rewards"] = expeditionLootMessage(expShare(st.Diff))
 		if p.Type == 1 {
 			body["guards"] = expGuards(best, expGuardPower(own, st.Diff, p.Floor))
 		}
@@ -315,7 +292,13 @@ func (e *expSvc) takeBox(s *gateway.Session, req proto.Message) error {
 			}
 		}
 		st.Taken = append(st.Taken, id)
-		if _, err := e.pay(s, role, st, expShare(st.Diff), 1); err != nil {
+		loot := expeditionLoot(st, 1)
+		if err := e.save(role.RID, st, loot); errors.Is(err, store.ErrConflict) {
+			return refuse("远征进度已更新，请重试")
+		} else if err != nil {
+			return err
+		}
+		if err := e.sendBalances(s, role.RID); err != nil {
 			return err
 		}
 		return s.Send(24402, proto.Message{"code": 1, "msg": "领取成功", "id": id})
@@ -341,10 +324,12 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 		case st.guard() > expLastPoint:
 			return refuse("今日远征已全部通关")
 		}
+		h5 := dungeonH5(s)
 		all, err := e.st.PartnersOf(role.RID)
 		if err != nil {
 			return err
 		}
+		all = dungeonHeroes(all, h5)
 		byID := map[int64]store.Partner{}
 		for _, h := range all {
 			byID[h.PartnerID] = h
@@ -366,7 +351,7 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 				continue
 			}
 			for _, h := range st.Hired {
-				if h.PID == id && h.RID == owner && !h.Used {
+				if h.PID == id && h.RID == owner && !h.Used && dungeonHeroAllowed(h5, h.BID, h.Star) {
 					seen[id] = true
 					roster = append(roster, pfHero{Flag: 1, PID: id, BID: h.BID, Lev: h.Lev, Star: h.Star, HP: h.Per})
 					slots = append(slots, pfSlot{Pos: p.Int("pos"), ID: id, Flag: 1})
@@ -378,8 +363,17 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 		}
 		point := st.guard()
 		floor := expCfg.Points[point-1].Floor
-		pf, msg, err := planesFight(e.st, e.fights, role, roster, slots, req.Int("formation_type"),
-			expGuardPower(rolePower(bestHeroes(all, 5)), st.Diff, floor), "远征守卫", []proto.Message{{"param": floor}}, combatExpedit)
+		best := bestHeroes(all, 5)
+		power := expGuardPower(rolePower(best), st.Diff, floor)
+		if h5 && len(best) == 0 {
+			return refuse("守卫已无法应战")
+		}
+		if !h5 {
+			best = nil
+		}
+		extra := []proto.Message{{"param": floor}}
+		pf, msg, err := planesFightWithGuards(e.st, e.fights, role, roster, slots, req.Int("formation_type"),
+			power, "远征守卫", extra, combatExpedit, best)
 		if err != nil {
 			return err
 		}
@@ -389,23 +383,27 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 		if err := s.Send(24403, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
-		diff, fighters, ft, left := st.Diff, pf.fighters, pf.formType, pf.left
+		day, diff := st.Day, st.Diff
 		return e.fights.begin(s, role, combatExpedit, pf.intro, pf.rounds, pf.won, func(s *gateway.Session, won bool) error {
-			return e.settle(s, point, diff, fighters, ft, left, won)
+			return e.settle(s, day, point, diff, pf, won)
 		})
 	})
 }
 
-func (e *expSvc) settle(s *gateway.Session, point, diff int64, fighters []pfSlot, formType int64, left map[int64]int64, won bool) error {
+func (e *expSvc) settle(s *gateway.Session, day, point, diff int64, fight *planesFightPlan, won bool) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
-		if st.Diff != diff || st.guard() != point { // the day turned meanwhile
+		h5 := dungeonH5(s)
+		if st.Diff != diff || st.guard() != point || (h5 && st.Day != day) {
+			if h5 {
+				return sendExpeditionResult(s, 0, nil)
+			}
 			return nil
 		}
 		if st.Hurt == nil {
 			st.Hurt = map[string]int64{}
 		}
-		for _, sl := range fighters {
-			per := left[battleCell(formType, sl.Pos)]
+		for _, sl := range fight.fighters {
+			per := fight.left[battleCell(fight.formType, sl.Pos)]
 			if sl.Flag == 0 {
 				st.Hurt[strconv.FormatInt(sl.ID, 10)] = per
 				continue
@@ -417,34 +415,30 @@ func (e *expSvc) settle(s *gateway.Session, point, diff int64, fighters []pfSlot
 				}
 			}
 		}
-		items := []proto.Message{}
+		var loot [][2]int64
 		result := int64(2)
 		if won {
 			result = 1
-			var err error
-			if items, err = e.pay(s, role, st, expShare(diff), 1); err != nil {
-				return err
-			}
-			for i := range items {
-				items[i]["is_bind"], items[i]["id"] = 1, 0
-			}
+			loot = expeditionLoot(st, 1)
 			st.Guard = expNext(point)
 			if st.Guard > expLastPoint {
 				st.Max = max(st.Max, diff)
 			}
 		}
-		if err := s.Send(20006, proto.Message{"result": result, "item_rewards": items, "show_panel_type": 1, "current_time": 0, "best_time": 0, "combat_type": combatExpedit,
-			"target_role_name": "远征守卫", "hurt_statistics": []proto.Message{}, "adventure_end_hp": 0, "room_id": 0, "ext_list": []proto.Message{}}); err != nil {
+		if err := e.save(role.RID, st, loot); errors.Is(err, store.ErrConflict) {
+			return sendExpeditionResult(s, 0, nil)
+		} else if err != nil {
 			return err
 		}
-		if !won {
-			return nil
+		if won {
+			if err := e.sendBalances(s, role.RID); err != nil {
+				return err
+			}
 		}
-		rewards := []proto.Message{}
-		for _, it := range items {
-			rewards = append(rewards, proto.Message{"bid": it.Int("bid"), "num": it.Int("num")})
+		if err := sendExpeditionResult(s, result, loot); err != nil || !won {
+			return err
 		}
-		if err := s.Send(24414, proto.Message{"guard_id": point, "floor_id": expCfg.Points[point-1].Floor, "rewards": rewards}); err != nil {
+		if err := s.Send(24414, proto.Message{"guard_id": point, "floor_id": expCfg.Points[point-1].Floor, "rewards": expeditionLootMessage(loot)}); err != nil {
 			return err
 		}
 		return e.sendInfo(s, st)
@@ -476,34 +470,39 @@ func (e *expSvc) choose(s *gateway.Session, req proto.Message) error {
 		if err != nil {
 			return err
 		}
-		if msg := e.open(role, st, diff, rolePower(bestHeroes(all, 5))); msg != "" {
+		if msg := e.open(role, st, diff, rolePower(dungeonHeroes(all, dungeonH5(s)))); msg != "" {
 			return refuse(msg)
 		}
 		st.Diff, st.Guard, st.Taken, st.Got = diff, 1, nil, nil
+		var loot [][2]int64
+		sweep := min(st.Prev.Cleared-expCfg.num("regression_level"), expFloors)
+		if st.Prev.Diff == diff && sweep > 0 {
+			loot = expeditionLoot(st, sweep+sweep/3)
+			st.Guard = expNext(expPointID(sweep))
+			for _, p := range expCfg.Points {
+				if p.Type == 2 && p.ID < st.Guard {
+					st.Taken = append(st.Taken, p.ID)
+				}
+			}
+			if st.Guard > expLastPoint {
+				st.Max = max(st.Max, diff)
+			}
+		}
+		if err := e.save(role.RID, st, loot); errors.Is(err, store.ErrConflict) {
+			return refuse("远征进度已更新，请重试")
+		} else if err != nil {
+			return err
+		}
 		if err := s.Send(24412, proto.Message{"code": 1, "msg": "选择成功"}); err != nil {
 			return err
 		}
-		// the same difficulty as yesterday: what it cleared beyond the backoff is swept at once
-		sweep := st.Prev.Cleared - expCfg.num("regression_level")
-		if st.Prev.Diff != diff || sweep <= 0 {
-			return e.sendInfo(s, st)
-		}
-		sweep = min(sweep, expFloors)
-		rewards, err := e.pay(s, role, st, expShare(diff), sweep+sweep/3)
-		if err != nil {
-			return err
-		}
-		st.Guard = expNext(expPointID(sweep))
-		for _, p := range expCfg.Points { // the boxes passed were paid with the floors
-			if p.Type == 2 && p.ID < st.Guard {
-				st.Taken = append(st.Taken, p.ID)
+		if len(loot) > 0 {
+			if err := e.sendBalances(s, role.RID); err != nil {
+				return err
 			}
-		}
-		if st.Guard > expLastPoint {
-			st.Max = max(st.Max, diff)
-		}
-		if err := s.Send(24414, proto.Message{"guard_id": expPointID(sweep), "floor_id": sweep, "rewards": rewards}); err != nil {
-			return err
+			if err := s.Send(24414, proto.Message{"guard_id": expPointID(sweep), "floor_id": sweep, "rewards": expeditionLootMessage(loot)}); err != nil {
+				return err
+			}
 		}
 		return e.sendInfo(s, st)
 	})

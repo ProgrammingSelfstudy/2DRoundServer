@@ -130,6 +130,11 @@ func damageTable(st *store.Store, role *store.Role) (stats []proto.Message, mvpB
 	if err != nil {
 		return nil, 0, 0, 0, err
 	}
+	stats, mvpBID, mvpHurt, totalHurt = formationDamage(role, team, heroes)
+	return stats, mvpBID, mvpHurt, totalHurt, nil
+}
+
+func formationDamage(role *store.Role, team store.Formation, heroes []store.Partner) (stats []proto.Message, mvpBID, mvpHurt, totalHurt int64) {
 	byID := map[int64]store.Partner{}
 	for _, h := range heroes {
 		byID[h.PartnerID] = h
@@ -149,7 +154,7 @@ func damageTable(st *store.Store, role *store.Role) (stats []proto.Message, mvpB
 			mvpBID, mvpHurt = h.BID, dps
 		}
 	}
-	return stats, mvpBID, mvpHurt, totalHurt, nil
+	return stats, mvpBID, mvpHurt, totalHurt
 }
 
 // defeatDrama tells the client the fight was lost: the result screen with no

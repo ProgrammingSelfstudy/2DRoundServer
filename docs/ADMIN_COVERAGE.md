@@ -82,7 +82,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `halidom` | 元素信念（22200–22205） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [halidom.go](../internal/game/halidom.go) |
 | role | `hallows` | 神技（24100–24135） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [hallows.go](../internal/game/hallows.go) |
 | role | `heaven` | 天界（25200–25232） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [heaven.go](../internal/game/heaven.go) |
-| role | `heroexpedit` | 英雄远征（24400–24415） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [expedition.go](../internal/game/expedition.go)、[expedition_help.go](../internal/game/expedition_help.go) |
+| role | `heroexpedit` | 英雄远征（24400–24415） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [expedition_progress.go](../internal/game/expedition_progress.go)、[expedition_help.go](../internal/game/expedition_help.go) |
 | role | `holelite` | 节日精英召唤/新春赐福（23220–23222） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [holiday_elite.go](../internal/game/holiday_elite.go) |
 | role | `holyeqm` | 神装实例/洗练/方案（11086–11094、25220–25224） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [holyeqm.go](../internal/store/holyeqm.go) |
 | role | `homepet` | 家园宠物旅行（26100–26113） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [homepet.go](../internal/game/homepet.go) |

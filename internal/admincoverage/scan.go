@@ -194,19 +194,22 @@ func scanPackage(root, dir string) (Inventory, error) {
 				return true
 			}
 			scope := ""
+			moduleArg, validArgs := 1, len(c.Args) == 3
 			switch method.Sel.Name {
 			case "LoadState", "SaveState":
 				scope = "role"
+			case "CommitModuleState":
+				scope, moduleArg, validArgs = "role", 0, len(c.Args) >= 2
 			case "LoadGlobal", "SaveGlobal":
 				scope = "global"
 			default:
 				return true
 			}
-			if len(c.Args) != 3 {
+			if !validArgs {
 				scanErr = fmt.Errorf("%s: unsupported persistence call", s.fset.Position(c.Pos()))
 				return false
 			}
-			keys, err := s.keys(c.Args[1], 0)
+			keys, err := s.keys(c.Args[moduleArg], 0)
 			if err != nil {
 				scanErr = fmt.Errorf("%s: %s module: %w", s.fset.Position(c.Pos()), method.Sel.Name, err)
 				return false

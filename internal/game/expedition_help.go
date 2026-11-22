@@ -1,6 +1,8 @@
 package game
 
 import (
+	"errors"
+
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
 	"2droundserver/internal/store"
@@ -28,13 +30,14 @@ func (e *expSvc) partner(rid, id int64) (*store.Partner, error) {
 // mySent (24405) is the hero the role lent to the friends.
 func (e *expSvc) mySent(s *gateway.Session, _ proto.Message) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
+		h5 := dungeonH5(s)
 		list := []proto.Message{}
 		if st.Sent != 0 {
 			h, err := e.partner(role.RID, st.Sent)
 			if err != nil {
 				return err
 			}
-			if h != nil {
+			if h != nil && dungeonHeroAllowed(h5, h.BID, int64(h.Star)) {
 				list = append(list, e.heroMessage(*h))
 			}
 		}
@@ -53,10 +56,17 @@ func (e *expSvc) dispatch(s *gateway.Session, req proto.Message) error {
 			return err
 		case h == nil:
 			return refuse("英雄不存在")
+		case !dungeonHeroAllowed(dungeonH5(s), h.BID, int64(h.Star)):
+			return refuse("只能派遣初始五星英雄")
 		case h.ResSlot > 0:
 			return refuse("原力水晶槽位中的英雄不能派遣")
 		}
 		st.Sent = id
+		if err := e.save(role.RID, st, nil); errors.Is(err, store.ErrConflict) {
+			return refuse("远征进度已更新，请重试")
+		} else if err != nil {
+			return err
+		}
 		return s.Send(24407, proto.Message{"code": 1, "msg": "派遣成功", "id": id})
 	})
 }
@@ -64,6 +74,7 @@ func (e *expSvc) dispatch(s *gateway.Session, req proto.Message) error {
 // friendHeroes (24406) lists the heroes lent by the friends of the same server, and whether they are hired today.
 func (e *expSvc) friendHeroes(s *gateway.Session, _ proto.Message) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
+		h5 := dungeonH5(s)
 		friends, err := e.st.Friends(role.RID)
 		if err != nil {
 			return err
@@ -84,7 +95,7 @@ func (e *expSvc) friendHeroes(s *gateway.Session, _ proto.Message) error {
 			if err != nil {
 				return err
 			}
-			if h == nil {
+			if h == nil || !dungeonHeroAllowed(h5, h.BID, int64(h.Star)) {
 				continue
 			}
 			m := e.heroMessage(*h)
@@ -107,12 +118,18 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 	rid, id := req.Int("rid"), req.Int("id")
 	return e.with(s, func(role *store.Role, st *expState) error {
 		refuse := func(msg string) error { return s.Send(24408, proto.Message{"code": 0, "msg": msg}) }
+		h5 := dungeonH5(s)
+		var hired int64
 		for _, h := range st.Hired {
+			if !dungeonHeroAllowed(h5, h.BID, h.Star) {
+				continue
+			}
+			hired++
 			if h.RID == rid && h.PID == id {
 				return refuse("今天已经雇佣过该英雄")
 			}
 		}
-		if int64(len(st.Hired)) >= expCfg.num("num_employees") {
+		if hired >= expCfg.num("num_employees") {
 			return refuse("今日雇佣次数已满")
 		}
 		ok, err := e.st.AreFriends(role.RID, rid)
@@ -123,17 +140,23 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 		if err != nil || !ok || owner.SrvID != role.SrvID {
 			return refuse("只能雇佣本服好友的英雄")
 		}
-		fs := &expState{}
-		if _, err := e.st.LoadState(rid, expModule, fs); err != nil {
+		now := s.Now()
+		if h5 {
+			now = dayTime(st.Day)
+		}
+		fs, err := e.load(rid, now)
+		if err != nil {
 			return err
 		}
-		fs.roll(s.Now())
 		target, err := e.partner(rid, id)
 		if err != nil {
 			return err
 		}
 		if fs.Sent != id || target == nil {
 			return refuse("该英雄未派遣")
+		}
+		if !dungeonHeroAllowed(h5, target.BID, int64(target.Star)) {
+			return refuse("只能雇佣初始五星英雄")
 		}
 		if fs.Borrowed >= expCfg.num("num_employment") {
 			return refuse("该英雄今日被雇佣次数已满")
@@ -143,7 +166,7 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 			return err
 		}
 		var best int64
-		for _, h := range mine {
+		for _, h := range dungeonHeroes(mine, h5) {
 			best = max(best, partnerMessage(h).Int("power"))
 		}
 		if partnerMessage(*target).Int("power")*1000 > best*expCfg.num("war_ratio") {
@@ -151,12 +174,12 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 		}
 		st.Hired = append(st.Hired, expHire{RID: rid, SrvID: owner.SrvID, PID: id, BID: target.BID, Lev: int64(target.Lev), Star: int64(target.Star), Per: 100})
 		fs.Borrowed++
-		if err := e.gain(nil, owner, expCfg.Drop()); err != nil {
+		if err := e.st.CommitModuleState(expModule, expeditionChange(role.RID, st, nil), expeditionChange(rid, fs, expCfg.Drop())); errors.Is(err, store.ErrConflict) {
+			return refuse("远征进度已更新，请重试")
+		} else if err != nil {
 			return err
 		}
-		if err := e.st.SaveState(rid, expModule, fs); err != nil {
-			return err
-		}
+		st.saved = true
 		return s.Send(24408, proto.Message{"code": 1, "msg": "雇佣成功"})
 	})
 }
@@ -164,8 +187,12 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 // hp (24409) is the hp the heroes carry over, and the heroes hired today.
 func (e *expSvc) hp(s *gateway.Session, _ proto.Message) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
+		h5 := dungeonH5(s)
 		list := []proto.Message{}
 		for _, h := range st.Hired {
+			if !dungeonHeroAllowed(h5, h.BID, h.Star) {
+				continue
+			}
 			owner, _ := e.st.RoleByID(h.RID)
 			name := ""
 			if owner != nil {
@@ -180,7 +207,7 @@ func (e *expSvc) hp(s *gateway.Session, _ proto.Message) error {
 		if err != nil {
 			return err
 		}
-		for _, h := range all {
+		for _, h := range dungeonHeroes(all, h5) {
 			if per := st.hurt(h.PartnerID); per < 100 {
 				plist = append(plist, proto.Message{"id": h.PartnerID, "hp_per": per})
 			}

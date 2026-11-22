@@ -32,6 +32,7 @@ type env struct {
 	st      *store.Store
 	gw      *gateway.Server
 	addr    string
+	connect func() (net.Conn, error)
 	logs    *syncBuf
 	login   *Login
 	friends *FriendService
@@ -52,6 +53,9 @@ func (e *env) advance(d time.Duration) { e.clk.Add(int64(d)) }
 
 // setNow puts the gateway's clock at t.
 func (e *env) setNow(t time.Time) { e.clk.Store(t.UnixNano()) }
+
+// setupEnv builds the game stack without listening (the dungeon tests use it).
+func setupEnv(t *testing.T, idle time.Duration) *env { return newGameEnv(t, idle) }
 
 func newEnv(t *testing.T, idle time.Duration) *env {
 	t.Helper()
@@ -215,7 +219,11 @@ type client struct {
 
 func (e *env) dial(handshake bool) *client {
 	e.t.Helper()
-	c, err := net.Dial("tcp", e.addr)
+	connect := e.connect
+	if connect == nil {
+		connect = func() (net.Conn, error) { return net.Dial("tcp", e.addr) }
+	}
+	c, err := connect()
 	if err != nil {
 		e.t.Fatal(err)
 	}

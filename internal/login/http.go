@@ -28,19 +28,10 @@ type Server struct {
 
 const platform = "symlf" // PLATFORM_NAME in the client's config.lua
 
-// platformOf is the platform an account endpoint works on: the H5 client adds client=h5 to its login, register and token calls and gets its
-// own accounts (store.PlatformH5); every other client keeps "symlf".
-func platformOf(r *http.Request) string {
-	if r.URL.Query().Get("client") == "h5" {
-		return store.PlatformH5
-	}
-	return platform
-}
-
 func (s *Server) Handler() http.Handler {
 	// A plain HandlerFunc (not ServeMux) so odd client paths are not redirected.
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.Log.Printf("http %s %s from %s", r.Method, r.URL.RequestURI(), r.RemoteAddr)
+		s.Log.Printf("http %s %s from %s", r.Method, r.URL.EscapedPath(), r.RemoteAddr)
 		// The client's URLs were patched in place at equal length, so they may
 		// carry filler such as "////log" or "?&&&username=": match loosely.
 		p := r.URL.Path
@@ -152,21 +143,36 @@ func (s *Server) serverList(w http.ResponseWriter, r *http.Request) {
 		serverEntry(def, s.payHost()), strings.Join(entries, ", "))
 }
 
-// makeToken issues the token the client later puts into the 1164 args.
-// The reply is a Lua table whose msg field is the token (login_controller.lua).
+// makeToken issues a username-only token for the 1164 args. H5 accounts with a
+// password get their token from userLogin. The Lua reply carries it in msg.
 func (s *Server) makeToken(w http.ResponseWriter, r *http.Request) {
-	user := r.URL.Query().Get("username")
+	plat, user, ok := tokenUsername(w, r)
+	if !ok {
+		return
+	}
 	if user == "" {
 		fmt.Fprint(w, `{code=0, msg="missing username"}`)
 		return
 	}
-	acc, err := s.Store.FindOrCreateAccount(platformOf(r), user)
+	findAccount := s.Store.FindOrCreateAccount
+	if plat == store.PlatformH5 && !s.Cfg.LoginHTTP.AutoRegister {
+		findAccount = s.Store.AccountByName
+	}
+	acc, err := findAccount(plat, user)
 	if err != nil || acc.Status != 1 {
 		fmt.Fprint(w, `{code=0, msg="account unavailable"}`)
 		return
 	}
 	ttl := int64(s.Cfg.LoginHTTP.TokenTTLHours) * 3600
-	tok, err := s.Store.IssueToken(acc.ID, ttl)
+	issueToken := s.Store.IssueToken
+	if plat == store.PlatformH5 {
+		issueToken = s.Store.IssuePasswordlessToken
+	}
+	tok, err := issueToken(acc.ID, ttl)
+	if errors.Is(err, store.ErrNotFound) {
+		fmt.Fprint(w, `{code=0, msg="account unavailable"}`)
+		return
+	}
 	if err != nil {
 		http.Error(w, "token", http.StatusInternalServerError)
 		return
@@ -180,32 +186,32 @@ func (s *Server) makeToken(w http.ResponseWriter, r *http.Request) {
 // success, and msg is then the login token. With auto_register on, an unknown
 // account is created with the password it presented (development convenience).
 func (s *Server) userLogin(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	user, pass := q.Get("username"), q.Get("password")
-	acc, err := s.Store.AccountByName(platformOf(r), user)
-	switch {
-	case errors.Is(err, store.ErrNotFound):
+	plat, user, pass, ok := accountCredentials(w, r)
+	if !ok {
+		return
+	}
+	acc, err := s.Store.AccountByName(plat, user)
+	if errors.Is(err, store.ErrNotFound) {
 		if !s.Cfg.LoginHTTP.AutoRegister || user == "" {
 			fmt.Fprint(w, `{msg="206"}`)
 			return
 		}
 		h, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-		if acc, err = s.Store.CreateAccount(platformOf(r), user, string(h), ""); err != nil {
+		acc, err = s.Store.CreateAccount(plat, user, string(h), "")
+		if plat == store.PlatformH5 && errors.Is(err, store.ErrConflict) {
+			acc, err = s.Store.AccountByName(plat, user)
+			if err == nil && !s.verifyAccountPassword(w, acc, pass) {
+				return
+			}
+		}
+		if err != nil {
 			http.Error(w, "create", http.StatusInternalServerError)
 			return
 		}
-	case err != nil:
+	} else if err != nil {
 		http.Error(w, "lookup", http.StatusInternalServerError)
 		return
-	case acc.Status != 1:
-		fmt.Fprint(w, `{msg="208"}`)
-		return
-	case acc.PasswordHash == "":
-		// created by the token endpoint without a password: adopt this one
-		h, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-		s.Store.SetAccountPassword(acc.ID, string(h))
-	case bcrypt.CompareHashAndPassword([]byte(acc.PasswordHash), []byte(pass)) != nil:
-		fmt.Fprint(w, `{msg="207"}`)
+	} else if !s.verifyAccountPassword(w, acc, pass) {
 		return
 	}
 	// The client keeps this reply's msg in a global and later sends it as the
@@ -218,14 +224,43 @@ func (s *Server) userLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{code=1, msg=%s}`, luaStr(tok))
 }
 
+func (s *Server) verifyAccountPassword(w http.ResponseWriter, acc *store.Account, pass string) bool {
+	if acc.Status == 1 && acc.PasswordHash == "" {
+		// The token endpoint created this account without a password.
+		hash, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
+		if acc.Platform != store.PlatformH5 {
+			s.Store.SetAccountPassword(acc.ID, string(hash))
+			return true
+		}
+		if err == nil {
+			acc, err = s.Store.ClaimAccountPassword(acc.ID, string(hash))
+		}
+		if err != nil {
+			http.Error(w, "password", http.StatusInternalServerError)
+			return false
+		}
+	}
+	switch {
+	case acc.Status != 1:
+		fmt.Fprint(w, `{msg="208"}`)
+	case bcrypt.CompareHashAndPassword([]byte(acc.PasswordHash), []byte(pass)) != nil:
+		fmt.Fprint(w, `{msg="207"}`)
+	default:
+		return true
+	}
+	return false
+}
+
 var (
 	reUser = regexp.MustCompile(`^[A-Za-z0-9]{6,12}$`)
 )
 
 // userReg: "205" registered, "200" already exists, "203" bad name, "204" bad password.
 func (s *Server) userReg(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	user, pass := q.Get("username"), q.Get("password")
+	plat, user, pass, ok := accountCredentials(w, r)
+	if !ok {
+		return
+	}
 	if !reUser.MatchString(user) {
 		fmt.Fprint(w, `{msg="203"}`)
 		return
@@ -235,7 +270,7 @@ func (s *Server) userReg(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	h, _ := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
-	if _, err := s.Store.CreateAccount(platformOf(r), user, string(h), ""); errors.Is(err, store.ErrConflict) {
+	if _, err := s.Store.CreateAccount(plat, user, string(h), ""); errors.Is(err, store.ErrConflict) {
 		fmt.Fprint(w, `{msg="200"}`)
 		return
 	} else if err != nil {

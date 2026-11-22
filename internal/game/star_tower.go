@@ -237,7 +237,7 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
-		stats, _, _, _, err := damageTable(st, role)
+		stats, _, _, _, err := damageTable(st, role, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -279,7 +279,7 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 			}
 			t.Used++
 		}
-		team, objects, form, err := fights.teamSide(role)
+		team, objects, form, err := fights.teamSide(role, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -315,7 +315,7 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		}
 		return fights.begin(s, role, combatStarTower, intro, rounds, won, func(s *gateway.Session, won bool) error {
 			if !won {
-				stats, _, _, _, err := damageTable(st, role)
+				stats, _, _, _, err := damageTable(st, role, isH5RoleSession(s))
 				if err != nil {
 					return err
 				}

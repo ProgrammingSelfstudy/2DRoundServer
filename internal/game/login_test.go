@@ -54,9 +54,6 @@ func (e *env) advance(d time.Duration) { e.clk.Add(int64(d)) }
 // setNow puts the gateway's clock at t.
 func (e *env) setNow(t time.Time) { e.clk.Store(t.UnixNano()) }
 
-// setupEnv builds the game stack without listening (the dungeon tests use it).
-func setupEnv(t *testing.T, idle time.Duration) *env { return newGameEnv(t, idle) }
-
 func newEnv(t *testing.T, idle time.Duration) *env {
 	t.Helper()
 	e := newGameEnv(t, idle)
@@ -113,6 +110,7 @@ func newGameEnv(t *testing.T, idle time.Duration) *env {
 	RegisterLooks(gw.Router, st)
 	RegisterRoleMisc(gw.Router, st)
 	RegisterShop(gw.Router, st)
+	RegisterH5Shop(gw.Router, st)
 	RegisterMarket(gw.Router, st)
 	RegisterArena(gw.Router, st)
 	RegisterStarTower(gw.Router, st)
@@ -230,7 +228,9 @@ func (e *env) dial(handshake bool) *client {
 	e.t.Cleanup(func() { c.Close() })
 	schema, _ := proto.LoadSchema()
 	if handshake {
-		c.Write([]byte(proto.Handshake))
+		if _, err := c.Write([]byte(proto.Handshake)); err != nil {
+			e.t.Fatal(err)
+		}
 	}
 	return &client{t: e.t, c: c, br: bufio.NewReader(c), schema: schema}
 }

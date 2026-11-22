@@ -116,7 +116,7 @@ func (l *Login) roleDataRequest(s *gateway.Session, _ proto.Message) error {
 	if err := pushDrama(s, l.Store, fresh.RID); err != nil {
 		return err
 	}
-	if isH5Session(s) {
+	if isH5RoleSession(s) {
 		if err := sendRolePower(s, l.Store, fresh.RID, 0); err != nil {
 			return err
 		}

@@ -85,14 +85,8 @@ func (f *FriendService) blackRemove(s *gateway.Session, req proto.Message) error
 		return nil
 	}
 	rid, srvID := req.Int("rid"), req.Str("srv_id")
-	if srvID != f.SrvID {
-		h5, err := h5SocialViewer(f.Store, s, me)
-		if err != nil {
-			return err
-		}
-		if h5 {
-			return s.Send(13333, proto.Message{"code": 0, "msg": "暂不支持跨服好友", "rid": rid, "srv_id": srvID})
-		}
+	if srvID != f.SrvID && isH5RoleSession(s) {
+		return s.Send(13333, proto.Message{"code": 0, "msg": "暂不支持跨服好友", "rid": rid, "srv_id": srvID})
 	}
 	gone, err := f.Store.RemoveBlack(me.RID, rid)
 	if err != nil {

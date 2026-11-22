@@ -15,11 +15,6 @@ const (
 	h5GuildBoss
 )
 
-func isH5Client(s *gateway.Session) bool {
-	account := s.Account()
-	return account != nil && account.Platform == store.PlatformH5
-}
-
 // Use the same currency IDs that the guild handlers charge and credit.
 func guildAmounts(list [][2]int64) [][2]int64 {
 	out := make([][2]int64, 0, len(list))
@@ -102,7 +97,7 @@ func (g *GuildService) registerH5Guild(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
-		if !isH5Client(s) {
+		if !isH5RoleSession(s) {
 			return gcode(s, proto.H5GuildView, false, "当前客户端不支持此公会页面")
 		}
 		var data any

@@ -192,7 +192,7 @@ func sendPartnerRoster(s *gateway.Session, st *store.Store, rid int64, cmd uint1
 	if err != nil {
 		return err
 	}
-	return s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": partnerMessages(visiblePartners(heroes, isH5Session(s)), nil)})
+	return s.Send(cmd, proto.Message{"sort_type": 0, "num": heroSlotCapacity(buys), "buy_num": buys, "partners": partnerMessages(visiblePartners(heroes, isH5RoleSession(s)), nil)})
 }
 
 // RegisterPartner registers the hero list (11000 full, 11025 brief) and the
@@ -227,7 +227,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 			if err := expireEmpowered(st, role.RID, s.Now()); err != nil { // an empowered hero whose day is over is gone
 				return err
 			}
-			h5 := isH5Session(s)
+			h5 := isH5RoleSession(s)
 			msgs, err := messages(role.RID, nil, h5)
 			if err != nil {
 				return err
@@ -293,7 +293,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if !visiblePartner(*p, isH5Session(s)) {
+		if !visiblePartner(*p, isH5RoleSession(s)) {
 			return nil
 		}
 		m := partnerMessage(*p)
@@ -316,7 +316,7 @@ func RegisterPartner(r *gateway.Router, st *store.Store) {
 		for _, a := range req.Arr("partner_ids") {
 			only[a.Int("partner_id")] = true
 		}
-		msgs, err := messages(role.RID, only, isH5Session(s))
+		msgs, err := messages(role.RID, only, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}

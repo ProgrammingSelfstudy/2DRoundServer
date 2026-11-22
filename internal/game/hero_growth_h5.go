@@ -10,29 +10,39 @@ import (
 	"2droundserver/internal/store"
 )
 
-const h5MinPartnerStar = 5
+const h5MinHeroStar = 5
 
-func isH5Session(s *gateway.Session) bool {
-	account := s.Account()
-	return account != nil && account.Platform == store.PlatformH5
+func h5HeroEligible(bid int64, star int) bool {
+	_, known := partnerTable[bid]
+	return known && star >= h5MinHeroStar
 }
 
 func visiblePartner(p store.Partner, h5 bool) bool {
+	if h5 {
+		return h5HeroEligible(p.BID, p.Star)
+	}
 	_, known := partnerTable[p.BID]
-	return known && (!h5 || p.Star >= h5MinPartnerStar)
+	return known
+}
+
+func playablePartners(heroes []store.Partner, h5 bool) []store.Partner {
+	if h5 {
+		return visiblePartners(heroes, true)
+	}
+	return heroes
 }
 
 // The list handlers filter their query results. Apply the same star floor to
 // roster pushes, including changes sent by summons, resonance and admin grants.
 func registerH5RosterPushFilters(r *gateway.Router) {
 	r.FilterSend(11001, func(s *gateway.Session, msg proto.Message) proto.Message {
-		if !isH5Session(s) {
+		if !isH5RoleSession(s) {
 			return msg
 		}
 		partners := msg.Arr("partners")
 		visible := make([]proto.Message, 0, len(partners))
 		for _, p := range partners {
-			if p.Int("star") >= h5MinPartnerStar {
+			if h5HeroEligible(p.Int("bid"), int(p.Int("star"))) {
 				visible = append(visible, p)
 			}
 		}
@@ -42,7 +52,7 @@ func registerH5RosterPushFilters(r *gateway.Router) {
 		return proto.Message{"partners": visible}
 	})
 	r.FilterSend(11002, func(s *gateway.Session, msg proto.Message) proto.Message {
-		if isH5Session(s) && msg.Int("star") < h5MinPartnerStar {
+		if isH5RoleSession(s) && !h5HeroEligible(msg.Int("bid"), int(msg.Int("star"))) {
 			return nil
 		}
 		return msg
@@ -84,7 +94,7 @@ func h5StarRecipe(row starInfo) starInfo {
 	camps := append([][3]int64(nil), row.CampFodder...)
 	for _, f := range row.Fodder {
 		base, ok := partnerTable[f[0]]
-		if f[1] == h5MinPartnerStar && ok && base.InitStar < h5MinPartnerStar {
+		if f[1] == h5MinHeroStar && ok && base.InitStar < h5MinHeroStar {
 			camps = append(camps, [3]int64{int64(base.Camp), f[1], f[2]})
 		} else {
 			specific = append(specific, f)

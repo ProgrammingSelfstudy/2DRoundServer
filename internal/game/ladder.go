@@ -615,7 +615,7 @@ func (l *ladderSvc) challenge(s *gateway.Session, req proto.Message) error {
 		return refuse("挑战次数不足")
 	}
 	fights := fightServiceOf(l.st)
-	team, objects, form, err := fights.teamSide(role)
+	team, objects, form, err := fights.teamSide(role, isH5RoleSession(s))
 	if err != nil {
 		l.mu.Unlock()
 		return err
@@ -741,7 +741,7 @@ func (l *ladderSvc) settle(s *gateway.Session, foe ladderFoe, won bool, replayID
 	if err := l.pay(role.RID, reward); err != nil {
 		return err
 	}
-	stats, _, _, _, err := damageTable(l.st, role)
+	stats, _, _, _, err := damageTable(l.st, role, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

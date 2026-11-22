@@ -285,7 +285,8 @@ func (l *leSvc) fight(s *gateway.Session, _ proto.Message) error {
 		case st.Count <= 0:
 			return refuse("今日次数已用完~~")
 		}
-		form, err := formationOf(l.st, role.RID, formLE)
+		h5 := isH5RoleSession(s)
+		form, err := formationForRole(l.st, role.RID, formLE, h5)
 		if err != nil {
 			return err
 		}
@@ -295,7 +296,7 @@ func (l *leSvc) fight(s *gateway.Session, _ proto.Message) error {
 				return refuse("英雄使用次数已满")
 			}
 		}
-		team, objects, err := l.fights.teamFor(role, max(1, form.FormationType), form.Slots)
+		team, objects, err := l.fights.teamFor(role, max(1, form.FormationType), form.Slots, h5)
 		if err != nil {
 			return err
 		}

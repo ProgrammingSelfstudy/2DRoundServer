@@ -11,17 +11,9 @@ import (
 	"2droundserver/internal/store"
 )
 
-const (
-	formArenaDefense = 1 // PartnerConst.Fun_Form.Arena
-	h5ArenaMinStar   = 5
-)
+const formArenaDefense = 1 // PartnerConst.Fun_Form.Arena
 
 var errArenaNoAttempts = errors.New("arena: no free attempts or tickets")
-
-func usesH5Arena(s *gateway.Session) bool {
-	a := s.Account()
-	return a != nil && a.Platform == store.PlatformH5
-}
 
 func refuseArenaChallenge(s *gateway.Session, msg string) error {
 	return s.Send(20203, proto.Message{"code": 0, "msg": msg})
@@ -48,59 +40,8 @@ func arenaStanding(st *store.Store, rid int64, srvID string, now time.Time) (*st
 	return st.ArenaPlayerOf(rid, arenaInitScore, now.Unix())
 }
 
-func isH5ArenaHero(bid int64, star int) bool {
-	_, known := partnerTable[bid]
-	return known && star >= h5ArenaMinStar
-}
-
-type arenaTeam struct {
-	form store.Formation
-	byID map[int64]store.Partner
-}
-
-// h5ArenaTeamOf projects a saved formation through the H5 roster. When none of the
-// saved slots are usable, field the first eligible heroes in roster order.
-func h5ArenaTeamOf(st *store.Store, rid, kind int64) (arenaTeam, error) {
-	saved, err := st.Formation(rid, kind)
-	if kind != formDrama && errors.Is(err, store.ErrNotFound) {
-		saved, err = st.Formation(rid, formDrama)
-	}
-	if err != nil && !errors.Is(err, store.ErrNotFound) {
-		return arenaTeam{}, err
-	}
-	heroes, err := st.PartnersOf(rid)
-	if err != nil {
-		return arenaTeam{}, err
-	}
-	team := arenaTeam{form: store.Formation{Type: kind, FormationType: 1}, byID: map[int64]store.Partner{}}
-	for _, h := range heroes {
-		if isH5ArenaHero(h.BID, h.Star) {
-			team.byID[h.PartnerID] = h
-		}
-	}
-	if saved != nil {
-		team.form.FormationType, team.form.HallowsID = saved.FormationType, saved.HallowsID
-		for _, slot := range saved.Slots {
-			if _, ok := team.byID[slot.PartnerID]; ok {
-				team.form.Slots = append(team.form.Slots, slot)
-			}
-		}
-	}
-	if len(team.form.Slots) == 0 {
-		for _, h := range heroes {
-			if _, ok := team.byID[h.PartnerID]; ok {
-				team.form.Slots = append(team.form.Slots, store.FormationSlot{Pos: int64(len(team.form.Slots) + 1), PartnerID: h.PartnerID})
-				if len(team.form.Slots) == formMaxHeroes {
-					break
-				}
-			}
-		}
-	}
-	return team, nil
-}
-
 func newH5ArenaOpponents(st *store.Store, role *store.Role, score int64, rng *rand.Rand) ([]arenaOpp, error) {
-	near, err := st.ArenaH5Near(role.SrvID, role.RID, score, h5ArenaMinStar, 12)
+	near, err := st.ArenaH5Near(role.SrvID, role.RID, score, h5MinHeroStar, 12)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +58,7 @@ func newH5ArenaOpponents(st *store.Store, role *store.Role, score int64, rng *ra
 			}
 		}
 	}
-	team, err := h5ArenaTeamOf(st, role.RID, formDrama)
+	team, err := h5FormationTeamOf(st, role.RID, formDrama)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +77,7 @@ func h5ArenaOpponentOf(st *store.Store, rid, score int64) (arenaOpp, bool, error
 	if err != nil || role.Status != 1 {
 		return arenaOpp{}, false, err
 	}
-	team, err := h5ArenaTeamOf(st, rid, formArenaDefense)
+	team, err := h5FormationTeamOf(st, rid, formArenaDefense)
 	if err != nil {
 		return arenaOpp{}, false, err
 	}
@@ -167,7 +108,7 @@ func arenaOpponentOnSlot(st *store.Store, srvID string, slot store.ArenaSlot, h5
 		lineup := o.Lineup[:0]
 		var heroes []store.Partner
 		for _, h := range o.Lineup {
-			if isH5ArenaHero(h.BID, int(h.Star)) {
+			if h5HeroEligible(h.BID, int(h.Star)) {
 				lineup = append(lineup, h)
 				heroes = append(heroes, store.Partner{BID: h.BID, Lev: int(h.Lev), Star: int(h.Star), BreakLev: int(h.Break)})
 			}
@@ -256,7 +197,7 @@ func startArenaFight(s *gateway.Session, st *store.Store, fights *FightService, 
 	if _, err := starterGrant(st, role); err != nil {
 		return err
 	}
-	attack, err := h5ArenaTeamOf(st, role.RID, formDrama)
+	attack, err := h5FormationTeamOf(st, role.RID, formDrama)
 	if err != nil {
 		return err
 	}

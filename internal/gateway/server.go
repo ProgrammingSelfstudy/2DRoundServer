@@ -23,15 +23,30 @@ type Router struct {
 	handlers    map[uint16]Handler
 	enter       []Handler
 	sendFilters map[uint16]func(*Session, proto.Message) proto.Message
+	strict      bool
 }
 
 func NewRouter() *Router { return &Router{handlers: map[uint16]Handler{}} }
 
-func (r *Router) Handle(cmd uint16, h Handler) { r.handlers[cmd] = h }
+func NewStrictRouter() *Router {
+	router := NewRouter()
+	router.strict = true
+	return router
+}
+
+func (r *Router) Handle(cmd uint16, h Handler) {
+	if _, exists := r.handlers[cmd]; r.strict && exists {
+		panic(fmt.Sprintf("gateway: handler already registered for command %d", cmd))
+	}
+	r.handlers[cmd] = h
+}
 
 // FilterSend registers a transformation for outgoing messages before the server
 // starts. Returning nil suppresses the frame for that session.
 func (r *Router) FilterSend(cmd uint16, filter func(*Session, proto.Message) proto.Message) {
+	if _, exists := r.sendFilters[cmd]; r.strict && exists {
+		panic(fmt.Sprintf("gateway: send filter already registered for command %d", cmd))
+	}
 	if r.sendFilters == nil {
 		r.sendFilters = make(map[uint16]func(*Session, proto.Message) proto.Message)
 	}

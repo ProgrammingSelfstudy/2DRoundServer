@@ -521,7 +521,7 @@ func (e *escSvc) duel(s *gateway.Session, role, foe *store.Role, req proto.Messa
 	if err != nil {
 		return "", err
 	}
-	team, objects, form, err := e.fights.teamSide(role)
+	team, objects, form, err := e.fights.teamSide(role, isH5RoleSession(s))
 	if err != nil {
 		return "", err
 	}

@@ -459,7 +459,7 @@ func (e *eliteSvc) fight(s *gateway.Session, _ proto.Message) error {
 	}
 	opp := er.Pending.Opp
 	fights := fightServiceOf(e.st)
-	team, objects, form, err := fights.teamSide(role)
+	team, objects, form, err := fights.teamSide(role, isH5RoleSession(s))
 	if err != nil {
 		e.mu.Unlock()
 		return err
@@ -566,7 +566,7 @@ func (e *eliteSvc) settle(s *gateway.Session, opp arenaOpp, won bool, replayID, 
 			return err
 		}
 	}
-	stats, _, _, _, err := damageTable(e.st, role)
+	stats, _, _, _, err := damageTable(e.st, role, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}
@@ -708,7 +708,7 @@ func (e *eliteSvc) formation(s *gateway.Session, req proto.Message) error {
 	typ := req.Int("type")
 	forms := er.Forms[typ]
 	if len(forms) == 0 {
-		base, err := formationOf(e.st, role.RID, formDrama)
+		base, err := formationForRole(e.st, role.RID, formDrama, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}

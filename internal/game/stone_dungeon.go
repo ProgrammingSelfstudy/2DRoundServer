@@ -79,7 +79,7 @@ func stoneCost(typ, done int64) int64 {
 
 func stoneDungeonTeam(fights *FightService, role *store.Role, heroes []store.Partner, h5 bool) ([]fightUnit, []proto.Message, store.Formation, error) {
 	if !h5 {
-		return fights.teamSide(role)
+		return fights.teamSide(role, false)
 	}
 	form, err := fights.Store.Formation(role.RID, formDrama)
 	switch {
@@ -97,7 +97,7 @@ func stoneDungeonTeam(fights *FightService, role *store.Role, heroes []store.Par
 			return !allowed[slot.PartnerID]
 		})
 	}
-	team, objects, err := fights.teamFor(role, form.FormationType, form.Slots)
+	team, objects, err := fights.teamFor(role, form.FormationType, form.Slots, true)
 	return team, objects, *form, err
 }
 
@@ -164,7 +164,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return
 		}
-		heroes = dungeonHeroes(heroes, h5)
+		heroes = playablePartners(heroes, h5)
 		counts, err := st.StoneCounts(role.RID, day)
 		if err != nil {
 			return
@@ -193,7 +193,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		return st.TakeStoneAttempt(role.RID, d.Type, day, done, stoneAllowed(d.Type, role.VIPLev), stoneCost(d.Type, done), assets, items)
 	}
 	r.Handle(13031, func(s *gateway.Session, req proto.Message) error {
-		h5 := dungeonH5(s)
+		h5 := isH5RoleSession(s)
 		day := summonDay(s.Now())
 		d, role, heroes, done, msg, err := check(s, req.Int("id"), day, false, h5)
 		if err != nil || role == nil {
@@ -256,7 +256,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 			if h5 {
 				stats, _, _, _ = formationDamage(role, form, heroes)
 			} else {
-				stats, _, _, _, err = damageTable(st, role)
+				stats, _, _, _, err = damageTable(st, role, false)
 				if err != nil {
 					return err
 				}
@@ -298,7 +298,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		})
 	})
 	r.Handle(13032, func(s *gateway.Session, req proto.Message) error {
-		h5 := dungeonH5(s)
+		h5 := isH5RoleSession(s)
 		day := summonDay(s.Now())
 		d, role, _, done, msg, err := check(s, req.Int("id"), day, true, h5)
 		if err != nil || role == nil {

@@ -209,7 +209,7 @@ func RegisterPrimus(r *gateway.Router, st *store.Store) {
 			if need := primusCfg.Seats[pos-1].Rank; rank > need {
 				return refuse("竞技场排名需要进入前" + itoa64(need) + "名")
 			}
-			team, objects, form, err := g.fights.teamSide(role)
+			team, objects, form, err := g.fights.teamSide(role, isH5RoleSession(s))
 			if err != nil {
 				return false, err
 			}

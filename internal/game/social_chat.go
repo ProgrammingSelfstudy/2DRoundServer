@@ -13,18 +13,6 @@ const privateChatUnavailable = "暂时无法与该玩家私聊"
 
 var errChatThrottled = errors.New("chat: rate limit")
 
-func h5SocialViewer(st *store.Store, session *gateway.Session, role *store.Role) (bool, error) {
-	account := session.Account()
-	if account == nil || account.ID != role.AccountID {
-		var err error
-		account, err = st.AccountByID(role.AccountID)
-		if err != nil {
-			return false, err
-		}
-	}
-	return account.Platform == store.PlatformH5, nil
-}
-
 func (c *ChatService) pushPrivate(me, to *store.Role, flag int, text string, now time.Time, h5Pair bool) error {
 	if h5Pair {
 		defer c.Store.LockChatRecipient(to.RID)()

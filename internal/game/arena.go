@@ -64,7 +64,7 @@ type arenaOpp struct {
 	Kind int64 `json:",omitempty"`
 	// RefreshTime distinguishes successive H5 lists with identical opponents.
 	RefreshTime int64 `json:",omitempty"`
-	defense     *arenaTeam
+	defense     *formationTeam
 }
 
 // arenaLogEntry is one line of the fight log as it is stored: Type 1 is a challenge by the role, 2 one against it;
@@ -270,7 +270,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 	}
 	standing := func(s *gateway.Session) (*store.ArenaPlayer, error) {
 		role := s.Role()
-		if usesH5Arena(s) {
+		if isH5RoleSession(s) {
 			return arenaStanding(st, role.RID, role.SrvID, s.Now())
 		}
 		a, err := st.ArenaPlayerOf(role.RID, arenaInitScore, s.Now().Unix())
@@ -293,7 +293,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if _, err := starterGrant(st, role); err != nil {
 			return nil, err
 		}
-		h5 := usesH5Arena(s)
+		h5 := isH5RoleSession(s)
 		var opps []arenaOpp
 		if h5 {
 			opps, err = newH5ArenaOpponents(st, role, a.Score, rngOf())
@@ -325,7 +325,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 	}
 	opponentOnSlot := func(s *gateway.Session, sl store.ArenaSlot) (arenaOpp, bool, error) {
-		return arenaOpponentOnSlot(st, s.Role().SrvID, sl, usesH5Arena(s))
+		return arenaOpponentOnSlot(st, s.Role().SrvID, sl, isH5RoleSession(s))
 	}
 	sendList := func(s *gateway.Session, a *store.ArenaPlayer) error {
 		slots, err := opponents(s, a, false)
@@ -388,7 +388,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if left := a.RefTime - s.Now().Unix(); left > 0 {
 			return s.Send(20206, proto.Message{"code": 0, "msg": "刷新太频繁了，请稍后再试"})
 		}
-		h5 := usesH5Arena(s)
+		h5 := isH5RoleSession(s)
 		if !h5 {
 			a.RefTime = s.Now().Unix() + arenaRefreshCD
 			if err := st.SaveArenaPlayer(a); err != nil {
@@ -423,7 +423,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 				if err != nil {
 					return err
 				}
-				if sid := req.Str("srv_id"); !ok || usesH5Arena(s) && sid != "" && sid != o.SrvID {
+				if sid := req.Str("srv_id"); !ok || isH5RoleSession(s) && sid != "" && sid != o.SrvID {
 					break
 				}
 				return s.Send(20202, proto.Message{"rid": o.RID, "srv_id": o.SrvID, "name": o.Name, "lev": o.Lev, "face": o.Face, "power": o.Power, "score": o.Score,
@@ -445,7 +445,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		h5 := usesH5Arena(s)
+		h5 := isH5RoleSession(s)
 		if h5 {
 			err = st.BuyArenaTickets(role.RID, n, arenaTicket, arenaTicketGems)
 		} else {
@@ -557,7 +557,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 	// the ranking: the first three as statues, the first fifty as a list
 	top := func(s *gateway.Session, n int) ([]proto.Message, error) {
 		srvID := s.Role().SrvID
-		h5 := usesH5Arena(s)
+		h5 := isH5RoleSession(s)
 		var rows []store.ArenaRow
 		var err error
 		if h5 {
@@ -584,7 +584,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			}
 			var power int64
 			if h5 {
-				if defense, err := h5ArenaTeamOf(st, r.RID, formArenaDefense); err == nil {
+				if defense, err := h5FormationTeamOf(st, r.RID, formArenaDefense); err == nil {
 					_, power = describeArenaLineup(defense.form.Slots, defense.byID)
 				}
 			} else {
@@ -609,7 +609,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if s.Role() == nil {
 			return nil
 		}
-		if !usesH5Arena(s) {
+		if !isH5RoleSession(s) {
 			a, err := standing(s)
 			if err != nil {
 				return err
@@ -664,7 +664,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 		if a.LogSeen != int64(len(logs)) {
 			a.LogSeen = int64(len(logs))
-			if usesH5Arena(s) {
+			if isH5RoleSession(s) {
 				err = st.SetArenaLogSeen(a.RID, a.LogSeen)
 			} else {
 				err = st.SaveArenaPlayer(a)
@@ -677,7 +677,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 	})
 	h5Challenge := arenaChallenge(st, fights, opponents, rngOf)
 	r.Handle(20203, func(s *gateway.Session, req proto.Message) error {
-		if usesH5Arena(s) {
+		if isH5RoleSession(s) {
 			return h5Challenge(s, req)
 		}
 		role := s.Role()
@@ -717,7 +717,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if !ok {
 			return refuse("对手不存在，请刷新列表")
 		}
-		team, objects, form, err := fights.teamSide(role)
+		team, objects, form, err := fights.teamSide(role, false)
 		if err != nil {
 			return err
 		}
@@ -849,7 +849,7 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 			return err
 		}
 	}
-	stats, bid, hurt, total, err := damageTable(st, role)
+	stats, bid, hurt, total, err := damageTable(st, role, false)
 	if err != nil {
 		return err
 	}

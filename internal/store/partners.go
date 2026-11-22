@@ -301,6 +301,7 @@ type SummonResult struct {
 	SpendAssets        map[int64]int64
 	SpendItems         map[int64]int64
 	GainAssets         map[int64]int64
+	GainItems          map[int64]int64
 	FreeGroup, FreeDay int64        // FreeGroup 0 = not a free summon
 	Elite              *EliteSummon // the elite summon state after the draws, saved with them
 }
@@ -325,7 +326,7 @@ func (s *Store) Summon(rid int64, r SummonResult) ([]Partner, error) {
 	if err := spendTx(tx, rid, r.SpendAssets, r.SpendItems); err != nil {
 		return nil, err
 	}
-	if err := creditTx(tx, rid, r.GainAssets, nil); err != nil {
+	if err := creditTx(tx, rid, r.GainAssets, r.GainItems); err != nil {
 		return nil, err
 	}
 	out, err := insertPartnersTx(tx, rid, s.unix(), r.Seeds)

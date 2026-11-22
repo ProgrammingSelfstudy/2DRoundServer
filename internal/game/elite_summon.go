@@ -270,6 +270,7 @@ func RegisterEliteSummon(r *gateway.Router, st *store.Store) {
 		if (times != 1 && times != 10) || kind != eliteScrollType {
 			return refuse("召唤方式不正确")
 		}
+		h5 := isH5RoleSession(s)
 		have, err := st.PartnersOf(role.RID)
 		if err != nil {
 			return err
@@ -278,7 +279,7 @@ func RegisterEliteSummon(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if len(have)+int(times) > heroSlotCapacity(buys) {
+		if !h5 && len(have)+int(times) > heroSlotCapacity(buys) {
 			return refuse("英雄数量已达上限")
 		}
 		e, err := st.EliteSummon(role.RID)
@@ -294,18 +295,20 @@ func RegisterEliteSummon(r *gateway.Router, st *store.Store) {
 		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}}
 		splitGains(toGains(cost), 1, res.SpendAssets, res.SpendItems)
 		splitGains(toGains(gain), 1, res.GainAssets, map[int64]int64{})
-		var rewards, bids []proto.Message
+		var draws summonDrawResults
 		next := e
 		for i := int64(0); i < times; i++ {
 			bid, up := eliteDraw(luckyBID, &next.Since)
-			star := partnerTable[bid].InitStar
-			res.Seeds = append(res.Seeds, store.PartnerSeed{BID: bid, Star: star})
-			bids = append(bids, proto.Message{"partner_bid": bid, "init_star": star})
-			if card, ok := heroCardItem(bid, star); ok {
-				rewards = append(rewards, proto.Message{"base_id": card, "num": 1})
-			} else if item, ok := eliteWishItem(bid); ok && up {
-				rewards = append(rewards, proto.Message{"base_id": item, "num": 1})
+			var fallbackCard int64
+			if up {
+				fallbackCard, _ = eliteWishItem(bid)
 			}
+			if !draws.addHero(&res, h5, bid, fallbackCard) {
+				return refuse(summonRewardUnavailable)
+			}
+		}
+		if h5 && summonRosterFull(len(have), len(res.Seeds), buys) {
+			return refuse("英雄数量已达上限")
 		}
 		next.Times += times
 		res.Elite = &next
@@ -324,15 +327,10 @@ func RegisterEliteSummon(r *gateway.Router, st *store.Store) {
 		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
-		msgs := make([]proto.Message, 0, len(heroes))
-		for _, h := range heroes {
-			msgs = append(msgs, partnerMessage(h))
-		}
-		if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
+		if err := sendSummonedPartners(s, h5, heroes); err != nil {
 			return err
 		}
-		if err := s.Send(23201, proto.Message{"group_id": eliteGroup, "times": times, "flag": 3, "rewards": nonNil(rewards),
-			"partner_bids": bids, "partner_chips": []proto.Message{}, "must_five_num": 0}); err != nil {
+		if err := s.Send(23201, draws.message(eliteGroup, times, 3)); err != nil {
 			return err
 		}
 		if err := questEvent(s, st, role.RID, evtRecruit, times); err != nil {

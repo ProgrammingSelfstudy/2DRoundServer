@@ -31,10 +31,7 @@ func (f *FriendService) profile(s *gateway.Session, req proto.Message) error {
 	if t == nil {
 		return nil
 	}
-	h5, err := h5SocialViewer(f.Store, s, me)
-	if err != nil {
-		return err
-	}
+	h5 := isH5RoleSession(s)
 	heroes, err := f.Store.PartnersOf(t.RID)
 	if err != nil {
 		return err
@@ -42,7 +39,7 @@ func (f *FriendService) profile(s *gateway.Session, req proto.Message) error {
 	shown := []proto.Message{}
 	known := make([]proto.Message, 0, len(heroes))
 	for _, h := range heroes {
-		if info, ok := partnerTable[h.BID]; ok && (!h5 || info.InitStar == 5) {
+		if visiblePartner(h, h5) {
 			known = append(known, partnerMessage(h))
 		}
 	}

@@ -93,6 +93,9 @@ func (l *Login) roleList(s *gateway.Session, req proto.Message) error {
 	if srv.Status != 1 {
 		return reply1164(s, codeNotice, "服务器维护中", nil)
 	}
+	if role := s.Role(); role != nil && role.AccountID != acc.ID {
+		return reply1164(s, codeFail, "已进入角色，切换账号请重新连接", nil)
+	}
 	if want := args["enter_srv_id"]; want != "" && want != l.SrvID {
 		l.Log.Printf("1164: client asked for %q, this gateway serves %q", want, l.SrvID)
 	}
@@ -281,7 +284,7 @@ func (l *Login) giveStarter(s *gateway.Session, role *store.Role) error {
 	if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
 		return err
 	}
-	f, err := formationOf(l.Store, role.RID, formDrama)
+	f, err := formationForRole(l.Store, role.RID, formDrama, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

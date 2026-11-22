@@ -261,7 +261,7 @@ func (g *GuildService) secretStrike(s *gateway.Session, gd *store.Guild, st *sto
 	if err := sendAssets(s, g.Store, role.RID); err != nil {
 		return err
 	}
-	stats, _, _, _, err := damageTable(g.Store, role)
+	stats, _, _, _, err := damageTable(g.Store, role, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}
@@ -615,10 +615,10 @@ func (g *GuildService) registerSecret(r *gateway.Router) {
 			if formType < 1 {
 				formType = 1
 			}
-			team, objects, err = fights.teamFor(role, formType, slots)
+			team, objects, err = fights.teamFor(role, formType, slots, isH5RoleSession(s))
 		} else {
 			var form store.Formation
-			team, objects, form, err = fights.teamSide(role)
+			team, objects, form, err = fights.teamSide(role, isH5RoleSession(s))
 			formType = form.FormationType
 		}
 		if err != nil {

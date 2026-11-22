@@ -164,7 +164,7 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
-		if account := s.Account(); account != nil && account.Platform == store.PlatformH5 && len(state.Taken) >= len(loginDays) {
+		if isH5RoleSession(s) && len(state.Taken) >= len(loginDays) {
 			return s.Send(10923, proto.Message{"id": loginDayIcon, "status": 0})
 		}
 		return nil

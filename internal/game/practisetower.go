@@ -312,7 +312,7 @@ func (p *ptSvc) fight(s *gateway.Session, req proto.Message) error {
 			return refuse("至少需要上阵一个英雄")
 		}
 		formType := max(1, req.Int("formation_type"))
-		team, objects, err := p.fights.teamFor(role, formType, slots)
+		team, objects, err := p.fights.teamFor(role, formType, slots, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}

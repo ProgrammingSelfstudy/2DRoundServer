@@ -1,89 +1,21 @@
 package game
 
 import (
-	"bufio"
 	"fmt"
-	"log"
-	"net"
 	"strconv"
-	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
-	"2droundserver/internal/gateway"
 	"2droundserver/internal/proto"
 	"2droundserver/internal/store"
 )
 
-// The shop tests exercise the gateway's frame handling without binding a socket.
-type shopPipeListener struct {
-	conns  chan net.Conn
-	closed chan struct{}
-	once   sync.Once
-}
-
-func (l *shopPipeListener) Accept() (net.Conn, error) {
-	select {
-	case c := <-l.conns:
-		return c, nil
-	case <-l.closed:
-		return nil, net.ErrClosed
-	}
-}
-
-func (l *shopPipeListener) Close() error {
-	l.once.Do(func() { close(l.closed) })
-	return nil
-}
-
-func (l *shopPipeListener) Addr() net.Addr { return nil }
-
 func newH5ShopTestGateway(t *testing.T) (*store.Store, func() *client, func(time.Time)) {
 	t.Helper()
-	st, err := store.Open(":memory:")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { st.Close() })
-	if err := st.EnsureServer(store.Server{SrvID: "symlf_1", Name: "s1", Platform: "symlf", ZoneID: 1, Status: 1}); err != nil {
-		t.Fatal(err)
-	}
-	schema, err := proto.LoadSchema()
-	if err != nil {
-		t.Fatal(err)
-	}
-	var clock atomic.Int64
-	setNow := func(now time.Time) { clock.Store(now.UnixNano()) }
-	setNow(time.Date(2026, 10, 21, 10, 0, 0, 0, dayZone))
-	gw := &gateway.Server{Schema: schema, Codec: proto.DefaultOptions(), Log: log.Default(),
-		Hub: gateway.NewHub(), Router: gateway.NewRouter(), Now: func() time.Time { return time.Unix(0, clock.Load()) }}
-	(&Login{Store: st, SrvID: "symlf_1", Hub: gw.Hub, Log: gw.Log}).Register(gw.Router)
-	RegisterShop(gw.Router, st)
-	RegisterMarket(gw.Router, st)
-	RegisterH5Shop(gw.Router, st)
-	ln := &shopPipeListener{conns: make(chan net.Conn), closed: make(chan struct{})}
-	done := make(chan error, 1)
-	go func() { done <- gw.Serve(ln) }()
-	t.Cleanup(func() {
-		ln.Close()
-		if err := <-done; err != nil {
-			t.Error(err)
-		}
-		gw.Close()
-	})
-	dial := func() *client {
-		t.Helper()
-		c, server := net.Pipe()
-		t.Cleanup(func() { c.Close() })
-		ln.conns <- server
-		c.SetWriteDeadline(time.Now().Add(5 * time.Second))
-		if _, err := c.Write([]byte(proto.Handshake)); err != nil {
-			t.Fatal(err)
-		}
-		return &client{t: t, c: c, br: bufio.NewReader(c), schema: schema}
-	}
-	return st, dial, setNow
+	env := newGameEnv(t, time.Minute)
+	env.setNow(time.Date(2026, 10, 21, 10, 0, 0, 0, dayZone))
+	env.connect = serveTestPipe(t, env.gw, false)
+	return env.st, func() *client { return env.dial(true) }, env.setNow
 }
 
 func createShopTestRole(t *testing.T, st *store.Store, platform, name string) (*store.Account, *store.Role, string) {
@@ -236,7 +168,7 @@ func TestH5ShopGatewayAccessAndFiveStarOffers(t *testing.T) {
 		}
 	}
 	c := dial()
-	login := func(a *store.Account, token string) {
+	login := func(a *store.Account, token string, code int64) {
 		t.Helper()
 		args := loginArgs(a.Account, token)
 		for _, arg := range args.Arr("args") {
@@ -245,8 +177,8 @@ func TestH5ShopGatewayAccessAndFiveStarOffers(t *testing.T) {
 			}
 		}
 		c.send(1164, args)
-		if r := c.recv(1164); r.Int("code") != 1 {
-			t.Fatalf("login: %v", r)
+		if r := c.recv(1164); r.Int("code") != code {
+			t.Fatalf("login: %v, want code %d", r, code)
 		}
 	}
 	enter := func(role *store.Role) {
@@ -272,7 +204,7 @@ func TestH5ShopGatewayAccessAndFiveStarOffers(t *testing.T) {
 		refuse(shopTestOrder(1, 31008, 24, 24908, 50, 20, 1), "请先登录 H5 角色")
 	}
 	deny() // no login
-	login(legacy, legacyToken)
+	login(legacy, legacyToken, codeOK)
 	enter(legacyRole)
 	deny() // the platform string in the request does not change the authenticated account
 	c.send(13402, proto.Message{"eid": 31040, "num": 1})
@@ -289,8 +221,11 @@ func TestH5ShopGatewayAccessAndFiveStarOffers(t *testing.T) {
 		t.Fatalf("legacy wallet: %v, %v", balances, err)
 	}
 
-	login(h5, h5Token)
-	deny() // the selected role still belongs to the previous account
+	login(h5, h5Token, codeFail)
+	deny() // the session still belongs to the original native account
+	c = dial()
+	login(h5, h5Token, codeOK)
+	deny() // an authenticated account still needs to enter its role
 	enter(h5Role)
 	c.send(proto.H5ShopCatalog, proto.Message{})
 	r := c.recv(proto.H5ShopCatalog)
@@ -315,11 +250,46 @@ func TestH5ShopGatewayAccessAndFiveStarOffers(t *testing.T) {
 	}
 	refuse(shopTestOrder(2, 6001, 8, 29404, 10, 1000, 1), "商品暂不可购买")
 	refuse(shopTestOrder(3, 31040, 24, 24800, 30, 3, 1), "商品暂不可购买")
+	for _, offer := range []int64{6001, 31040} {
+		c.send(13402, proto.Message{"eid": offer, "num": 1})
+		if reply := c.recv(13402); reply.Int("code") != 0 || reply.Int("eid") != offer || reply.Str("msg") == "" {
+			t.Fatalf("legacy exchange sold a low-star shard to an H5 role: %v", reply)
+		}
+	}
 	if balances, err := st.RoleAssets(h5Role.RID); err != nil || balances[8] != 1000 || balances[24] != 30 {
 		t.Fatalf("H5 wallet after refusals: %v, %v", balances, err)
 	}
 	if items, err := st.RoleItems(h5Role.RID); err != nil || len(items) != 0 {
 		t.Fatalf("H5 bag after refusals: %v, %v", items, err)
+	}
+}
+
+func TestH5ShopRechecksHeroItemEligibilityOnPurchase(t *testing.T) {
+	st, _, _ := newH5ShopTestGateway(t)
+	_, role, _ := createShopTestRole(t, st, store.PlatformH5, "商城测试")
+	if err := st.Exchange(role.RID, nil, nil, map[int64]int64{8: 2000}, nil); err != nil {
+		t.Fatal(err)
+	}
+	if !h5ShopItemAllowed(29900) {
+		t.Error("the legendary five-star shard recipe should be eligible without an ID allowlist")
+	}
+	now := time.Date(2026, 10, 21, 12, 0, 0, 0, dayZone)
+	for _, item := range []int64{24000, 29404} {
+		order := store.H5ShopOrder{OfferID: item, ItemID: item, CurrencyID: 8, Bundle: 1, Price: 1000}
+		offers := map[int64]h5ShopOffer{order.OfferID: {order: order}}
+		req := shopTestOrder(item, order.OfferID, order.CurrencyID, order.ItemID, order.Bundle, order.Price, 1)
+		if _, msg, err := buyH5Shop(st, role, now, offers, req); err != nil || msg != "商品暂不可购买" {
+			t.Errorf("stale offer for low-star item %d: %q, %v", item, msg, err)
+		}
+	}
+	if balances, err := st.RoleAssets(role.RID); err != nil || balances[8] != 2000 {
+		t.Errorf("refused offers changed the wallet: %v, %v", balances, err)
+	}
+	if items, err := st.RoleItems(role.RID); err != nil || len(items) != 0 {
+		t.Errorf("refused offers changed the bag: %v, %v", items, err)
+	}
+	if bought, err := st.ShopBought(role.RID, 0, dayKey(now)); err != nil || len(bought) != 0 {
+		t.Errorf("refused offers updated purchase counts: %v, %v", bought, err)
 	}
 }
 

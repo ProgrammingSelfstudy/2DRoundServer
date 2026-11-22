@@ -367,12 +367,13 @@ func RegisterSandybeach(r *gateway.Router, st *store.Store) {
 			if _, err := starterGrant(st, c.role); err != nil {
 				return false, err
 			}
-			form, err := formationOf(st, c.role.RID, sbForm)
+			h5 := isH5RoleSession(s)
+			form, err := formationForRole(st, c.role.RID, sbForm, h5)
 			if err != nil {
 				return false, err
 			}
 			formType := max(1, form.FormationType)
-			team, objects, err := fights.teamFor(c.role, formType, form.Slots)
+			team, objects, err := fights.teamFor(c.role, formType, form.Slots, h5)
 			if err != nil {
 				return false, err
 			}

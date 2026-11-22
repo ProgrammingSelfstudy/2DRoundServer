@@ -25,12 +25,9 @@ var guildSkillEffects = func() map[int][gskillPerHeaven]guildSkillEffect {
 	return map[int][gskillPerHeaven]guildSkillEffect{2: attack, 3: attack, 4: tank, 5: support}
 }()
 
-// H5 lists heroes that start at five stars, including those raised past five.
-func h5GuildHero(bid int64) bool { return partnerTable[bid].InitStar >= 5 }
-
 // There is one entry per distinct attribute in a heaven.
 func guildSkillBonus(p store.Partner, key string) int64 {
-	if len(p.GuildSkillLevels) == 0 || !h5GuildHero(p.BID) {
+	if len(p.GuildSkillLevels) == 0 || !h5HeroEligible(p.BID, p.Star) {
 		return 0
 	}
 	career := partnerTable[p.BID].Type

@@ -247,7 +247,7 @@ func (e *endSvc) fightRound(s *gateway.Session, role *store.Role, st *endState) 
 	for _, f := range st.Form {
 		slots = append(slots, f)
 	}
-	pf, msg, err := planesFight(e.st, e.fights, role, e.pfHeroes(run), slots, st.FormType, endEnemyPower(own, run.Round), "试炼守卫", []proto.Message{{"param": run.Round}}, combatEndless)
+	pf, msg, err := planesFight(e.st, e.fights, role, e.pfHeroes(run), slots, st.FormType, endEnemyPower(own, run.Round), "试炼守卫", []proto.Message{{"param": run.Round}}, combatEndless, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

@@ -335,7 +335,7 @@ func (p *plSvc) fightTile(s *gateway.Session, role *store.Role, st *plState, f *
 	if len(slots) == 0 {
 		return reply(0, "请选择出战英雄")
 	}
-	pf, msg, err := planesFight(p.st, p.fights, role, st.Heroes, slots, formType, t.Power, e.Name, []proto.Message{{"param": st.Dun}, {"param": t.Index}}, combatPlanesOld)
+	pf, msg, err := planesFight(p.st, p.fights, role, st.Heroes, slots, formType, t.Power, e.Name, []proto.Message{{"param": st.Dun}, {"param": t.Index}}, combatPlanesOld, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

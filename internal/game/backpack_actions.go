@@ -37,21 +37,13 @@ var backpackActions = func() backpackActionTable {
 	return data
 }()
 
-const (
-	h5HeroStar = 5
-	// Keep even a page of the larger catalog entries inside one protocol frame.
-	maxBackpackDetails = 64
-)
-
-func isH5RoleSession(s *gateway.Session) bool {
-	account, role := s.Account(), s.Role()
-	return account != nil && role != nil && account.ID == role.AccountID && account.Platform == store.PlatformH5
-}
+// Keep even a page of the larger catalog entries inside one protocol frame.
+const maxBackpackDetails = 64
 
 func heroCardForUse(id int64) (store.PartnerSeed, bool) {
 	seed := backpackActions.HeroCards[id]
 	_, starKnown := partnerTable[seed.BID].Stars[strconv.Itoa(seed.Star)]
-	return seed, seed.Star == h5HeroStar && starKnown
+	return seed, seed.Star == h5MinHeroStar && starKnown
 }
 
 // The generic shard table specifies star and camp. Use the eligible heroes
@@ -60,7 +52,7 @@ func heroCardForUse(id int64) (store.PartnerSeed, bool) {
 var shardPools = func() map[int64][]int64 {
 	out := make(map[int64][]int64, len(backpackActions.HeroShards))
 	for id, recipe := range backpackActions.HeroShards {
-		if recipe.Star != h5HeroStar {
+		if recipe.Star != h5MinHeroStar {
 			continue
 		}
 		if recipe.BID != 0 {

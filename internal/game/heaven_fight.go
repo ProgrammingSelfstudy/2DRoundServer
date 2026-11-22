@@ -133,7 +133,7 @@ func (h *heavenSvc) challenge(s *gateway.Session, req proto.Message) error {
 			for _, p := range forms[i].Pos {
 				slots = append(slots, pfSlot{Pos: p.Pos, ID: p.ID})
 			}
-			plan, msg, err := planesFight(h.st, h.fights, role, roster, slots, forms[i].FormType, heavenEnemyPower(own, ch, order), "天界守卫", []proto.Message{{"param": ch}, {"param": order}}, combatHeaven)
+			plan, msg, err := planesFight(h.st, h.fights, role, roster, slots, forms[i].FormType, heavenEnemyPower(own, ch, order), "天界守卫", []proto.Message{{"param": ch}, {"param": order}}, combatHeaven, isH5RoleSession(s))
 			if err != nil {
 				return err
 			}

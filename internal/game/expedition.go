@@ -158,7 +158,7 @@ func (e *expSvc) with(s *gateway.Session, fn func(role *store.Role, st *expState
 	if fresh, err := e.st.RoleByID(role.RID); err == nil {
 		role = fresh
 	}
-	h5 := dungeonH5(s)
+	h5 := isH5RoleSession(s)
 	now := s.Now()
 	if h5 {
 		now = now.In(dayZone)
@@ -259,7 +259,7 @@ func (e *expSvc) floor(s *gateway.Session, req proto.Message) error {
 		if err != nil {
 			return err
 		}
-		best := bestHeroes(dungeonHeroes(all, dungeonH5(s)), 5)
+		best := bestHeroes(playablePartners(all, isH5RoleSession(s)), 5)
 		own := rolePower(best)
 		p := expCfg.Points[id-1]
 		status := int64(0)
@@ -324,12 +324,12 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 		case st.guard() > expLastPoint:
 			return refuse("今日远征已全部通关")
 		}
-		h5 := dungeonH5(s)
+		h5 := isH5RoleSession(s)
 		all, err := e.st.PartnersOf(role.RID)
 		if err != nil {
 			return err
 		}
-		all = dungeonHeroes(all, h5)
+		all = playablePartners(all, h5)
 		byID := map[int64]store.Partner{}
 		for _, h := range all {
 			byID[h.PartnerID] = h
@@ -351,7 +351,7 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 				continue
 			}
 			for _, h := range st.Hired {
-				if h.PID == id && h.RID == owner && !h.Used && dungeonHeroAllowed(h5, h.BID, h.Star) {
+				if h.PID == id && h.RID == owner && !h.Used && (!h5 || h5HeroEligible(h.BID, int(h.Star))) {
 					seen[id] = true
 					roster = append(roster, pfHero{Flag: 1, PID: id, BID: h.BID, Lev: h.Lev, Star: h.Star, HP: h.Per})
 					slots = append(slots, pfSlot{Pos: p.Int("pos"), ID: id, Flag: 1})
@@ -373,7 +373,7 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 		}
 		extra := []proto.Message{{"param": floor}}
 		pf, msg, err := planesFightWithGuards(e.st, e.fights, role, roster, slots, req.Int("formation_type"),
-			power, "远征守卫", extra, combatExpedit, best)
+			power, "远征守卫", extra, combatExpedit, best, h5)
 		if err != nil {
 			return err
 		}
@@ -392,7 +392,7 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 
 func (e *expSvc) settle(s *gateway.Session, day, point, diff int64, fight *planesFightPlan, won bool) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
-		h5 := dungeonH5(s)
+		h5 := isH5RoleSession(s)
 		if st.Diff != diff || st.guard() != point || (h5 && st.Day != day) {
 			if h5 {
 				return sendExpeditionResult(s, 0, nil)
@@ -466,11 +466,11 @@ func (e *expSvc) choose(s *gateway.Session, req proto.Message) error {
 	diff := req.Int("difficulty")
 	return e.with(s, func(role *store.Role, st *expState) error {
 		refuse := func(msg string) error { return s.Send(24412, proto.Message{"code": 0, "msg": msg}) }
-		all, err := e.st.PartnersOf(role.RID)
+		power, err := rosterPowerOf(e.st, role.RID, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
-		if msg := e.open(role, st, diff, rolePower(dungeonHeroes(all, dungeonH5(s)))); msg != "" {
+		if msg := e.open(role, st, diff, power); msg != "" {
 			return refuse(msg)
 		}
 		st.Diff, st.Guard, st.Taken, st.Got = diff, 1, nil, nil

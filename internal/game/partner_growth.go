@@ -93,7 +93,7 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return nil
 		}
-		h5 := isH5Session(s)
+		h5 := isH5RoleSession(s)
 		if !visiblePartner(*p, h5) {
 			return nil
 		}
@@ -117,7 +117,7 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 			if err != nil {
 				return reply(0, "英雄不存在")
 			}
-			h5 := isH5Session(s)
+			h5 := isH5RoleSession(s)
 			if !visiblePartner(*p, h5) {
 				return reply(0, "英雄不存在")
 			}
@@ -169,7 +169,7 @@ func RegisterPartnerGrowth(r *gateway.Router, st *store.Store) {
 				return err
 			}
 			if h5 {
-				if err := sendRolePower(s, st, role.RID, rolePower(heroes)); err != nil {
+				if err := sendRolePower(s, st, role.RID, rolePower(playablePartners(heroes, h5))); err != nil {
 					return err
 				}
 			}

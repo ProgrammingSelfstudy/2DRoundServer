@@ -23,20 +23,12 @@ type h5ShopSection struct {
 	offers     []h5ShopOffer
 }
 
-func h5ShopShowsItem(item int64) bool {
-	if item >= 24000 && item < 29000 {
-		// The five camp ranges encode (star - 1) in the hundreds digit of
-		// a hero card ID, as in heroCardItem. The matching shard adds 500.
-		hundreds := item % 1000 / 100
-		return hundreds == 4 || hundreds == 9
+func h5ShopItemAllowed(item int64) bool {
+	if card, ok := backpackActions.HeroCards[item]; ok {
+		return card.Star >= h5MinHeroStar
 	}
-	if itemTable[item].Type == 102 {
-		// The five-star random and camp shard items have separate IDs.
-		switch item {
-		case 29105, 29205, 29305, 29405, 29505, 29905, 29906, 29907:
-			return true
-		}
-		return false
+	if shard, ok := backpackActions.HeroShards[item]; ok {
+		return shard.Star >= h5MinHeroStar
 	}
 	return true
 }
@@ -51,7 +43,7 @@ func h5ShopSections() []h5ShopSection {
 	add := func(section *h5ShopSection, eid, item, amount, price, level int64, rule shopGood) {
 		name, known := ItemName(item)
 		if !known || name == "" || name == "获取途径用" || !ItemListedInBackpack(item) || isArtifact(item) ||
-			!h5ShopShowsItem(item) || amount <= 0 || price <= 0 {
+			!h5ShopItemAllowed(item) || amount <= 0 || price <= 0 {
 			return
 		}
 		section.offers = append(section.offers, h5ShopOffer{
@@ -154,7 +146,7 @@ func buyH5Shop(st *store.Store, role *store.Role, now time.Time, offers map[int6
 		return store.H5ShopOrder{}, "", err
 	}
 	g, ok := offers[order.OfferID]
-	if !ok || int64(role.Lev) < g.level {
+	if !ok || int64(role.Lev) < g.level || !h5ShopItemAllowed(g.order.ItemID) {
 		return store.H5ShopOrder{}, "商品暂不可购买", nil
 	}
 	expected := g.order
@@ -184,9 +176,8 @@ func RegisterH5Shop(r *gateway.Router, st *store.Store) {
 		}
 	}
 	getRole := func(s *gateway.Session) *store.Role {
-		role, account := s.Role(), s.Account()
-		if role != nil && account != nil && account.Platform == store.PlatformH5 && account.ID == role.AccountID {
-			return role
+		if isH5RoleSession(s) {
+			return s.Role()
 		}
 		return nil
 	}

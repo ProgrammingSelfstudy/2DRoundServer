@@ -92,7 +92,7 @@ func combatType(s *gateway.Session, st *store.Store, req proto.Message) error {
 	if err := s.Send(20060, proto.Message{"combat_type": ct, "type": 2}); err != nil {
 		return err
 	}
-	hook, err := hookBattle(st, role.RID)
+	hook, err := hookBattle(st, role.RID, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,7 @@ func skillEntry(sid, minHurt, maxHurt int64) proto.Message {
 
 // hookBattle builds 20061 for a role: its campaign formation (kind 0) against the
 // fixed wave.
-func hookBattle(st *store.Store, rid int64) (proto.Message, error) {
+func hookBattle(st *store.Store, rid int64, h5 bool) (proto.Message, error) {
 	d, err := dramaState(st, rid)
 	if err != nil {
 		return nil, err
@@ -144,18 +144,11 @@ func hookBattle(st *store.Store, rid int64) (proto.Message, error) {
 	if !ok || len(wave.Monsters) == 0 {
 		return nil, errNoWave
 	}
-	f, err := formationOf(st, rid, 0)
+	lineup, err := combatFormation(st, rid, h5)
 	if err != nil {
 		return nil, err
 	}
-	heroes, err := st.PartnersOf(rid)
-	if err != nil {
-		return nil, err
-	}
-	owned := map[int64]store.Partner{}
-	for _, h := range heroes {
-		owned[h.PartnerID] = h
-	}
+	f, owned := lineup.form, lineup.byID
 	slots := append([]store.FormationSlot(nil), f.Slots...)
 	sort.SliceStable(slots, func(i, j int) bool { return slots[i].Pos < slots[j].Pos })
 

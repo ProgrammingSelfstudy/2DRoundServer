@@ -521,7 +521,7 @@ func (g *GuildService) answerApply(s *gateway.Session, kind int, rid int64, repl
 	if kind != 1 && kind != 2 {
 		return reply(false, "参数错误")
 	}
-	h5 := isH5Client(s)
+	h5 := isH5RoleSession(s)
 	if kind == 2 || !h5 {
 		had, err := g.Store.DeleteApply(gd.GID, rid)
 		if err != nil {

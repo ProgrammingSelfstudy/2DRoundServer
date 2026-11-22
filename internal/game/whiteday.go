@@ -206,15 +206,16 @@ func RegisterWhiteDay(r *gateway.Router, st *store.Store) {
 				slots = append(slots, store.FormationSlot{Pos: p.Int("pos"), PartnerID: id})
 			}
 		}
+		h5 := isH5RoleSession(s)
 		if len(slots) == 0 {
-			form, err := formationOf(st, c.role.RID, wdForm)
+			form, err := formationForRole(st, c.role.RID, wdForm, h5)
 			if err != nil {
 				return err
 			}
 			slots, formType = form.Slots, form.FormationType
 		}
 		formType = max(1, formType)
-		team, objects, err := fights.teamFor(c.role, formType, slots)
+		team, objects, err := fights.teamFor(c.role, formType, slots, h5)
 		if err != nil {
 			return err
 		}

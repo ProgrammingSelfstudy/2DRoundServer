@@ -760,36 +760,32 @@ func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRo
 // wave, and the 20027 message that introduces them.
 // teamSide makes a role's own side of a fight: its campaign formation, and the 20027 objects (the spirit and
 // the heroes).
-func (f *FightService) teamSide(role *store.Role) ([]fightUnit, []proto.Message, store.Formation, error) {
+func (f *FightService) teamSide(role *store.Role, h5 bool) ([]fightUnit, []proto.Message, store.Formation, error) {
 	// the starter hero is normally granted when the hero list is first opened; a
 	// role that fights before that gets it now (granted once, never twice)
 	if _, err := starterGrant(f.Store, role); err != nil {
 		return nil, nil, store.Formation{}, err
 	}
-	form, err := formationOf(f.Store, role.RID, formDrama)
+	lineup, err := combatFormation(f.Store, role.RID, h5)
 	if err != nil {
-		return nil, nil, store.Formation{}, err
+		return nil, nil, lineup.form, err
 	}
-	team, objects, err := f.teamFor(role, form.FormationType, form.Slots)
-	return team, objects, form, err
+	team, objects := ownFightSide(role, lineup.form.FormationType, lineup.form.Slots, lineup.byID)
+	return team, objects, lineup.form, nil
 }
 
 // teamFor makes a role's side of a fight from the heroes it puts in the given places.
-func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []store.FormationSlot) ([]fightUnit, []proto.Message, error) {
+func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []store.FormationSlot, h5 bool) ([]fightUnit, []proto.Message, error) {
 	heroes, err := f.Store.PartnersOf(role.RID)
 	if err != nil {
 		return nil, nil, err
 	}
-	team, objects := buildFightTeam(role, formType, formSlots, heroes)
+	team, objects := buildFightTeam(role, formType, formSlots, playablePartners(heroes, h5))
 	return team, objects, nil
 }
 
 func buildFightTeam(role *store.Role, formType int64, formSlots []store.FormationSlot, heroes []store.Partner) ([]fightUnit, []proto.Message) {
-	byID := map[int64]store.Partner{}
-	for _, h := range heroes {
-		byID[h.PartnerID] = h
-	}
-	return ownFightSide(role, formType, formSlots, byID)
+	return ownFightSide(role, formType, formSlots, partnersByID(heroes))
 }
 
 func ownFightSide(role *store.Role, formType int64, formSlots []store.FormationSlot, byID map[int64]store.Partner) ([]fightUnit, []proto.Message) {
@@ -805,8 +801,8 @@ func ownFightSide(role *store.Role, formType int64, formSlots []store.FormationS
 	return team, append(objects, heroObjects...)
 }
 
-func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) ([]fightRound, bool, proto.Message, error) {
-	team, objects, form, err := f.teamSide(role)
+func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64, h5 bool) ([]fightRound, bool, proto.Message, error) {
+	team, objects, form, err := f.teamSide(role, h5)
 	if err != nil {
 		return nil, false, nil, err
 	}
@@ -887,13 +883,24 @@ var errNoWave = errors.New("the dungeon has no monsters")
 
 // start begins a fight: the confirmation of 13003, the map and the fight data.
 func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama, auto int64) error {
-	rounds, won, intro, err := f.fightSetup(role, d, auto)
+	h5 := isH5RoleSession(s)
+	rounds, won, intro, err := f.fightSetup(role, d, auto, h5)
 	if err != nil {
+		if h5 && errors.Is(err, errNoHeroes) {
+			return s.Send(13003, proto.Message{"code": 0, "msg": "没有可以出战的英雄"})
+		}
 		return err
 	}
 	var pass *passRecord
 	if won && d.DunID == d.MaxDunID { // the clear that takes the role past the dungeon
-		_, _, power, _ := lineupOf(f.Store, role.RID)
+		var power int64
+		if h5 {
+			if lineup, err := h5FormationTeamOf(f.Store, role.RID, formDrama); err == nil {
+				_, power = describeArenaLineup(lineup.form.Slots, lineup.byID)
+			}
+		} else {
+			_, _, power, _ = lineupOf(f.Store, role.RID)
+		}
 		face := int64(role.FaceID)
 		if face == 0 {
 			face = store.DefaultFaceID

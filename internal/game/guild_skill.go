@@ -227,14 +227,14 @@ func pvpInfoMessage(st *store.GuildSkills, career int) proto.Message {
 }
 
 func (g *GuildService) refreshH5GuildSkillStats(s *gateway.Session, rid, previousPower int64) error {
-	if !isH5Client(s) {
+	if !isH5RoleSession(s) {
 		return nil
 	}
 	heroes, err := g.Store.PartnersOf(rid)
 	if err != nil {
 		return err
 	}
-	if err := sendRolePowerValue(s, g.Store, rid, previousPower, rolePower(heroes)); err != nil {
+	if err := sendRolePowerValue(s, g.Store, rid, previousPower, rolePower(playablePartners(heroes, true))); err != nil {
 		return err
 	}
 	return sendPartnerRoster(s, g.Store, rid, 11025, heroes)
@@ -321,8 +321,11 @@ func (g *GuildService) registerSkills(r *gateway.Router) {
 			return err
 		}
 		var next, previousPower int64
-		if isH5Client(s) {
-			previousPower = g.guildPower(role.RID)
+		if isH5RoleSession(s) {
+			previousPower, err = rosterPowerOf(g.Store, role.RID, true)
+			if err != nil {
+				return err
+			}
 		}
 		err = g.Store.UpdateGuildSkills(role.RID, func(st *store.GuildSkills) (a, i, ga, gi map[int64]int64, err error) {
 			done := st.PveDone[career]
@@ -389,8 +392,12 @@ func (g *GuildService) registerSkills(r *gateway.Router) {
 		}
 		career := int(req.Int("career"))
 		var previousPower int64
-		if isH5Client(s) {
-			previousPower = g.guildPower(role.RID)
+		if isH5RoleSession(s) {
+			power, err := rosterPowerOf(g.Store, role.RID, true)
+			if err != nil {
+				return err
+			}
+			previousPower = power
 		}
 		err := g.Store.UpdateGuildSkills(role.RID, func(st *store.GuildSkills) (a, i, ga, gi map[int64]int64, err error) {
 			levels := gskillPveLevel(st, career)

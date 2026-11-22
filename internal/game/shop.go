@@ -143,6 +143,8 @@ func RegisterShop(r *gateway.Router, st *store.Store) {
 			return reply(0, "商品不存在", 0)
 		case num <= 0 || num > maxUseAtOnce:
 			return reply(0, "购买数量不正确", 0)
+		case isH5RoleSession(s) && !h5ShopItemAllowed(g.Item):
+			return reply(0, "商品暂不可购买", 0)
 		}
 		from, to, limit := g.limitWindow(s.Now())
 		spendA, spendI, gainA, gainI := map[int64]int64{}, map[int64]int64{}, map[int64]int64{}, map[int64]int64{}

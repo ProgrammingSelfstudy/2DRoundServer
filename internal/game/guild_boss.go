@@ -221,7 +221,7 @@ func appendInt(b []byte, n int64) []byte {
 
 // bossResult is the 21309 / 21317 body for a challenge.
 func bossResult(st *store.Store, role *store.Role, boss gbossRow, o bossOutcome) (proto.Message, error) {
-	stats, bid, _, _, err := damageTable(st, role)
+	stats, bid, _, _, err := damageTable(st, role, false)
 	if err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
-		h5, now := isH5Client(s), s.Now()
+		h5, now := isH5RoleSession(s), s.Now()
 		typ := req.Int("type")
 		refuse := func(msg string) error { return s.Send(21312, proto.Message{"code": 0, "msg": msg, "type": typ}) }
 		gd, _, err := g.mine(s)
@@ -323,7 +323,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
-		h5, now := isH5Client(s), s.Now()
+		h5, now := isH5RoleSession(s), s.Now()
 		refuse := func(msg string) error { return s.Send(21305, proto.Message{"code": 0, "msg": msg}) }
 		gd, _, err := g.mine(s)
 		if errors.Is(err, errNoGuild) {
@@ -409,7 +409,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
-		h5, now := isH5Client(s), s.Now()
+		h5, now := isH5RoleSession(s), s.Now()
 		refuse := func(msg string) error { return s.Send(21308, proto.Message{"code": 0, "msg": msg}) }
 		gd, _, err := g.mine(s)
 		if errors.Is(err, errNoGuild) {
@@ -548,7 +548,7 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		if role == nil {
 			return nil
 		}
-		h5, now := isH5Client(s), s.Now()
+		h5, now := isH5RoleSession(s), s.Now()
 		refuse := func(msg string) error { return s.Send(21317, proto.Message{"code": 0, "msg": msg}) }
 		gd, _, err := g.mine(s)
 		if errors.Is(err, errNoGuild) {

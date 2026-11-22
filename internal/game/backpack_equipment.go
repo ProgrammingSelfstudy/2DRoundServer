@@ -42,7 +42,7 @@ func changeEquipment(st *store.Store, cmd uint16, sendBag func(*gateway.Session,
 			changes = []store.Equip{{Slot: eq.Slot, BaseID: base}}
 		}
 		hero, err := st.PartnerByID(role.RID, pid)
-		if errors.Is(err, store.ErrNotFound) || err == nil && h5 && hero.Star < h5HeroStar {
+		if errors.Is(err, store.ErrNotFound) || err == nil && h5 && !h5HeroEligible(hero.BID, hero.Star) {
 			if cmd == 11011 && pos != 0 {
 				return reply(0, "该位置没有装备")
 			}
@@ -81,11 +81,10 @@ func changeEquipment(st *store.Store, cmd uint16, sendBag func(*gateway.Session,
 
 		var previousPower int64
 		if h5 {
-			heroes, err := st.PartnersOf(role.RID)
+			previousPower, err = rosterPowerOf(st, role.RID, h5)
 			if err != nil {
 				return err
 			}
-			previousPower = rolePower(heroes)
 		}
 		if err := applyEquipmentChanges(st, *hero, changes, h5); err != nil {
 			switch {

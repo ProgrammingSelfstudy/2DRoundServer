@@ -670,7 +670,7 @@ func (m *monoSvc) guardFight(s *gateway.Session, role *store.Role, st *monoState
 		name = "大Boss"
 	}
 	combat := 100 + id
-	plan, msg, err := planesFight(m.st, m.fights, role, roster, slots, args[1][0], power, name, []proto.Message{}, combat)
+	plan, msg, err := planesFight(m.st, m.fights, role, roster, slots, args[1][0], power, name, []proto.Message{}, combat, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

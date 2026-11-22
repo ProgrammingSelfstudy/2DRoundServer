@@ -73,7 +73,7 @@ func TestH5SocialFriendBlacklistLifecycle(t *testing.T) {
 	}
 }
 
-func TestH5SocialProfileUsesBaseFiveStarHeroes(t *testing.T) {
+func TestH5SocialProfileUsesCurrentFiveStarMinimum(t *testing.T) {
 	e := newSocialEnv(t)
 	h5, _ := e.enter(store.PlatformH5, "a", "甲")
 	legacy, _ := e.enter("symlf", "b", "乙")
@@ -89,8 +89,8 @@ func TestH5SocialProfileUsesBaseFiveStarHeroes(t *testing.T) {
 	for _, hero := range heroes {
 		stars[hero.Int("bid")] = hero.Int("star")
 	}
-	if len(heroes) != 2 || stars[10501] != 5 || stars[10503] != 7 || card.Int("power") <= 0 {
-		t.Fatalf("H5 card should only show base five-star heroes, even after upgrades: %v", card)
+	if len(heroes) != 3 || stars[10501] != 5 || stars[10503] != 7 || stars[10401] != 5 || card.Int("power") <= 0 {
+		t.Fatalf("H5 card should show all known heroes currently at five stars or higher: %v", card)
 	}
 	legacy.send(10315, rid(target))
 	if original := legacy.recv(10315); len(original.Arr("partner_list")) != len(seeds) || original.Int("power") <= card.Int("power") {

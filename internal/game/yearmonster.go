@@ -1008,7 +1008,7 @@ func ymFight(s *gateway.Session, st *store.Store, fights *FightService, c *ymCtx
 	if len(slots) == 0 {
 		return reply(0, "至少需要上阵一个英雄")
 	}
-	team, objects, err := fights.teamFor(c.role, formType, slots)
+	team, objects, err := fights.teamFor(c.role, formType, slots, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

@@ -205,6 +205,7 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 		if times != 1 && times != 10 {
 			return refuse("次数不对")
 		}
+		h5 := isH5RoleSession(s)
 		c := timeSummonCfg.Camps[strconv.FormatInt(camp, 10)]
 		g := timeSummonCfg.Groups[strconv.FormatInt(c.Group, 10)]
 		have, err := st.PartnersOf(role.RID)
@@ -215,7 +216,7 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if len(have)+int(times) > heroSlotCapacity(buys) {
+		if !h5 && len(have)+int(times) > heroSlotCapacity(buys) {
 			return refuse("英雄数量已达上限")
 		}
 		d, p, err := load(role, camp)
@@ -237,11 +238,16 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 		default:
 			return refuse("召唤方式不对")
 		}
-		var rewards, bids []proto.Message
+		var draws summonDrawResults
 		chips := map[int64]int64{}
 		good := false
 		for i := int64(0); i < times; i++ {
 			hero, item := timeSummonDraw(g)
+			if h5 {
+				if card, ok := backpackActions.HeroCards[hero]; ok {
+					hero = card.BID
+				}
+			}
 			if i == times-1 && times == 10 && !good && hero != 0 && partnerTable[hero].InitStar < 4 { // a ten draw has a 4-star at least
 				hero = elitePick(4, 0)
 			}
@@ -249,17 +255,18 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 				good = true
 				if ItemKnown(item) {
 					chips[item]++
-					rewards = append(rewards, proto.Message{"base_id": item, "num": 1})
+					draws.rewards = append(draws.rewards, proto.Message{"base_id": item, "num": 1})
 				}
 				continue
 			}
 			star := partnerTable[hero].InitStar
 			good = good || star >= 4
-			res.Seeds = append(res.Seeds, store.PartnerSeed{BID: hero, Star: star})
-			bids = append(bids, proto.Message{"partner_bid": hero, "init_star": star})
-			if card, ok := heroCardItem(hero, star); ok {
-				rewards = append(rewards, proto.Message{"base_id": card, "num": 1})
+			if !draws.addHero(&res, h5, hero, 0) {
+				return refuse(summonRewardUnavailable)
 			}
+		}
+		if h5 && summonRosterFull(len(have), len(res.Seeds), buys) {
+			return refuse("英雄数量已达上限")
 		}
 		heroes, err := st.Summon(role.RID, res)
 		if err != nil {
@@ -268,7 +275,7 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 			}
 			return err
 		}
-		if len(chips) > 0 { // Summon pays assets only; the chip items follow
+		if len(chips) > 0 {
 			gi := map[int64]int64{}
 			for id, n := range chips {
 				splitGains([]sellGain{{id, n}}, 1, map[int64]int64{}, gi)
@@ -287,15 +294,10 @@ func RegisterTimeSummon(r *gateway.Router, st *store.Store) {
 		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
-		msgs := make([]proto.Message, 0, len(heroes))
-		for _, h := range heroes {
-			msgs = append(msgs, partnerMessage(h))
-		}
-		if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
+		if err := sendSummonedPartners(s, h5, heroes); err != nil {
 			return err
 		}
-		if err := s.Send(23201, proto.Message{"group_id": c.Group, "times": times, "flag": 3, "rewards": nonNil(rewards),
-			"partner_bids": nonNil(bids), "partner_chips": []proto.Message{}, "must_five_num": 0}); err != nil {
+		if err := s.Send(23201, draws.message(c.Group, times, 3)); err != nil {
 			return err
 		}
 		if err := questEvent(s, st, role.RID, evtRecruit, times); err != nil {

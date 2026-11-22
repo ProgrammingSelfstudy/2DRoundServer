@@ -558,7 +558,7 @@ func (a *adv) doSkill(s *gateway.Session, st *advState, r *advRoom, e advEventCf
 }
 
 // heroTeam makes the side of the selected hero.
-func (a *adv) heroTeam(role *store.Role, st *advState) ([]fightUnit, []proto.Message, *advHero, error) {
+func (a *adv) heroTeam(role *store.Role, st *advState, h5 bool) ([]fightUnit, []proto.Message, *advHero, error) {
 	h := st.heroOf(st.Selected)
 	if h == nil || h.Per == 0 {
 		for i := range st.Heroes {
@@ -572,7 +572,7 @@ func (a *adv) heroTeam(role *store.Role, st *advState) ([]fightUnit, []proto.Mes
 	if h == nil || h.Per == 0 {
 		return nil, nil, nil, nil
 	}
-	team, objects, err := a.fights.teamFor(role, 1, []store.FormationSlot{{Pos: 3, PartnerID: h.PID}})
+	team, objects, err := a.fights.teamFor(role, 1, []store.FormationSlot{{Pos: 3, PartnerID: h.PID}}, h5)
 	if err != nil || len(team) == 0 {
 		return nil, nil, nil, err
 	}
@@ -596,7 +596,7 @@ func (a *adv) doGuard(s *gateway.Session, role *store.Role, st *advState, r *adv
 	if !ok || len(unitCfg.Monsters) == 0 {
 		return reply(0, "守卫不见了")
 	}
-	team, objects, hero, err := a.heroTeam(role, st)
+	team, objects, hero, err := a.heroTeam(role, st, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

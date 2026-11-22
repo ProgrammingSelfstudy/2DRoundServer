@@ -353,7 +353,7 @@ func RegisterHolyEqm(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		previousPower := rolePower(heroes)
+		previousPower := rolePower(playablePartners(heroes, isH5RoleSession(s)))
 		back, spend := map[int64]int64{}, map[int64]int64{}
 		switch {
 		case req.Int("type") == 0 && id == 0: // all off

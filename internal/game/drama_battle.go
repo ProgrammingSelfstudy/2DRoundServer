@@ -121,16 +121,12 @@ func settleFight(s *gateway.Session, st *store.Store, won bool) error {
 // damageTable is the damage table of the result screen: the heroes of the campaign
 // formation, their "damage" (our power, not real damage) and the MVP with the team
 // total (partner_bid / partner_hurt / partner_total_hurt; all zero shows "0(nan%)").
-func damageTable(st *store.Store, role *store.Role) (stats []proto.Message, mvpBID, mvpHurt, totalHurt int64, err error) {
-	team, err := formationOf(st, role.RID, formDrama)
+func damageTable(st *store.Store, role *store.Role, h5 bool) (stats []proto.Message, mvpBID, mvpHurt, totalHurt int64, err error) {
+	lineup, err := combatFormation(st, role.RID, h5)
 	if err != nil {
 		return nil, 0, 0, 0, err
 	}
-	heroes, err := st.PartnersOf(role.RID)
-	if err != nil {
-		return nil, 0, 0, 0, err
-	}
-	stats, mvpBID, mvpHurt, totalHurt = formationDamage(role, team, heroes)
+	stats, mvpBID, mvpHurt, totalHurt = lineupDamageTable(role, lineup.form.Slots, lineup.byID)
 	return stats, mvpBID, mvpHurt, totalHurt, nil
 }
 
@@ -170,7 +166,7 @@ func defeatDrama(s *gateway.Session, st *store.Store) error {
 	if role == nil {
 		return nil
 	}
-	stats, bid, hurt, total, err := damageTable(st, role)
+	stats, bid, hurt, total, err := damageTable(st, role, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}
@@ -216,7 +212,7 @@ func settleDrama(s *gateway.Session, st *store.Store) error {
 	for _, g := range reward {
 		rewards = append(rewards, proto.Message{"bid": g.ID, "is_bind": 1, "num": g.Amount, "id": 0})
 	}
-	stats, mvpBID, mvpHurt, totalHurt, err := damageTable(st, role)
+	stats, mvpBID, mvpHurt, totalHurt, err := damageTable(st, role, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}

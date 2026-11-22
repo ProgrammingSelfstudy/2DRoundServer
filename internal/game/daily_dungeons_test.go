@@ -99,7 +99,7 @@ func TestDailyDungeonsHeroRewardsByPlatform(t *testing.T) {
 		heroBIDs       []int64
 		rewards        map[int64]int64
 	}{
-		{"H5", store.PlatformH5, []int64{starterH5}, map[int64]int64{fiveStarRandomShard: 12}},
+		{"H5", store.PlatformH5, []int64{starterMale, starterH5}, map[int64]int64{fiveStarRandomShard: 12}},
 		{"original", "symlf", []int64{starterMale, starterH5}, map[int64]int64{threeStarRandomShard: 10, fourStarRandomShard: 2}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -317,8 +317,17 @@ func TestDailyDungeonsExpeditionFiltersH5HeroesAndLoans(t *testing.T) {
 	e.setNow(now)
 	highClient, h5 := enterDungeonRole(e, store.PlatformH5, "h5", "远征者")
 	friend, original := enterDungeonRole(e, "symlf", "native", "好友")
-	low, high := mixedDungeonHeroes(t, e.st, h5.RID)
-	friendLow, friendHigh := mixedDungeonHeroes(t, e.st, original.RID)
+	promoted, high := mixedDungeonHeroes(t, e.st, h5.RID)
+	friendPromoted, _ := mixedDungeonHeroes(t, e.st, original.RID)
+	wantLow := func(rid int64) store.Partner {
+		t.Helper()
+		heroes, err := e.st.Summon(rid, store.SummonResult{Seeds: []store.PartnerSeed{{BID: starterMale, Star: 4}}})
+		if err != nil || len(heroes) != 1 {
+			t.Fatalf("seed current four-star hero: %v (%v)", heroes, err)
+		}
+		return heroes[0]
+	}
+	low, friendLow := wantLow(h5.RID), wantLow(original.RID)
 	if err := e.st.RequestFriend(original.RID, h5.RID); err != nil {
 		t.Fatal(err)
 	}
@@ -343,7 +352,7 @@ func TestDailyDungeonsExpeditionFiltersH5HeroesAndLoans(t *testing.T) {
 	for _, cmd := range []uint16{24405, 24406} {
 		highClient.send(cmd, nil)
 		if r := highClient.waitFor(cmd); len(r.Arr("list")) != 0 {
-			t.Fatalf("%d exposes a four-star template: %v", cmd, r)
+			t.Fatalf("%d exposes a current four-star hero: %v", cmd, r)
 		}
 	}
 	highClient.send(24409, nil)
@@ -353,16 +362,21 @@ func TestDailyDungeonsExpeditionFiltersH5HeroesAndLoans(t *testing.T) {
 		t.Fatalf("H5 expedition HP: %v", hp)
 	}
 	highClient.send(24401, proto.Message{"id": 1})
-	if guards := highClient.waitFor(24401).Arr("guards"); len(guards) != 1 || guards[0].Int("bid") != starterH5 || guards[0].Int("star") != 6 {
+	guards := highClient.waitFor(24401).Arr("guards")
+	guardStars := make(map[int64]int64, len(guards))
+	for _, guard := range guards {
+		guardStars[guard.Int("bid")] = guard.Int("star")
+	}
+	if len(guards) != 2 || guardStars[starterH5] != 6 || guardStars[starterMale] != 5 {
 		t.Fatalf("H5 expedition guards: %v", guards)
 	}
 	highClient.send(24407, proto.Message{"id": low.PartnerID})
 	if r := highClient.waitFor(24407); r.Int("code") != 0 {
-		t.Fatalf("H5 dispatch accepted a four-star template: %v", r)
+		t.Fatalf("H5 dispatch accepted a current four-star hero: %v", r)
 	}
 	highClient.send(24408, proto.Message{"rid": original.RID, "srv_id": original.SrvID, "id": friendLow.PartnerID})
 	if r := highClient.waitFor(24408); r.Int("code") != 0 {
-		t.Fatalf("H5 hire accepted a four-star template: %v", r)
+		t.Fatalf("H5 hire accepted a current four-star hero: %v", r)
 	}
 	if assets, err := e.st.RoleAssets(original.RID); err != nil || assets[14] != 0 {
 		t.Fatalf("rejected hire paid friendship points: %v, %v", assets, err)
@@ -370,7 +384,7 @@ func TestDailyDungeonsExpeditionFiltersH5HeroesAndLoans(t *testing.T) {
 
 	highClient.send(24403, expTeam(low.PartnerID))
 	if r := highClient.waitFor(24403); r.Int("code") != 0 {
-		t.Fatalf("H5 expedition used a four-star template: %v", r)
+		t.Fatalf("H5 expedition used a current four-star hero: %v", r)
 	}
 	loan := expTeam(friendLow.PartnerID)
 	loan.Arr("pos_info")[0]["owner_id"] = original.RID
@@ -379,39 +393,46 @@ func TestDailyDungeonsExpeditionFiltersH5HeroesAndLoans(t *testing.T) {
 		t.Fatalf("H5 expedition used an old four-star loan: %v", r)
 	}
 
-	friend.send(24407, proto.Message{"id": friendHigh.PartnerID})
+	highClient.send(24407, proto.Message{"id": promoted.PartnerID})
+	if r := highClient.waitFor(24407); r.Int("code") != 1 {
+		t.Fatalf("H5 promoted hero dispatch: %v", r)
+	}
+	friend.send(24407, proto.Message{"id": friendPromoted.PartnerID})
 	if r := friend.waitFor(24407); r.Int("code") != 1 {
 		t.Fatalf("five-star dispatch: %v", r)
 	}
 	highClient.send(24406, nil)
-	if r := highClient.waitFor(24406).Arr("list"); len(r) != 1 || r[0].Int("id") != friendHigh.PartnerID {
+	if r := highClient.waitFor(24406).Arr("list"); len(r) != 1 || r[0].Int("id") != friendPromoted.PartnerID {
 		t.Fatalf("H5 five-star offer: %v", r)
 	}
-	highClient.send(24408, proto.Message{"rid": original.RID, "srv_id": original.SrvID, "id": friendHigh.PartnerID})
+	highClient.send(24408, proto.Message{"rid": original.RID, "srv_id": original.SrvID, "id": friendPromoted.PartnerID})
 	if r := highClient.waitFor(24408); r.Int("code") != 1 {
 		t.Fatalf("H5 five-star hire: %v", r)
 	}
 	if assets, err := e.st.RoleAssets(original.RID); err != nil || assets[14] != 10 {
 		t.Fatalf("five-star hire payout: %v, %v", assets, err)
 	}
-	highClient.send(24403, expTeam(high.PartnerID))
+	team := expTeam(promoted.PartnerID)
+	team["pos_info"] = append(team.Arr("pos_info"), proto.Message{"pos": 2, "id": friendPromoted.PartnerID, "owner_id": original.RID})
+	highClient.send(24403, team)
 	if r := highClient.waitFor(24403); r.Int("code") != 1 {
 		t.Fatalf("H5 five-star expedition: %v", r)
 	}
-	if intro := highClient.waitFor(20027); intro.Int("a_object_num") != 1 {
+	if intro := highClient.waitFor(20027); intro.Int("a_object_num") != 2 {
 		t.Fatalf("H5 expedition team: %v", intro)
 	} else {
-		n := 0
+		fighting := make(map[int64]int64)
 		for _, obj := range intro.Arr("objects") {
-			if obj.Int("object_type") == 2 {
-				n++
-				if obj.Int("object_bid") != starterH5 {
-					t.Fatalf("H5 expedition intro contains a four-star template: %v", obj)
-				}
+			if obj.Int("object_type") != 2 {
+				continue
 			}
+			if obj.Int("star") < 5 || obj.Int("group") == 1 && obj.Int("object_bid") != starterMale {
+				t.Fatalf("H5 expedition intro contains an unexpected hero: %v", obj)
+			}
+			fighting[obj.Int("group")]++
 		}
-		if n != 2 {
-			t.Fatalf("expected one fighter and one guard: %v", intro)
+		if fighting[1] != 2 || fighting[2] != 2 {
+			t.Fatalf("expected two promoted fighters and two guards: %v", intro)
 		}
 	}
 }

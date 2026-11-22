@@ -447,12 +447,13 @@ func (t *tbSvc) fightLevel(s *gateway.Session, _ proto.Message) error {
 		if !ok {
 			return refuse("关卡数据缺失")
 		}
-		form, err := formationOf(t.st, c.role.RID, tbFormChapter)
+		h5 := isH5RoleSession(s)
+		form, err := formationForRole(t.st, c.role.RID, tbFormChapter, h5)
 		if err != nil {
 			return err
 		}
 		formType := max(1, form.FormationType)
-		team, objects, err := t.fights.teamFor(c.role, formType, form.Slots)
+		team, objects, err := t.fights.teamFor(c.role, formType, form.Slots, h5)
 		if err != nil {
 			return err
 		}
@@ -636,12 +637,13 @@ func (t *tbSvc) fightBoss(s *gateway.Session, _ proto.Message) error {
 		if !ok {
 			return refuse("Boss数据缺失")
 		}
-		form, err := formationOf(t.st, c.role.RID, tbFormBoss)
+		h5 := isH5RoleSession(s)
+		form, err := formationForRole(t.st, c.role.RID, tbFormBoss, h5)
 		if err != nil {
 			return err
 		}
 		formType := max(1, form.FormationType)
-		team, objects, err := t.fights.teamFor(c.role, formType, form.Slots)
+		team, objects, err := t.fights.teamFor(c.role, formType, form.Slots, h5)
 		if err != nil {
 			return err
 		}
@@ -698,7 +700,7 @@ func (t *tbSvc) sweep(s *gateway.Session, _ proto.Message) error {
 		if err := s.Send(26709, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
-		form, err := formationOf(t.st, c.role.RID, tbFormBoss)
+		form, err := formationForRole(t.st, c.role.RID, tbFormBoss, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}

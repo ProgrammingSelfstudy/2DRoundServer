@@ -2,6 +2,8 @@ package store
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -14,6 +16,27 @@ func open(t *testing.T) *Store {
 	}
 	t.Cleanup(func() { s.Close() })
 	return s
+}
+
+func TestMigrationPrefixesAreUnique(t *testing.T) {
+	entries, err := migrationFS.ReadDir("migrations")
+	if err != nil {
+		t.Fatal(err)
+	}
+	names := make(map[int]string, len(entries))
+	for _, entry := range entries {
+		name := entry.Name()
+		prefix, _, found := strings.Cut(name, "_")
+		number, err := strconv.Atoi(prefix)
+		if !found || err != nil {
+			t.Errorf("migration %q has no numeric prefix", name)
+			continue
+		}
+		if previous, exists := names[number]; exists {
+			t.Errorf("migrations %q and %q share prefix %d", previous, name, number)
+		}
+		names[number] = name
+	}
 }
 
 func srv(id string) Server {

@@ -1,30 +1,9 @@
 package game
 
 import (
-	"slices"
-
 	"2droundserver/internal/gateway"
 	"2droundserver/internal/store"
 )
-
-func dungeonH5(s *gateway.Session) bool {
-	account := s.Account()
-	return account != nil && account.Platform == store.PlatformH5
-}
-
-// H5 uses hero templates that start at five stars, including their awakened forms.
-func dungeonHeroAllowed(h5 bool, bid, star int64) bool {
-	return !h5 || (partnerTable[bid].InitStar == 5 && star >= 5)
-}
-
-func dungeonHeroes(heroes []store.Partner, h5 bool) []store.Partner {
-	if !h5 {
-		return heroes
-	}
-	return slices.DeleteFunc(heroes, func(h store.Partner) bool {
-		return !dungeonHeroAllowed(h5, h.BID, int64(h.Star))
-	})
-}
 
 const (
 	threeStarRandomShard = 29903

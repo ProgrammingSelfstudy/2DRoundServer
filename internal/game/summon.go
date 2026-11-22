@@ -219,8 +219,7 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		}
 		gid, times, kind := req.Int("group_id"), req.Int("times"), req.Int("recruit_type")
 		// 23201 opens the result window. H5 uses separate notices for capacity and payment failures.
-		account := s.Account()
-		h5 := account != nil && account.Platform == store.PlatformH5
+		h5 := isH5RoleSession(s)
 		g, ok := summonTable[gid]
 		allowed := false
 		if ok {
@@ -239,10 +238,7 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		if len(have)+int(times) > heroSlotCapacity(buys) {
-			if h5 {
-				return s.Send(12741, proto.Message{"msg": "英雄背包已满, 不能召唤英雄"})
-			}
+		if !h5 && len(have)+int(times) > heroSlotCapacity(buys) {
 			return nil
 		}
 		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}}
@@ -267,19 +263,14 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		for _, h := range g.HeroGain { // points for every draw, paid with 10302 and not listed
 			res.GainAssets[h[0]] += h[1] * times
 		}
-		// rewards has one entry per draw, in step with partner_bids: the card item of the hero
-		// drawn (the original server's 23201, captured 2026-10-21), which is what the result
-		// page shows for the heroes without a reveal animation.
-		var rewards []proto.Message
-		bids := make([]proto.Message, 0, times)
+		var draws summonDrawResults
 		for i := int64(0); i < times; i++ {
-			bid := pickHero(g, summonRand())
-			star := partnerTable[bid].InitStar
-			res.Seeds = append(res.Seeds, store.PartnerSeed{BID: bid, Star: star})
-			bids = append(bids, proto.Message{"partner_bid": bid, "init_star": star})
-			if card, ok := heroCardItem(bid, star); ok {
-				rewards = append(rewards, proto.Message{"base_id": card, "num": 1})
+			if !draws.addHero(&res, h5, pickHero(g, summonRand()), 0) {
+				return s.Send(12741, proto.Message{"msg": summonRewardUnavailable})
 			}
+		}
+		if h5 && summonRosterFull(len(have), len(res.Seeds), buys) {
+			return s.Send(12741, proto.Message{"msg": "英雄背包已满, 不能召唤英雄"})
 		}
 		heroes, err := st.Summon(role.RID, res)
 		if err != nil {
@@ -303,15 +294,10 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			}
 			return s.Send(12741, proto.Message{"msg": "召唤所需资源不足"})
 		}
-		if err := s.Send(23201, proto.Message{"group_id": gid, "times": times, "flag": 0, "rewards": nonNil(rewards),
-			"partner_bids": bids, "partner_chips": []proto.Message{}, "must_five_num": 0}); err != nil {
+		if err := s.Send(23201, draws.message(gid, times, 0)); err != nil {
 			return err
 		}
-		msgs := make([]proto.Message, 0, len(heroes))
-		for _, h := range heroes {
-			msgs = append(msgs, partnerMessage(h))
-		}
-		if err := s.Send(11001, proto.Message{"partners": msgs}); err != nil {
+		if err := sendSummonedPartners(s, h5, heroes); err != nil {
 			return err
 		}
 		if err := questEvent(s, st, role.RID, evtRecruit, times); err != nil {
@@ -328,6 +314,68 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		}
 		return nil
 	})
+}
+
+const summonRewardUnavailable = "该召唤奖励暂不可用"
+
+var summonHeroShards = func() map[int64]sellGain {
+	byHero := make(map[int64]sellGain)
+	for itemID, recipe := range backpackActions.HeroShards {
+		hero, known := partnerTable[recipe.BID]
+		if known && recipe.Star == hero.InitStar && recipe.Star < h5MinHeroStar && recipe.Need > 0 && ItemKnown(itemID) {
+			byHero[recipe.BID] = sellGain{itemID, recipe.Need}
+		}
+	}
+	return byHero
+}()
+
+type summonDrawResults struct {
+	rewards, bids, chips []proto.Message
+}
+
+func (draws *summonDrawResults) addHero(result *store.SummonResult, h5 bool, bid, fallbackCard int64) bool {
+	star := partnerTable[bid].InitStar
+	if h5 && !h5HeroEligible(bid, star) {
+		shards, ok := summonHeroShards[bid]
+		if !ok {
+			return false
+		}
+		if result.GainItems == nil {
+			result.GainItems = make(map[int64]int64)
+		}
+		result.GainItems[shards.ID] += shards.Amount
+		draws.rewards = append(draws.rewards, proto.Message{"base_id": shards.ID, "num": shards.Amount})
+		draws.chips = append(draws.chips, proto.Message{"partner_bid": bid, "chip_bid": shards.ID, "chip_num": shards.Amount})
+		return true
+	}
+	result.Seeds = append(result.Seeds, store.PartnerSeed{BID: bid, Star: star})
+	draws.bids = append(draws.bids, proto.Message{"partner_bid": bid, "init_star": star})
+	if card, ok := heroCardItem(bid, star); ok {
+		draws.rewards = append(draws.rewards, proto.Message{"base_id": card, "num": 1})
+	} else if fallbackCard != 0 {
+		draws.rewards = append(draws.rewards, proto.Message{"base_id": fallbackCard, "num": 1})
+	}
+	return true
+}
+
+func (draws summonDrawResults) message(group, times, flag int64) proto.Message {
+	return proto.Message{"group_id": group, "times": times, "flag": flag, "rewards": nonNil(draws.rewards),
+		"partner_bids": nonNil(draws.bids), "partner_chips": nonNil(draws.chips), "must_five_num": 0}
+}
+
+func summonRosterFull(owned, grants, buys int) bool {
+	return grants > 0 && owned+grants > heroSlotCapacity(buys)
+}
+
+func sendSummonedPartners(s *gateway.Session, h5 bool, heroes []store.Partner) error {
+	if h5 && len(heroes) == 0 {
+		return nil
+	}
+	msgs := make([]proto.Message, 0, len(heroes))
+	for _, hero := range heroes {
+		msgs = append(msgs, partnerMessage(hero))
+	}
+	return s.Send(11001, proto.Message{"partners": msgs})
 }
 
 func nonNil(l []proto.Message) []proto.Message {

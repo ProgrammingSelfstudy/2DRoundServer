@@ -233,16 +233,15 @@ func TestH5GuildBossKeepsRewardsAfterDisconnect(t *testing.T) {
 	if err := e.st.JoinGuild(gid, member.RID, now, 15); err != nil {
 		t.Fatal(err)
 	}
-	// A legacy four-star hero raised to five stays out of the H5 guild lineup.
-	if _, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: starterMale, Star: 5}, {BID: starterH5, Star: 5}}); err != nil {
+	if _, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: starterH5, Star: 4}, {BID: starterMale, Star: 5}, {BID: starterH5, Star: 5}}); err != nil {
 		t.Fatal(err)
 	}
 	heroes, err := e.st.PartnersOf(role.RID)
-	if err != nil || len(heroes) != 2 {
+	if err != nil || len(heroes) != 3 {
 		t.Fatalf("guild roster: %v, %v", heroes, err)
 	}
 	c.send(11211, proto.Message{"type": formGuildBoss})
-	if slots := c.waitFor(11211).Arr("pos_info"); len(slots) != 1 || slots[0].Int("id") != heroes[1].PartnerID {
+	if slots := c.waitFor(11211).Arr("pos_info"); len(slots) != 2 || slots[0].Int("id") != heroes[1].PartnerID || slots[1].Int("id") != heroes[2].PartnerID {
 		t.Fatalf("H5 guild lineup: %v", slots)
 	}
 	type bossView struct {
@@ -266,13 +265,17 @@ func TestH5GuildBossKeepsRewardsAfterDisconnect(t *testing.T) {
 		t.Fatalf("challenge: %v", reply)
 	}
 	opening := c.waitFor(20027)
-	if opening.Int("combat_type") != combatGuildDun || opening.Int("a_object_num") != 1 {
+	if opening.Int("combat_type") != combatGuildDun || opening.Int("a_object_num") != 2 {
 		t.Fatalf("unexpected Boss battle: %v", opening)
 	}
+	fighters := make(map[int64]int64)
 	for _, unit := range opening.Arr("objects") {
-		if unit.Int("object_type") == 2 && unit.Int("object_id") != heroes[1].PartnerID {
-			t.Fatalf("unexpected Boss fighter: %v", unit)
+		if unit.Int("object_type") == 2 {
+			fighters[unit.Int("object_id")] = unit.Int("star")
 		}
+	}
+	if len(fighters) != 2 || fighters[heroes[1].PartnerID] != 5 || fighters[heroes[2].PartnerID] != 5 {
+		t.Fatalf("unexpected Boss fighters: %v", fighters)
 	}
 	c.c.Close()
 	other := guildView[bossView](t, observer, h5GuildBoss, 0)
@@ -390,5 +393,17 @@ func TestH5GuildBonusesWorkInFight(t *testing.T) {
 	stun := buffRule{Kind: "stun", Chance: 100, Rounds: 1}
 	if got := sim.addBuff(&fightUnit{}, &fightUnit{hp: 1, guild: guildCombatBonus{resistControl: 1000}}, stun); got != nil {
 		t.Fatalf("full control resistance let a stun through: %v", got)
+	}
+}
+
+func TestH5GuildTrainingUsesCurrentStar(test *testing.T) {
+	levels := map[int]int{3: 6}
+	promoted := store.Partner{BID: 20401, Lev: 10, Star: 5, GuildSkillLevels: levels}
+	if bonus := guildCombatBonusOf(promoted); bonus.damage != 5 || guildSkillBonus(promoted, "speed") != 4 {
+		test.Fatalf("promoted hero missed guild training: %+v", bonus)
+	}
+	belowMinimum := store.Partner{BID: starterH5, Lev: 10, Star: 4, GuildSkillLevels: levels}
+	if bonus := guildCombatBonusOf(belowMinimum); bonus.damage != 0 || guildSkillBonus(belowMinimum, "speed") != 0 {
+		test.Fatalf("below-minimum hero received guild training: %+v", bonus)
 	}
 }

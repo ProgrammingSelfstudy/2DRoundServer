@@ -53,7 +53,7 @@ func rankingAt(st *store.Store, srvID string, typ int64, now int64) ([]rankEntry
 }
 
 func sessionRankKey(st *store.Store, s *gateway.Session, typ int64) rankKey {
-	return rankKey{st: st, srv: s.Role().SrvID, typ: typ, h5Arena: typ == rankArena && usesH5Arena(s)}
+	return rankKey{st: st, srv: s.Role().SrvID, typ: typ, h5Arena: typ == rankArena && isH5RoleSession(s)}
 }
 
 func (k rankKey) snapshot(now int64) ([]rankEntry, error) {

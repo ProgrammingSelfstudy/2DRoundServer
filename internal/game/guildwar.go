@@ -852,7 +852,7 @@ func (g *gwSvc) attack(s *gateway.Session, req proto.Message) error {
 		case !ruin && (diff < 1 || diff > 3 || diff > h.Hp):
 			return refuse("难度不可选")
 		}
-		team, objects, form, err := g.fights.teamSide(c.role)
+		team, objects, form, err := g.fights.teamSide(c.role, isH5RoleSession(s))
 		if err != nil {
 			return false, err
 		}

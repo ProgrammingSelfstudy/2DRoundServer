@@ -18,12 +18,12 @@ type planesFightPlan struct {
 
 // planesFight makes the fight of a formation of the roster (hp in per cent, own and hired heroes) against a scaled copy of
 // the role's own best heroes whose power is `power`. A non-empty message says why it cannot be fought.
-func planesFight(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64) (*planesFightPlan, string, error) {
-	return planesFightWithGuards(db, fights, role, roster, slots, formType, power, foeName, extra, combat, nil)
+func planesFight(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64, h5 bool) (*planesFightPlan, string, error) {
+	return planesFightWithGuards(db, fights, role, roster, slots, formType, power, foeName, extra, combat, nil, h5)
 }
 
 // When guards is nil, use the role's usual strongest heroes.
-func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64, guards []store.Partner) (*planesFightPlan, string, error) {
+func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64, guards []store.Partner, h5 bool) (*planesFightPlan, string, error) {
 	if formType == 0 {
 		formType = 1
 	}
@@ -40,7 +40,7 @@ func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Ro
 	var fighters []pfSlot
 	for _, sl := range slots {
 		h := heroOf(sl)
-		if h == nil || h.HP <= 0 || len(fighters) == formMaxHeroes {
+		if h == nil || h.HP <= 0 || len(fighters) == formMaxHeroes || h5 && sl.Flag == 1 && !h5HeroEligible(h.BID, int(h.Star)) {
 			continue
 		}
 		fighters = append(fighters, sl)
@@ -55,13 +55,16 @@ func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Ro
 	if len(fighters) == 0 {
 		return nil, "没有可以出战的英雄", nil
 	}
-	team, objects, err := fights.teamFor(role, formType, ownSlots)
+	team, objects, err := fights.teamFor(role, formType, ownSlots, h5)
 	if err != nil {
 		return nil, "", err
 	}
 	if len(hiredSlots) > 0 {
 		hu, ho := sideUnits(role.RID, role.SrvID, hiredSlots, formType, hired, true)
 		team, objects = append(team, hu...), append(objects, ho...)
+	}
+	if h5 && len(team) == 0 {
+		return nil, "没有可以出战的英雄", nil
 	}
 	at := map[int64]*pfSlot{} // battle cell -> who stands there
 	for i := range fighters {
@@ -84,7 +87,7 @@ func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Ro
 		if err != nil {
 			return nil, "", err
 		}
-		guards = bestHeroes(all, 5)
+		guards = bestHeroes(playablePartners(all, h5), 5)
 	}
 	factor := power * 1000 / max(1, rolePower(guards))
 	opp := arenaOpp{RID: arenaRobotBase + power, SrvID: role.SrvID, Name: foeName, Robot: true, FormType: 1, Power: power}

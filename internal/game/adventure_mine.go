@@ -432,7 +432,7 @@ func (a *adv) mineAttack(s *gateway.Session, req proto.Message) error {
 		case c.attacksLeft() <= 0:
 			return refuse("挑战次数不足")
 		}
-		team, objects, form, err := a.fights.teamSide(c.role)
+		team, objects, form, err := a.fights.teamSide(c.role, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -500,7 +500,7 @@ func (a *adv) mineSettle(s *gateway.Session, f, room int64, opp arenaOpp, won bo
 		}
 		p, _ := a.partners(c.role)
 		stats := []proto.Message{}
-		heroes, _ := formationOf(a.st, c.role.RID, formDrama)
+		heroes, _ := formationForRole(a.st, c.role.RID, formDrama, isH5RoleSession(s))
 		for _, sl := range heroes.Slots {
 			if pp, ok := p[sl.PartnerID]; ok {
 				stats = append(stats, proto.Message{"rid": c.role.RID, "srvid": c.role.SrvID, "id": pp.PartnerID, "bid": pp.BID, "star": pp.Star, "lev": pp.Lev,

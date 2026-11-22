@@ -121,12 +121,8 @@ func (c *ChatService) private(s *gateway.Session, req proto.Message) error {
 	case !validChatMsg(text):
 		return reply(false, "消息内容不合法")
 	}
-	h5, err := h5SocialViewer(c.Store, s, me)
-	if err != nil {
-		return err
-	}
 	h5Pair := false
-	if h5 {
+	if isH5RoleSession(s) {
 		h5Pair, err = c.Store.H5SocialPair(me.RID, target.RID)
 		if err != nil {
 			return err
@@ -163,11 +159,7 @@ func (c *ChatService) Deliver(s *gateway.Session) error {
 	if me == nil {
 		return nil
 	}
-	h5, err := h5SocialViewer(c.Store, s, me)
-	if err != nil {
-		return err
-	}
-	if h5 {
+	if isH5RoleSession(s) {
 		return c.Store.DeliverOfflineChat(me.RID, func(waiting []store.OfflineChat) error {
 			return c.deliverPrivate(s, me.RID, waiting, true)
 		})
@@ -283,15 +275,12 @@ func (c *ChatService) historyOf(s *gateway.Session, req proto.Message) error {
 			c.mu.Unlock()
 		}
 	}
-	h5, err := h5SocialViewer(c.Store, s, me)
-	if err != nil {
-		return err
-	}
-	if h5 {
-		list, err = c.visibleChatHistory(me.RID, list)
+	if isH5RoleSession(s) {
+		visible, err := c.visibleChatHistory(me.RID, list)
 		if err != nil {
 			return err
 		}
+		list = visible
 	}
 	return s.Send(12766, proto.Message{"channel": req.Int("channel"), "msg_list": list})
 }

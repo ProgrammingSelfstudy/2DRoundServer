@@ -14,11 +14,19 @@ type rolePowerState struct {
 // previous includes the pre-operation power when tracking an existing role for
 // the first time. The power formula itself remains the existing local model.
 func sendRolePower(s *gateway.Session, st *store.Store, rid, previous int64) error {
-	heroes, err := st.PartnersOf(rid)
+	power, err := rosterPowerOf(st, rid, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}
-	return sendRolePowerValue(s, st, rid, previous, rolePower(heroes))
+	return sendRolePowerValue(s, st, rid, previous, power)
+}
+
+func rosterPowerOf(st *store.Store, rid int64, h5 bool) (int64, error) {
+	heroes, err := st.PartnersOf(rid)
+	if err != nil {
+		return 0, err
+	}
+	return rolePower(playablePartners(heroes, h5)), nil
 }
 
 func sendRolePowerValue(s *gateway.Session, st *store.Store, rid, previous, power int64) error {
@@ -42,7 +50,7 @@ func init() {
 // new high and not after star-ups that used up a levelled hero. previous is the power before
 // the operation.
 func sendPowerIfHigh(s *gateway.Session, st *store.Store, rid, previous int64) error {
-	heroes, err := st.PartnersOf(rid)
+	power, err := rosterPowerOf(st, rid, isH5RoleSession(s))
 	if err != nil {
 		return err
 	}
@@ -50,7 +58,7 @@ func sendPowerIfHigh(s *gateway.Session, st *store.Store, rid, previous int64) e
 	if _, err := st.LoadState(rid, "role_power", &state); err != nil {
 		return err
 	}
-	if rolePower(heroes) <= max(state.Max, previous) {
+	if power <= max(state.Max, previous) {
 		return nil
 	}
 	return sendRolePower(s, st, rid, previous)

@@ -61,6 +61,67 @@ func formationOf(st *store.Store, rid, typ int64) (store.Formation, error) {
 	return defaultFormation(typ, heroes), nil
 }
 
+type formationTeam struct {
+	form store.Formation
+	byID map[int64]store.Partner
+}
+
+func h5FormationTeamOf(st *store.Store, rid, kind int64) (formationTeam, error) {
+	saved, err := st.Formation(rid, kind)
+	if kind != formDrama && errors.Is(err, store.ErrNotFound) {
+		saved, err = st.Formation(rid, formDrama)
+	}
+	if err != nil && !errors.Is(err, store.ErrNotFound) {
+		return formationTeam{}, err
+	}
+	heroes, err := st.PartnersOf(rid)
+	if err != nil {
+		return formationTeam{}, err
+	}
+	heroes = playablePartners(heroes, true)
+	team := formationTeam{form: store.Formation{Type: kind, FormationType: 1}, byID: partnersByID(heroes)}
+	if saved != nil {
+		team.form.FormationType, team.form.HallowsID = saved.FormationType, saved.HallowsID
+		for _, slot := range saved.Slots {
+			if _, ok := team.byID[slot.PartnerID]; ok {
+				team.form.Slots = append(team.form.Slots, slot)
+			}
+		}
+	}
+	if len(team.form.Slots) == 0 {
+		team.form.Slots = defaultFormation(kind, heroes).Slots
+	}
+	return team, nil
+}
+
+func formationForRole(st *store.Store, rid, kind int64, h5 bool) (store.Formation, error) {
+	if h5 {
+		team, err := h5FormationTeamOf(st, rid, kind)
+		return team.form, err
+	}
+	return formationOf(st, rid, kind)
+}
+
+func combatFormation(st *store.Store, rid int64, h5 bool) (formationTeam, error) {
+	if h5 {
+		return h5FormationTeamOf(st, rid, formDrama)
+	}
+	form, err := formationOf(st, rid, formDrama)
+	if err != nil {
+		return formationTeam{}, err
+	}
+	heroes, err := st.PartnersOf(rid)
+	return formationTeam{form: form, byID: partnersByID(heroes)}, err
+}
+
+func partnersByID(heroes []store.Partner) map[int64]store.Partner {
+	byID := make(map[int64]store.Partner, len(heroes))
+	for _, hero := range heroes {
+		byID[hero.PartnerID] = hero
+	}
+	return byID
+}
+
 func defaultFormation(typ int64, heroes []store.Partner) store.Formation {
 	def := store.Formation{Type: typ, FormationType: 1}
 	for i, h := range heroes {
@@ -86,12 +147,9 @@ func formationMessage(f store.Formation) proto.Message {
 func RegisterFormation(r *gateway.Router, st *store.Store) {
 	read := func(s *gateway.Session, typ int64) (store.Formation, error) {
 		role := s.Role()
-		if typ == formArenaDefense && usesH5Arena(s) {
-			team, err := h5ArenaTeamOf(st, role.RID, typ)
-			return team.form, err
-		}
-		if typ != formGuildBoss || !isH5Client(s) {
-			return formationOf(st, role.RID, typ)
+		h5 := isH5RoleSession(s)
+		if typ != formGuildBoss || !h5 {
+			return formationForRole(st, role.RID, typ, h5)
 		}
 		heroes, err := h5GuildBossRoster(st, role)
 		if err != nil {
@@ -150,7 +208,8 @@ func RegisterFormation(r *gateway.Router, st *store.Store) {
 		if len(f.Slots) == 0 || len(f.Slots) > formMaxHeroes {
 			return reply(0, "上阵英雄数量不正确")
 		}
-		if typ == formGuildBoss && isH5Client(s) {
+		h5 := isH5RoleSession(s)
+		if typ == formGuildBoss && h5 {
 			heroes, err := h5GuildBossRoster(st, role)
 			if err != nil {
 				return err
@@ -158,8 +217,7 @@ func RegisterFormation(r *gateway.Router, st *store.Store) {
 			if len(h5GuildBossSlots(f.Slots, heroes)) != len(f.Slots) {
 				return reply(0, "公会副本阵容不合法")
 			}
-		}
-		if typ == formArenaDefense && usesH5Arena(s) {
+		} else if h5 {
 			for _, slot := range f.Slots {
 				hero, err := st.PartnerByID(role.RID, slot.PartnerID)
 				if errors.Is(err, store.ErrNotFound) {
@@ -168,7 +226,7 @@ func RegisterFormation(r *gateway.Router, st *store.Store) {
 				if err != nil {
 					return err
 				}
-				if !isH5ArenaHero(hero.BID, hero.Star) {
+				if !h5HeroEligible(hero.BID, hero.Star) {
 					return reply(0, "只能上阵五星及以上英雄")
 				}
 			}

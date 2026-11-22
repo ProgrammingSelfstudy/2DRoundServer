@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"slices"
 
 	"2droundserver/internal/proto"
 	"2droundserver/internal/store"
@@ -20,7 +19,7 @@ func h5GuildBossRoster(st *store.Store, role *store.Role) ([]store.Partner, erro
 	if err != nil {
 		return nil, err
 	}
-	return slices.DeleteFunc(heroes, func(h store.Partner) bool { return !h5GuildHero(h.BID) }), nil
+	return playablePartners(heroes, true), nil
 }
 
 // h5GuildBossSlots keeps eligible heroes in distinct positions. It is also used
@@ -85,11 +84,11 @@ func (f *FightService) guildBossTeam(role *store.Role, req proto.Message, h5 boo
 	}
 	if !h5 {
 		if len(slots) == 0 {
-			team, objects, form, err := f.teamSide(role)
+			team, objects, form, err := f.teamSide(role, false)
 			return team, objects, form.FormationType, err
 		}
 		formType = max(1, formType)
-		team, objects, err := f.teamFor(role, formType, slots)
+		team, objects, err := f.teamFor(role, formType, slots, false)
 		return team, objects, formType, err
 	}
 

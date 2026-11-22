@@ -332,10 +332,10 @@ func RegisterElement(r *gateway.Router, st *store.Store) {
 		var objects []proto.Message
 		if len(slots) > 0 {
 			formType = max(formType, 1)
-			team, objects, err = fights.teamFor(role, formType, slots)
+			team, objects, err = fights.teamFor(role, formType, slots, isH5RoleSession(s))
 		} else {
 			var form store.Formation
-			team, objects, form, err = fights.teamSide(role)
+			team, objects, form, err = fights.teamSide(role, isH5RoleSession(s))
 			formType, slots = form.FormationType, form.Slots
 		}
 		if err != nil {

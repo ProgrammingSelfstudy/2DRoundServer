@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"2droundserver/internal/proto"
+	"2droundserver/internal/store"
 )
 
 func TestLoginDay(t *testing.T) {
-	e := newEnv(t, time.Minute)
-	c, role := e.enter("a", "甲")
+	e := newGameEnv(t, time.Minute)
+	account, token, role := e.welfareRole("symlf", "a", "甲")
+	c := enterWelfareRole(e.welfareDialer(), account, token, role)
 	statuses := func() map[int64]int64 {
 		c.send(21100, proto.Message{})
 		r := c.waitFor(21100)
@@ -41,6 +43,9 @@ func TestLoginDay(t *testing.T) {
 	if r := c.waitFor(21101); r.Int("code") != 1 || r.Int("day") != 1 {
 		t.Fatalf("take day 1: %v", r)
 	}
+	c.recv(10302)
+	c.recv(10500)
+	c.recv(10501)
 	if got, _ := e.st.RoleAssets(role.RID); got[1] < loginDays[0][0][1] {
 		t.Fatalf("berries not paid: %v", got)
 	}
@@ -57,5 +62,16 @@ func TestLoginDay(t *testing.T) {
 	}
 	if got := loginDayReached(role, time.Unix(role.CreatedAt, 0).Add(1000*time.Hour)); got != 8 {
 		t.Fatalf("capped: %d", got)
+	}
+}
+
+func TestLoginDayUnlocksAtChinaMidnight(t *testing.T) {
+	created := time.Date(2026, time.November, 1, 23, 59, 58, 0, dayZone)
+	role := &store.Role{CreatedAt: created.Unix()}
+	if got := loginDayReached(role, created.Add(time.Second).UTC()); got != 1 {
+		t.Fatalf("one second before China midnight: reached day %d", got)
+	}
+	if got := loginDayReached(role, created.Add(2*time.Second).UTC()); got != 2 {
+		t.Fatalf("at China midnight: reached day %d", got)
 	}
 }

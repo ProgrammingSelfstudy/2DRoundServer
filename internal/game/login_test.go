@@ -55,6 +55,18 @@ func (e *env) setNow(t time.Time) { e.clk.Store(t.UnixNano()) }
 
 func newEnv(t *testing.T, idle time.Duration) *env {
 	t.Helper()
+	e := newGameEnv(t, idle)
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	e.addr = ln.Addr().String()
+	go e.gw.Serve(ln)
+	return e
+}
+
+func newGameEnv(t *testing.T, idle time.Duration) *env {
+	t.Helper()
 	st, err := store.Open(":memory:")
 	if err != nil {
 		t.Fatal(err)
@@ -180,13 +192,8 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterElfin(gw.Router, st)
 	RegisterHomeworld(gw.Router, st)
 	RegisterHomepet(gw.Router, st)
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	go gw.Serve(ln)
 	t.Cleanup(gw.Close)
-	return &env{t: t, st: st, gw: gw, addr: ln.Addr().String(), logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns, champ: champ}
+	return &env{t: t, st: st, gw: gw, logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns, champ: champ}
 }
 
 func (e *env) account(name string) (*store.Account, string) {

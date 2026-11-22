@@ -7,8 +7,8 @@
 ## 口径与生成
 
 - `role`：`LoadState/SaveState` 的模块参数；`global`：`LoadGlobal/SaveGlobal` 的模块参数。相同 key 在两个范围出现须分别登记，不按 key 去重。
-- 源码扫描到 **360 处持久化调用、80 项玩家模块、31 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查88个以 `Module`/`Mod` 结尾的字符串模块常量。阶段3新增 `worldlev`；计划中的“约65/31”是估计，不能当验收数量。
-- `table`：92 张显式建表，来自 `internal/store/migrations/*.sql` 和 `store.go` 的启动建表；包括游戏相关表及4张安全/运维表 `admins`、`audit_logs`、`login_tokens`、`schema_migrations`，后者也列出以说明边界。SQLite 自动维护的 `sqlite_sequence` 等内部表不由项目注册，不计入。
+- 源码扫描到 **361 处持久化调用、80 项玩家模块、31 项全服模块**；其中三项为动态前缀，代表整族模块而不是一个已存在的数据库行。另检查87个以 `Module`/`Mod` 结尾的字符串模块常量。阶段3新增 `worldlev`；计划中的“约65/31”是估计，不能当验收数量。
+- `table`：98 张显式建表，来自 `internal/store/migrations/*.sql` 和 `store.go` 的启动建表；包括游戏相关表及4张安全/运维表 `admins`、`audit_logs`、`login_tokens`、`schema_migrations`，后者也列出以说明边界。SQLite 自动维护的 `sqlite_sequence` 等内部表不由项目注册，不计入。
 - 下表的范围、键和源码列由 `tools/admincoverage` 扫描结果生成；中文窗口、当前能力、后续处置和原因经人工补充。窗口协议用于定位游戏功能，不等于后台 HTTP 路由。**“当前未接”是待补缺口，不是永久排除；“拟提供”不表示已经实现或已经授权具体写操作。**
 - 本文机器可读表格是覆盖清单；阶段1已在各模块文件的 `init()` 中注册到 `internal/game/adminreg.go` 的 `AdminModules()`。完整性门禁同时核对源码扫描、本文及运行时注册，任一边缺项都失败。测试采用精确的 `(scope,key)` 对比，不能用一个任意 `*` 冒充全覆盖。
 
@@ -36,6 +36,12 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 - 当前角色详情保留基本资料、发放及账本，另有“玩法与只读数据”：充值状态与角色订单、模块JSON及计算视图、全部role表分组。英雄/装备/天赋、阵容、任务/好友、收件等经通用白名单表读取；没有专用投影的字段显示存储值，不虚构游戏计算属性。
 - 现有写操作并非全部执行新计划的“先查离线、不可达不写”；本阶段不更改旧接口或规则。后续新增玩家数据写必须先网关在线校验（在线409、未知502），再读before、写入、审计。不能用当前踢线选项代替这一前置条件。
 - 全服模块数据必须经网关，在所属服务的锁/定时器边界内读取/修改；禁止后台直接调用 `SaveGlobal`。专用表若同样受网关服务锁保护，也不能因其是SQL表就绕开该边界。
+
+## H5 邮件与福利
+
+- 邮件（10800–10806）：`GET /api/mails` 查看发件、附件及领取汇总；`POST /api/mails` 保持 operator 发件权限。角色收件白名单 `GET /api/roles/{id}/tables/role_mails` 显示主题、已读、领取和软删除时间，不触发广播补投递，也不能代领或删除。
+- 公告、月签到、兑换码：公告与兑换码配置继续用 `/api/notices` 和 `/api/redeem-codes` 管理。角色的 `role_notice_reads`、`checkin` 和 `redeem_uses` 明细只读，不开放清除记录或代领。
+- 八日登录礼（21100/21101）：`GET /api/roles/{id}/modules/loginday` 只读已领取的 `taken` 列表。沿用创建日起按中国时间日历日解锁；领取记录与货币、物品发放在同一事务，重试不重复发放。H5 领完后立即收到图标关闭推送（10923）；其他客户端仍按原有查询（10922/10924/10925）得到关闭状态。沿用 `module_state`，无新表、迁移或后台写权限。
 
 ## 玩家模块（80项）
 
@@ -86,7 +92,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `levgift` | 升级礼包/全服限量（21200/21201） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [levgift.go](../internal/game/levgift.go) |
 | role | `limitexercise` | 试炼之境（25410–25414） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [limitexercise.go](../internal/game/limitexercise.go) |
 | role | `limitgift` | 养成/等级限时礼包（21210/21211） | 原始JSON、23项礼包状态视图（read）；配置内ID重置（manage） | 已接查看/专用视图/单礼包重置 | 白名单从23项配置生成；4项Kind3仍不发售，清记录不解锁原本未实现的玩法 | [limitgift.go](../internal/game/limitgift.go) |
-| role | `loginday` | 登录天数/登录奖励（10922–10925、21100/21101） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [loginday.go](../internal/game/loginday.go) |
+| role | `loginday` | 登录天数/登录奖励（10922–10925、21100/21101） | 原始JSON `taken` 列表（read） | 保持只读；不开放重置/编辑 | 领取记录与奖励同事务；删除或改写记录会破坏幂等约束 | [login_day_claim.go](../internal/store/login_day_claim.go) |
 | role | `luckydog` | 幸运锦鲤（28400–28403） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [luckydog.go](../internal/game/luckydog.go) |
 | role | `mergegoal` | 合服目标（27300/27301） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [mergegoal.go](../internal/game/mergegoal.go) |
 | role | `monopoly` | 和之国火祭个人状态（27400–27506） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [monopoly.go](../internal/game/monopoly.go) |
@@ -164,7 +170,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | global | `yearmonster` | 年兽活动（28200–28224） | 网关服务锁内只读原始JSON及状态投影（read） | 查看（玩法状态页，经网关）；不提供自由编辑/强制结算 | 共享状态/记录须经服务锁读取；无已审定的强制结算白名单，不改玩法规则 | [yearmonster.go](../internal/game/yearmonster.go) |
 | global | `worldlev` | World level override (10192/10905) | Gateway-owned read; manage PUT with reason/audit and online push | Implemented in phase 3c | 0 disables; until=0 persistent; expiry uses game clock; original top-10 average remains the fallback | [worldlevel.go](../internal/store/worldlevel.go) |
 
-## 专用表与基础设施（92张）
+## 专用表与基础设施（98张）
 
 表范围固定记为 `table`，标题标明业务归属。没有现成后台入口的游戏表均列为待接只读视图，不因阶段4只举了八类页签就从清单消失；下表也不授权新增通用SQL写入。多表事务、领奖幂等及服务锁必须保留，不能逐表清空。现有写入入口仅记录事实，不代表已符合新接口的离线写约束。
 
@@ -236,7 +242,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `client_config` | 客户端启动配置 | 资源与版本页：CDN地址、公告、最低版本、功能开关（read/write）；有专用页：客户端资源与版本 | 保留专用入口/不提供通用表视图 | 有专用页：客户端资源与版本；键固定，避免写出没人读的设置 | [053_client_release.sql](../internal/store/migrations/053_client_release.sql) |
 | table | `client_release` | 客户端资源版本 | 资源与版本页：登记草稿、发布、回滚、测试白名单（read/write）；有专用页：客户端资源与版本 | 保留专用入口/不提供通用表视图 | 有专用页：客户端资源与版本；发布与回滚要审计，不走通用表 | [053_client_release.sql](../internal/store/migrations/053_client_release.sql) |
 | table | `redeem_codes` | 兑换码配置/兑换码页 | 列表/创建/删除及已用次数（read/write）；有专用页：兑换码管理 | 保留专用入口/不提供通用表视图 | 有专用页：兑换码管理 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
-| table | `redeem_uses` | 兑换码领取明细 | 仅兑换码已用次数汇总，无逐角色明细（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
+| table | `redeem_uses` | 兑换码领取明细 | 兑换码页查看已用次数；表视图注册：按角色只读分页显示兑换码及使用时间，含COUNT摘要（read） | 已接API及通用表浏览，不提供逐表编辑/清空 | 仅显示该角色的使用记录；不允许重置兑换次数 | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `replay_collects` | 录像收藏关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
 | table | `replays` | 战斗录像元数据/脚本 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated；不返回战斗脚本 | [046_replays.sql](../internal/store/migrations/046_replays.sql) |
 | table | `resonance_extract` | 共鸣炼金批次/领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [034_resonance_stone.sql](../internal/store/migrations/034_resonance_stone.sql) |
@@ -249,7 +255,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `role_follows` | 空间关注关系 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [040_space.sql](../internal/store/migrations/040_space.sql) |
 | table | `role_items` | 物品账本/角色详情 | 角色详情账本查看、发放（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [003_mail.sql](../internal/store/migrations/003_mail.sql) |
 | table | `role_looks` | 外观拥有记录 | 仅发放外观（write），无拥有列表；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [032_role_looks.sql](../internal/store/migrations/032_role_looks.sql) |
-| table | `role_mails` | 角色收件/阅读/领取 | 仅发件历史收件/领取汇总，无角色收件列表（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [001_init.sql](../internal/store/migrations/001_init.sql) |
+| table | `role_mails` | 角色收件/阅读/领取 | 发件历史收件/领取汇总；表视图注册：按角色联出主题及状态时间，只读分页与COUNT摘要（read） | 已接API及通用表浏览，不提供逐表编辑/清空 | 仅显示已投递的收件记录；不触发广播补投递，不提供代领或删除 | [001_init.sql](../internal/store/migrations/001_init.sql) |
 | table | `role_notice_reads` | 角色公告已读 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [004_notice_reads.sql](../internal/store/migrations/004_notice_reads.sql) |
 | table | `role_reports` | 玩家举报/举报页 | 举报页只读（read）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [035_role_misc.sql](../internal/store/migrations/035_role_misc.sql) |
 | table | `role_resonance` | 共鸣核心/石碑等级 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [033_resonance.sql](../internal/store/migrations/033_resonance.sql) |
@@ -276,7 +282,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 2. **阶段2已接充值状态汇总和白名单重置**：六组模块覆盖9个具体key；汇总附真实role_charge和仅该角色的订单分页。累计实付、VIP经验、历史购买次数和其他模块不可编辑。月卡Base策略已注明并登记OPEN_QUESTIONS；View中的协议字段来自现有游戏逻辑，状态投影不写回。
 3. **阶段3全服入口已接入**：31项经真实服务锁读取，16项Rank复用现有排序；赛季/区服概览只读。8个审定赛季状态项已验证自然到期补结算、重复与原生滚动/实际冠军赛tick并发；其他23项无结算入口（405），不提前结束或取消进行中的赛季。
 4. **阶段3c已接世界等级覆盖**：新增并登记 `worldlev`，专用GET/PUT经网关。0表示不覆盖，until=0长期生效，过期按游戏时钟自动恢复原前10名平均等级；读取不清理存档。登录10192、请求10905、PUT后的10905推送均使用相同有效值。后台不直接改全服状态，PUT与带原因的审计同事务；返回计算值、配置值及有效值。
-5. **阶段4专用表后端已接**：82项列白名单、归属分页与role COUNT摘要；英雄装备/天赋按英雄归属联接、角色收件联主题，签到/邀请/商店/召唤/共鸣/推图等均逐表登记。10项使用专用页或安全排除；覆盖门禁核对所有92张表。聊天正文、录像脚本及登录凭据不返回，文本上限4KB并标记truncated。角色订单复用charge接口；前端已接角色分组及区服/公会表浏览。
+5. **阶段4专用表后端已接**：82项列白名单、归属分页与role COUNT摘要；英雄装备/天赋按英雄归属联接、角色收件联主题，签到/邀请/商店/召唤/共鸣/推图等均逐表登记。当时10项使用专用页或安全排除；覆盖门禁核对所有已登记表。聊天正文、录像脚本及登录凭据不返回，文本上限4KB并标记truncated。角色订单复用charge接口；前端已接角色分组及区服/公会表浏览。
 6. **前端已接入，阶段6完成文档收口**：模块总表108项、玩法状态、充值状态与角色表分组均有入口。公会范围表可从公会列表的“数据表”按钮直达（带公会GID），也可在玩法状态页手输GID；区服列表每行有“玩法状态”链接。
 7. **权限与验证边界**：只读表包括 `tickets.phone/email/phone_info`，viewer可读，审核已接受；聊天正文、录像脚本及凭据不返回。表分页单请求内一致，多次offset请求不提供跨请求快照；截断JSON仅预览。补结算事务较长、邮件可在提交前推送，跨进程锁未验证。最终测试及仍未验证的范围见 [ADMIN_COMPLETION_PLAN.md](ADMIN_COMPLETION_PLAN.md)。
 

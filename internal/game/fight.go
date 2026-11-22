@@ -789,6 +789,10 @@ func buildFightTeam(role *store.Role, formType int64, formSlots []store.Formatio
 	for _, h := range heroes {
 		byID[h.PartnerID] = h
 	}
+	return ownFightSide(role, formType, formSlots, byID)
+}
+
+func ownFightSide(role *store.Role, formType int64, formSlots []store.FormationSlot, byID map[int64]store.Partner) ([]fightUnit, []proto.Message) {
 	slots := append([]store.FormationSlot(nil), formSlots...)
 	sort.SliceStable(slots, func(i, j int) bool { return slots[i].Pos < slots[j].Pos })
 

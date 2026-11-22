@@ -139,8 +139,12 @@ func formationDamage(role *store.Role, team store.Formation, heroes []store.Part
 	for _, h := range heroes {
 		byID[h.PartnerID] = h
 	}
+	return lineupDamageTable(role, team.Slots, byID)
+}
+
+func lineupDamageTable(role *store.Role, slots []store.FormationSlot, byID map[int64]store.Partner) (stats []proto.Message, mvpBID, mvpHurt, totalHurt int64) {
 	stats = []proto.Message{}
-	for _, sl := range team.Slots {
+	for _, sl := range slots {
 		h, ok := byID[sl.PartnerID]
 		if !ok {
 			continue

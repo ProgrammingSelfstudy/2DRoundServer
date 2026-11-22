@@ -62,6 +62,9 @@ type arenaOpp struct {
 	Lineup   []arenaHero
 	// Kind is the formation of a real role the fight uses (PartnerConst.Fun_Form); 0 is the campaign team.
 	Kind int64 `json:",omitempty"`
+	// RefreshTime distinguishes successive H5 lists with identical opponents.
+	RefreshTime int64 `json:",omitempty"`
+	defense     *arenaTeam
 }
 
 // arenaLogEntry is one line of the fight log as it is stored: Type 1 is a challenge by the role, 2 one against it;
@@ -141,6 +144,9 @@ func arenaHeroesKind(st *store.Store, rid, kind int64) (slots []store.FormationS
 
 // fighters turns an opponent into what a fight needs.
 func (o arenaOpp) fighters(st *store.Store) (slots []store.FormationSlot, formType int64, byID map[int64]store.Partner, err error) {
+	if o.defense != nil {
+		return o.defense.form.Slots, o.defense.form.FormationType, o.defense.byID, nil
+	}
 	if !o.Robot {
 		return arenaHeroesKind(st, o.RID, o.Kind)
 	}
@@ -163,6 +169,11 @@ func lineupOfKind(st *store.Store, rid, kind int64) ([]arenaHero, int64, int64, 
 	if err != nil {
 		return nil, 0, 0, err
 	}
+	lineup, power := describeArenaLineup(slots, byID)
+	return lineup, formType, power, nil
+}
+
+func describeArenaLineup(slots []store.FormationSlot, byID map[int64]store.Partner) ([]arenaHero, int64) {
 	var out []arenaHero
 	var all []store.Partner
 	for _, sl := range slots {
@@ -173,7 +184,7 @@ func lineupOfKind(st *store.Store, rid, kind int64) ([]arenaHero, int64, int64, 
 			}
 		}
 	}
-	return out, formType, rolePower(all), nil
+	return out, rolePower(all)
 }
 
 func oppFromRole(st *store.Store, r *store.Role, score int64) (arenaOpp, bool, error) {
@@ -185,11 +196,15 @@ func oppFromRoleKind(st *store.Store, r *store.Role, score, kind int64) (arenaOp
 	if err != nil || len(lineup) == 0 {
 		return arenaOpp{}, false, err
 	}
+	return describeArenaOpponent(r, score, kind, formType, power, lineup), true, nil
+}
+
+func describeArenaOpponent(r *store.Role, score, kind, formType, power int64, lineup []arenaHero) arenaOpp {
 	face := int64(r.FaceID)
 	if face == 0 {
 		face = store.DefaultFaceID
 	}
-	return arenaOpp{RID: r.RID, SrvID: r.SrvID, Name: r.Name, Lev: int64(r.Lev), Sex: int64(r.Sex), Face: face, Power: power, Score: score, FormType: formType, Lineup: lineup, Kind: kind}, true, nil
+	return arenaOpp{RID: r.RID, SrvID: r.SrvID, Name: r.Name, Lev: int64(r.Lev), Sex: int64(r.Sex), Face: face, Power: power, Score: score, FormType: formType, Lineup: lineup, Kind: kind}
 }
 
 // newOpponents picks the three opponents of a role: real roles whose score is closest, and robots (a copy of
@@ -220,6 +235,10 @@ func newOpponents(st *store.Store, role *store.Role, score int64, rng *rand.Rand
 	if err != nil {
 		return nil, err
 	}
+	return fillArenaRobots(out, role, score, rng, mine, formType), nil
+}
+
+func fillArenaRobots(out []arenaOpp, role *store.Role, score int64, rng *rand.Rand, mine []arenaHero, formType int64) []arenaOpp {
 	for i := len(out); i < arenaOpponents; i++ {
 		o := arenaOpp{RID: arenaRobotBase + role.RID%1000000*10 + int64(i), SrvID: role.SrvID, Robot: true, FormType: formType,
 			Name: arenaRobotNames[rng.Intn(len(arenaRobotNames))], Sex: int64(rng.Intn(2) + 1), Face: arenaRobotFaces[rng.Intn(len(arenaRobotFaces))],
@@ -235,7 +254,7 @@ func newOpponents(st *store.Store, role *store.Role, score int64, rng *rand.Rand
 		o.Lev = int64(role.Lev)
 		out = append(out, o)
 	}
-	return out, nil
+	return out
 }
 
 // RegisterArena registers the arena: 20200 my standing, 20201 the list, 20202 an opponent, 20203 challenge,
@@ -250,7 +269,11 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		return rand.New(rand.NewSource(time.Now().UnixNano()))
 	}
 	standing := func(s *gateway.Session) (*store.ArenaPlayer, error) {
-		a, err := st.ArenaPlayerOf(s.Role().RID, arenaInitScore, s.Now().Unix())
+		role := s.Role()
+		if usesH5Arena(s) {
+			return arenaStanding(st, role.RID, role.SrvID, s.Now())
+		}
+		a, err := st.ArenaPlayerOf(role.RID, arenaInitScore, s.Now().Unix())
 		if err != nil {
 			return nil, err
 		}
@@ -270,40 +293,70 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if _, err := starterGrant(st, role); err != nil {
 			return nil, err
 		}
-		opps, err := newOpponents(st, role, a.Score, rngOf())
+		h5 := usesH5Arena(s)
+		var opps []arenaOpp
+		if h5 {
+			opps, err = newH5ArenaOpponents(st, role, a.Score, rngOf())
+		} else {
+			opps, err = newOpponents(st, role, a.Score, rngOf())
+		}
 		if err != nil {
 			return nil, err
 		}
 		slots = nil
+		now := s.Now().Unix()
 		for i, o := range opps {
+			if h5 && force {
+				o.RefreshTime = now + arenaRefreshCD
+			}
 			raw, _ := json.Marshal(o)
 			slots = append(slots, store.ArenaSlot{Idx: int64(i + 1), OppRID: o.RID, Info: string(raw)})
 		}
-		return slots, st.SetArenaSlots(role.RID, slots)
+		if !h5 {
+			return slots, st.SetArenaSlots(role.RID, slots)
+		}
+		if force {
+			return slots, st.RefreshArenaSlots(role.RID, now, now+arenaRefreshCD, slots)
+		}
+		if err := st.InitArenaSlots(role.RID, slots); errors.Is(err, store.ErrConflict) {
+			return st.ArenaSlots(role.RID)
+		} else {
+			return slots, err
+		}
 	}
-	slotMessage := func(sl store.ArenaSlot, mine int64) (proto.Message, arenaOpp) {
+	opponentOnSlot := func(s *gateway.Session, sl store.ArenaSlot) (arenaOpp, bool, error) {
+		if usesH5Arena(s) {
+			return arenaOpponentOnSlot(st, s.Role().SrvID, sl)
+		}
 		var o arenaOpp
 		_ = json.Unmarshal([]byte(sl.Info), &o)
-		return proto.Message{"idx": sl.Idx, "rid": o.RID, "srv_id": o.SrvID, "name": o.Name, "lev": o.Lev, "sex": o.Sex, "face": o.Face, "power": o.Power,
-			"score": o.Score, "get_score": arenaGain(mine, o.Score), "status": sl.Status, "p_list": o.heroMessages(), "face_update_time": 0, "face_file": "",
-			"gid": 0, "gsrv_id": "", "gname": ""}, o
+		return o, true, nil
 	}
-	sendList := func(s *gateway.Session, a *store.ArenaPlayer, kind int64, only int64) error {
+	sendList := func(s *gateway.Session, a *store.ArenaPlayer) error {
 		slots, err := opponents(s, a, false)
 		if err != nil {
 			return err
 		}
 		list := []proto.Message{}
 		for _, sl := range slots {
-			if only == 0 || sl.Idx == only {
-				m, _ := slotMessage(sl, a.Score)
-				list = append(list, m)
+			o, ok, err := opponentOnSlot(s, sl)
+			if err != nil {
+				return err
+			}
+			if ok {
+				list = append(list, arenaSlotMessage(sl, o, a.Score))
 			}
 		}
-		return s.Send(20201, proto.Message{"f_list": list, "type": kind})
+		return s.Send(20201, proto.Message{"f_list": list, "type": 0})
+	}
+	rankOf := func(s *gateway.Session, rid int64) (int64, error) {
+		if usesH5Arena(s) {
+			return st.ArenaH5Rank(rid)
+		}
+		return st.ArenaRank(rid)
 	}
 	standingMessage := func(s *gateway.Session, a *store.ArenaPlayer) (proto.Message, error) {
-		rank, err := st.ArenaRank(a.RID)
+		rank, err := rankOf(s, a.RID)
 		if err != nil {
 			return nil, err
 		}
@@ -333,7 +386,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		return sendList(s, a, 0, 0)
+		return sendList(s, a)
 	})
 	r.Handle(20206, func(s *gateway.Session, _ proto.Message) error {
 		if s.Role() == nil {
@@ -346,17 +399,22 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if left := a.RefTime - s.Now().Unix(); left > 0 {
 			return s.Send(20206, proto.Message{"code": 0, "msg": "刷新太频繁了，请稍后再试"})
 		}
-		a.RefTime = s.Now().Unix() + arenaRefreshCD
-		if err := st.SaveArenaPlayer(a); err != nil {
-			return err
+		h5 := usesH5Arena(s)
+		if !h5 {
+			a.RefTime = s.Now().Unix() + arenaRefreshCD
+			if err := st.SaveArenaPlayer(a); err != nil {
+				return err
+			}
 		}
-		if _, err := opponents(s, a, true); err != nil {
+		if _, err := opponents(s, a, true); h5 && errors.Is(err, store.ErrConflict) {
+			return s.Send(20206, proto.Message{"code": 0, "msg": "刷新太频繁了，请稍后再试"})
+		} else if err != nil {
 			return err
 		}
 		if err := s.Send(20206, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
-		return sendList(s, a, 0, 0)
+		return sendList(s, a)
 	})
 	r.Handle(20202, func(s *gateway.Session, req proto.Message) error {
 		if s.Role() == nil {
@@ -372,7 +430,13 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 		for _, sl := range slots {
 			if sl.OppRID == req.Int("rid") {
-				_, o := slotMessage(sl, a.Score)
+				o, ok, err := opponentOnSlot(s, sl)
+				if err != nil {
+					return err
+				}
+				if sid := req.Str("srv_id"); !ok || usesH5Arena(s) && sid != "" && sid != o.SrvID {
+					break
+				}
 				return s.Send(20202, proto.Message{"rid": o.RID, "srv_id": o.SrvID, "name": o.Name, "lev": o.Lev, "face": o.Face, "power": o.Power, "score": o.Score,
 					"formation_type": o.FormType, "formation_lev": 1, "p_list": o.heroMessages(), "face_update_time": 0, "face_file": "", "gid": 0, "gsrv_id": "", "gname": ""})
 			}
@@ -392,7 +456,12 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		err = st.Exchange(role.RID, map[int64]int64{3: arenaTicketGems * n}, map[int64]int64{}, map[int64]int64{}, map[int64]int64{arenaTicket: n})
+		h5 := usesH5Arena(s)
+		if h5 {
+			err = st.BuyArenaTickets(role.RID, n, arenaTicket, arenaTicketGems)
+		} else {
+			err = st.Exchange(role.RID, map[int64]int64{3: arenaTicketGems * n}, map[int64]int64{}, map[int64]int64{}, map[int64]int64{arenaTicket: n})
+		}
 		if errors.Is(err, store.ErrConflict) {
 			if err := s.Send(20207, proto.Message{"code": 0, "msg": ""}); err != nil {
 				return err
@@ -402,9 +471,11 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		a.Bought += n
-		if err := st.SaveArenaPlayer(a); err != nil {
-			return err
+		if !h5 {
+			a.Bought += n
+			if err := st.SaveArenaPlayer(a); err != nil {
+				return err
+			}
 		}
 		if err := sendAssets(s, st, role.RID); err != nil {
 			return err
@@ -496,7 +567,19 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 	})
 	// the ranking: the first three as statues, the first fifty as a list
 	top := func(s *gateway.Session, n int) ([]proto.Message, error) {
-		rows, err := st.ArenaTop(s.Role().SrvID, n)
+		srvID := s.Role().SrvID
+		h5 := usesH5Arena(s)
+		var rows []store.ArenaRow
+		var err error
+		if h5 {
+			season, _, _ := arenaSeason(s.Now())
+			if err := st.RollH5ArenaSeason(srvID, season, arenaInitScore, arenaKeepPermil); err != nil {
+				return nil, err
+			}
+			rows, err = st.ArenaH5Top(srvID, n)
+		} else {
+			rows, err = st.ArenaTop(srvID, n)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -510,7 +593,14 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			if face == 0 {
 				face = store.DefaultFaceID
 			}
-			_, _, power, _ := lineupOf(st, r.RID)
+			var power int64
+			if h5 {
+				if defense, err := h5ArenaTeamOf(st, r.RID, formArenaDefense); err == nil {
+					_, power = describeArenaLineup(defense.form.Slots, defense.byID)
+				}
+			} else {
+				_, _, power, _ = lineupOf(st, r.RID)
+			}
 			out = append(out, proto.Message{"rid": r.RID, "srv_id": r.SrvID, "name": r.Name, "lev": r.Lev, "face": face, "sex": r.Sex, "rank": i + 1, "score": row.Score,
 				"power": power, "avatar_id": 0, "lookid": 0, "face_update_time": 0, "face_file": "", "worship": 0, "worship_status": 0})
 		}
@@ -530,19 +620,38 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		if s.Role() == nil {
 			return nil
 		}
-		a, err := standing(s)
-		if err != nil {
-			return err
-		}
-		rank, err := st.ArenaRank(a.RID)
-		if err != nil {
-			return err
+		if !usesH5Arena(s) {
+			a, err := standing(s)
+			if err != nil {
+				return err
+			}
+			rank, err := st.ArenaRank(a.RID)
+			if err != nil {
+				return err
+			}
+			list, err := top(s, arenaTopList)
+			if err != nil {
+				return err
+			}
+			return s.Send(20221, proto.Message{"rank": rank, "score": a.Score, "worship": 0, "rank_list": list})
 		}
 		list, err := top(s, arenaTopList)
 		if err != nil {
 			return err
 		}
-		return s.Send(20221, proto.Message{"rank": rank, "score": a.Score, "worship": 0, "rank_list": list})
+		rid := s.Role().RID
+		score, _, entered, err := st.ArenaScoreOf(rid)
+		if err != nil {
+			return err
+		}
+		var rank int64
+		if entered {
+			rank, err = rankOf(s, rid)
+			if err != nil {
+				return err
+			}
+		}
+		return s.Send(20221, proto.Message{"rank": rank, "score": score, "worship": 0, "rank_list": list})
 	})
 	r.Handle(20222, func(s *gateway.Session, _ proto.Message) error {
 		if s.Role() == nil {
@@ -566,13 +675,22 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 		if a.LogSeen != int64(len(logs)) {
 			a.LogSeen = int64(len(logs))
-			if err := st.SaveArenaPlayer(a); err != nil {
+			if usesH5Arena(s) {
+				err = st.SetArenaLogSeen(a.RID, a.LogSeen)
+			} else {
+				err = st.SaveArenaPlayer(a)
+			}
+			if err != nil {
 				return err
 			}
 		}
 		return s.Send(20222, proto.Message{"log_list": out})
 	})
+	h5Challenge := arenaChallenge(st, fights, opponents, rngOf)
 	r.Handle(20203, func(s *gateway.Session, req proto.Message) error {
+		if usesH5Arena(s) {
+			return h5Challenge(s, req)
+		}
 		role := s.Role()
 		if role == nil {
 			return nil
@@ -639,21 +757,9 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 				return err
 			}
 		}
-		intro := proto.Message{
-			"combat_type": combatArena, "formation": []proto.Message{{"group": 1, "formation_type": form.FormationType, "formation_lev": 1}, {"group": 2, "formation_type": oform, "formation_lev": 1}},
-			"objects": append(objects, foeObjects...), "is_auto": req.Int("is_auto"), "current_wave": 1, "total_wave": 1, "play_speed": 1,
-			"extra_args": []proto.Message{}, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name, "target_role_name": opp.Name,
-			"suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
-		}
+		intro := arenaFightIntro(role.Name, opp.Name, form.FormationType, oform, req.Int("is_auto"), len(team), append(objects, foeObjects...))
 		rounds, won := buildFight(team, foes, rngOf())
-		// the original: the (empty) buff list, the answer, then the daily quest progress (capture original-2026-10-28, 22-arena)
-		if err := s.Send(13011, proto.Message{"buff_list": []proto.Message{}}); err != nil {
-			return err
-		}
-		if err := s.Send(20203, proto.Message{"code": 1, "msg": ""}); err != nil {
-			return err
-		}
-		if err := questEvent(s, st, role.RID, evtArena, 1); err != nil {
+		if err := acceptArenaChallenge(s, st, role.RID); err != nil {
 			return err
 		}
 		idx := slot.Idx
@@ -764,8 +870,9 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 		if sl.Idx == idx {
 			var o arenaOpp
 			_ = json.Unmarshal([]byte(sl.Info), &o)
-			return s.Send(20201, proto.Message{"f_list": []proto.Message{{"idx": sl.Idx, "rid": o.RID, "srv_id": o.SrvID, "name": o.Name, "lev": o.Lev, "sex": o.Sex, "face": o.Face,
-				"power": o.Power, "score": o.Score, "get_score": gain, "status": sl.Status, "p_list": o.heroMessages(), "face_update_time": 0, "face_file": "", "gid": 0, "gsrv_id": "", "gname": ""}}, "type": 1})
+			row := arenaSlotMessage(sl, o, a.Score)
+			row["get_score"] = gain
+			return s.Send(20201, proto.Message{"f_list": []proto.Message{row}, "type": 1})
 		}
 	}
 	return nil

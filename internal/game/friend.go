@@ -17,8 +17,7 @@ const maxFriends = 50
 // FriendService implements the friend list: requests, accepting and refusing,
 // deleting, searching and recommending, plus the online / offline notices.
 // Friends live on one server; the client's (srv_id, rid) pairs must name this
-// gateway's server. Gifts, intimacy and the other per-friend numbers are not
-// implemented and are sent as 0.
+// gateway's server.
 type FriendService struct {
 	Store *store.Store
 	SrvID string
@@ -186,6 +185,8 @@ func (f *FriendService) ask(me *store.Role, rid int64, srvID string) (msg string
 		return "对方已向你发出申请，请在申请列表中同意", false, err
 	}
 	switch err := f.Store.RequestFriend(me.RID, t.RID); {
+	case errors.Is(err, store.ErrSocialBlocked):
+		return "无法发送好友申请", false, nil
 	case errors.Is(err, store.ErrConflict):
 		return "已发送过申请，请等待对方处理", false, nil
 	case err != nil:

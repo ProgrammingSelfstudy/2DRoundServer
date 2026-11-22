@@ -16,8 +16,15 @@ func (s *Store) AddOfflineChat(from, to int64, flag int, msg string, keep int) e
 		return err
 	}
 	defer tx.Rollback()
-	if _, err := tx.Exec(`INSERT INTO chat_offline(from_rid,to_rid,len,msg,sent_at) VALUES(?,?,?,?,?)`, from, to, flag, msg, s.unix()); err != nil {
+	res, err := tx.Exec(`INSERT INTO chat_offline(from_rid,to_rid,len,msg,sent_at) SELECT ?,?,?,?,? WHERE NOT `+h5SocialBlock,
+		from, to, flag, msg, s.unix(), from, to, to, from, from, to, PlatformH5)
+	if err != nil {
 		return err
+	}
+	if n, err := res.RowsAffected(); err != nil {
+		return err
+	} else if n == 0 {
+		return ErrSocialBlocked
 	}
 	if _, err := tx.Exec(`DELETE FROM chat_offline WHERE to_rid=? AND id NOT IN (SELECT id FROM chat_offline WHERE to_rid=? ORDER BY id DESC LIMIT ?)`, to, to, keep); err != nil {
 		return err

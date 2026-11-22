@@ -46,13 +46,22 @@ func (s *Store) CountFriends(rid int64) (int, error) {
 }
 
 // RequestFriend records a request from -> to. ErrConflict when one is already
-// pending in that direction.
+// pending in that direction. ErrSocialBlocked when either H5 role blocked the other.
 func (s *Store) RequestFriend(from, to int64) error {
-	_, err := s.db.Exec(`INSERT INTO friend_requests(from_rid,to_rid,created_at) VALUES(?,?,?)`, from, to, s.unix())
+	res, err := s.db.Exec(`INSERT INTO friend_requests(from_rid,to_rid,created_at) SELECT ?,?,? WHERE NOT `+h5SocialBlock,
+		from, to, s.unix(), from, to, to, from, from, to, PlatformH5)
 	if isUnique(err) {
 		return ErrConflict
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	if n, err := res.RowsAffected(); err != nil {
+		return err
+	} else if n == 0 {
+		return ErrSocialBlocked
+	}
+	return nil
 }
 
 func (s *Store) HasFriendRequest(from, to int64) (bool, error) {
@@ -165,6 +174,13 @@ func (s *Store) IsBlacklisted(rid, other int64) (bool, error) {
 // the two end with it; wasFriend says there was a friendship. ErrConflict: already listed; ErrFriendsFull: the
 // list holds max already.
 func (s *Store) AddBlack(rid, other int64, max int) (wasFriend bool, err error) {
+	h5Pair, err := s.H5SocialPair(rid, other)
+	if err != nil {
+		return false, err
+	}
+	if h5Pair {
+		defer s.lockChatPair(rid, other)()
+	}
 	tx, err := s.db.Begin()
 	if err != nil {
 		return false, err
@@ -190,6 +206,11 @@ func (s *Store) AddBlack(rid, other int64, max int) (wasFriend bool, err error) 
 	gone, _ := res.RowsAffected()
 	if _, err := tx.Exec(`DELETE FROM friend_requests WHERE (from_rid=? AND to_rid=?) OR (from_rid=? AND to_rid=?)`, rid, other, other, rid); err != nil {
 		return false, err
+	}
+	if h5Pair {
+		if _, err := tx.Exec(`DELETE FROM chat_offline WHERE (to_rid=? AND from_rid=?) OR (to_rid=? AND from_rid=?)`, rid, other, other, rid); err != nil {
+			return false, err
+		}
 	}
 	return gone > 0, tx.Commit()
 }

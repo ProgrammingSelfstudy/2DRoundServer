@@ -3,6 +3,7 @@ package game
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -119,20 +120,30 @@ func (c *ChatService) private(s *gateway.Session, req proto.Message) error {
 		return reply(false, "不能和自己聊天")
 	case !validChatMsg(text):
 		return reply(false, "消息内容不合法")
-	case !c.throttle(me.RID, s.Now()):
-		return reply(false, "发言太快了，请稍后再试")
 	}
-	tick := s.Now().Unix()
-	// flag 2: what the recipient gets, showing the sender; flag 1: the echo to the
-	// sender, showing the recipient (role_controller reads rid/name as "the other side")
-	if sess := c.Hub.Online(target.RID); sess != nil {
-		if err := sess.Send(12721, privateMsg(2, me, flag, text, tick)); err != nil {
-			c.Log.Printf("chat: push to role %d: %v", target.RID, err)
-		}
-	} else if err := c.Store.AddOfflineChat(me.RID, target.RID, flag, text, chatOfflineKeep); err != nil {
+	h5, err := h5SocialViewer(c.Store, s, me)
+	if err != nil {
 		return err
 	}
-	if err := s.Send(12721, privateMsg(1, target, flag, text, tick)); err != nil {
+	h5Pair := false
+	if h5 {
+		h5Pair, err = c.Store.H5SocialPair(me.RID, target.RID)
+		if err != nil {
+			return err
+		}
+	}
+	now := s.Now()
+	// flag 2: what the recipient gets, showing the sender; flag 1: the echo to the
+	// sender, showing the recipient (role_controller reads rid/name as "the other side")
+	switch err := c.pushPrivate(me, target, flag, text, now, h5Pair); {
+	case errors.Is(err, store.ErrSocialBlocked):
+		return reply(false, privateChatUnavailable)
+	case errors.Is(err, errChatThrottled):
+		return reply(false, "发言太快了，请稍后再试")
+	case err != nil:
+		return err
+	}
+	if err := s.Send(12721, privateMsg(1, target, flag, text, now.Unix())); err != nil {
 		return err
 	}
 	return reply(true, "")
@@ -152,33 +163,20 @@ func (c *ChatService) Deliver(s *gateway.Session) error {
 	if me == nil {
 		return nil
 	}
-	waiting, err := c.Store.TakeOfflineChat(me.RID)
-	if err != nil || len(waiting) == 0 {
+	h5, err := h5SocialViewer(c.Store, s, me)
+	if err != nil {
 		return err
 	}
-	var order []int64
-	bySender := map[int64][]proto.Message{}
-	for _, m := range waiting {
-		if _, seen := bySender[m.FromRID]; !seen {
-			order = append(order, m.FromRID)
-		}
-		bySender[m.FromRID] = append(bySender[m.FromRID], proto.Message{"len": m.Len, "msg": m.Msg, "tick": m.SentAt})
-	}
-	list := []proto.Message{}
-	for _, rid := range order {
-		from, err := c.Store.RoleByID(rid)
-		if err != nil {
-			continue // the sender is gone
-		}
-		list = append(list, proto.Message{
-			"rid": from.RID, "srv_id": from.SrvID, "name": from.Name, "lev": from.Lev, "career": from.Career,
-			"face_id": from.FaceID, "sex": from.Sex, "msg_list": bySender[rid],
+	if h5 {
+		return c.Store.DeliverOfflineChat(me.RID, func(waiting []store.OfflineChat) error {
+			return c.deliverPrivate(s, me.RID, waiting, true)
 		})
 	}
-	if len(list) == 0 {
-		return nil
+	waiting, err := c.Store.TakeOfflineChat(me.RID)
+	if err != nil {
+		return err
 	}
-	return s.Send(12722, proto.Message{"offline_list": list})
+	return c.deliverPrivate(s, me.RID, waiting, false)
 }
 
 // ---- world channel ----
@@ -197,13 +195,13 @@ func (c *ChatService) world(s *gateway.Session, req proto.Message) error {
 	}
 	reply := func(ok bool, msg string) error { return s.Send(12762, proto.Message{"code": b2i(ok), "msg": msg}) }
 	channel, flag, text := req.Int("channel"), req.Int("len"), req.Str("msg")
-	var gid int64
+	var gd *store.Guild
 	if channel == chatGuild {
-		gd, _, err := c.Store.GuildOfRole(me.RID)
+		var err error
+		gd, _, err = c.Store.GuildOfRole(me.RID)
 		if err != nil {
 			return reply(false, "你还没有加入公会")
 		}
-		gid = gd.GID
 	}
 	switch {
 	case channel != chatWorld && channel != chatGuild:
@@ -217,23 +215,25 @@ func (c *ChatService) world(s *gateway.Session, req proto.Message) error {
 	if req.Str("sign") != chatSign(me.RID, me.SrvID, channel, flag, text) {
 		c.Log.Printf("chat: role %d: channel message sign mismatch", me.RID)
 	}
+	muted, err := c.Store.ChatMuters(me.RID)
+	if err != nil {
+		return err
+	}
 	who := speaker(me)
-	if channel == chatGuild {
-		if gd, _, err := c.Store.GuildOfRole(me.RID); err == nil {
-			who["gid"], who["gsrv_id"], who["g_name"] = gd.GID, gd.SrvID, gd.Name
-		}
+	if gd != nil {
+		who["gid"], who["gsrv_id"], who["g_name"] = gd.GID, gd.SrvID, gd.Name
 	}
 	msg := proto.Message{"role_list": []proto.Message{who}, "channel": channel, "len": flag, "msg": text, "tick": s.Now().Unix()}
 	c.mu.Lock()
-	if channel == chatGuild {
+	if gd != nil {
 		if c.guildHist == nil {
 			c.guildHist = map[int64][]proto.Message{}
 		}
-		h := append(c.guildHist[gid], msg)
+		h := append(c.guildHist[gd.GID], msg)
 		if len(h) > chatHistory {
 			h = h[len(h)-chatHistory:]
 		}
-		c.guildHist[gid] = h
+		c.guildHist[gd.GID] = h
 	} else {
 		c.history = append(c.history, msg)
 		if len(c.history) > chatHistory {
@@ -242,12 +242,15 @@ func (c *ChatService) world(s *gateway.Session, req proto.Message) error {
 	}
 	c.mu.Unlock()
 	push := func(rid int64, sess *gateway.Session) {
+		if muted[rid] {
+			return
+		}
 		if err := sess.Send(12761, msg); err != nil {
 			c.Log.Printf("chat: push to role %d: %v", rid, err)
 		}
 	}
-	if channel == chatGuild {
-		members, err := c.Store.MembersOf(gid)
+	if gd != nil {
+		members, err := c.Store.MembersOf(gd.GID)
 		if err != nil {
 			return err
 		}
@@ -263,7 +266,8 @@ func (c *ChatService) world(s *gateway.Session, req proto.Message) error {
 }
 
 func (c *ChatService) historyOf(s *gateway.Session, req proto.Message) error {
-	if s.Role() == nil {
+	me := s.Role()
+	if me == nil {
 		return nil
 	}
 	list := []proto.Message{}
@@ -273,10 +277,20 @@ func (c *ChatService) historyOf(s *gateway.Session, req proto.Message) error {
 		list = append(list, c.history...)
 		c.mu.Unlock()
 	case chatGuild:
-		if gd, _, err := c.Store.GuildOfRole(s.Role().RID); err == nil {
+		if gd, _, err := c.Store.GuildOfRole(me.RID); err == nil {
 			c.mu.Lock()
 			list = append(list, c.guildHist[gd.GID]...)
 			c.mu.Unlock()
+		}
+	}
+	h5, err := h5SocialViewer(c.Store, s, me)
+	if err != nil {
+		return err
+	}
+	if h5 {
+		list, err = c.visibleChatHistory(me.RID, list)
+		if err != nil {
+			return err
 		}
 	}
 	return s.Send(12766, proto.Message{"channel": req.Int("channel"), "msg_list": list})

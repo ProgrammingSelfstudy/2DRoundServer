@@ -13,6 +13,11 @@
 # device screenshots (large, not code)
 *.png
 
+# Source artwork required to build and run the standalone summon demo.
+!/demos/card-summon/assets/zoro-card-art.png
+!/demos/card-summon/assets/zoro-pack-art-hd.png
+!/demos/card-summon/assets/zoro-reference.png
+
 # build output / editor files
 *.exe
 *.test

@@ -31,11 +31,12 @@ func TestPickHeroFollowsChances(t *testing.T) {
 }
 
 func TestSummon(t *testing.T) {
-	e := newEnv(t, time.Minute)
-	c, role := e.enter("u1", "甲")
 	old := summonRand
 	summonRand = func() float64 { return 0 }
+	// Register before newEnv so its gateway stops before the random source is restored.
 	t.Cleanup(func() { summonRand = old })
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
 	first := int64(summonTable[100].Pool[0][0])
 
 	// the state: group 100 has its free summon
@@ -116,11 +117,11 @@ func TestSummon(t *testing.T) {
 }
 
 func TestSummonForGemsAndCap(t *testing.T) {
-	e := newEnv(t, time.Minute)
-	c, role := e.enter("u1", "甲")
 	old := summonRand
 	summonRand = func() float64 { return 0 }
 	t.Cleanup(func() { summonRand = old })
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
 	summon := func(group, times, kind int64) proto.Message {
 		c.send(23201, proto.Message{"group_id": group, "times": times, "recruit_type": kind})
 		return c.recvOrNone(23201)
@@ -210,12 +211,12 @@ func TestHeroCardItemMatchesTheOriginalServer(t *testing.T) {
 }
 
 func TestSummonRewardsListTheHeroCards(t *testing.T) {
-	e := newEnv(t, time.Minute)
-	c, role := e.enter("u1", "甲")
-	e.give(c, role, map[int64]int64{10401: 20})
 	old := summonRand
 	summonRand = func() float64 { return 0 }
 	t.Cleanup(func() { summonRand = old })
+	e := newEnv(t, time.Minute)
+	c, role := e.enter("u1", "甲")
+	e.give(c, role, map[int64]int64{10401: 20})
 	c.send(23201, proto.Message{"group_id": 100, "recruit_type": 4, "times": 10})
 	r := c.recv(23201)
 	bids, rewards := r.Arr("partner_bids"), r.Arr("rewards")
@@ -269,8 +270,28 @@ func TestAdvancedSummonHasAFreeDraw(t *testing.T) {
 	c.recv(11001)
 	c.recv(10302)
 	c.recv(10500)
-	if f := c.recv(23202); f.Int("group_id") != 300 || f.Int("free_times") != 0 || f.Int("free_cd_end") == 0 {
+	f := c.recv(23202)
+	if f.Int("group_id") != 300 || f.Int("free_times") != 0 || f.Int("free_cd_end") == 0 {
 		t.Fatalf("23202: %v", f)
+	}
+	// A new visit has no previous 23202 push. Its initial state must restore the same timer.
+	c.send(23200, proto.Message{})
+	var end int64
+	for _, group := range c.recv(23200).Arr("recruit_list") {
+		if group.Int("group_id") == 300 {
+			for _, draw := range group.Arr("draw_list") {
+				if draw.Int("times") == 1 {
+					for _, entry := range draw.Arr("kv_list") {
+						if entry.Int("key") == 5 {
+							end = entry.Int("val")
+						}
+					}
+				}
+			}
+		}
+	}
+	if end != f.Int("free_cd_end") {
+		t.Fatalf("23200 restored cooldown %d, want %d", end, f.Int("free_cd_end"))
 	}
 	c.send(23201, proto.Message{"group_id": 300, "recruit_type": 1, "times": 1})
 	if r := c.recvOrNone(23201); r != nil {

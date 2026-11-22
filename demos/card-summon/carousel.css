@@ -1,0 +1,70 @@
+/* A true 360-degree ring: ten radial positions, 36 degrees apart. Every bag
+   has front/back faces; depth sorting and perspective provide the occlusion. */
+.scene { perspective:var(--scene-perspective, 1000px); perspective-origin:50% 52%; }
+.fleet-rig { transform:none; transform-origin:50% 52%; animation:none!important; transition:none!important; }
+.stage.is-idle .fleet-rig,.stage.is-assembling .fleet-rig { will-change:transform; }
+.fleet-pose { width:230px; height:393px; left:calc(50% - 115px); top:calc(52% - 196.5px); }
+.stage.is-idle .fleet-pose,.stage.is-assembling .fleet-pose { transition:none; }
+.stage.is-arming .fleet-pose,.stage.is-multi-opening .fleet-pose,.stage.is-gathering .fleet-pose { will-change:transform; }
+.stage.is-idle[data-mode="ten"] .fleet-sleeve { animation:none; }
+/* The sealed face already contains the printed seal. Hidden interior cards and
+   duplicate seal layers do not need to participate in the spinning 3D scene. */
+.stage.is-idle .fleet-card,.stage.is-assembling .fleet-card,
+.stage.is-idle .fleet-model .pack-strip,.stage.is-assembling .fleet-model .pack-strip { visibility:hidden; }
+.fleet-model { height:393px; }
+.fleet-model .pack-face { border-radius:0; background:transparent; }
+.fleet-model .pack-front { transform:translateZ(1.25px); }
+.fleet-model .pack-back { transform:rotateY(180deg) translateZ(1.25px); }
+.fleet-model .pack-side { display:none; }
+.fleet-model .side-left { left:-4px; }
+.fleet-model .side-right { right:-4px; }
+.fleet-model .pack-strip { transform:translateZ(5px); border-bottom:0; height:30px; }
+.fleet-model .pack-strip>img,.fleet-model .pack-flap img { width:230px; height:393px; }
+.fleet-model .pack-flap { top:30px; }
+.fleet-model .pack-flap img { top:-30px; }
+.fleet-model .cut-line { top:30px; transform:translateZ(7px); background:#f9f7ff; box-shadow:0 0 8px 3px #fff,0 0 28px 10px #adffc6; }
+.fleet-model .fleet-number,.fleet-model .bottom-crimp,.fleet-model .strip-crimp,.fleet-base-shadow { display:none; }
+.fleet-model .foil-sheen { background:linear-gradient(110deg,transparent 20%,#f8e5ff15 40%,#fff5fc2b 48%,transparent 61%); }
+.pack-reflection { position:absolute; left:0; top:calc(100% + 5px); width:230px; height:393px; pointer-events:none; transform-style:preserve-3d; }
+.reflection-face { position:absolute; inset:0; opacity:.14; backface-visibility:hidden; -webkit-backface-visibility:hidden; -webkit-mask-image:linear-gradient(to bottom,#000 0%,#0008 20%,transparent 61%); mask-image:linear-gradient(to bottom,#000 0%,#0008 20%,transparent 61%); }
+.reflection-front { transform:translateZ(.1px); }
+.reflection-back { transform:rotateY(180deg) translateZ(.1px); }
+.pack-reflection img { display:block; width:100%; height:100%; transform:scaleY(-1); }
+.stage:not(.is-idle):not(.is-assembling) .pack-reflection { display:none; }
+.stage.is-arming .fleet-pose,.stage.is-multi-opening .fleet-pose { transform:translate3d(calc((var(--index) - 4.5) * 5px),calc((4.5 - var(--index)) * 7px + 30px),calc(var(--index) * -14px)) rotateY(-6deg) rotateZ(0deg) scale(var(--stack-scale)); transition:transform .85s cubic-bezier(.22,.8,.18,1); }
+.stage.is-multi-opening .fleet-pose[data-state="opened"] .fleet-card { transform:translate3d(-250px,-30px,20px) rotateZ(-14deg) scale(.75); }
+.fleet-card { top:35px; bottom:32px; }
+.fleet-card-face { background:#45126a; border-color:#dba8ef; }
+.stage.is-gathering .fleet-pose,.stage.is-revealing[data-mode="ten"] .fleet-pose { transform:translate3d(calc((var(--index) - 4.5) * 3px),calc(var(--index) * 2.4px + 16px + var(--gather-offset)),calc((10 - var(--index)) * 3px)) rotateY(0deg) rotateZ(calc((var(--index) - 4.5) * 1deg)) scale(.94); }
+.stage.is-gathering .fleet-card,.stage.is-revealing[data-mode="ten"] .fleet-card { transform:translateZ(0) scale(1); }
+.stage[data-mode="ten"] .card-presentation { transform:translateZ(70px); }
+.reveal-card { width:250px; will-change:transform; }
+.card-caption strong { font-size:22px; letter-spacing:1px; }
+.result-art img { object-position:50% 22%; }
+
+/* The single draw uses the same image and bag dimensions. */
+.pack-position { width:230px; height:393px; top:calc(52% - 196.5px); left:calc(50% - 115px); transform:scale(var(--single-scale,1)); }
+.pack-model { height:393px; }
+.pack-model .pack-face { border-radius:0; background:transparent; }
+.pack-model .pack-front { transform:translateZ(1.25px); }
+.pack-model .pack-back { transform:rotateY(180deg) translateZ(1.25px); }
+.pack-model .pack-side { display:none; }
+.pack-model .side-left { left:-4px; }.pack-model .side-right { right:-4px; }
+.pack-model .pack-strip { transform:translateZ(5px); border-bottom:0; }
+.pack-model .pack-strip>img,.pack-model .pack-flap img { width:230px; height:393px; }
+.pack-model .bottom-crimp,.pack-model .strip-crimp { display:none; }
+.stage[data-mode="single"].is-revealing .pack-position { visibility:hidden; transition:none; }
+.ghost-pack { display:none; }
+.pack-shadow { display:none; }
+.stage[data-mode="ten"].is-idle { cursor:grab; touch-action:pan-y; }
+.stage[data-mode="ten"].is-idle:active { cursor:grabbing; }
+.carousel-controls { display:flex; justify-content:center; gap:10px; margin:18px 0; }
+.carousel-controls button { border:1px solid #c8b9db; border-radius:20px; background:#faf7ff; padding:8px 13px; font-size:11px; color:#70458f; }
+.carousel-controls button:hover:not(:disabled) { background:#ede3fb; }
+.carousel-controls button:disabled { opacity:.35; }
+.carousel-controls button[aria-pressed="true"]:before { content:"Ⅱ"; margin-right:6px; }
+.carousel-controls button[aria-pressed="false"]:before { content:"▷"; margin-right:6px; }
+@media(max-width:780px){.fleet-pose{top:calc(52% - 196.5px)}.reveal-card{width:220px}.pack-position{width:230px;height:393px;top:calc(52% - 196.5px);left:calc(50% - 115px)}.pack-model .pack-strip>img,.pack-model .pack-flap img{width:230px;height:393px}.stage.is-gathering .fleet-pose,.stage.is-revealing[data-mode="ten"] .fleet-pose{transform:translate3d(calc((var(--index) - 4.5) * 2px),calc(var(--index) * 2px + 24px + var(--gather-offset)),calc((10 - var(--index)) * 3px)) rotateY(0deg) rotateZ(calc((var(--index) - 4.5) * .7deg)) scale(.84)}}
+@media(prefers-reduced-motion:reduce){.stage.is-idle .fleet-pose,.stage.is-assembling .fleet-pose{transition:none!important}}
+
+.quantity-option{gap:10px;padding:14px 12px}.quantity-option span{white-space:nowrap;font-size:10px}

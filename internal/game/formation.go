@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	formDrama     = 0 // PartnerConst.Fun_Form.Drama
-	formMaxHeroes = 6 // every formation of the client (data_form_data) has six positions
-	formMaxPos    = 6 // positions in 11212 are 1-6 (the capture of the original server saved six heroes)
-	formTypes     = 6 // data_form_data has six formations
+	formDrama     = 0  // PartnerConst.Fun_Form.Drama
+	formStarTower = 17 // PartnerConst.Fun_Form.Startower
+	formMaxHeroes = 6  // every formation of the client (data_form_data) has six positions
+	formMaxPos    = 6  // positions in 11212 are 1-6 (the capture of the original server saved six heroes)
+	formTypes     = 6  // data_form_data has six formations
 )
 
 // formCells is data_form_data of the client: for each formation type, the battle

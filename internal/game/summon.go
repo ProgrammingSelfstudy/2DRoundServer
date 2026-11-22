@@ -163,17 +163,20 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 				n = 1
 			}
 			// one entry per draw size the group offers; kv key 4 = free summons left (only the
-			// single draw can be free, 1 shows the red dot), key 5 = when the next one comes (0)
+			// single draw can be free), key 5 = when that free draw returns after it was used.
 			draws := []proto.Message{}
 			if g, ok := summonTable[id]; ok {
 				sizes := append([]int64(nil), g.DrawList...)
 				sort.Slice(sizes, func(i, j int) bool { return sizes[i] > sizes[j] }) // the original lists 10 before 1
 				for _, t := range sizes {
-					left := int64(0)
+					left, end := int64(0), int64(0)
 					if t == 1 {
 						left = n
+						if !free && freeSummonGroups[id] {
+							end = nextFreeReset(s.Now()).Unix()
+						}
 					}
-					draws = append(draws, proto.Message{"times": t, "kv_list": []proto.Message{kv(4, left), kv(5, 0)}})
+					draws = append(draws, proto.Message{"times": t, "kv_list": []proto.Message{kv(4, left), kv(5, end)}})
 				}
 			}
 			out = append(out, proto.Message{"group_id": id, "draw_list": draws})
@@ -199,7 +202,15 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		return s.Send(23200, proto.Message{"recruit_list": list, "is_share": 0, "is_day_share": 0, "must_five_num": 0})
+		remaining := 0
+		if a := s.Account(); a != nil && a.Platform == store.PlatformH5 {
+			misses, err := st.AdvancedSummonMisses(role.RID)
+			if err != nil {
+				return err
+			}
+			remaining = h5Advanced.Pity - misses
+		}
+		return s.Send(23200, proto.Message{"recruit_list": list, "is_share": 0, "is_day_share": 0, "must_five_num": remaining})
 	})
 	r.Handle(23202, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -232,18 +243,11 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		if !allowed {
 			return refuse()
 		}
-		have, err := st.PartnersOf(role.RID)
-		if err != nil {
-			return err
-		}
 		buys, err := st.HeroSlotBuys(role.RID)
 		if err != nil {
 			return err
 		}
-		if len(have)+int(times) > heroSlotCapacity(buys) {
-			return refuse()
-		}
-		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}}
+		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}, Capacity: heroSlotCapacity(buys)}
 		if kind == summonFree {
 			free, err := freeLeft(s, role.RID, gid)
 			if err != nil {
@@ -264,18 +268,17 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		for _, h := range g.HeroGain { // points for every draw, paid with 10302 and not listed
 			res.GainAssets[h[0]] += h[1] * times
 		}
-		// rewards has one entry per draw, in step with partner_bids: the card item of the hero
-		// drawn (the original server's 23201, captured 2026-10-21), which is what the result
-		// page shows for the heroes without a reveal animation.
-		var rewards []proto.Message
-		bids := make([]proto.Message, 0, times)
-		for i := int64(0); i < times; i++ {
-			bid := pickHero(g, summonRand())
-			star := partnerTable[bid].InitStar
-			res.Seeds = append(res.Seeds, store.PartnerSeed{BID: bid, Star: star})
-			bids = append(bids, proto.Message{"partner_bid": bid, "init_star": star})
-			if card, ok := heroCardItem(bid, star); ok {
-				rewards = append(rewards, proto.Message{"base_id": card, "num": 1})
+		remaining := 0
+		if a := s.Account(); gid == 300 && a != nil && a.Platform == store.PlatformH5 {
+			res.AdvancedDraw = func(misses int) ([]store.PartnerSeed, int) {
+				seeds, next := h5Advanced.draw(misses, times)
+				remaining = h5Advanced.Pity - next
+				return seeds, next
+			}
+		} else {
+			for i := int64(0); i < times; i++ {
+				bid := pickHero(g, summonRand())
+				res.Seeds = append(res.Seeds, store.PartnerSeed{BID: bid, Star: partnerTable[bid].InitStar})
 			}
 		}
 		heroes, err := st.Summon(role.RID, res)
@@ -285,8 +288,17 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			}
 			return err
 		}
+		// Both lists follow the actual grant order, including a guarantee in the middle of a ten-draw.
+		var rewards []proto.Message
+		bids := make([]proto.Message, 0, len(heroes))
+		for _, h := range heroes {
+			bids = append(bids, proto.Message{"partner_bid": h.BID, "init_star": h.Star})
+			if card, ok := heroCardItem(h.BID, h.Star); ok {
+				rewards = append(rewards, proto.Message{"base_id": card, "num": 1})
+			}
+		}
 		if err := s.Send(23201, proto.Message{"group_id": gid, "times": times, "flag": 0, "rewards": nonNil(rewards),
-			"partner_bids": bids, "partner_chips": []proto.Message{}, "must_five_num": 0}); err != nil {
+			"partner_bids": bids, "partner_chips": []proto.Message{}, "must_five_num": remaining}); err != nil {
 			return err
 		}
 		msgs := make([]proto.Message, 0, len(heroes))

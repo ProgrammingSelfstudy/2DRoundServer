@@ -371,6 +371,18 @@
         "type": "string"
       }
     ],
+    "10560": [
+      {
+        "fields": [
+          {
+            "name": "bid",
+            "type": "uint32"
+          }
+        ],
+        "name": "items",
+        "type": "array"
+      }
+    ],
     "10800": {},
     "10801": [
       {
@@ -10664,6 +10676,100 @@
           }
         ],
         "name": "gemstones",
+        "type": "array"
+      }
+    ],
+    "10560": [
+      {
+        "fields": [
+          {
+            "name": "bid",
+            "type": "uint32"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "type": "uint16"
+          },
+          {
+            "name": "sellable",
+            "type": "uint8"
+          },
+          {
+            "name": "usable",
+            "type": "uint8"
+          },
+          {
+            "name": "use_name",
+            "type": "string"
+          },
+          {
+            "name": "gift_rand",
+            "type": "uint16"
+          },
+          {
+            "fields": [
+              {
+                "name": "bid",
+                "type": "uint32"
+              },
+              {
+                "name": "num",
+                "type": "uint32"
+              }
+            ],
+            "name": "rewards",
+            "type": "array"
+          },
+          {
+            "name": "compose_cmd",
+            "type": "uint16"
+          },
+          {
+            "name": "compose_id",
+            "type": "uint32"
+          },
+          {
+            "name": "compose_name",
+            "type": "string"
+          },
+          {
+            "fields": [
+              {
+                "name": "bid",
+                "type": "uint32"
+              },
+              {
+                "name": "num",
+                "type": "uint32"
+              }
+            ],
+            "name": "cost",
+            "type": "array"
+          },
+          {
+            "fields": [
+              {
+                "name": "attr_id",
+                "type": "uint32"
+              },
+              {
+                "name": "attr_val",
+                "type": "uint32"
+              }
+            ],
+            "name": "main_attr",
+            "type": "array"
+          }
+        ],
+        "name": "items",
         "type": "array"
       }
     ],

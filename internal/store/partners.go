@@ -328,14 +328,9 @@ func (s *Store) Summon(rid int64, r SummonResult) ([]Partner, error) {
 	if err := creditTx(tx, rid, r.GainAssets, nil); err != nil {
 		return nil, err
 	}
-	out := make([]Partner, 0, len(r.Seeds))
-	for _, sd := range r.Seeds {
-		res, err := tx.Exec(`INSERT INTO partners(rid,bid,lev,star,created_at) VALUES(?,?,1,?,?)`, rid, sd.BID, sd.Star, s.unix())
-		if err != nil {
-			return nil, err
-		}
-		id, _ := res.LastInsertId()
-		out = append(out, Partner{PartnerID: id, RID: rid, BID: sd.BID, Lev: 1, Star: sd.Star})
+	out, err := insertPartnersTx(tx, rid, s.unix(), r.Seeds)
+	if err != nil {
+		return nil, err
 	}
 	if r.Elite != nil {
 		if err := saveEliteTx(tx, rid, *r.Elite); err != nil {

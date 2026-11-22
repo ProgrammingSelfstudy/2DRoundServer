@@ -173,6 +173,8 @@ func RegisterBag(r *gateway.Router, st *store.Store) {
 	r.Handle(10500, func(s *gateway.Session, _ proto.Message) error { return sendBackpack(s, st) })
 	r.Handle(10521, sellPreview(st))
 	r.Handle(10522, sell(st))
+	r.Handle(10560, backpackDetails)
+	r.Handle(11008, composeHeroShards(st))
 	r.Handle(10502, func(s *gateway.Session, _ proto.Message) error { return sendHomeBag(s, st) })
 	r.Handle(10503, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()

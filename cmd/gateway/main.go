@@ -92,6 +92,7 @@ func main() {
 		game.RegisterLooks(gw.Router, st)
 		game.RegisterRoleMisc(gw.Router, st)
 		game.RegisterShop(gw.Router, st)
+		game.RegisterH5Shop(gw.Router, st)
 		game.RegisterMarket(gw.Router, st)
 		game.RegisterArena(gw.Router, st)
 		game.RegisterLadder(gw.Router, st)

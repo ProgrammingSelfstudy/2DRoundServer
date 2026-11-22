@@ -39,7 +39,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 ## 玩家模块（80项）
 
-2026-11-05新增 `role_power` 的只读登记，用于查看10306历史战力峰值；不开放编辑或重置。当前源码扫描为360处持久化调用、80项玩家模块、31项全服模块、96张显式表、88个模块常量。前文阶段统计保留历史口径，当前运行时共111项登记。
+2026-11-05新增 `role_power` 的只读登记，用于查看10306历史战力峰值；不开放编辑或重置。当前源码扫描为363处持久化调用、80项玩家模块、31项全服模块、99张显式表、88个模块常量。前文阶段统计保留历史口径，当前运行时共111项登记。
 
 原始JSON和充值专用视图均只读。专用视图在新解码的内存副本中复用现有activate/view/roll；不调用会保存或发奖的游戏loader。重置仅superadmin，先核对网关离线状态，再持同一角色付款锁检查白名单/读before，最后比较before并将写入与审计同事务提交。`all`只在首充窗口显式开放；不提供JSON编辑。
 
@@ -214,6 +214,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `guild_skill_pve` | 公会PvE技能 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
 | table | `guild_skill_pvp` | 公会PvP技能 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [037_guild_skill.sql](../internal/store/migrations/037_guild_skill.sql) |
 | table | `guilds` | 公会/公会页 | 公会列表/详情及解散（read/write）；表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [036_guild.sql](../internal/store/migrations/036_guild.sql) |
+| table | `h5_shop_purchases` | H5 商城购买回执 | 不提供：H5 商城购买重试记录 | 由商城协议返回回执 | 与扣款和发货同事务提交，用于同一角色和请求 ID 的重试 | [072_h5_shop_purchases.sql](../internal/store/migrations/072_h5_shop_purchases.sql) |
 | table | `hero_equips` | 英雄普通装备槽位 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [019_hero_equips.sql](../internal/store/migrations/019_hero_equips.sql) |
 | table | `invite_binds` | 邀请绑定 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [010_invite.sql](../internal/store/migrations/010_invite.sql) |
 | table | `invite_claims` | 邀请奖励领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [010_invite.sql](../internal/store/migrations/010_invite.sql) |

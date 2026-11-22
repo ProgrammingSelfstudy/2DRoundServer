@@ -53,7 +53,7 @@ func (s *Store) AccountByName(platform, account string) (*Account, error) {
 	return scanAccount(s.db.QueryRow(`SELECT `+accountCols+` FROM accounts WHERE platform=? AND account=?`, platform, account))
 }
 
-// FindOrCreateAccount is used by the login service when auto_register is on.
+// FindOrCreateAccount provisions a passwordless account on first use.
 func (s *Store) FindOrCreateAccount(platform, account string) (*Account, error) {
 	a, err := s.AccountByName(platform, account)
 	if err == nil {
@@ -112,6 +112,16 @@ func (s *Store) TouchAccountLogin(id int64) error {
 
 // IssueToken creates a random login token valid for ttlSeconds.
 func (s *Store) IssueToken(accountID int64, ttlSeconds int64) (string, error) {
+	return s.issueToken(accountID, ttlSeconds, false)
+}
+
+// IssuePasswordlessToken checks eligibility in the insert so an account that
+// has just set a password or been banned cannot receive a bootstrap token.
+func (s *Store) IssuePasswordlessToken(accountID int64, ttlSeconds int64) (string, error) {
+	return s.issueToken(accountID, ttlSeconds, true)
+}
+
+func (s *Store) issueToken(accountID int64, ttlSeconds int64, passwordless bool) (string, error) {
 	var b [16]byte
 	if _, err := rand.Read(b[:]); err != nil {
 		return "", err
@@ -119,6 +129,21 @@ func (s *Store) IssueToken(accountID int64, ttlSeconds int64) (string, error) {
 	tok := hex.EncodeToString(b[:])
 	now := s.unix()
 	s.db.Exec(`DELETE FROM login_tokens WHERE expires_at < ?`, now)
+	if passwordless {
+		r, err := s.db.Exec(`INSERT INTO login_tokens(token,account_id,expires_at)
+			SELECT ?,id,? FROM accounts WHERE id=? AND status=1 AND password_hash=''`, tok, now+ttlSeconds, accountID)
+		if err != nil {
+			return "", err
+		}
+		n, err := r.RowsAffected()
+		if err != nil {
+			return "", err
+		}
+		if n == 0 {
+			return "", ErrNotFound
+		}
+		return tok, nil
+	}
 	_, err := s.db.Exec(`INSERT INTO login_tokens(token,account_id,expires_at) VALUES(?,?,?)`, tok, accountID, now+ttlSeconds)
 	return tok, err
 }
@@ -140,4 +165,33 @@ func (s *Store) AccountByToken(token string) (*Account, error) {
 func (s *Store) SetAccountPassword(id int64, hash string) error {
 	_, err := s.db.Exec(`UPDATE accounts SET password_hash=? WHERE id=?`, hash, id)
 	return err
+}
+
+// ClaimAccountPassword sets the first password of an active account and
+// revokes its passwordless tokens. It returns the account with whichever
+// password was set first so concurrent logins can verify their credentials.
+func (s *Store) ClaimAccountPassword(id int64, hash string) (*Account, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	r, err := tx.Exec(`UPDATE accounts SET password_hash=? WHERE id=? AND status=1 AND password_hash=''`, hash, id)
+	if err != nil {
+		return nil, err
+	}
+	n, err := r.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if n != 0 {
+		if _, err := tx.Exec(`DELETE FROM login_tokens WHERE account_id=?`, id); err != nil {
+			return nil, err
+		}
+	}
+	acc, err := scanAccount(tx.QueryRow(`SELECT `+accountCols+` FROM accounts WHERE id=?`, id))
+	if err != nil {
+		return nil, err
+	}
+	return acc, tx.Commit()
 }

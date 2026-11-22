@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -13,14 +14,19 @@ import (
 	"2droundserver/internal/store"
 )
 
-func newTestServer(t *testing.T) (*Server, *httptest.Server) {
+func newTestLogin(t *testing.T) *Server {
 	t.Helper()
 	st, err := store.Open(":memory:")
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { st.Close() })
-	s := &Server{Store: st, Cfg: config.Default(), Log: log.New(io.Discard, "", 0)}
+	return &Server{Store: st, Cfg: config.Default(), Log: log.New(io.Discard, "", 0)}
+}
+
+func newTestServer(t *testing.T) (*Server, *httptest.Server) {
+	t.Helper()
+	s := newTestLogin(t)
 	ts := httptest.NewServer(s.Handler())
 	t.Cleanup(ts.Close)
 	return s, ts
@@ -115,8 +121,25 @@ func TestPlatformLoginAndRegister(t *testing.T) {
 func TestH5AccountsLiveOnTheirOwnPlatform(t *testing.T) {
 	s, ts := newTestServer(t)
 	post := func(path, q string) string {
-		_, b := get(t, "POST", ts.URL+path+"?&&&"+q)
-		return b
+		t.Helper()
+		if !strings.Contains(q, "client=h5") {
+			_, b := get(t, "POST", ts.URL+path+"?&&&"+q)
+			return b
+		}
+		form, err := url.ParseQuery(q)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp, err := ts.Client().PostForm(ts.URL+path, form)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer resp.Body.Close()
+		b, err := io.ReadAll(resp.Body)
+		if err != nil || resp.StatusCode != http.StatusOK {
+			t.Fatalf("%s: %d %s %v", path, resp.StatusCode, b, err)
+		}
+		return string(b)
 	}
 	if b := post("/index.php/userlogin/userRegs", "username=h5player&password=123456&client=h5"); b != `{msg="205"}` {
 		t.Fatal(b)

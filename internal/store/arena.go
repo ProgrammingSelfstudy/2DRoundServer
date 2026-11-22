@@ -47,26 +47,16 @@ type ArenaRow struct {
 
 // ArenaTop lists the best arena players of a server, best first.
 func (s *Store) ArenaTop(srvID string, limit int) ([]ArenaRow, error) {
-	rows, err := s.db.Query(`SELECT a.rid,a.score FROM arena_players a JOIN roles r ON r.rid=a.rid WHERE r.srv_id=? ORDER BY a.score DESC, a.created_at, a.rid LIMIT ?`, srvID, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var out []ArenaRow
-	for rows.Next() {
-		var r ArenaRow
-		if err := rows.Scan(&r.RID, &r.Score); err != nil {
-			return nil, err
-		}
-		out = append(out, r)
-	}
-	return out, rows.Err()
+	return arenaRows(s.db.Query(`SELECT a.rid,a.score FROM arena_players a JOIN roles r ON r.rid=a.rid WHERE r.srv_id=? ORDER BY a.score DESC, a.created_at, a.rid LIMIT ?`, srvID, limit))
 }
 
 // ArenaNear lists other arena players of the server whose score is closest to the given one.
 func (s *Store) ArenaNear(srvID string, rid, score int64, limit int) ([]ArenaRow, error) {
-	rows, err := s.db.Query(`SELECT a.rid,a.score FROM arena_players a JOIN roles r ON r.rid=a.rid WHERE r.srv_id=? AND a.rid<>?
-		ORDER BY ABS(a.score-?), a.rid LIMIT ?`, srvID, rid, score, limit)
+	return arenaRows(s.db.Query(`SELECT a.rid,a.score FROM arena_players a JOIN roles r ON r.rid=a.rid WHERE r.srv_id=? AND a.rid<>?
+		ORDER BY ABS(a.score-?), a.rid LIMIT ?`, srvID, rid, score, limit))
+}
+
+func arenaRows(rows *sql.Rows, err error) ([]ArenaRow, error) {
 	if err != nil {
 		return nil, err
 	}
@@ -113,13 +103,8 @@ func (s *Store) SetArenaSlots(rid int64, slots []ArenaSlot) error {
 		return err
 	}
 	defer tx.Rollback()
-	if _, err := tx.Exec(`DELETE FROM arena_slots WHERE rid=?`, rid); err != nil {
+	if err := replaceArenaSlots(tx, rid, slots); err != nil {
 		return err
-	}
-	for _, a := range slots {
-		if _, err := tx.Exec(`INSERT INTO arena_slots(rid,idx,opp_rid,status,info) VALUES(?,?,?,?,?)`, rid, a.Idx, a.OppRID, a.Status, a.Info); err != nil {
-			return err
-		}
 	}
 	return tx.Commit()
 }

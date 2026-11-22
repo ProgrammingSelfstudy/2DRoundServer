@@ -771,6 +771,11 @@ func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []sto
 	for _, h := range heroes {
 		byID[h.PartnerID] = h
 	}
+	team, objects := ownFightSide(role, formType, formSlots, byID)
+	return team, objects, nil
+}
+
+func ownFightSide(role *store.Role, formType int64, formSlots []store.FormationSlot, byID map[int64]store.Partner) ([]fightUnit, []proto.Message) {
 	slots := append([]store.FormationSlot(nil), formSlots...)
 	sort.SliceStable(slots, func(i, j int) bool { return slots[i].Pos < slots[j].Pos })
 
@@ -780,7 +785,7 @@ func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []sto
 		"sex": 0, "skills": []proto.Message{}, "sprites": []proto.Message{{"item_bid": 0, "pos": 1}}, "star": 0,
 	}}
 	team, heroObjects := sideUnits(role.RID, role.SrvID, slots, formType, byID, true)
-	return team, append(objects, heroObjects...), nil
+	return team, append(objects, heroObjects...)
 }
 
 func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) ([]fightRound, bool, proto.Message, error) {

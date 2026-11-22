@@ -80,12 +80,19 @@ func formationMessage(f store.Formation) proto.Message {
 // (several kinds) and 11212 (save). The campaign's challenge window opens on
 // the formation of kind 0.
 func RegisterFormation(r *gateway.Router, st *store.Store) {
+	read := func(s *gateway.Session, rid, typ int64) (store.Formation, error) {
+		if typ == formArenaDefense && usesH5Arena(s) {
+			team, err := h5ArenaTeamOf(st, rid, typ)
+			return team.form, err
+		}
+		return formationOf(st, rid, typ)
+	}
 	r.Handle(11211, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
 		if role == nil {
 			return nil
 		}
-		f, err := formationOf(st, role.RID, req.Int("type"))
+		f, err := read(s, role.RID, req.Int("type"))
 		if err != nil {
 			return err
 		}
@@ -98,7 +105,7 @@ func RegisterFormation(r *gateway.Router, st *store.Store) {
 		}
 		info := []proto.Message{}
 		for _, t := range req.Arr("type_list") {
-			f, err := formationOf(st, role.RID, t.Int("type"))
+			f, err := read(s, role.RID, t.Int("type"))
 			if err != nil {
 				return err
 			}
@@ -130,6 +137,20 @@ func RegisterFormation(r *gateway.Router, st *store.Store) {
 		}
 		if len(f.Slots) == 0 || len(f.Slots) > formMaxHeroes {
 			return reply(0, "上阵英雄数量不正确")
+		}
+		if typ == formArenaDefense && usesH5Arena(s) {
+			for _, slot := range f.Slots {
+				hero, err := st.PartnerByID(role.RID, slot.PartnerID)
+				if errors.Is(err, store.ErrNotFound) {
+					return reply(0, "英雄不存在")
+				}
+				if err != nil {
+					return err
+				}
+				if !isH5ArenaHero(hero.BID, hero.Star) {
+					return reply(0, "只能上阵五星及以上英雄")
+				}
+			}
 		}
 		if err := st.SaveFormation(role.RID, f); err != nil {
 			if errors.Is(err, store.ErrNotFound) {

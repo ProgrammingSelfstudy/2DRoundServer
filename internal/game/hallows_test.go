@@ -20,10 +20,10 @@ func hallowsEnv(t *testing.T) (*env, *client, *store.Role) {
 	return e, c, role
 }
 
-// hwSync round-trips a request so that the handler before it has saved its state.
+// hwSync waits for the preceding handler's save without starting another one.
 func (c *client) hwSync() {
-	c.send(24100, proto.Message{})
-	c.waitFor(24100)
+	c.send(1169, nil)
+	c.waitFor(1169)
 }
 
 func (e *env) hwState(t *testing.T, role *store.Role) *hwState {

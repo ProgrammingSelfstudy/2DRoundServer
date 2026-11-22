@@ -32,10 +32,16 @@ func TestVoyageOrderLifecycle(t *testing.T) {
 	if len(list) != 6 || b.Int("free_times") != 0 {
 		t.Fatalf("23800: %v", b)
 	}
+	// The heartbeat is handled after the first order list saves.
+	c.send(1169, nil)
+	c.waitFor(1169)
 	// 10001: two heroes, a 2 star one and one of camp 1; costs 2000 coins, takes two hours
 	st := &voyageState{}
 	if _, err := e.st.LoadState(role.RID, voyageModule, st); err != nil {
 		t.Fatal(err)
+	}
+	if len(st.Orders) != len(list) {
+		t.Fatalf("saved orders: got %d, want %d", len(st.Orders), len(list))
 	}
 	st.Orders[0] = voyageOrder{ID: 77, Bid: 10001, Status: voyageUnget}
 	if err := e.st.SaveState(role.RID, voyageModule, st); err != nil {
@@ -187,8 +193,8 @@ func TestVoyagePrivilegeRefresh(t *testing.T) {
 			t.Fatalf("refresh %d: %v", i, r)
 		}
 		c.waitFor(23800)
-		c.send(23800, proto.Message{}) // the refresh answers before it saves: this one is handled after the save
-		c.waitFor(23800)
+		c.send(1169, nil) // the refresh answers before it saves
+		c.waitFor(1169)
 		saved := &voyageState{}
 		if _, err := e.st.LoadState(role.RID, voyageModule, saved); err != nil {
 			t.Fatal(err)

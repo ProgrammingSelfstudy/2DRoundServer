@@ -59,6 +59,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { st.Close() })
 	if err := st.EnsureServer(store.Server{SrvID: "symlf_1", Name: "s1", Platform: "symlf", ZoneID: 1, Host: "127.0.0.1", Port: 8800, Status: 1, GroupID: 1}); err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +185,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 		t.Fatal(err)
 	}
 	go gw.Serve(ln)
-	t.Cleanup(func() { gw.Close(); st.Close() })
+	t.Cleanup(gw.Close)
 	return &env{t: t, st: st, gw: gw, addr: ln.Addr().String(), logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns, champ: champ}
 }
 

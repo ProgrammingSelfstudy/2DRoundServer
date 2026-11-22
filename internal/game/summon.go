@@ -144,49 +144,47 @@ func summonCost(g *summonGroup, times, kind int64) (spend, gain []sellGain, msg 
 func RegisterSummon(r *gateway.Router, st *store.Store) {
 	kv := func(key, val int64) proto.Message { return proto.Message{"key": key, "val": val, "str_val": ""} }
 	// freeLeft says whether the group's free summon is still there today.
-	freeLeft := func(s *gateway.Session, rid, group int64) (bool, error) {
+	freeLeft := func(now time.Time, rid, group int64) (bool, error) {
 		if !freeSummonGroups[group] {
 			return false, nil
 		}
-		used, err := st.FreeSummonUsed(rid, group, summonDay(s.Now()))
+		used, err := st.FreeSummonUsed(rid, group, summonDay(now))
 		return !used, err
 	}
-	state := func(s *gateway.Session, rid int64, groups []int64) ([]proto.Message, error) {
+	// freeState supplies the cooldown after today's free single has been used.
+	freeState := func(now time.Time, group int64, free bool) proto.Message {
+		if free || !freeSummonGroups[group] {
+			return proto.Message{"group_id": group, "free_cd_end": 0, "free_times": b2i(free)}
+		}
+		return proto.Message{"group_id": group, "free_cd_end": nextFreeReset(now).Unix(), "free_times": 0}
+	}
+	state := func(now time.Time, rid int64, groups []int64) ([]proto.Message, error) {
 		out := []proto.Message{}
 		for _, id := range groups {
-			free, err := freeLeft(s, rid, id)
+			free, err := freeLeft(now, rid, id)
 			if err != nil {
 				return nil, err
 			}
-			n := int64(0)
-			if free {
-				n = 1
+			// H5 reads the advanced single's cooldown from key 5 when the page opens.
+			cooldown := int64(0)
+			if id == 300 {
+				cooldown = freeState(now, id, free).Int("free_cd_end")
 			}
-			// one entry per draw size the group offers; kv key 4 = free summons left (only the
-			// single draw can be free, 1 shows the red dot), key 5 = when the next one comes (0)
 			draws := []proto.Message{}
 			if g, ok := summonTable[id]; ok {
 				sizes := append([]int64(nil), g.DrawList...)
 				sort.Slice(sizes, func(i, j int) bool { return sizes[i] > sizes[j] }) // the original lists 10 before 1
 				for _, t := range sizes {
-					left := int64(0)
+					left, end := int64(0), int64(0)
 					if t == 1 {
-						left = n
+						left, end = int64(b2i(free)), cooldown
 					}
-					draws = append(draws, proto.Message{"times": t, "kv_list": []proto.Message{kv(4, left), kv(5, 0)}})
+					draws = append(draws, proto.Message{"times": t, "kv_list": []proto.Message{kv(4, left), kv(5, end)}})
 				}
 			}
 			out = append(out, proto.Message{"group_id": id, "draw_list": draws})
 		}
 		return out, nil
-	}
-	// freeState is the 23202 body: how many free draws are left and, once today's is used,
-	// when it comes back.
-	freeState := func(s *gateway.Session, group int64, free bool) proto.Message {
-		if free || !freeSummonGroups[group] {
-			return proto.Message{"group_id": group, "free_cd_end": 0, "free_times": b2i(free)}
-		}
-		return proto.Message{"group_id": group, "free_cd_end": nextFreeReset(s.Now()).Unix(), "free_times": 0}
 	}
 	groupIDs := func() []int64 { return []int64{100, 200, 300, 400} }
 
@@ -195,7 +193,7 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		list, err := state(s, role.RID, groupIDs())
+		list, err := state(s.Now(), role.RID, groupIDs())
 		if err != nil {
 			return err
 		}
@@ -207,11 +205,12 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		id := req.Int("group_id")
-		free, err := freeLeft(s, role.RID, id)
+		now := s.Now()
+		free, err := freeLeft(now, role.RID, id)
 		if err != nil {
 			return err
 		}
-		return s.Send(23202, freeState(s, id, free))
+		return s.Send(23202, freeState(now, id, free))
 	})
 	r.Handle(23201, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -244,15 +243,16 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			return refuse()
 		}
 		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}}
+		now := s.Now()
 		if kind == summonFree {
-			free, err := freeLeft(s, role.RID, gid)
+			free, err := freeLeft(now, role.RID, gid)
 			if err != nil {
 				return err
 			}
 			if !free || times != 1 {
 				return refuse()
 			}
-			res.FreeGroup, res.FreeDay = gid, summonDay(s.Now())
+			res.FreeGroup, res.FreeDay = gid, summonDay(now)
 		} else {
 			spend, gain, msg := summonCost(g, times, kind)
 			if msg != "" {
@@ -306,7 +306,7 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		if kind == summonFree { // the original follows a free draw with the group's new free state
-			return s.Send(23202, freeState(s, gid, false))
+			return s.Send(23202, freeState(now, gid, false))
 		}
 		return nil
 	})

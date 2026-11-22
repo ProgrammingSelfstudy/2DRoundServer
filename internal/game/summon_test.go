@@ -269,13 +269,36 @@ func TestAdvancedSummonHasAFreeDraw(t *testing.T) {
 	c.recv(11001)
 	c.recv(10302)
 	c.recv(10500)
-	if f := c.recv(23202); f.Int("group_id") != 300 || f.Int("free_times") != 0 || f.Int("free_cd_end") == 0 {
+	reset := nextFreeReset(time.Unix(0, e.clk.Load()))
+	if f := c.recv(23202); f.Int("group_id") != 300 || f.Int("free_times") != 0 || f.Int("free_cd_end") != reset.Unix() {
 		t.Fatalf("23202: %v", f)
 	}
+	checkSummary := func(free, cooldown int64) {
+		t.Helper()
+		c.send(23200, nil)
+		groups := c.recv(23200).Arr("recruit_list")
+		if len(groups) < 3 || groups[2].Int("group_id") != 300 {
+			t.Fatalf("advanced summon summary: %v", groups)
+		}
+		draws := groups[2].Arr("draw_list")
+		if len(draws) != 2 || draws[0].Int("times") != 10 || draws[1].Int("times") != 1 {
+			t.Fatalf("advanced draw sizes: %v", draws)
+		}
+		for i, want := range [][2]int64{{0, 0}, {free, cooldown}} {
+			kv := draws[i].Arr("kv_list")
+			if len(kv) != 2 || kv[0].Int("key") != 4 || kv[1].Int("key") != 5 ||
+				kv[0].Int("val") != want[0] || kv[1].Int("val") != want[1] {
+				t.Fatalf("23200 %d draws: %v, want free %d and cooldown %d", draws[i].Int("times"), kv, want[0], want[1])
+			}
+		}
+	}
+	checkSummary(0, reset.Unix())
 	c.send(23201, proto.Message{"group_id": 300, "recruit_type": 1, "times": 1})
 	if r := c.recvOrNone(23201); r != nil {
 		t.Fatalf("a second free advanced draw: %v", r)
 	}
+	e.setNow(reset)
+	checkSummary(1, 0)
 	// the friendship summon has none
 	c.send(23201, proto.Message{"group_id": 200, "recruit_type": 1, "times": 1})
 	if r := c.recvOrNone(23201); r != nil {

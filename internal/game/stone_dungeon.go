@@ -103,7 +103,7 @@ func stoneDungeonTeam(fights *FightService, role *store.Role, heroes []store.Par
 
 // RegisterStoneDungeon registers the material dungeons: 13030 the state, 13031 a challenge (the result comes as
 // 20006) and 13032 a sweep of a cleared dungeon. A kind has 2 free attempts a day and more for gems and VIP, the
-// day turns at 5:00, and H5 applies the configured level and previous-clear requirements for each difficulty.
+// day turns at 5:00, and each difficulty has configured level and previous-clear requirements.
 // The role's power must reach the dungeon's. The monsters are those of the dungeon's unit group, fought
 // with the heroes' own attack. The pushes follow the capture original-2026-11-05-materials (13031 and
 // 13032 of the first gold dungeon); the rules around them are ours.
@@ -171,9 +171,9 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		}
 		done = counts[d.Type]
 		switch {
-		case int64(role.Lev) < stoneCfg.OpenLev[strconv.FormatInt(d.Type, 10)] || (h5 && int64(role.Lev) < d.LevLimit):
+		case int64(role.Lev) < stoneCfg.OpenLev[strconv.FormatInt(d.Type, 10)] || int64(role.Lev) < d.LevLimit:
 			msg = "等级不足"
-		case h5 && d.PreID != 0 && !cleared[d.PreID]:
+		case d.PreID != 0 && !cleared[d.PreID]:
 			msg = "通关前置难度后开启"
 		case rolePower(heroes) < d.Power:
 			msg = "战力不足"

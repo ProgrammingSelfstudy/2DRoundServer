@@ -503,11 +503,26 @@ func (g *GuildService) registerBoss(r *gateway.Router) {
 		}
 		return fights.begin(s, role, combatGuildDun, intro, rounds, damage >= fightHP, func(s *gateway.Session, _ bool) error {
 			if !h5 {
-				lifeCount(g.Store, role.RID, "evt_guild_dun_fight", 1)
+				finishedAt := s.Now()
+				if dayKey(finishedAt) > st.Day {
+					if _, err := g.bossState(gd.GID, finishedAt); err != nil {
+						return err
+					}
+				}
 				var err error
-				out, err = g.bossSettle(role, gd, st, boss, damage, s.Now(), true)
-				if err != nil {
+				out, err = g.bossSettle(role, gd, st, boss, damage, finishedAt, true)
+				if errors.Is(err, store.ErrConflict) {
+					// A stale challenge does not cost an attempt. Refund only its original day's reservation.
+					if err := g.Store.RefundGuildBossAttempt(role.RID, st.Day); err != nil {
+						return err
+					}
+					if err := s.Send(12741, proto.Message{"msg": "Boss状态已变化，请刷新"}); err != nil {
+						return err
+					}
+				} else if err != nil {
 					return err
+				} else {
+					lifeCount(g.Store, role.RID, "evt_guild_dun_fight", 1)
 				}
 			}
 			if err := sendAssets(s, g.Store, role.RID); err != nil {

@@ -151,10 +151,17 @@ func h5ArenaOpponentOf(st *store.Store, rid, score int64) (arenaOpp, bool, error
 
 // Read current defenses even on lists saved before the arena used a defense formation.
 // Robots keep their generated lineup, filtered in case the snapshot predates H5 matching.
-func arenaOpponentOnSlot(st *store.Store, srvID string, slot store.ArenaSlot) (arenaOpp, bool, error) {
+func arenaOpponentOnSlot(st *store.Store, srvID string, slot store.ArenaSlot, h5 bool) (arenaOpp, bool, error) {
 	var o arenaOpp
 	if err := json.Unmarshal([]byte(slot.Info), &o); err != nil || o.RID != slot.OppRID || o.SrvID != srvID {
 		return arenaOpp{}, false, nil
+	}
+	if !h5 {
+		if o.Robot {
+			return o, true, nil
+		}
+		ok, err := st.ArenaRoleInPool(srvID, o.RID, false)
+		return o, ok, err
 	}
 	if o.Robot {
 		lineup := o.Lineup[:0]
@@ -231,7 +238,7 @@ func arenaChallenge(st *store.Store, fights *FightService, slotsFor arenaSlotLoa
 			if slot.Status != 0 {
 				return refuseArenaChallenge(s, "已经挑战过该对手")
 			}
-			opp, ok, err := arenaOpponentOnSlot(st, role.SrvID, slot)
+			opp, ok, err := arenaOpponentOnSlot(st, role.SrvID, slot, true)
 			if err != nil {
 				return err
 			}

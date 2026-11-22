@@ -325,12 +325,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 	}
 	opponentOnSlot := func(s *gateway.Session, sl store.ArenaSlot) (arenaOpp, bool, error) {
-		if usesH5Arena(s) {
-			return arenaOpponentOnSlot(st, s.Role().SrvID, sl)
-		}
-		var o arenaOpp
-		_ = json.Unmarshal([]byte(sl.Info), &o)
-		return o, true, nil
+		return arenaOpponentOnSlot(st, s.Role().SrvID, sl, usesH5Arena(s))
 	}
 	sendList := func(s *gateway.Session, a *store.ArenaPlayer) error {
 		slots, err := opponents(s, a, false)
@@ -349,14 +344,8 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 		return s.Send(20201, proto.Message{"f_list": list, "type": 0})
 	}
-	rankOf := func(s *gateway.Session, rid int64) (int64, error) {
-		if usesH5Arena(s) {
-			return st.ArenaH5Rank(rid)
-		}
-		return st.ArenaRank(rid)
-	}
 	standingMessage := func(s *gateway.Session, a *store.ArenaPlayer) (proto.Message, error) {
-		rank, err := rankOf(s, a.RID)
+		rank, err := st.ArenaRank(a.RID)
 		if err != nil {
 			return nil, err
 		}
@@ -646,7 +635,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 		}
 		var rank int64
 		if entered {
-			rank, err = rankOf(s, rid)
+			rank, err = st.ArenaRank(rid)
 			if err != nil {
 				return err
 			}
@@ -710,11 +699,9 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		var slot *store.ArenaSlot
-		var opp arenaOpp
 		for i := range slots {
 			if slots[i].OppRID == req.Int("rid") {
 				slot = &slots[i]
-				_ = json.Unmarshal([]byte(slots[i].Info), &opp)
 			}
 		}
 		switch {
@@ -722,6 +709,13 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			return refuse("对手不存在，请刷新列表")
 		case slot.Status != 0:
 			return refuse("已经挑战过该对手")
+		}
+		opp, ok, err := arenaOpponentOnSlot(st, role.SrvID, *slot, false)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return refuse("对手不存在，请刷新列表")
 		}
 		team, objects, form, err := fights.teamSide(role)
 		if err != nil {
@@ -781,6 +775,15 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	role := s.Role()
 	if role == nil {
 		return nil
+	}
+	if !opp.Robot {
+		ok, err := st.ArenaRoleInPool(role.SrvID, opp.RID, false)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return s.Send(12741, proto.Message{"msg": "对手已无法应战，请刷新列表"})
+		}
 	}
 	a, err := st.ArenaPlayerOf(role.RID, arenaInitScore, s.Now().Unix())
 	if err != nil {
@@ -868,8 +871,10 @@ func settleArena(s *gateway.Session, st *store.Store, idx int64, opp arenaOpp, w
 	}
 	for _, sl := range slots {
 		if sl.Idx == idx {
-			var o arenaOpp
-			_ = json.Unmarshal([]byte(sl.Info), &o)
+			o, ok, err := arenaOpponentOnSlot(st, role.SrvID, sl, false)
+			if err != nil || !ok {
+				return err
+			}
 			row := arenaSlotMessage(sl, o, a.Score)
 			row["get_score"] = gain
 			return s.Send(20201, proto.Message{"f_list": []proto.Message{row}, "type": 1})

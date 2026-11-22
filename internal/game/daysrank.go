@@ -20,6 +20,7 @@ import (
 var daysRankJSON []byte
 
 const drModule = "daysrank"
+const drH5ArenaKey = "arena_h5"
 
 var drCfg = func() (c struct {
 	Days       int64
@@ -156,7 +157,7 @@ type drFrozen struct{ RID, Val int64 }
 
 type drWorld struct {
 	Settled bool
-	Frozen  map[string][]drFrozen // ranking id -> the first places at the end
+	Frozen  map[string][]drFrozen // ranking id (or arena_h5) -> the first places at the end
 }
 
 type drRole struct{ Claimed []int64 }
@@ -168,35 +169,48 @@ var drMu sync.Mutex
 func (w *drWorld) settle(st *store.Store, srv string) error {
 	w.Frozen = map[string][]drFrozen{}
 	for _, rk := range drCfg.Ranks {
-		list, err := ranking(st, srv, drTypes[rk.ID])
-		if err != nil {
-			return err
+		typ := drTypes[rk.ID]
+		key := strconv.FormatInt(rk.ID, 10)
+		pools := []string{key}
+		if typ == rankArena {
+			pools = append(pools, drH5ArenaKey)
 		}
-		var frozen []drFrozen
-		for i, e := range list {
-			if int64(i) >= drCfg.LimitCount {
-				break
+		for _, pool := range pools {
+			list, err := rankingInPool(st, srv, typ, pool == drH5ArenaKey)
+			if err != nil {
+				return err
 			}
-			frozen = append(frozen, drFrozen{e.role.RID, e.val})
-			place := int64(i + 1)
-			if place == 1 && !drQualifies(rk.ID, e.val) {
-				continue
+			frozen, err := freezeDaysRank(st, srv, rk.ID, rk.Name, list)
+			if err != nil {
+				return err
 			}
-			for _, tier := range drCfg.Rewards[strconv.FormatInt(rk.ID, 10)] {
-				if place >= tier.Low && place <= tier.High {
-					m := store.Mail{SrvID: srv, Subject: "开服冲榜·" + rk.Name + "奖励", Content: "开服冲榜“" + rk.Name + "”已结束，你排在第" + itoa64(place) + "名，这是排名奖励。",
-						FromName: "开服冲榜", CreatedBy: "daysrank", Attachments: attachmentsOf(tier.Rewards)}
-					if _, err := st.CreateMail(m, []int64{e.role.RID}); err != nil {
-						return err
-					}
-					break
-				}
-			}
+			w.Frozen[pool] = frozen
 		}
-		w.Frozen[strconv.FormatInt(rk.ID, 10)] = frozen
 	}
 	w.Settled = true
 	return nil
+}
+
+func freezeDaysRank(st *store.Store, srv string, id int64, name string, list []rankEntry) ([]drFrozen, error) {
+	var frozen []drFrozen
+	for i, e := range list[:min(int(drCfg.LimitCount), len(list))] {
+		frozen = append(frozen, drFrozen{e.role.RID, e.val})
+		place := int64(i + 1)
+		if place == 1 && !drQualifies(id, e.val) {
+			continue
+		}
+		for _, tier := range drCfg.Rewards[strconv.FormatInt(id, 10)] {
+			if place >= tier.Low && place <= tier.High {
+				m := store.Mail{SrvID: srv, Subject: "开服冲榜·" + name + "奖励", Content: "开服冲榜“" + name + "”已结束，你排在第" + itoa64(place) + "名，这是排名奖励。",
+					FromName: "开服冲榜", CreatedBy: "daysrank", Attachments: attachmentsOf(tier.Rewards)}
+				if _, err := st.CreateMail(m, []int64{e.role.RID}); err != nil {
+					return nil, err
+				}
+				break
+			}
+		}
+	}
+	return frozen, nil
 }
 
 // daysQuestValue is what a quest counts for a role now; the events this server cannot measure stay at 0.
@@ -320,9 +334,24 @@ func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 		}
 		var ents []rankEntry
 		myRank := int64(0)
+		key := sessionRankKey(st, s, typ)
 		if c.w.Settled {
-			for _, f := range c.w.Frozen[strconv.FormatInt(id, 10)] {
+			frozen := c.w.Frozen[strconv.FormatInt(id, 10)]
+			h5Arena, splitArena := c.w.Frozen[drH5ArenaKey]
+			if key.h5Arena && splitArena {
+				frozen = h5Arena
+			}
+			for _, f := range frozen {
 				if x, ok := byRID[f.RID]; ok {
+					if typ == rankArena && !splitArena {
+						inPool, err := st.ArenaRoleInPool(c.role.SrvID, f.RID, key.h5Arena)
+						if err != nil {
+							return err
+						}
+						if !inPool {
+							continue
+						}
+					}
 					ents = append(ents, rankEntry{x, f.Val})
 				}
 			}
@@ -332,7 +361,7 @@ func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 				}
 			}
 		} else {
-			full, err := rankingAt(st, c.role.SrvID, typ, s.Now().Unix())
+			full, err := key.snapshot(s.Now().Unix())
 			if err != nil {
 				return err
 			}

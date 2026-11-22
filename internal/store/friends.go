@@ -46,10 +46,10 @@ func (s *Store) CountFriends(rid int64) (int, error) {
 }
 
 // RequestFriend records a request from -> to. ErrConflict when one is already
-// pending in that direction. ErrSocialBlocked when either H5 role blocked the other.
+// pending in that direction. ErrSocialBlocked when either role blocked the other.
 func (s *Store) RequestFriend(from, to int64) error {
-	res, err := s.db.Exec(`INSERT INTO friend_requests(from_rid,to_rid,created_at) SELECT ?,?,? WHERE NOT `+h5SocialBlock,
-		from, to, s.unix(), from, to, to, from, from, to, PlatformH5)
+	res, err := s.db.Exec(`INSERT INTO friend_requests(from_rid,to_rid,created_at) SELECT ?,?,? WHERE NOT `+socialBlock,
+		from, to, s.unix(), from, to, to, from)
 	if isUnique(err) {
 		return ErrConflict
 	}

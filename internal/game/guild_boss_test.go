@@ -88,6 +88,72 @@ func TestGuildBossFight(t *testing.T) {
 	}
 }
 
+func TestNativeGuildBossResetDuringPlayback(t *testing.T) {
+	for _, tc := range []struct {
+		name       string
+		newDayUsed int64
+	}{
+		{name: "refund old day"},
+		{name: "preserve new day attempt", newDayUsed: 1},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e := newDungeonEnv(t)
+			c, role := enterDungeonRole(e, "symlf", "boss-player", "会长")
+			if err := e.st.SetRoleLevel(role.RID, 20); err != nil {
+				t.Fatal(err)
+			}
+			gid, err := e.st.CreateGuild(store.Guild{SrvID: role.SrvID, Name: "海贼联盟", LeaderRID: role.RID}, 1, nil, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			c.send(11000, proto.Message{})
+			hero := c.waitFor(11000).Arr("partners")[0]
+			const bossID = 101
+			c.send(21308, proto.Message{"boss_id": bossID, "formation_type": 1,
+				"pos_info": []proto.Message{{"pos": 1, "id": hero.Int("partner_id")}}, "hallows_id": 0})
+			if reply := c.waitFor(21308); reply.Int("code") != 1 {
+				t.Fatalf("challenge: %v", reply)
+			}
+			c.waitFor(20027)
+			reserved, err := e.st.BossRoleOf(role.RID)
+			if err != nil || reserved.Used != 1 {
+				t.Fatalf("attempt not reserved before playback: %+v, %v", reserved, err)
+			}
+			e.advance(24 * time.Hour)
+			c.send(21300, proto.Message{})
+			c.waitFor(21300)
+			reset, found, err := e.st.BossStateOf(gid)
+			if err != nil || !found || reset.Day <= reserved.Day {
+				t.Fatalf("boss did not reset during playback: %+v, %v", reset, err)
+			}
+			free := guildBossCfg.Const["free_time"]
+			wantDay := reserved.Day
+			if tc.newDayUsed != 0 {
+				if err := e.st.SpendGuildBossAttempt(gid, role.RID, reset.Day, free); err != nil {
+					t.Fatal(err)
+				}
+				wantDay = reset.Day
+			}
+			c.send(20062, proto.Message{})
+			c.waitFor(20062)
+			if result := c.waitFor(21309); result.Int("bossid") != bossID || result.Int("all_dps") != 0 || len(result.Arr("award_list")) != 0 {
+				t.Fatalf("stale fight awarded damage or rewards: %v", result)
+			}
+			if state, found, err := e.st.BossStateOf(gid); err != nil || !found || state.Day != reset.Day || state.HP != reset.HP {
+				t.Fatalf("stale fight changed the reset boss: %+v, %v", state, err)
+			}
+			if attempts, err := e.st.BossRoleOf(role.RID); err != nil || attempts.Day != wantDay || attempts.Used != tc.newDayUsed {
+				t.Fatalf("attempts after stale fight: %+v, %v; want day %d, used %d", attempts, err, wantDay, tc.newDayUsed)
+			}
+			c.waitFor(21300)
+			c.send(21300, proto.Message{})
+			if info := c.waitFor(21300); info.Int("count") != free-tc.newDayUsed {
+				t.Fatalf("refreshed attempts: %v", info)
+			}
+		})
+	}
+}
+
 func TestGuildBossKillBuffAndReset(t *testing.T) {
 	e := newEnv(t, 1000*time.Hour)
 	c, role := e.enter("ua", "会长")

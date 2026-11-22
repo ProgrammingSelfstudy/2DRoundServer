@@ -5,8 +5,8 @@ import (
 	"errors"
 )
 
-const h5ArenaPlayers = `FROM arena_players a JOIN roles r ON r.rid=a.rid JOIN accounts p ON p.id=r.account_id
-	WHERE r.srv_id=? AND p.platform=? AND r.status=1 AND p.status=1`
+const h5ArenaPool = `p.platform=? AND r.status=1 AND p.status=1`
+const h5ArenaPlayers = arenaStandings + ` WHERE r.srv_id=? AND ` + h5ArenaPool
 
 func (s *Store) ArenaH5Near(srvID string, rid, score int64, minStar, limit int) ([]ArenaRow, error) {
 	return arenaRows(s.db.Query(`SELECT a.rid,a.score `+h5ArenaPlayers+`
@@ -17,18 +17,6 @@ func (s *Store) ArenaH5Near(srvID string, rid, score int64, minStar, limit int) 
 func (s *Store) ArenaH5Top(srvID string, limit int) ([]ArenaRow, error) {
 	return arenaRows(s.db.Query(`SELECT a.rid,a.score `+h5ArenaPlayers+`
 		ORDER BY a.score DESC, a.created_at, a.rid LIMIT ?`, srvID, PlatformH5, limit))
-}
-
-func (s *Store) ArenaH5Rank(rid int64) (int64, error) {
-	var rank int64
-	err := s.db.QueryRow(`SELECT COUNT(*)+1 FROM arena_players me
-		JOIN roles owner ON owner.rid=me.rid
-		JOIN roles r ON r.srv_id=owner.srv_id
-		JOIN accounts p ON p.id=r.account_id JOIN arena_players a ON a.rid=r.rid
-		WHERE me.rid=? AND p.platform=? AND r.status=1 AND p.status=1
-		AND (a.score>me.score OR (a.score=me.score AND
-		     (a.created_at<me.created_at OR (a.created_at=me.created_at AND a.rid<me.rid))))`, rid, PlatformH5).Scan(&rank)
-	return rank, err
 }
 
 func (s *Store) ArenaH5DefenderScore(srvID string, rid int64) (score int64, ok bool, err error) {

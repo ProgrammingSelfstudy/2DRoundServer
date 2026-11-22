@@ -388,7 +388,7 @@ func TestArenaH5ReadsOldRobotSnapshots(t *testing.T) {
 		t.Fatal(err)
 	}
 	slot := store.ArenaSlot{OppRID: old.RID, Info: string(raw)}
-	o, ok, err := arenaOpponentOnSlot(nil, old.SrvID, slot)
+	o, ok, err := arenaOpponentOnSlot(nil, old.SrvID, slot, true)
 	if err != nil || !ok || !reflect.DeepEqual(o.Lineup, old.Lineup[1:]) || o.Power != rolePower([]store.Partner{{BID: starterH5, Lev: 3, Star: 5}}) {
 		t.Fatalf("old robot with filtered roster: %+v %v %v", o, ok, err)
 	}
@@ -451,6 +451,130 @@ func TestArenaOriginalClientUsesCampaignAndSettlesAfterPlayback(t *testing.T) {
 	}
 }
 
+func arenaPoolPlayer(t *testing.T, e *env, platform, name string, score int64) (*client, *store.Role) {
+	t.Helper()
+	c, role := enterDungeonRole(e, platform, name, name)
+	if err := e.st.SetRoleLevel(role.RID, arenaLimitLev); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: starterH5, Star: 5}}); err != nil {
+		t.Fatal(err)
+	}
+	now := time.Unix(0, e.clk.Load())
+	a, err := e.st.ArenaPlayerOf(role.RID, score, now.Unix())
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.Score = score
+	a.Season, _, _ = arenaSeason(now)
+	if err := e.st.SaveArenaPlayer(a); err != nil {
+		t.Fatal(err)
+	}
+	return c, role
+}
+
+func TestArenaCrossPoolChallenges(t *testing.T) {
+	for _, tc := range []struct{ name, attacker, defender string }{
+		{name: "native against H5", attacker: "symlf", defender: store.PlatformH5},
+		{name: "H5 against native", attacker: store.PlatformH5, defender: "symlf"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e := newDungeonEnv(t)
+			c, attacker := arenaPoolPlayer(t, e, tc.attacker, "attacker", arenaInitScore)
+			const defenderScore = 1200
+			_, defender := arenaPoolPlayer(t, e, tc.defender, "defender", defenderScore)
+			strengthenDungeonHeroes(t, e.st, attacker.RID)
+
+			c.send(20201, proto.Message{})
+			for _, row := range c.waitFor(20201).Arr("f_list") {
+				if row.Int("rid") == defender.RID {
+					t.Errorf("fresh list included cross-pool defender: %v", row)
+				}
+			}
+			old, ok, err := oppFromRole(e.st, defender, defenderScore)
+			if err != nil || !ok {
+				t.Fatalf("legacy slot: %+v, %v", old, err)
+			}
+			raw, err := json.Marshal(old)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := e.st.SetArenaSlots(attacker.RID, []store.ArenaSlot{{Idx: 1, OppRID: defender.RID, Info: string(raw)}}); err != nil {
+				t.Fatal(err)
+			}
+			c.send(20201, proto.Message{})
+			if list := c.waitFor(20201).Arr("f_list"); len(list) != 0 {
+				t.Errorf("cached list exposed cross-pool defender: %v", list)
+			}
+			c.send(20203, proto.Message{"rid": defender.RID, "srv_id": defender.SrvID})
+			reply := c.waitFor(20203)
+			if reply.Int("code") == 1 {
+				c.waitFor(20027)
+				c.send(20062, proto.Message{})
+				c.waitFor(20210)
+			}
+			if score, _, entered, err := e.st.ArenaScoreOf(defender.RID); err != nil || !entered || score != defenderScore {
+				t.Errorf("defender score = %d, want %d (standing exists: %t, err: %v)", score, defenderScore, entered, err)
+			}
+			if reply.Int("code") != 0 || reply.Str("msg") != "对手不存在，请刷新列表" {
+				t.Errorf("challenge did not refuse the cross-pool slot: %v", reply)
+			}
+			c.send(20200, proto.Message{})
+			if standing := c.waitFor(20200); standing.Int("can_combat_num") != arenaFreeCombats {
+				t.Errorf("challenge spent an attempt: %v", standing)
+			}
+		})
+	}
+}
+
+func TestArenaRankingsArePoolSpecific(t *testing.T) {
+	e := newDungeonEnv(t)
+	_, first := arenaPoolPlayer(t, e, "symlf", "native-first", 1100)
+	native, second := arenaPoolPlayer(t, e, "symlf", "native-second", 1100)
+	h5, h5Role := arenaPoolPlayer(t, e, store.PlatformH5, "h5", 1500)
+	for _, tc := range []struct {
+		name     string
+		client   *client
+		wantRank int64
+		wantRIDs []int64
+	}{
+		{name: "native", client: native, wantRank: 2, wantRIDs: []int64{first.RID, second.RID}},
+		{name: "H5", client: h5, wantRank: 1, wantRIDs: []int64{h5Role.RID}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := tc.client
+			for _, view := range []struct {
+				command uint16
+				rankKey string
+				request proto.Message
+			}{
+				{command: 20221, rankKey: "rank", request: proto.Message{}},
+				{command: 12900, rankKey: "my_idx", request: proto.Message{"type": rankArena, "start": 1, "num": 10}},
+			} {
+				c.send(view.command, view.request)
+				reply := c.waitFor(view.command)
+				var rids []int64
+				for _, row := range reply.Arr("rank_list") {
+					rids = append(rids, row.Int("rid"))
+				}
+				if reply.Int(view.rankKey) != tc.wantRank || !reflect.DeepEqual(rids, tc.wantRIDs) {
+					t.Errorf("%d rank = %d, list = %v; want rank %d, list %v", view.command, reply.Int(view.rankKey), rids, tc.wantRank, tc.wantRIDs)
+				}
+			}
+			c.send(12902, proto.Message{})
+			var leader int64
+			for _, row := range c.waitFor(12902).Arr("rank_list") {
+				if row.Int("type") == rankArena {
+					leader = row.Int("rid")
+				}
+			}
+			if leader != tc.wantRIDs[0] {
+				t.Errorf("12902 arena leader = %d, want %d", leader, tc.wantRIDs[0])
+			}
+		})
+	}
+}
+
 func TestArenaMatchRollbackOnReplayFailure(t *testing.T) {
 	e := newEnv(t, time.Minute)
 	c, role := enterArenaH5(t, e, "arena-rollback", nil)
@@ -460,7 +584,7 @@ func TestArenaMatchRollbackOnReplayFailure(t *testing.T) {
 	if err != nil || len(slots) == 0 {
 		t.Fatalf("opponents: %v %v", slots, err)
 	}
-	opp, ok, err := arenaOpponentOnSlot(e.st, role.SrvID, slots[0])
+	opp, ok, err := arenaOpponentOnSlot(e.st, role.SrvID, slots[0], true)
 	if err != nil || !ok {
 		t.Fatalf("opponent: %+v %v", opp, err)
 	}

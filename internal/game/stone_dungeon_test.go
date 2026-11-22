@@ -107,6 +107,43 @@ func TestStoneDungeonRules(t *testing.T) {
 	}
 }
 
+func TestNativeStoneDungeonStagePrerequisites(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		id    int64
+		level int
+		clear int64
+		msg   string
+	}{
+		{name: "previous clear", id: 102, level: 20, msg: "通关前置难度后开启"},
+		{name: "stage level", id: 502, level: 70, clear: 501, msg: "等级不足"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e, c, role := stoneEnv(t)
+			strengthenDungeonHeroes(t, e.st, role.RID)
+			heroes, err := e.st.PartnersOf(role.RID)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if power, required := rolePower(heroes), stoneCfg.byID[tc.id].Power; power < required {
+				t.Fatalf("test lineup power %d is below the stage requirement %d", power, required)
+			}
+			if err := e.st.SetRoleLevel(role.RID, tc.level); err != nil {
+				t.Fatal(err)
+			}
+			if tc.clear != 0 {
+				if _, err := e.st.MarkStoneCleared(role.RID, tc.clear); err != nil {
+					t.Fatal(err)
+				}
+			}
+			c.send(13031, proto.Message{"id": tc.id})
+			if reply := c.waitFor(13031); reply.Int("code") != 0 || reply.Str("msg") != tc.msg {
+				t.Fatalf("challenge reply = %v, want refusal %q", reply, tc.msg)
+			}
+		})
+	}
+}
+
 func TestStoneDungeonFight(t *testing.T) {
 	e, c, role := stoneEnv(t)
 	c.send(13031, proto.Message{"id": 101})

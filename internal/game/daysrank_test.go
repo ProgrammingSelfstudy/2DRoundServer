@@ -33,6 +33,32 @@ func TestRankSelfIsLive(t *testing.T) {
 	}
 }
 
+func TestSevenDayArenaRankingsArePoolSpecific(t *testing.T) {
+	e := newDungeonEnv(t)
+	native, nativeRole := arenaPoolPlayer(t, e, "symlf", "native", 1100)
+	h5, h5Role := arenaPoolPlayer(t, e, store.PlatformH5, "h5", 1500)
+	check := func(c *client, role *store.Role, phase string) {
+		t.Helper()
+		c.send(22701, proto.Message{"id": 5})
+		reply := c.waitFor(22701)
+		list := reply.Arr("rank_list")
+		if reply.Int("rank") != 1 || len(list) != 1 || list[0].Int("rid") != role.RID {
+			t.Errorf("%s arena leaderboard for %s: %v", phase, role.Name, reply)
+		}
+	}
+	check(native, nativeRole, "live")
+	check(h5, h5Role, "live")
+	e.advance(time.Duration(drCfg.Days) * 24 * time.Hour)
+	check(native, nativeRole, "frozen")
+	check(h5, h5Role, "frozen")
+	legacy := &drWorld{Settled: true, Frozen: map[string][]drFrozen{"5": {{h5Role.RID, 1500}, {nativeRole.RID, 1100}}}}
+	if err := e.st.SaveGlobal(nativeRole.SrvID, drModule, legacy); err != nil {
+		t.Fatal(err)
+	}
+	check(native, nativeRole, "legacy frozen")
+	check(h5, h5Role, "legacy frozen")
+}
+
 func TestSevenDayRanking(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
 	e.setNow(actNow)

@@ -87,6 +87,11 @@ func (s *Store) SpendGuildBossAttempt(gid, rid, day, free int64) error {
 	return spendGuildBossAttempt(s.db, gid, rid, day, free)
 }
 
+func (s *Store) RefundGuildBossAttempt(rid, day int64) error {
+	_, err := s.db.Exec(`UPDATE guild_boss_roles SET used=used-1 WHERE rid=? AND day=? AND used>0`, rid, day)
+	return err
+}
+
 func spendGuildBossAttempt(db interface {
 	Exec(string, ...any) (sql.Result, error)
 }, gid, rid, day, free int64) error {

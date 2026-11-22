@@ -29,9 +29,10 @@ const (
 )
 
 type rankKey struct {
-	st  *store.Store
-	srv string
-	typ int64
+	st      *store.Store
+	srv     string
+	typ     int64
+	h5Arena bool
 }
 
 type rankSnap struct {
@@ -48,13 +49,20 @@ var (
 // request after that pays for it; no timer), so a busy server does not scan every hero for each request. A settlement
 // that pays by rank (a season, the end of an event) calls ranking directly and so pays by the final standing.
 func rankingAt(st *store.Store, srvID string, typ int64, now int64) ([]rankEntry, error) {
+	return rankKey{st: st, srv: srvID, typ: typ}.snapshot(now)
+}
+
+func sessionRankKey(st *store.Store, s *gateway.Session, typ int64) rankKey {
+	return rankKey{st: st, srv: s.Role().SrvID, typ: typ, h5Arena: typ == rankArena && usesH5Arena(s)}
+}
+
+func (k rankKey) snapshot(now int64) ([]rankEntry, error) {
 	rankMu.Lock()
 	defer rankMu.Unlock()
-	k := rankKey{st, srvID, typ}
 	if sn := rankSnaps[k]; sn != nil && now >= sn.at && now-sn.at < rankSnapshot {
 		return sn.list, nil
 	}
-	list, err := ranking(st, srvID, typ)
+	list, err := rankingInPool(k.st, k.srv, k.typ, k.h5Arena)
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +72,13 @@ func rankingAt(st *store.Store, srvID string, typ int64, now int64) ([]rankEntry
 
 // rankingTime is when the snapshot of a list was built, 0 for none.
 func rankingTime(st *store.Store, srvID string, typ int64) int64 {
+	return rankKey{st: st, srv: srvID, typ: typ}.snapshotTime()
+}
+
+func (k rankKey) snapshotTime() int64 {
 	rankMu.Lock()
 	defer rankMu.Unlock()
-	if sn := rankSnaps[rankKey{st, srvID, typ}]; sn != nil {
+	if sn := rankSnaps[k]; sn != nil {
 		return sn.at
 	}
 	return 0
@@ -97,6 +109,10 @@ func rolePower(heroes []store.Partner) int64 {
 // ranking builds one server's list for a type, best first, at most rankMaxLen
 // long; nil for a type this server does not rank. Ties keep the older progress first.
 func ranking(st *store.Store, srvID string, typ int64) ([]rankEntry, error) {
+	return rankingInPool(st, srvID, typ, false)
+}
+
+func rankingInPool(st *store.Store, srvID string, typ int64, h5Arena bool) ([]rankEntry, error) {
 	roles, err := st.RankRoles(srvID)
 	if err != nil {
 		return nil, err
@@ -148,7 +164,11 @@ func ranking(st *store.Store, srvID string, typ int64) ([]rankEntry, error) {
 				rows = append(rows, struct{ rid, val int64 }{t.RID, t.Tower})
 			}
 		} else {
-			top, err := st.ArenaTop(srvID, rankMaxLen)
+			arenaTop := st.ArenaTop
+			if h5Arena {
+				arenaTop = st.ArenaH5Top
+			}
+			top, err := arenaTop(srvID, rankMaxLen)
 			if err != nil {
 				return nil, err
 			}
@@ -244,7 +264,8 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		typ, start, num := req.Int("type"), req.Int("start"), req.Int("num")
-		list, err := rankingAt(st, role.SrvID, typ, s.Now().Unix())
+		key := sessionRankKey(st, s, typ)
+		list, err := key.snapshot(s.Now().Unix())
 		if err != nil {
 			return err
 		}
@@ -260,7 +281,7 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 			rows = append(rows, rankRow(list[i], role.SrvID, i+1))
 		}
 		return s.Send(12900, proto.Message{"is_cluster": 0, "type": typ, "start": start, "num": len(rows), "len": len(list),
-			"time": rankingTime(st, role.SrvID, typ), "my_idx": myIdx, "lev": role.Lev, "face_id": role.FaceID, "avatar_bid": 0, "name": role.Name,
+			"time": key.snapshotTime(), "my_idx": myIdx, "lev": role.Lev, "face_id": role.FaceID, "avatar_bid": 0, "name": role.Name,
 			"my_val1": myVal, "my_val2": 0, "my_val3": 0, "rank_list": rows})
 	})
 	r.Handle(12903, func(s *gateway.Session, req proto.Message) error {
@@ -312,10 +333,12 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		if _, err := rankingAt(st, role.SrvID, req.Int("type"), s.Now().Unix()); err != nil {
+		typ := req.Int("type")
+		key := sessionRankKey(st, s, typ)
+		if _, err := key.snapshot(s.Now().Unix()); err != nil {
 			return err
 		}
-		return s.Send(12901, proto.Message{"is_cluster": 0, "type": req.Int("type"), "time": rankingTime(st, role.SrvID, req.Int("type"))})
+		return s.Send(12901, proto.Message{"is_cluster": 0, "type": typ, "time": key.snapshotTime()})
 	})
 	r.Handle(12902, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
@@ -324,7 +347,7 @@ func RegisterRank(r *gateway.Router, st *store.Store) {
 		}
 		out := []proto.Message{}
 		for _, typ := range []int64{rankDrama, rankTower, rankArena, rankPower} {
-			list, err := rankingAt(st, role.SrvID, typ, s.Now().Unix())
+			list, err := sessionRankKey(st, s, typ).snapshot(s.Now().Unix())
 			if err != nil {
 				return err
 			}

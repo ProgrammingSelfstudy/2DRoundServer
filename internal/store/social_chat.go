@@ -2,7 +2,7 @@ package store
 
 import "errors"
 
-// ErrSocialBlocked means a request or private message between H5 roles is blocked in either direction.
+// ErrSocialBlocked means either role blocked the other for this social action.
 var ErrSocialBlocked = errors.New("store: a role blocked the other")
 
 const socialBlock = `EXISTS (SELECT 1 FROM friend_blacklist

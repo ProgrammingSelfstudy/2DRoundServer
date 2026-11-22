@@ -5,6 +5,11 @@ import (
 	"errors"
 )
 
+const arenaRoles = `FROM roles r JOIN accounts p ON p.id=r.account_id`
+const arenaStandings = arenaRoles + ` JOIN arena_players a ON a.rid=r.rid`
+const nativeArenaPool = `p.platform<>?`
+const nativeArenaPlayers = arenaStandings + ` WHERE r.srv_id=? AND ` + nativeArenaPool
+
 // ArenaPlayer is a role's standing in the arena.
 type ArenaPlayer struct {
 	RID, Score, Season, Battles, Day, FreeUsed, Bought, ContWin, RefTime, LogSeen int64
@@ -28,14 +33,17 @@ func (s *Store) SaveArenaPlayer(a *ArenaPlayer) error {
 	return err
 }
 
-// ArenaRank is the place of a role among the arena players of its server (1 = best; the earlier to arrive wins a tie).
+// ArenaRank is the place of a role in its own server and client pool (1 = best; the earlier to arrive wins a tie).
 func (s *Store) ArenaRank(rid int64) (int64, error) {
 	var n int64
-	err := s.db.QueryRow(`SELECT COUNT(*)+1 FROM arena_players a JOIN roles r ON r.rid=a.rid
-		WHERE r.srv_id=(SELECT srv_id FROM roles WHERE rid=?)
-		AND (a.score > (SELECT score FROM arena_players WHERE rid=?)
-		 OR (a.score = (SELECT score FROM arena_players WHERE rid=?) AND (a.created_at < (SELECT created_at FROM arena_players WHERE rid=?)
-		  OR (a.created_at = (SELECT created_at FROM arena_players WHERE rid=?) AND a.rid < ?))))`, rid, rid, rid, rid, rid, rid).Scan(&n)
+	err := s.db.QueryRow(`SELECT COUNT(*)+1 `+arenaStandings+`
+		JOIN roles owner ON owner.srv_id=r.srv_id JOIN accounts owner_account ON owner_account.id=owner.account_id
+		JOIN arena_players me ON me.rid=owner.rid
+		WHERE me.rid=? AND ((owner_account.platform<>? AND `+nativeArenaPool+`)
+		                 OR (owner_account.platform=? AND `+h5ArenaPool+`))
+		AND (a.score>me.score OR (a.score=me.score AND
+		     (a.created_at<me.created_at OR (a.created_at=me.created_at AND a.rid<me.rid))))`,
+		rid, PlatformH5, PlatformH5, PlatformH5, PlatformH5).Scan(&n)
 	return n, err
 }
 
@@ -45,15 +53,27 @@ type ArenaRow struct {
 	Score int64
 }
 
-// ArenaTop lists the best arena players of a server, best first.
+// ArenaTop lists the best native arena players of a server, best first.
 func (s *Store) ArenaTop(srvID string, limit int) ([]ArenaRow, error) {
-	return arenaRows(s.db.Query(`SELECT a.rid,a.score FROM arena_players a JOIN roles r ON r.rid=a.rid WHERE r.srv_id=? ORDER BY a.score DESC, a.created_at, a.rid LIMIT ?`, srvID, limit))
+	return arenaRows(s.db.Query(`SELECT a.rid,a.score `+nativeArenaPlayers+`
+		ORDER BY a.score DESC, a.created_at, a.rid LIMIT ?`, srvID, PlatformH5, limit))
 }
 
-// ArenaNear lists other arena players of the server whose score is closest to the given one.
+// ArenaNear lists other native arena players of the server whose score is closest to the given one.
 func (s *Store) ArenaNear(srvID string, rid, score int64, limit int) ([]ArenaRow, error) {
-	return arenaRows(s.db.Query(`SELECT a.rid,a.score FROM arena_players a JOIN roles r ON r.rid=a.rid WHERE r.srv_id=? AND a.rid<>?
-		ORDER BY ABS(a.score-?), a.rid LIMIT ?`, srvID, rid, score, limit))
+	return arenaRows(s.db.Query(`SELECT a.rid,a.score `+nativeArenaPlayers+` AND a.rid<>?
+		ORDER BY ABS(a.score-?), a.rid LIMIT ?`, srvID, PlatformH5, rid, score, limit))
+}
+
+func (s *Store) ArenaRoleInPool(srvID string, rid int64, h5 bool) (bool, error) {
+	pool := nativeArenaPool
+	if h5 {
+		pool = h5ArenaPool
+	}
+	var ok bool
+	err := s.db.QueryRow(`SELECT EXISTS(SELECT 1 `+arenaRoles+`
+		WHERE r.srv_id=? AND r.rid=? AND `+pool+`)`, srvID, rid, PlatformH5).Scan(&ok)
+	return ok, err
 }
 
 func arenaRows(rows *sql.Rows, err error) ([]ArenaRow, error) {

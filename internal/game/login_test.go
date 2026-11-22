@@ -32,6 +32,7 @@ type env struct {
 	st      *store.Store
 	gw      *gateway.Server
 	addr    string
+	connect func() (net.Conn, error)
 	logs    *syncBuf
 	login   *Login
 	friends *FriendService
@@ -54,6 +55,19 @@ func (e *env) advance(d time.Duration) { e.clk.Add(int64(d)) }
 func (e *env) setNow(t time.Time) { e.clk.Store(t.UnixNano()) }
 
 func newEnv(t *testing.T, idle time.Duration) *env {
+	t.Helper()
+	e := setupEnv(t, idle)
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	e.addr = ln.Addr().String()
+	go e.gw.Serve(ln)
+	t.Cleanup(e.gw.Close)
+	return e
+}
+
+func setupEnv(t *testing.T, idle time.Duration) *env {
 	t.Helper()
 	st, err := store.Open(":memory:")
 	if err != nil {
@@ -180,13 +194,7 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 	RegisterElfin(gw.Router, st)
 	RegisterHomeworld(gw.Router, st)
 	RegisterHomepet(gw.Router, st)
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	go gw.Serve(ln)
-	t.Cleanup(gw.Close)
-	return &env{t: t, st: st, gw: gw, addr: ln.Addr().String(), logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns, champ: champ}
+	return &env{t: t, st: st, gw: gw, logs: logs, login: l, friends: fs, chat: cs, online: og, invite: inv, clk: clk, mail: ms, notes: ns, champ: champ}
 }
 
 func (e *env) account(name string) (*store.Account, string) {
@@ -208,7 +216,11 @@ type client struct {
 
 func (e *env) dial(handshake bool) *client {
 	e.t.Helper()
-	c, err := net.Dial("tcp", e.addr)
+	connect := e.connect
+	if connect == nil {
+		connect = func() (net.Conn, error) { return net.Dial("tcp", e.addr) }
+	}
+	c, err := connect()
 	if err != nil {
 		e.t.Fatal(err)
 	}

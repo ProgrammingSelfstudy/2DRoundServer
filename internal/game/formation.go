@@ -54,18 +54,22 @@ func formationOf(st *store.Store, rid, typ int64) (store.Formation, error) {
 			return cp, nil
 		}
 	}
-	def := store.Formation{Type: typ, FormationType: 1}
 	heroes, err := st.PartnersOf(rid)
 	if err != nil {
-		return def, err
+		return store.Formation{Type: typ, FormationType: 1}, err
 	}
+	return defaultFormation(typ, heroes), nil
+}
+
+func defaultFormation(typ int64, heroes []store.Partner) store.Formation {
+	def := store.Formation{Type: typ, FormationType: 1}
 	for i, h := range heroes {
 		if i == formMaxHeroes {
 			break
 		}
 		def.Slots = append(def.Slots, store.FormationSlot{Pos: int64(i + 1), PartnerID: h.PartnerID})
 	}
-	return def, nil
+	return def
 }
 
 func formationMessage(f store.Formation) proto.Message {

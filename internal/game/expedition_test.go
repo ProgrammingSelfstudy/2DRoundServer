@@ -9,8 +9,13 @@ import (
 )
 
 func expEnv(t *testing.T) (*env, *client, *store.Role, int64) {
-	e := newEnv(t, 100*time.Hour)
-	c, role := e.enter("ux", "远征者")
+	return expEnvFor(t, "symlf")
+}
+
+func expEnvFor(t *testing.T, platform string) (*env, *client, *store.Role, int64) {
+	t.Helper()
+	e := newDungeonEnv(t)
+	c, role := enterDungeonRole(e, platform, "ux", "远征者")
 	c.send(11000, proto.Message{})
 	c.waitFor(11000)
 	heroes, err := e.st.PartnersOf(role.RID)

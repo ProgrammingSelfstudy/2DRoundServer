@@ -19,6 +19,11 @@ type planesFightPlan struct {
 // planesFight makes the fight of a formation of the roster (hp in per cent, own and hired heroes) against a scaled copy of
 // the role's own best heroes whose power is `power`. A non-empty message says why it cannot be fought.
 func planesFight(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64) (*planesFightPlan, string, error) {
+	return planesFightWithGuards(db, fights, role, roster, slots, formType, power, foeName, extra, combat, nil)
+}
+
+// When guards is nil, use the role's usual strongest heroes.
+func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Role, roster []pfHero, slots []pfSlot, formType, power int64, foeName string, extra []proto.Message, combat int64, guards []store.Partner) (*planesFightPlan, string, error) {
 	if formType == 0 {
 		formType = 1
 	}
@@ -74,14 +79,16 @@ func planesFight(db *store.Store, fights *FightService, role *store.Role, roster
 			}
 		}
 	}
-	all, err := db.PartnersOf(role.RID)
-	if err != nil {
-		return nil, "", err
+	if guards == nil {
+		all, err := db.PartnersOf(role.RID)
+		if err != nil {
+			return nil, "", err
+		}
+		guards = bestHeroes(all, 5)
 	}
-	best := bestHeroes(all, 5)
-	factor := power * 1000 / max(1, rolePower(best))
+	factor := power * 1000 / max(1, rolePower(guards))
 	opp := arenaOpp{RID: arenaRobotBase + power, SrvID: role.SrvID, Name: foeName, Robot: true, FormType: 1, Power: power}
-	for i, h := range best {
+	for i, h := range guards {
 		opp.Lineup = append(opp.Lineup, arenaHero{Pos: int64(i + 1), BID: h.BID, Lev: max(1, int64(h.Lev)*factor/1000), Star: int64(h.Star), Break: int64(h.BreakLev)})
 	}
 	oslots, oform, obyID, err := opp.fighters(db)

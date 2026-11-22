@@ -9,8 +9,14 @@ import (
 )
 
 func stoneEnv(t *testing.T) (*env, *client, *store.Role) {
-	e := newEnv(t, 100*time.Hour)
-	c, role := e.enter("ua", "挑战者")
+	t.Helper()
+	return stoneEnvFor(t, "symlf")
+}
+
+func stoneEnvFor(t *testing.T, platform string) (*env, *client, *store.Role) {
+	t.Helper()
+	e := newDungeonEnv(t)
+	c, role := enterDungeonRole(e, platform, "ua", "挑战者")
 	if ok, err := e.st.GrantStarterPartners(role.RID, []store.PartnerSeed{{BID: 10501, Star: 5}, {BID: 10503, Star: 5}, {BID: 10509, Star: 5}, {BID: 20511, Star: 5}, {BID: 30506, Star: 5}}); err != nil || !ok {
 		t.Fatalf("heroes: %v %v", ok, err)
 	}

@@ -6,7 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"slices"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"2droundserver/internal/gateway"
@@ -22,10 +24,13 @@ var stoneDungeonJSON []byte
 const combatStoneDungeon = 14 // BattleConst.Fight_Type.DungeonStone
 
 type stoneDungeon struct {
-	ID, Type, Difficulty, LevLimit, PreID, Power, UnitID int64
-	Name, Title                                          string
-	First, Show                                          [][]int64
-	Monsters                                             []towerMonster
+	ID, Type, Difficulty, Power int64
+	LevLimit                    int64 `json:"lev_limit"`
+	PreID                       int64 `json:"pre_id"`
+	UnitID                      int64 `json:"unit_id"`
+	Name, Title                 string
+	First, Show                 [][]int64
+	Monsters                    []towerMonster
 }
 
 type stoneConf struct {
@@ -72,10 +77,34 @@ func stoneCost(typ, done int64) int64 {
 	return list[done].Cost
 }
 
+func stoneDungeonTeam(fights *FightService, role *store.Role, heroes []store.Partner, h5 bool) ([]fightUnit, []proto.Message, store.Formation, error) {
+	if !h5 {
+		return fights.teamSide(role)
+	}
+	form, err := fights.Store.Formation(role.RID, formDrama)
+	switch {
+	case errors.Is(err, store.ErrNotFound):
+		fallback := defaultFormation(formDrama, heroes)
+		form = &fallback
+	case err != nil:
+		return nil, nil, store.Formation{}, err
+	default:
+		allowed := make(map[int64]bool, len(heroes))
+		for _, h := range heroes {
+			allowed[h.PartnerID] = true
+		}
+		form.Slots = slices.DeleteFunc(form.Slots, func(slot store.FormationSlot) bool {
+			return !allowed[slot.PartnerID]
+		})
+	}
+	team, objects, err := fights.teamFor(role, form.FormationType, form.Slots)
+	return team, objects, *form, err
+}
+
 // RegisterStoneDungeon registers the material dungeons: 13030 the state, 13031 a challenge (the result comes as
 // 20006) and 13032 a sweep of a cleared dungeon. A kind has 2 free attempts a day and more for gems and VIP, the
-// day turns at 5:00 and a dungeon opens when the one before it is cleared; the client also asks for the role's
-// power (what 10306 says) to reach the dungeon's. The monsters are those of the dungeon's unit group, fought
+// day turns at 5:00, and H5 applies the configured level and previous-clear requirements for each difficulty.
+// The role's power must reach the dungeon's. The monsters are those of the dungeon's unit group, fought
 // with the heroes' own attack. The pushes follow the capture original-2026-11-05-materials (13031 and
 // 13032 of the first gold dungeon); the rules around them are ours.
 func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
@@ -114,7 +143,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		return state(s)
 	})
 	// check says whether the role may enter a dungeon now, and with which attempt it would be paid
-	check := func(s *gateway.Session, id int64, sweep bool) (d stoneDungeon, role *store.Role, cleared map[int64]bool, done int64, msg string, err error) {
+	check := func(s *gateway.Session, id, day int64, sweep, h5 bool) (d stoneDungeon, role *store.Role, heroes []store.Partner, done int64, msg string, err error) {
 		me := s.Role()
 		if me == nil {
 			return d, nil, nil, 0, "", errors.New("no role")
@@ -127,22 +156,24 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		if !ok {
 			return d, role, nil, 0, "副本不存在", nil
 		}
-		if cleared, err = st.StoneCleared(role.RID); err != nil {
+		cleared, err := st.StoneCleared(role.RID)
+		if err != nil {
 			return
 		}
-		heroes, err2 := st.PartnersOf(role.RID)
-		if err2 != nil {
-			return d, role, cleared, 0, "", err2
+		heroes, err = st.PartnersOf(role.RID)
+		if err != nil {
+			return
 		}
-		counts, err2 := st.StoneCounts(role.RID, summonDay(s.Now()))
-		if err2 != nil {
-			return d, role, cleared, 0, "", err2
+		heroes = dungeonHeroes(heroes, h5)
+		counts, err := st.StoneCounts(role.RID, day)
+		if err != nil {
+			return
 		}
 		done = counts[d.Type]
 		switch {
-		case int64(role.Lev) < stoneCfg.OpenLev[strconv.FormatInt(d.Type, 10)] || int64(role.Lev) < d.LevLimit:
+		case int64(role.Lev) < stoneCfg.OpenLev[strconv.FormatInt(d.Type, 10)] || (h5 && int64(role.Lev) < d.LevLimit):
 			msg = "等级不足"
-		case d.PreID != 0 && !cleared[d.PreID]:
+		case h5 && d.PreID != 0 && !cleared[d.PreID]:
 			msg = "通关前置难度后开启"
 		case rolePower(heroes) < d.Power:
 			msg = "战力不足"
@@ -158,50 +189,13 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		}
 		return
 	}
-	pay := func(role *store.Role, s *gateway.Session, d stoneDungeon, done int64) error {
-		spendA, spendI := map[int64]int64{}, map[int64]int64{}
-		if cost := stoneCost(d.Type, done); cost > 0 {
-			spendA[3] = cost
-		}
-		return st.StoneAttempt(role.RID, d.Type, summonDay(s.Now()), stoneAllowed(d.Type, role.VIPLev), spendA, spendI)
-	}
-	rewards := func(d stoneDungeon, first bool) [][2]int64 {
-		out := pairsOf(d.Show)
-		if first {
-			out = append(out, pairsOf(d.First)...)
-		}
-		return out
-	}
-	// give credits a reward list and sends what changed: 10302, then the bag entries that changed
-	// (10510/10512, capture original-2026-11-05-materials), and returns the gain by id for the notice
-	give := func(s *gateway.Session, role *store.Role, list [][2]int64) ([]sellGain, error) {
-		ga, gi := map[int64]int64{}, map[int64]int64{}
-		splitGains(guildGains(list), 1, ga, gi)
-		before, err := snapshotBags(st, role.RID)
-		if err != nil {
-			return nil, err
-		}
-		if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
-			return nil, err
-		}
-		if err := sendAssets(s, st, role.RID); err != nil {
-			return nil, err
-		}
-		after, err := snapshotBags(st, role.RID)
-		if err != nil {
-			return nil, err
-		}
-		if err := sendBagDelta(s, before, after); err != nil {
-			return nil, err
-		}
-		var gain []sellGain
-		for _, id := range mergedKeys(ga, gi) {
-			gain = append(gain, sellGain{id, ga[id] + gi[id]})
-		}
-		return gain, nil
+	pay := func(role *store.Role, d stoneDungeon, day, done int64, assets, items map[int64]int64) error {
+		return st.TakeStoneAttempt(role.RID, d.Type, day, done, stoneAllowed(d.Type, role.VIPLev), stoneCost(d.Type, done), assets, items)
 	}
 	r.Handle(13031, func(s *gateway.Session, req proto.Message) error {
-		d, role, _, done, msg, err := check(s, req.Int("id"), false)
+		h5 := dungeonH5(s)
+		day := summonDay(s.Now())
+		d, role, heroes, done, msg, err := check(s, req.Int("id"), day, false, h5)
 		if err != nil || role == nil {
 			return err
 		}
@@ -209,7 +203,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		if msg != "" {
 			return refuse(msg)
 		}
-		team, objects, form, err := fights.teamSide(role)
+		team, objects, form, err := stoneDungeonTeam(fights, role, heroes, h5)
 		if err != nil {
 			return err
 		}
@@ -225,7 +219,7 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 			foes = append(foes, unit)
 			objects = append(objects, obj)
 		}
-		if err := pay(role, s, d, done); errors.Is(err, store.ErrConflict) {
+		if err := pay(role, d, day, done, nil, nil); errors.Is(err, store.ErrConflict) {
 			return refuse("钻石不足或今日已无次数")
 		} else if err != nil {
 			return err
@@ -252,21 +246,41 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		if err := s.Send(13031, proto.Message{"code": 1, "msg": ""}); err != nil {
 			return err
 		}
+		var settled atomic.Bool
 		return fights.begin(s, role, combatStoneDungeon, intro, rounds, won, func(s *gateway.Session, won bool) error {
-			stats, _, _, _, err := damageTable(st, role)
-			if err != nil {
-				return err
+			if settled.Swap(true) {
+				return nil
+			}
+			var stats []proto.Message
+			var err error
+			if h5 {
+				stats, _, _, _ = formationDamage(role, form, heroes)
+			} else {
+				stats, _, _, _, err = damageTable(st, role)
+				if err != nil {
+					return err
+				}
 			}
 			result := int64(2)
 			var gained [][2]int64
 			if won {
 				result = 1
-				first, err := st.MarkStoneCleared(role.RID, d.ID)
+				before, err := snapshotBags(st, role.RID)
 				if err != nil {
 					return err
 				}
-				gained = rewards(d, first)
-				if _, err := give(s, role, gained); err != nil {
+				gained = stoneLoot(d.Show, h5)
+				firstLoot := stoneLoot(d.First, h5)
+				assets, items := dungeonGains(gained)
+				firstAssets, firstItems := dungeonGains(firstLoot)
+				first, err := st.ClearStoneDungeon(role.RID, d.ID, assets, items, firstAssets, firstItems)
+				if err != nil {
+					return err
+				}
+				if first {
+					gained = append(gained, firstLoot...)
+				}
+				if err := sendStoneBalances(s, st, role.RID, before); err != nil {
 					return err
 				}
 			}
@@ -284,7 +298,9 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		})
 	})
 	r.Handle(13032, func(s *gateway.Session, req proto.Message) error {
-		d, role, _, done, msg, err := check(s, req.Int("id"), true)
+		h5 := dungeonH5(s)
+		day := summonDay(s.Now())
+		d, role, _, done, msg, err := check(s, req.Int("id"), day, true, h5)
 		if err != nil || role == nil {
 			return err
 		}
@@ -292,14 +308,22 @@ func RegisterStoneDungeon(r *gateway.Router, st *store.Store) {
 		if msg != "" {
 			return refuse(msg)
 		}
-		if err := pay(role, s, d, done); errors.Is(err, store.ErrConflict) {
+		before, err := snapshotBags(st, role.RID)
+		if err != nil {
+			return err
+		}
+		assets, items := dungeonGains(stoneLoot(d.Show, h5))
+		if err := pay(role, d, day, done, assets, items); errors.Is(err, store.ErrConflict) {
 			return refuse("钻石不足或今日已无次数")
 		} else if err != nil {
 			return err
 		}
-		gain, err := give(s, role, rewards(d, false))
-		if err != nil {
+		if err := sendStoneBalances(s, st, role.RID, before); err != nil {
 			return err
+		}
+		gain := make([]sellGain, 0, len(assets)+len(items))
+		for _, id := range mergedKeys(assets, items) {
+			gain = append(gain, sellGain{id, assets[id] + items[id]})
 		}
 		// capture original-2026-11-05-materials: 10302, 10512, 12742, the quest (10409) and feat
 		// (16401), 13030, then the answer with an empty msg

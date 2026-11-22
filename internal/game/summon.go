@@ -218,9 +218,9 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		gid, times, kind := req.Int("group_id"), req.Int("times"), req.Int("recruit_type")
-		// Any 23201 opens the result window and 23201 has no message field, so a refused
-		// summon is not answered at all (the client checks the cost itself before sending).
-		refuse := func() error { return nil }
+		// 23201 opens the result window. H5 uses separate notices for capacity and payment failures.
+		account := s.Account()
+		h5 := account != nil && account.Platform == store.PlatformH5
 		g, ok := summonTable[gid]
 		allowed := false
 		if ok {
@@ -229,7 +229,7 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			}
 		}
 		if !allowed {
-			return refuse()
+			return nil
 		}
 		have, err := st.PartnersOf(role.RID)
 		if err != nil {
@@ -240,7 +240,10 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		if len(have)+int(times) > heroSlotCapacity(buys) {
-			return refuse()
+			if h5 {
+				return s.Send(12741, proto.Message{"msg": "英雄背包已满, 不能召唤英雄"})
+			}
+			return nil
 		}
 		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}}
 		now := s.Now()
@@ -250,13 +253,13 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 				return err
 			}
 			if !free || times != 1 {
-				return refuse()
+				return nil
 			}
 			res.FreeGroup, res.FreeDay = gid, summonDay(now)
 		} else {
 			spend, gain, msg := summonCost(g, times, kind)
 			if msg != "" {
-				return refuse()
+				return nil
 			}
 			splitGains(spend, 1, res.SpendAssets, res.SpendItems)
 			splitGains(gain, 1, res.GainAssets, map[int64]int64{})
@@ -280,10 +283,25 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		}
 		heroes, err := st.Summon(role.RID, res)
 		if err != nil {
-			if errors.Is(err, store.ErrConflict) {
-				return refuse()
+			if !errors.Is(err, store.ErrConflict) {
+				return err
 			}
-			return err
+			if !h5 || kind == summonFree {
+				return nil
+			}
+			// The failed spend has rolled back, so read the current ticket balance for the notice.
+			if len(res.SpendItems) > 0 {
+				items, err := st.RoleItems(role.RID)
+				if err != nil {
+					return err
+				}
+				for bid, need := range res.SpendItems {
+					if count := items[bid]; count < need {
+						return s.Send(12745, proto.Message{"bid": bid, "need_num": need, "num": count})
+					}
+				}
+			}
+			return s.Send(12741, proto.Message{"msg": "召唤所需资源不足"})
 		}
 		if err := s.Send(23201, proto.Message{"group_id": gid, "times": times, "flag": 0, "rewards": nonNil(rewards),
 			"partner_bids": bids, "partner_chips": []proto.Message{}, "must_five_num": 0}); err != nil {

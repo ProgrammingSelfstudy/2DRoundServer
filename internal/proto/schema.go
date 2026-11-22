@@ -92,6 +92,7 @@ func LoadSchema() (*Schema, error) {
 			return
 		}
 		registerH5Shop(s)
+		registerH5GuildSchema(s)
 		schema = s
 	})
 	return schema, schemaErr

@@ -39,16 +39,17 @@ var skillsJSON []byte
 // percents of the caster's attack; How says which targets (front, random, max_atk,
 // min_hp, all) and N how many; Side 1 targets the enemy, 2 the own side.
 type skillRule struct {
-	Name   string `json:"name"`
-	Normal int    `json:"normal"`
-	Type   string `json:"type"`
-	CD     int    `json:"cd"`
-	FireCD int    `json:"fire_cd"`
-	Side   int    `json:"side"`
-	How    string `json:"how"`
-	N      int    `json:"n"`
-	Dmg    int64  `json:"dmg"`
-	Heal   int64  `json:"heal"`
+	Description string `json:"des"`
+	Name        string `json:"name"`
+	Normal      int    `json:"normal"`
+	Type        string `json:"type"`
+	CD          int    `json:"cd"`
+	FireCD      int    `json:"fire_cd"`
+	Side        int    `json:"side"`
+	How         string `json:"how"`
+	N           int    `json:"n"`
+	Dmg         int64  `json:"dmg"`
+	Heal        int64  `json:"heal"`
 	// Purge is how many negative statuses the skill removes from its targets (99 =
 	// all), each target with chance PurgeChance percent.
 	Purge       int   `json:"purge"`
@@ -145,6 +146,7 @@ const spiritPos = 41
 
 // fightUnit is one fighter while the script is made.
 type fightUnit struct {
+	guild                      guildCombatBonus
 	pos, speed, hp, maxHP, atk int64
 	crit, critRatio            int64 // per mille; critRatio 1500 = x1.5
 	skills                     []int64
@@ -432,7 +434,15 @@ func buffEntry(action int64, b *activeBuff, target int64, endRound int) proto.Me
 // addBuff gives a status to a unit when the chance comes up; it returns the
 // buff_list entry or nil. A status that does not stack only refreshes its rounds.
 func (f *fightSim) addBuff(caster, t *fightUnit, r buffRule) proto.Message {
-	if t.hp <= 0 || f.rng.Int63n(100) >= r.Chance {
+	if t.hp <= 0 {
+		return nil
+	}
+	control := caster.guild.control - t.guild.resistControl
+	if r.Kind == "stun" && control != 0 {
+		if f.rng.Int63n(1000) >= r.Chance*10+control {
+			return nil
+		}
+	} else if f.rng.Int63n(100) >= r.Chance {
 		return nil
 	}
 	rounds, end := r.Rounds, f.round+r.Rounds
@@ -644,11 +654,14 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 				base = d
 			}
 			dmg := base * pct / 100 * dealtPct(u) / 100
-			if c := critOf(u); c > 0 && f.rng.Int63n(1000) < c {
+			dmg += dmg * u.guild.damage / 1000
+			if c := critOf(u) - t.guild.tenacity; c > 0 && f.rng.Int63n(1000) < c {
 				crit = 1
 				dmg = dmg * critRatioOf(u) / 1000
 			}
-			if dmg = dmg * takenPct(t) / 100; dmg < 1 {
+			dmg = dmg * takenPct(t) / 100
+			dmg -= dmg * t.guild.resistDamage(rule) / 1000
+			if dmg < 1 {
 				dmg = 1
 			}
 			if dmg > t.hp {
@@ -767,6 +780,11 @@ func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []sto
 	if err != nil {
 		return nil, nil, err
 	}
+	team, objects := buildFightTeam(role, formType, formSlots, heroes)
+	return team, objects, nil
+}
+
+func buildFightTeam(role *store.Role, formType int64, formSlots []store.FormationSlot, heroes []store.Partner) ([]fightUnit, []proto.Message) {
 	byID := map[int64]store.Partner{}
 	for _, h := range heroes {
 		byID[h.PartnerID] = h
@@ -780,7 +798,7 @@ func (f *FightService) teamFor(role *store.Role, formType int64, formSlots []sto
 		"sex": 0, "skills": []proto.Message{}, "sprites": []proto.Message{{"item_bid": 0, "pos": 1}}, "star": 0,
 	}}
 	team, heroObjects := sideUnits(role.RID, role.SrvID, slots, formType, byID, true)
-	return team, append(objects, heroObjects...), nil
+	return team, append(objects, heroObjects...)
 }
 
 func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64) ([]fightRound, bool, proto.Message, error) {
@@ -848,7 +866,7 @@ func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, for
 			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
 		}
 		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"),
-			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours})
+			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours, guild: guildCombatBonusOf(h)})
 		objects = append(objects, proto.Message{
 			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": 0}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
 			"face_id": 0, "group": group, "hp": m.Int("hp"), "hp_max": m.Int("hp"), "lev": h.Lev, "object_bid": h.BID, "object_id": h.PartnerID,

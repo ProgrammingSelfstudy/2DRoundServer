@@ -60,8 +60,16 @@ func (s *Store) BossHit(gid, day, bossID, rid, dmg int64) (applied, hpLeft int64
 		return 0, 0, false, err
 	}
 	defer tx.Rollback()
+	applied, hpLeft, killed, err = bossHitTx(tx, gid, day, bossID, rid, dmg)
+	if err != nil {
+		return 0, 0, false, err
+	}
+	return applied, hpLeft, killed, tx.Commit()
+}
+
+func bossHitTx(tx *sql.Tx, gid, day, bossID, rid, dmg int64) (applied, hpLeft int64, killed bool, err error) {
 	var hp, fid, maxID int64
-	if err := tx.QueryRow(`SELECT hp,fid,max_id FROM guild_boss_state WHERE gid=?`, gid).Scan(&hp, &fid, &maxID); err != nil {
+	if err := tx.QueryRow(`SELECT hp,fid,max_id FROM guild_boss_state WHERE gid=? AND day=?`, gid, day).Scan(&hp, &fid, &maxID); err != nil {
 		return 0, 0, false, err
 	}
 	applied = min(dmg, hp)
@@ -77,7 +85,7 @@ func (s *Store) BossHit(gid, day, bossID, rid, dmg int64) (applied, hpLeft int64
 	if _, err := tx.Exec(`UPDATE guild_boss_state SET hp=?, max_id=? WHERE gid=?`, hpLeft, maxID, gid); err != nil {
 		return 0, 0, false, err
 	}
-	return applied, hpLeft, killed, tx.Commit()
+	return applied, hpLeft, killed, nil
 }
 
 // BossDamage is what a member did to a boss in a day.
@@ -85,7 +93,11 @@ type BossDamage struct{ RID, Total, Last int64 }
 
 // BossDamages lists the members' damage to a boss on a day, the most first.
 func (s *Store) BossDamages(gid, day, bossID int64) ([]BossDamage, error) {
-	rows, err := s.db.Query(`SELECT rid,total,last FROM guild_boss_dmg WHERE gid=? AND day=? AND boss_id=? ORDER BY total DESC, rid`, gid, day, bossID)
+	return bossDamages(s.db, gid, day, bossID)
+}
+
+func bossDamages(db skillQuerier, gid, day, bossID int64) ([]BossDamage, error) {
+	rows, err := db.Query(`SELECT rid,total,last FROM guild_boss_dmg WHERE gid=? AND day=? AND boss_id=? ORDER BY total DESC, rid`, gid, day, bossID)
 	if err != nil {
 		return nil, err
 	}
@@ -120,12 +132,7 @@ func (s *Store) BossDayTotal(gid, day int64) (int64, error) {
 
 // ClaimBossKill marks that a role was paid the kill reward of a boss; false when it was paid already.
 func (s *Store) ClaimBossKill(rid, bossID int64) (bool, error) {
-	res, err := s.db.Exec(`INSERT OR IGNORE INTO guild_boss_kills(rid,boss_id) VALUES(?,?)`, rid, bossID)
-	if err != nil {
-		return false, err
-	}
-	n, _ := res.RowsAffected()
-	return n == 1, nil
+	return changedOne(s.db.Exec(`INSERT OR IGNORE INTO guild_boss_kills(rid,boss_id) VALUES(?,?)`, rid, bossID))
 }
 
 // BossGuildRow is one guild of the server's boss ranking.
@@ -161,6 +168,13 @@ func (s *Store) AddGuildExp(gid, exp int64, levelExp []int64) error {
 		return err
 	}
 	defer tx.Rollback()
+	if err := addGuildExpTx(tx, gid, exp, levelExp); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+func addGuildExpTx(tx *sql.Tx, gid, exp int64, levelExp []int64) error {
 	var lev, have int64
 	if err := tx.QueryRow(`SELECT lev,exp FROM guilds WHERE gid=?`, gid).Scan(&lev, &have); err != nil {
 		return err
@@ -170,8 +184,6 @@ func (s *Store) AddGuildExp(gid, exp int64, levelExp []int64) error {
 		have -= levelExp[lev-1]
 		lev++
 	}
-	if _, err := tx.Exec(`UPDATE guilds SET lev=?, exp=? WHERE gid=?`, lev, have, gid); err != nil {
-		return err
-	}
-	return tx.Commit()
+	_, err := tx.Exec(`UPDATE guilds SET lev=?, exp=? WHERE gid=?`, lev, have, gid)
+	return err
 }

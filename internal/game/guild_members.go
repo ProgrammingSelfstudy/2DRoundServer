@@ -521,17 +521,23 @@ func (g *GuildService) answerApply(s *gateway.Session, kind int, rid int64, repl
 	if kind != 1 && kind != 2 {
 		return reply(false, "参数错误")
 	}
-	had, err := g.Store.DeleteApply(gd.GID, rid)
-	if err != nil {
-		return err
-	}
-	if !had {
-		return reply(false, "该申请已不存在")
-	}
-	if kind == 2 {
-		return reply(true, "已拒绝申请")
+	h5 := isH5Client(s)
+	if kind == 2 || !h5 {
+		had, err := g.Store.DeleteApply(gd.GID, rid)
+		if err != nil {
+			return err
+		}
+		if !had {
+			return reply(false, "该申请已不存在")
+		}
+		if kind == 2 {
+			return reply(true, "已拒绝申请")
+		}
 	}
 	applicant, err := g.Store.RoleByID(rid)
+	if errors.Is(err, store.ErrNotFound) {
+		return reply(false, "该申请已不存在")
+	}
 	if err != nil {
 		return err
 	}
@@ -541,9 +547,16 @@ func (g *GuildService) answerApply(s *gateway.Session, kind int, rid int64, repl
 	} else if left > 0 {
 		return reply(false, "该玩家刚退出公会，暂时不能加入")
 	}
-	err = g.Store.JoinGuild(gd.GID, rid, now, guildCapacity(gd.Lev))
+	if h5 {
+		err = g.Store.AcceptGuildApplication(gd.GID, s.Role().RID, rid, now, g.cfg("guild_quit_cd"), guildCapacity(gd.Lev))
+	} else {
+		err = g.Store.JoinGuild(gd.GID, rid, now, guildCapacity(gd.Lev))
+	}
 	switch {
 	case errors.Is(err, store.ErrConflict):
+		if h5 {
+			return reply(false, "公会已满、申请已失效或管理权限已变化")
+		}
 		return reply(false, "公会人数已满，或该玩家已加入其他公会")
 	case err != nil:
 		return err

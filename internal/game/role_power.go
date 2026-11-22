@@ -18,7 +18,10 @@ func sendRolePower(s *gateway.Session, st *store.Store, rid, previous int64) err
 	if err != nil {
 		return err
 	}
-	power := rolePower(heroes)
+	return sendRolePowerValue(s, st, rid, previous, rolePower(heroes))
+}
+
+func sendRolePowerValue(s *gateway.Session, st *store.Store, rid, previous, power int64) error {
 	state := rolePowerState{}
 	if _, err := st.LoadState(rid, "role_power", &state); err != nil {
 		return err

@@ -51,6 +51,12 @@ func (s *Session) Send(cmd uint16, msg proto.Message) error {
 	if !ok {
 		return fmt.Errorf("gateway: no receive schema for command %d", cmd)
 	}
+	if filter := s.srv.Router.sendFilters[cmd]; filter != nil {
+		msg = filter(s, msg)
+		if msg == nil {
+			return nil
+		}
+	}
 	payload, err := proto.Encode(s.srv.Codec, fields, msg)
 	if err != nil {
 		return fmt.Errorf("gateway: encode %d: %w", cmd, err)

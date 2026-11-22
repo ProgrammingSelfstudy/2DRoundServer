@@ -51,59 +51,14 @@ func releaseEquipsTx(tx *sql.Tx, rid, partnerID int64) error {
 // nothing, when the role does not hold the piece; ErrNotFound for a hero that
 // is not the role's.
 func (s *Store) EquipPiece(rid, partnerID, slot, baseID int64) error {
-	tx, err := s.db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	var one int
-	if err := tx.QueryRow(`SELECT 1 FROM partners WHERE partner_id=? AND rid=?`, partnerID, rid).Scan(&one); err != nil {
-		return wrapNoRows(err)
-	}
-	res, err := tx.Exec(`UPDATE role_items SET num=num-1 WHERE rid=? AND item_id=? AND num>=1`, rid, baseID)
-	if err != nil {
-		return err
-	}
-	if n, _ := res.RowsAffected(); n == 0 {
+	if baseID <= 0 {
 		return ErrConflict
 	}
-	if _, err := tx.Exec(`DELETE FROM role_items WHERE rid=? AND num<=0`, rid); err != nil {
-		return err
-	}
-	var old int64
-	switch err := tx.QueryRow(`SELECT base_id FROM hero_equips WHERE partner_id=? AND slot=?`, partnerID, slot).Scan(&old); {
-	case err == nil:
-		if err := creditPlainTx(tx, rid, nil, map[int64]int64{old: 1}); err != nil {
-			return err
-		}
-	case err != sql.ErrNoRows:
-		return err
-	}
-	if _, err := tx.Exec(`INSERT INTO hero_equips(partner_id,slot,base_id) VALUES(?,?,?) ON CONFLICT(partner_id,slot) DO UPDATE SET base_id=excluded.base_id`, partnerID, slot, baseID); err != nil {
-		return err
-	}
-	return tx.Commit()
+	return s.ChangeEquipment(rid, partnerID, nil, []Equip{{Slot: slot, BaseID: baseID}})
 }
 
 // UnequipPiece takes the piece off a hero's slot and back into the ledger.
 // ErrNotFound when the hero is not the role's or wears nothing there.
 func (s *Store) UnequipPiece(rid, partnerID, slot int64) error {
-	tx, err := s.db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	var base int64
-	err = tx.QueryRow(`SELECT e.base_id FROM hero_equips e JOIN partners p ON p.partner_id=e.partner_id
-		WHERE e.partner_id=? AND e.slot=? AND p.rid=?`, partnerID, slot, rid).Scan(&base)
-	if err != nil {
-		return wrapNoRows(err)
-	}
-	if _, err := tx.Exec(`DELETE FROM hero_equips WHERE partner_id=? AND slot=?`, partnerID, slot); err != nil {
-		return err
-	}
-	if err := creditPlainTx(tx, rid, nil, map[int64]int64{base: 1}); err != nil {
-		return err
-	}
-	return tx.Commit()
+	return s.ChangeEquipment(rid, partnerID, nil, []Equip{{Slot: slot}})
 }

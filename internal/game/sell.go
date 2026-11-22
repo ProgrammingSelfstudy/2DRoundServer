@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"math"
 	"sort"
 
 	"2droundserver/internal/gateway"
@@ -18,17 +19,19 @@ type quote struct {
 }
 
 // priceSale checks a sell request (10521 preview, 10522 confirm) against the
-// ledger. The request lists {id, bid, num}; the instance id of a stack is its
-// base id, so a request whose two ids differ is refused. Every line must be a
-// backpack item the client says can be sold (a flat value list), for no more
-// than the role holds; the same item listed twice is added up first.
-func priceSale(ledger map[int64]int64, args []proto.Message) quote {
+// ledger, which only holds unequipped copies of ordinary equipment. Preview
+// and confirmation accept the same storage, instance IDs and quantity range.
+func priceSale(ledger map[int64]int64, storage int64, args []proto.Message, h5 bool) quote {
 	q := quote{assets: map[int64]int64{}, items: map[int64]int64{}}
 	want := map[int64]int64{}
 	for _, a := range args {
 		id, bid, num := a.Int("id"), a.Int("bid"), a.Int("num")
-		if id != bid || num <= 0 {
+		if !saleInstanceMatches(id, bid, storage) || num <= 0 {
 			q.msg = "物品不存在"
+			return q
+		}
+		if h5 && num > math.MaxUint16 {
+			q.msg = "出售数量过多"
 			return q
 		}
 		want[bid] += num
@@ -43,9 +46,9 @@ func priceSale(ledger map[int64]int64, args []proto.Message) quote {
 	}
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 	for _, id := range ids {
-		info, known := itemTable[id]
+		info := itemTable[id]
 		switch {
-		case !known || !goesToBackpack(info.Type) || ledger[id] <= 0:
+		case !saleStorageMatches(id, storage, h5) || ledger[id] <= 0:
 			q.msg = "物品不存在"
 			return q
 		case len(info.Value) == 0:
@@ -58,6 +61,17 @@ func priceSale(ledger map[int64]int64, args []proto.Message) quote {
 		q.sold = append(q.sold, store.ItemSale{ItemID: id, Num: want[id]})
 		splitGains(info.Value, want[id], q.assets, q.items)
 	}
+	if !h5 {
+		return q
+	}
+	for _, gains := range []map[int64]int64{q.assets, q.items} {
+		for _, amount := range gains {
+			if amount > math.MaxUint32 {
+				q.msg = "出售收益过多，请分批出售"
+				return q
+			}
+		}
+	}
 	return q
 }
 
@@ -69,12 +83,14 @@ func sellPreview(st *store.Store) gateway.Handler {
 			return nil
 		}
 		items := []proto.Message{}
-		if req.Int("storage") == bagBackpack {
+		storage := req.Int("storage")
+		h5 := isH5Session(s)
+		if allowsSaleStorage(storage, h5) {
 			ledger, err := st.RoleItems(role.RID)
 			if err != nil {
 				return err
 			}
-			if q := priceSale(ledger, req.Arr("args")); q.msg == "" {
+			if q := priceSale(ledger, storage, req.Arr("args"), h5); q.msg == "" {
 				for _, id := range mergedKeys(q.assets, q.items) {
 					n := q.assets[id]
 					if n == 0 {
@@ -97,14 +113,16 @@ func sell(st *store.Store) gateway.Handler {
 			return nil
 		}
 		fail := func(msg string) error { return s.Send(10522, proto.Message{"flag": 0, "msg": msg}) }
-		if req.Int("storage") != bagBackpack {
+		storage := req.Int("storage")
+		h5 := isH5Session(s)
+		if !allowsSaleStorage(storage, h5) {
 			return fail("该背包暂不支持出售")
 		}
 		ledger, err := st.RoleItems(role.RID)
 		if err != nil {
 			return err
 		}
-		q := priceSale(ledger, req.Arr("args"))
+		q := priceSale(ledger, storage, req.Arr("args"), h5)
 		if q.msg != "" {
 			return fail(q.msg)
 		}

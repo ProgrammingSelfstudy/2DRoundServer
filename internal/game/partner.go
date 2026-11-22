@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"maps"
 	"math"
 	"strconv"
 
@@ -163,11 +164,41 @@ const heroSlotsPerBuy = 5
 // heroSlotCapacity is how many heroes a role may hold after `buys` purchases.
 func heroSlotCapacity(buys int) int { return heroListMax + heroSlotsPerBuy*buys }
 
+// filterH5Roster applies to both requests and pushes. Keep heroes visible after
+// they are upgraded from five stars, and preserve the message shared by other recipients.
+func filterH5Roster(s *gateway.Session, msg proto.Message) proto.Message {
+	if !isH5Session(s) {
+		return msg
+	}
+	partners := msg.Arr("partners")
+	visible := make([]proto.Message, 0, len(partners))
+	for _, hero := range partners {
+		if hero.Int("star") >= h5HeroStar {
+			visible = append(visible, hero)
+		}
+	}
+	if len(visible) == len(partners) {
+		return msg
+	}
+	filtered := maps.Clone(msg)
+	filtered["partners"] = visible
+	return filtered
+}
+
 // RegisterPartner registers the hero list (11000 full, 11025 brief) and the
 // details by id (11026). The first time a role asks for the list it receives
 // the starter heroes. The encoder sends only the fields a command's table has,
 // so one full message serves all three.
 func RegisterPartner(r *gateway.Router, st *store.Store) {
+	for _, cmd := range []uint16{11000, 11001, 11025, 11026} {
+		r.FilterSend(cmd, filterH5Roster)
+	}
+	r.FilterSend(11002, func(s *gateway.Session, msg proto.Message) proto.Message {
+		if isH5Session(s) && msg.Int("star") < h5HeroStar {
+			return nil
+		}
+		return msg
+	})
 	messages := func(rid int64, only map[int64]bool) ([]proto.Message, error) {
 		ps, err := st.PartnersOf(rid)
 		if err != nil {

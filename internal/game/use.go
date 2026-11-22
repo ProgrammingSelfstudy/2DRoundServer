@@ -72,8 +72,7 @@ func openGifts(g giftInfo, n int64, pick func(int) int) (assets, items map[int64
 	return
 }
 
-// RegisterUse registers 10515 (use an item): gift boxes the client has a
-// table for turn into their content. Other kinds of use are refused.
+// RegisterUse registers 10515 for gift boxes, return red envelopes and H5 hero cards.
 func RegisterUse(r *gateway.Router, st *store.Store) {
 	r.Handle(10515, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -92,6 +91,9 @@ func RegisterUse(r *gateway.Router, st *store.Store) {
 		case id == retNum("red_item_id"):
 			return returnRedbagUse(s, st, role, n, reply)
 		case !isGift:
+			if card, ok := heroCardForUse(id); ok && isH5Session(s) {
+				return useHeroCard(s, st, role.RID, id, n, card, reply)
+			}
 			return reply(0, "该物品暂不能使用")
 		case n <= 0 || n > maxUseAtOnce:
 			return reply(0, "使用数量不正确")

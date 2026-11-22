@@ -20,13 +20,23 @@ import (
 type Handler func(s *Session, req proto.Message) error
 
 type Router struct {
-	handlers map[uint16]Handler
-	enter    []Handler
+	handlers    map[uint16]Handler
+	enter       []Handler
+	sendFilters map[uint16]func(*Session, proto.Message) proto.Message
 }
 
 func NewRouter() *Router { return &Router{handlers: map[uint16]Handler{}} }
 
 func (r *Router) Handle(cmd uint16, h Handler) { r.handlers[cmd] = h }
+
+// FilterSend registers a per-recipient transformation before encoding a command.
+// A filter that returns nil suppresses the message for that recipient.
+func (r *Router) FilterSend(cmd uint16, filter func(*Session, proto.Message) proto.Message) {
+	if r.sendFilters == nil {
+		r.sendFilters = make(map[uint16]func(*Session, proto.Message) proto.Message)
+	}
+	r.sendFilters[cmd] = filter
+}
 
 // OnEnter registers a push the original makes when a role comes into the game: RunEnter calls it
 // (with no request) once the main city is up.

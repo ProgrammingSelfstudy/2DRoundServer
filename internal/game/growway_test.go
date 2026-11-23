@@ -9,7 +9,7 @@ import (
 )
 
 func TestGrowWay(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newProfileEnv(t)
 	a, ra := e.enter("ua", "甲甲")
 	b, rb := e.enter("ub", "乙乙")
 	// a follower is the first line of the followed role's growth way
@@ -63,7 +63,7 @@ func TestGrowWay(t *testing.T) {
 }
 
 func TestGrowEvents(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newProfileEnv(t)
 	_, ra := e.enter("ua", "甲甲")
 	_, rb := e.enter("ub", "乙乙")
 	ids := func(rid int64) []int64 {

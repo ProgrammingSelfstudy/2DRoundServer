@@ -46,13 +46,17 @@ func TestSpaceCityFollowAndFans(t *testing.T) {
 }
 
 func TestSpaceMessageBoard(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newProfileEnv(t)
 	a, ra := e.enter("ua", "甲甲")
 	b, rb := e.enter("ub", "乙乙")
 	for _, r := range []int64{ra.RID, rb.RID} {
 		if err := e.st.SetRoleLevel(r, 40); err != nil {
 			t.Fatal(err)
 		}
+	}
+	b.send(25837, proto.Message{"rid": rb.RID, "srv_id": "symlf_1", "start": 0, "num": 44})
+	if list := b.waitFor(25837); list.Int("result") != 1 || list.Int("rid") != rb.RID || list.Int("start") != 0 || list.Int("num") != 44 || list.Int("max_num") != 0 || len(list.Arr("room_bbs_info")) != 0 {
+		t.Fatalf("empty page: %v", list)
 	}
 	a.send(25835, proto.Message{"rid": rb.RID, "srv_id": "symlf_1", "msg": "你好"})
 	if r := a.waitFor(25835); r.Int("result") != 1 {
@@ -82,7 +86,7 @@ func TestSpaceMessageBoard(t *testing.T) {
 	}
 	a.send(25837, proto.Message{"rid": rb.RID, "srv_id": "symlf_1", "start": 0, "num": 10})
 	list := a.waitFor(25837)
-	if list.Int("max_num") != 1 || len(list.Arr("room_bbs_info")) != 1 {
+	if list.Int("num") != 10 || list.Int("max_num") != 1 || len(list.Arr("room_bbs_info")) != 1 {
 		t.Fatalf("list: %v", list)
 	}
 	id := list.Arr("room_bbs_info")[0].Int("bbs_id")
@@ -96,6 +100,10 @@ func TestSpaceMessageBoard(t *testing.T) {
 	rows := list.Arr("room_bbs_info")
 	if len(rows) != 2 || rows[0].Int("bbs_type") != 2 || rows[0].Str("reply_name") != "甲甲" || rows[0].Str("name") != "乙乙" {
 		t.Fatalf("list after the reply: %v", rows)
+	}
+	a.send(25837, proto.Message{"rid": rb.RID, "srv_id": "symlf_1", "start": 1, "num": 44})
+	if page := a.waitFor(25837); page.Int("start") != 1 || page.Int("num") != 44 || page.Int("max_num") != 2 || len(page.Arr("room_bbs_info")) != 1 || page.Arr("room_bbs_info")[0].Int("bbs_id") != id {
+		t.Fatalf("partial page: %v", page)
 	}
 	// a stranger cannot delete; the author can
 	c, _ := e.enter("uc", "丙丙")
@@ -117,7 +125,7 @@ func TestSpaceMessageBoard(t *testing.T) {
 }
 
 func TestSpaceHonorWall(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newProfileEnv(t)
 	a, ra := e.enter("ua", "甲甲")
 	a.send(25805, proto.Message{"pos": 1, "id": 5})
 	if r := a.waitFor(25805); r.Int("code") != 0 {

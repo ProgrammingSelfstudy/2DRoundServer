@@ -82,8 +82,7 @@ func (f *FriendService) bbsList(owner int64, start, num int) ([]proto.Message, i
 }
 
 // registerSpace registers the personal space: 25800 home city, 25801 follow / unfollow, 25802 the most
-// followed, 25805 / 25806 the honor wall, and the message board 25835-25841. The honor badges and the growth
-// way have no source yet, so the wall only shows what the admin page grants and the growth way is empty.
+// followed, 25805 / 25806 the honor wall, and the message board 25835-25841. The honor wall shows persisted badges.
 func (f *FriendService) registerSpace(r *gateway.Router) {
 	r.Handle(25800, func(s *gateway.Session, req proto.Message) error {
 		me := s.Role()
@@ -214,11 +213,11 @@ func (f *FriendService) registerSpace(r *gateway.Router) {
 		if num < 1 || num > 50 {
 			num = 10
 		}
-		list, total, err := f.bbsList(owner.RID, max(start, 0), num)
+		list, total, err := f.bbsList(owner.RID, start, num)
 		if err != nil {
 			return err
 		}
-		return s.Send(25837, proto.Message{"result": 1, "msg": "", "rid": owner.RID, "srv_id": owner.SrvID, "start": start, "num": len(list), "max_num": total, "room_bbs_info": list})
+		return s.Send(25837, proto.Message{"result": 1, "msg": "", "rid": owner.RID, "srv_id": owner.SrvID, "start": start, "num": num, "max_num": total, "room_bbs_info": list})
 	})
 	// write or reply: the common checks and the push to the board's owner
 	post := func(s *gateway.Session, cmd uint16, req proto.Message, replyTo int64) error {

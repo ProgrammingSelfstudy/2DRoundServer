@@ -9,7 +9,7 @@ import (
 )
 
 func TestRoleMisc(t *testing.T) {
-	e := newEnv(t, time.Minute)
+	e := newProfileEnv(t)
 	c, role := e.enter("u1", "甲")
 	c2, other := e.enter("u2", "乙")
 

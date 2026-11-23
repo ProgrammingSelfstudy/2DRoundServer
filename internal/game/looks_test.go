@@ -9,8 +9,15 @@ import (
 	"2droundserver/internal/store"
 )
 
+func newProfileEnv(t *testing.T) *env {
+	t.Helper()
+	e := newGameEnv(t, time.Hour)
+	e.connect = serveTestPipe(t, e.gw, true)
+	return e
+}
+
 func TestRoleSettings(t *testing.T) {
-	e := newEnv(t, time.Minute)
+	e := newProfileEnv(t)
 	c, role := e.enter("u1", "甲")
 	c.send(10309, proto.Message{"signature": "  出海去  "})
 	if r := c.recv(10309); r.Int("code") != 1 || r.Str("signature") != "出海去" {
@@ -84,25 +91,25 @@ func TestRoleFaces(t *testing.T) {
 }
 
 func TestRoleCosmetics(t *testing.T) {
-	e := newEnv(t, time.Minute)
+	e := newProfileEnv(t)
 	c, role := e.enter("u1", "甲")
 	// backdrops: the default 0 is always there; an owned one can be used
 	c.send(10328, proto.Message{})
 	if l := c.recv(10328).Arr("backdrop_list"); len(l) != 1 || l[0].Int("backdrop_id") != 0 {
 		t.Fatalf("backdrops: %v", l)
 	}
-	c.send(10329, proto.Message{"backdrop_id": 4242})
+	c.send(10329, proto.Message{"backdrop_id": 100402})
 	if r := c.recv(10329); r.Int("code") != 0 {
 		t.Fatalf("not owned: %v", r)
 	}
-	if err := e.st.GrantLook(role.RID, store.LookBackdrop, 4242, 0); err != nil {
+	if err := e.st.GrantLook(role.RID, store.LookBackdrop, 100402, 0); err != nil {
 		t.Fatal(err)
 	}
-	c.send(10329, proto.Message{"backdrop_id": 4242})
+	c.send(10329, proto.Message{"backdrop_id": 100402})
 	if r := c.recv(10329); r.Int("code") != 1 {
 		t.Fatalf("use: %v", r)
 	}
-	if cfg, _ := e.st.SettingsOf(role.RID); cfg.BackdropID != 4242 {
+	if cfg, _ := e.st.SettingsOf(role.RID); cfg.BackdropID != 100402 {
 		t.Fatalf("not saved: %+v", cfg)
 	}
 
@@ -149,8 +156,16 @@ func TestRoleCosmetics(t *testing.T) {
 	}
 	c2, _ := e.dialSameRole("u1", role)
 	c2.send(10300, proto.Message{})
-	if m := c2.recv(10301); m.Int("avatar_base_id") != 2000 || m.Int("backdrop_id") != 4242 {
+	if m := c2.recv(10301); m.Int("avatar_base_id") != 2000 || m.Int("backdrop_id") != 100402 {
 		t.Fatalf("10301: %v", m)
+	}
+	c2.send(23301, proto.Message{"base_id": 0})
+	if r := c2.waitFor(23301); r.Int("base_id") != 0 {
+		t.Fatalf("remove title: %v", r)
+	}
+	c2.send(23300, proto.Message{})
+	if r := c2.recv(23300); r.Int("base_id") != 0 || len(r.Arr("honor")) != 1 {
+		t.Fatalf("removed title must remain owned: %v", r)
 	}
 }
 

@@ -1,0 +1,47 @@
+# A server behind a domain: Caddy (deploy/Caddyfile.domain) terminates https and forwards /ws to the gateway. Copy to
+# configs/prod.yaml, replace play.example.com and the jwt_secret. deploy/README.md "以后有了域名" has the steps.
+# Holds a private random jwt_secret: CHANGE-ME-random-at-least-32-characters
+db_path: data/2droundserver.db
+log_dir: data/logs
+log_max_mb: 20
+log_keep: 5
+
+login_http:
+  # loopback: players reach it through Caddy (https://play.example.com/loginapi/...)
+  addr: 127.0.0.1:8081
+  # true lets anyone who has the link create an account by logging in. Set false once your testers have their accounts.
+  auto_register: true
+  token_ttl_hours: 24
+  public_base: https://play.example.com/loginapi
+
+gateway:
+  # the original client's TCP port: not used by the H5 page, so it stays on loopback
+  tcp_addr: 127.0.0.1:8800
+  # loopback: Caddy forwards wss://<domain>/ws here, so this port is not opened to the internet
+  ws_addr: 127.0.0.1:8802
+  # the page's address as the browser sends it in Origin (host:port of the Caddy entry)
+  ws_origins: ["play.example.com"]
+  srv_id: symlf_1
+  idle_seconds: 120
+  login_timeout_seconds: 20
+  max_conns_per_ip: 0   # every player arrives from the proxy address
+  # the control endpoint has no authentication: it must stay on loopback
+  admin_addr: 127.0.0.1:8801
+  empty_replies: true
+  new_role_flow: false
+
+admin:
+  # loopback only: the connection is not encrypted without a domain, so the admin site is not opened to the internet.
+  # From your own machine:  ssh -L 8080:127.0.0.1:8080 root@YOUR-SERVER-IP   then open http://127.0.0.1:8080
+  addr: 127.0.0.1:8080
+  jwt_secret: CHANGE-ME-random-at-least-32-characters
+  ttl_hours: 12
+  backup_every_hours: 24
+  backup_keep: 14
+
+codec:
+  byte_order: big
+  str_len_bytes: 2
+  arr_len_bytes: 2
+  str_null_term: false
+  confirmed: true

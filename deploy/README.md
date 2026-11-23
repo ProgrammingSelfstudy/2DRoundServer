@@ -99,3 +99,5 @@ tar -xzf /tmp/2dround-server-linux-amd64.tar.gz -C /opt/2dround ./bin && systemc
    （连接都从 Caddy 进来，按 IP 限制会把所有人算成一个）。
 4. 后台里把 CDN 地址、清单地址换成 `https://域名/cdn...`，网关 WebSocket 地址填 `wss://域名/ws`。
 5. 到这一步页面是 https 了，H5 页面和后台页面就可以搬到 Vercel。
+
+现成的域名版文件：`deploy/Caddyfile.domain`（页面、资源、登录和 `/ws` 同一个 https 来源，客户端不用配 `ws_url`）和 `configs/prod-domain.example.yaml`（网关只听回环，`max_conns_per_ip` 为 0）。把里面的 `play.example.com` 换成你的域名即可。

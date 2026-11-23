@@ -48,6 +48,19 @@ func TestCheckAcceptsConsistentSetups(t *testing.T) {
 	}
 }
 
+func TestSevenDayLoginIsOptIn(test *testing.T) {
+	if Default().Gateway.SevenDayLogin {
+		test.Fatal("seven-day login enabled by default")
+	}
+	path := filepath.Join(test.TempDir(), "gateway.yaml")
+	if err := os.WriteFile(path, []byte("gateway:\n  seven_day_login: true\n"), 0600); err != nil {
+		test.Fatal(err)
+	}
+	if cfg, err := Load(path); err != nil || !cfg.Gateway.SevenDayLogin {
+		test.Fatalf("could not opt in to seven-day login: %v", err)
+	}
+}
+
 func TestCheckFindsContradictions(t *testing.T) {
 	for _, tc := range []struct {
 		name  string

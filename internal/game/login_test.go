@@ -68,6 +68,11 @@ func newEnv(t *testing.T, idle time.Duration) *env {
 
 func newGameEnv(t *testing.T, idle time.Duration) *env {
 	t.Helper()
+	return newGameEnvWithLoginDay(t, idle, false)
+}
+
+func newGameEnvWithLoginDay(t *testing.T, idle time.Duration, sevenDayLogin bool) *env {
+	t.Helper()
 	st, err := store.Open(":memory:")
 	if err != nil {
 		t.Fatal(err)
@@ -155,7 +160,7 @@ func newGameEnv(t *testing.T, idle time.Duration) *env {
 	RegisterStory(gw.Router)
 	RegisterGuide(gw.Router)
 	RegisterWelfare(gw.Router, st)
-	RegisterLoginDay(gw.Router, st)
+	RegisterLoginDay(gw.Router, st, sevenDayLogin)
 	RegisterHolidayConvert(gw.Router, st)
 	RegisterCrossArena(gw.Router, st)
 	RegisterSweet(gw.Router, st)

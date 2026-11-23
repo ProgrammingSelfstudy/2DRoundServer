@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -167,12 +168,19 @@ func ActivityOpen(st *store.Store, srv string, camp int64, now time.Time) (start
 	if err != nil {
 		return 0, 0, false
 	}
-	for _, e := range es {
-		if e.Row.CampID == camp {
-			return e.Row.StartAt, e.Row.EndAt, true
-		}
+	if row := activityForCamp(es, camp); row != nil {
+		return row.StartAt, row.EndAt, true
 	}
 	return 0, 0, false
+}
+
+func activityForCamp(entries []actEntry, camp int64) *store.Activity {
+	for index := range entries {
+		if row := &entries[index].Row; row.CampID == camp {
+			return row
+		}
+	}
+	return nil
 }
 
 // ---- what a role has done
@@ -483,46 +491,79 @@ func activityEvent(s *gateway.Session, st *store.Store, rid int64, label string,
 
 // ---- the ticker
 
-// activitySignature names the set of open activities of a server and the state of their rows; it changes when one
-// opens, closes or is edited.
-func activitySignature(st *store.Store, srv string, now time.Time) string {
-	es, err := openActivities(st, srv, now)
-	if err != nil {
-		return "error"
-	}
-	var b strings.Builder
-	for _, e := range es {
-		fmt.Fprintf(&b, "%d:%d;", e.Row.ID, e.Row.UpdatedAt)
-	}
-	return b.String()
+type activitySnapshot struct {
+	entries []actEntry
+	at      time.Time
 }
 
-// WatchActivities tells the online roles (16607 with type 0, which makes the client ask for the list again) when the
-// set of open activities of their server changes, and pushes growth icon changes on period rollover.
-// It checks every interval and returns when stop is closed.
-func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now func() time.Time, stop <-chan struct{}) {
-	last := map[string]string{}
-	previous := now()
-	tick := func() {
-		current := now()
-		bySrv := map[string][]*gateway.Session{}
-		hub.Each(func(_ int64, s *gateway.Session) {
-			if role := s.Role(); role != nil {
-				bySrv[role.SrvID] = append(bySrv[role.SrvID], s)
-				_ = pushGrowthIconChanges(s, role, previous, current)
-			}
-		})
-		previous = current
-		for srv, sessions := range bySrv {
-			sig := activitySignature(st, srv, current)
-			if prev, seen := last[srv]; seen && prev != sig {
-				for _, s := range sessions {
-					_ = s.Send(16607, proto.Message{"type": 0})
-				}
-			}
-			last[srv] = sig
+func readActivitySnapshot(st *store.Store, srv string, now time.Time) (activitySnapshot, error) {
+	es, err := openActivities(st, srv, now)
+	return activitySnapshot{entries: es, at: now}, err
+}
+
+type activityWatcher struct {
+	st        *store.Store
+	hub       *gateway.Hub
+	previous  time.Time
+	last      map[string]activitySnapshot
+	returning map[int64]bool
+}
+
+func newActivityWatcher(st *store.Store, hub *gateway.Hub, now time.Time) *activityWatcher {
+	return &activityWatcher{st: st, hub: hub, previous: now, last: make(map[string]activitySnapshot)}
+}
+
+func (watcher *activityWatcher) tick(current time.Time) {
+	bySrv := map[string][]*gateway.Session{}
+	watcher.hub.Each(func(_ int64, session *gateway.Session) {
+		if role := session.Role(); role != nil {
+			bySrv[role.SrvID] = append(bySrv[role.SrvID], session)
+			_ = pushGrowthIconChanges(session, role, watcher.previous, current)
 		}
+	})
+	nextReturning := make(map[int64]bool)
+	for srv, sessions := range bySrv {
+		after, err := readActivitySnapshot(watcher.st, srv, current)
+		if err != nil {
+			continue
+		}
+		before, seen := watcher.last[srv]
+		if !seen {
+			before, err = readActivitySnapshot(watcher.st, srv, watcher.previous)
+			if err != nil {
+				before = after
+			}
+		}
+		prevIcons := festivalIcons{schedule: festivalScheduleOf(before.entries), war: warIconPeriod(before.at)}
+		icons := festivalIcons{schedule: festivalScheduleOf(after.entries), war: warIconPeriod(current)}
+		changed := !slices.EqualFunc(before.entries, after.entries, func(left, right actEntry) bool { return left.Row == right.Row })
+		for _, session := range sessions {
+			role := session.Role()
+			if role == nil || role.SrvID != srv {
+				continue
+			}
+			var state *retRole
+			wasReturning, known := watcher.returning[role.RID]
+			if icons.schedule.returnCamp != nil || (!known && prevIcons.schedule.returnCamp != nil) {
+				state, _ = loadReturnRole(watcher.st, role.RID)
+			}
+			prevIcons.returning = wasReturning || (!known && prevIcons.schedule.returning(state, before.at))
+			icons.returning = icons.schedule.returning(state, current)
+			nextReturning[role.RID] = icons.returning
+			_ = pushFestivalIconChanges(session, prevIcons, icons)
+			if changed {
+				_ = session.Send(16607, proto.Message{"type": 0})
+			}
+		}
+		watcher.last[srv] = after
 	}
+	watcher.previous, watcher.returning = current, nextReturning
+}
+
+// WatchActivities pushes icon changes (10923) on rollover and tells online roles (16607) to reload the schedule
+// when its open rows change. It checks every interval and returns when stop is closed.
+func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now func() time.Time, stop <-chan struct{}) {
+	watcher := newActivityWatcher(st, hub, now())
 	t := time.NewTicker(every)
 	defer t.Stop()
 	for {
@@ -530,7 +571,7 @@ func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now
 		case <-stop:
 			return
 		case <-t.C:
-			tick()
+			watcher.tick(now())
 		}
 	}
 }

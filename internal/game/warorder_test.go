@@ -108,10 +108,10 @@ func TestWarOrderFlow(t *testing.T) {
 		t.Fatalf("the extra pack without the card: %v", r)
 	}
 	// a month without a war order, and a new month starting from nothing
-	e.setNow(time.Date(2026, time.August, 3, 12, 0, 0, 0, dayZone))
+	e.setNow(time.Date(2026, time.June, 3, 12, 0, 0, 0, dayZone))
 	c.send(25300, proto.Message{})
 	if r := c.waitFor(25300); r.Int("period") != 0 || len(r.Arr("list")) != 0 {
-		t.Fatalf("august: %v", r)
+		t.Fatalf("june: %v", r)
 	}
 	e.setNow(time.Date(2026, time.November, 3, 12, 0, 0, 0, dayZone))
 	c.send(25300, proto.Message{})

@@ -24,9 +24,10 @@ const (
 	warOrderLevPrice = 600 // diamonds per level bought (1000 struck down by 0.6 in the client's buy window)
 )
 
-// warOrderMonths is the period a calendar month runs. The client table only numbers the periods (its texts name the
-// season of 5 to 10: September to February); the month of a period and the month as the window are our rules.
+// warOrderMonths is the period a calendar month runs. The client text names August for period 4 and September to
+// February for periods 5–10; July for period 3 continues the local calendar-month schedule.
 var warOrderMonths = map[time.Month]int64{
+	time.July: 3, time.August: 4,
 	time.September: 5, time.October: 6, time.November: 7, time.December: 8, time.January: 9, time.February: 10,
 }
 

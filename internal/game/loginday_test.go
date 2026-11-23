@@ -28,7 +28,7 @@ func TestLoginDay(t *testing.T) {
 		t.Fatalf("day 1 only: %v", s)
 	}
 	c.send(10922, proto.Message{})
-	if l := c.waitFor(10922).Arr("act_list"); len(l) != len(growthIconIDs)+1 || l[0].Int("id") != loginDayIcon || l[0].Int("status") != 1 {
+	if l := c.waitFor(10922).Arr("act_list"); len(l) != len(growthIconIDs)+len(festivalIconIDs)+2 || l[0].Int("id") != loginDayIcon || l[0].Int("status") != 1 {
 		t.Fatalf("10922: %v", l)
 	}
 	c.send(10925, proto.Message{"id": loginDayIcon})
@@ -65,6 +65,81 @@ func TestLoginDay(t *testing.T) {
 	}
 }
 
+func TestSevenLoginDay(test *testing.T) {
+	env := newGameEnvWithLoginDay(test, time.Minute, true)
+	env.connect = serveTestPipe(test, env.gw, true)
+	dial := func() *client { return env.dial(true) }
+	account, token, role := env.welfareRole(store.PlatformH5, "seven-login", "七天登陆")
+	created := time.Date(2026, time.June, 15, 23, 59, 59, 0, dayZone)
+	if err := env.st.SetRoleCreatedAt(role.RID, created.Unix()); err != nil {
+		test.Fatal(err)
+	}
+	if err := env.st.SaveState(role.RID, store.LoginDayStateKey, store.LoginDayState{Taken: []int64{1}}); err != nil {
+		test.Fatal(err)
+	}
+	env.setNow(created.UTC())
+	player := enterWelfareRole(dial, account, token, role)
+	expectFestivalIcons(test, player, 505)
+	status := func() []proto.Message {
+		test.Helper()
+		player.send(21100, proto.Message{})
+		got := player.recv(21100)
+		days := got.Arr("status_list")
+		if got.Int("type") != 0 || len(days) != 7 {
+			test.Fatalf("seven-day status: %v", got)
+		}
+		return days
+	}
+	claim := func(day, code int64) {
+		test.Helper()
+		player.send(21101, proto.Message{"day": day})
+		if got := player.recv(21101); got.Int("day") != day || got.Int("code") != code {
+			test.Fatalf("day %d: want code %d, got %v", day, code, got)
+		}
+		if code == 1 {
+			player.recv(10302)
+			player.recv(10500)
+			player.recv(10501)
+		}
+	}
+	if days := status(); days[0].Int("day") != 1 || days[0].Int("status") != loginDayOpen || days[1].Int("status") != loginDayLocked {
+		test.Fatalf("day 1 status: %v", days)
+	}
+	claim(2, 0)
+	claim(8, 0)
+	claim(1, 1)
+	claim(1, 0)
+	if assets, err := env.st.RoleAssets(role.RID); err != nil || assets[3] != 200 || assets[1] != 20000 {
+		test.Fatalf("day 1 seven-day rewards: %v (%v)", assets, err)
+	}
+	env.setNow(created.Add(time.Second).UTC())
+	if days := status(); days[0].Int("status") != loginDayTaken || days[1].Int("status") != loginDayOpen {
+		test.Fatalf("day 2 at China midnight: %v", days)
+	}
+	claim(2, 1)
+	if items, err := env.st.RoleItems(role.RID); err != nil || items[26900] != 50 || items[10001] != 250 {
+		test.Fatalf("day 2 seven-day rewards: %v (%v)", items, err)
+	}
+	env.setNow(created.AddDate(0, 0, 6).UTC())
+	for day := int64(3); day <= 7; day++ {
+		claim(day, 1)
+	}
+	expectActivityIconPush(test, player, 505, 0)
+	expectFestivalIcons(test, player)
+	if eight, err := env.st.LoginDay(role.RID); err != nil || len(eight.Taken) != 1 || !eight.Has(1) {
+		test.Fatalf("eight-day receipts changed: %v (%v)", eight, err)
+	}
+	player.c.Close()
+	player = enterWelfareRole(dial, account, token, role)
+	for index, day := range status() {
+		if day.Int("day") != int64(index+1) || day.Int("status") != loginDayTaken {
+			test.Fatalf("seven-day receipt lost on reconnect: %v", day)
+		}
+	}
+	claim(7, 0)
+	expectFestivalIcons(test, player)
+}
+
 func TestGrowthActivityIconsFollowModulePeriods(t *testing.T) {
 	e := newGameEnv(t, time.Minute)
 	e.connect = serveTestPipe(t, e.gw, true)
@@ -92,7 +167,7 @@ func TestGrowthActivityIconsFollowModulePeriods(t *testing.T) {
 		for _, cmd := range []uint16{10922, 10924} {
 			c.send(cmd, proto.Message{})
 			list := c.waitFor(cmd).Arr("act_list")
-			if len(list) != len(growthIconIDs)+1 {
+			if len(list) != len(growthIconIDs)+len(festivalIconIDs)+2 {
 				t.Fatalf("%d: %v", cmd, list)
 			}
 			byID := make(map[int64]proto.Message)

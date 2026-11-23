@@ -74,6 +74,41 @@ func TestLoginDayClaimsAcrossStores(t *testing.T) {
 	}
 }
 
+func TestSevenLoginDayUsesSeparateReceipts(test *testing.T) {
+	env := newMailEnv(test)
+	if _, err := env.s.ClaimLoginDay(env.a.RID, 1, map[int64]int64{3: 10}, nil); err != nil {
+		test.Fatal(err)
+	}
+	if _, err := env.s.db.Exec(`CREATE TRIGGER reject_seven_day_reward BEFORE INSERT ON role_items BEGIN SELECT RAISE(ABORT, 'test ledger failure'); END`); err != nil {
+		test.Fatal(err)
+	}
+	assets, items := map[int64]int64{3: 200}, map[int64]int64{10001: 100}
+	if _, err := env.s.ClaimSevenLoginDay(env.a.RID, 1, assets, items); err == nil || errors.Is(err, ErrConflict) {
+		test.Fatalf("expected a ledger error, not a conflict with the eight-day receipt: %v", err)
+	}
+	if state, err := env.s.SevenLoginDay(env.a.RID); err != nil || len(state.Taken) != 0 {
+		test.Fatalf("seven-day receipt persisted after rollback: %+v (%v)", state, err)
+	}
+	if _, err := env.s.db.Exec(`DROP TRIGGER reject_seven_day_reward`); err != nil {
+		test.Fatal(err)
+	}
+	if state, err := env.s.ClaimSevenLoginDay(env.a.RID, 1, assets, items); err != nil || !state.Has(1) {
+		test.Fatalf("seven-day retry: %+v (%v)", state, err)
+	}
+	if _, err := env.s.ClaimSevenLoginDay(env.a.RID, 1, assets, items); !errors.Is(err, ErrConflict) {
+		test.Fatalf("duplicate seven-day claim: %v", err)
+	}
+	if state, err := env.s.LoginDay(env.a.RID); err != nil || len(state.Taken) != 1 || !state.Has(1) {
+		test.Fatalf("eight-day receipt: %+v (%v)", state, err)
+	}
+	if got, err := env.s.RoleAssets(env.a.RID); err != nil || got[3] != 210 {
+		test.Fatalf("asset ledger: %v (%v)", got, err)
+	}
+	if got, err := env.s.RoleItems(env.a.RID); err != nil || got[10001] != 100 {
+		test.Fatalf("item ledger: %v (%v)", got, err)
+	}
+}
+
 func TestLoginDayFailedCreditRollsBackReceipt(t *testing.T) {
 	e := newMailEnv(t)
 	if _, err := e.s.db.Exec(`CREATE TRIGGER reject_login_reward BEFORE INSERT ON role_items BEGIN SELECT RAISE(ABORT, 'test ledger failure'); END`); err != nil {

@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"slices"
 	"time"
 
 	"2droundserver/internal/gateway"
@@ -16,19 +17,30 @@ import (
 //go:embed data/loginday.json
 var loginDayJSON []byte
 
-var loginDays = func() [][][2]int64 {
-	var f struct {
+//go:embed data/sevenloginday.json
+var sevenLoginDayJSON []byte
+
+var (
+	loginDays      = parseLoginDays(loginDayJSON, 8)
+	sevenLoginDays = parseLoginDays(sevenLoginDayJSON, 7)
+)
+
+func parseLoginDays(data []byte, count int) [][][2]int64 {
+	var rewards struct {
 		Days [][][2]int64 `json:"days"`
 	}
-	if err := json.Unmarshal(loginDayJSON, &f); err != nil || len(f.Days) != 8 {
-		panic("game: bad loginday.json")
+	if err := json.Unmarshal(data, &rewards); err != nil || len(rewards.Days) != count {
+		panic("game: bad login day rewards")
 	}
-	return f.Days
-}()
+	return rewards.Days
+}
 
 // loginDayIcon is the id of the eight-day login in the client's function table; its icon
 // (open_type 2) shows only when the server lists it in the activity status (10922).
-const loginDayIcon = 508
+const (
+	loginDayIcon      = 508
+	sevenLoginDayIcon = 505
+)
 
 // Day states the client understands (action_eight_login_window.lua): 1 not reached, 2 reached and
 // not taken, 3 taken.
@@ -39,25 +51,11 @@ const (
 )
 
 // loginDayReached is how many of the eight days the role has reached: the day they were created
-// is day 1, and a day is a calendar one in China time (our policy: the original rule is unknown;
-// the client also has a seven-day table, login_days_data, which this server does not use).
+// is day 1, and a day is a calendar one in China time (our policy: the original rule is unknown).
 func loginDayReached(role *store.Role, now time.Time) int64 {
 	created := dayStart(time.Unix(role.CreatedAt, 0).In(dayZone))
 	days := int64(dayStart(now.In(dayZone)).Sub(created)/(24*time.Hour)) + 1
 	return max(1, min(days, int64(len(loginDays))))
-}
-
-// loginDayIconStatus is what 10922 / 10924 / 10925 tell about the icon: open (1) while a day is left to take
-// or to wait for, gone (0) when all eight were taken.
-func loginDayIconStatus(st *store.Store, rid int64) (int, error) {
-	state, err := st.LoginDay(rid)
-	if err != nil {
-		return 0, err
-	}
-	if len(state.Taken) >= len(loginDays) {
-		return 0, nil
-	}
-	return 1, nil
 }
 
 var growthIconIDs = [...]int64{503, 604, 605, 1503, 602, 603, 2503, 3503, 4503, 617}
@@ -67,10 +65,7 @@ func growthIconPeriods(role *store.Role, now time.Time) (seven, war int64) {
 	if sevenGoalCfg[seven] == nil {
 		seven = 0
 	}
-	war, _, _, _ = warNow(now)
-	if warOrderCfg[war] == nil {
-		war = 0
-	}
+	war = warIconPeriod(now)
 	return
 }
 
@@ -115,14 +110,23 @@ func pushGrowthIconChanges(s *gateway.Session, role *store.Role, previous, now t
 	return nil
 }
 
-// RegisterLoginDay registers the icon status (10922 the list, 10924 the same on request, 10925 one
-// icon by id; the ids this server has no activity for are told as not open) and the eight-day login gifts:
-// 21100 (the state of each day) and 21101 (take a reached day's reward).
-func RegisterLoginDay(r *gateway.Router, st *store.Store) {
+// RegisterLoginDay registers activity icons (10922/10924/10925) and login gifts (21100/21101).
+// A gateway offers exactly one login track because neither request identifies it on the wire.
+func RegisterLoginDay(r *gateway.Router, st *store.Store, sevenDayLogin bool) {
+	icon, loginType, days := int64(loginDayIcon), 1, loginDays
+	load, claim := st.LoginDay, st.ClaimLoginDay
+	if sevenDayLogin {
+		icon, loginType, days = sevenLoginDayIcon, 0, sevenLoginDays
+		load, claim = st.SevenLoginDay, st.ClaimSevenLoginDay
+	}
+	iconOpen := func(rid int64) (bool, error) {
+		state, err := load(rid)
+		return len(state.Taken) < len(days), err
+	}
 	list := func(role *store.Role, state store.LoginDayState, now time.Time) []proto.Message {
 		reached := loginDayReached(role, now)
 		out := []proto.Message{}
-		for day := int64(1); day <= int64(len(loginDays)); day++ {
+		for day := int64(1); day <= int64(len(days)); day++ {
 			status := loginDayLocked
 			switch {
 			case state.Has(day):
@@ -140,19 +144,27 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 			if role == nil {
 				return s.Send(cmd, proto.Message{"act_list": []proto.Message{}})
 			}
+			now := s.Now()
 			if cmd == 10922 { // asked once at login: the moment to offer the limited gifts the role reached
-				if err := CheckLimitGifts(s, st, s.Now()); err != nil {
+				if err := CheckLimitGifts(s, st, now); err != nil {
 					return err
 				}
 			}
-			status, err := loginDayIconStatus(st, role.RID)
+			open, err := iconOpen(role.RID)
 			if err != nil {
 				return err
 			}
-			list := []proto.Message{activityIcon(loginDayIcon, status)}
-			seven, war := growthIconPeriods(role, s.Now())
+			list := []proto.Message{activityIcon(loginDayIcon, b2i(open && icon == loginDayIcon)), activityIcon(sevenLoginDayIcon, b2i(open && icon == sevenLoginDayIcon))}
+			seven, war := growthIconPeriods(role, now)
 			for _, id := range growthIconIDs {
 				list = append(list, activityIcon(id, b2i(growthIconPeriod(id, seven, war) != 0)))
+			}
+			festival, err := readFestivalIcons(st, role, now)
+			if err != nil {
+				return err
+			}
+			for _, id := range festivalIconIDs {
+				list = append(list, activityIcon(id, b2i(festival.open(id))))
 			}
 			return s.Send(cmd, proto.Message{"act_list": list})
 		}
@@ -163,14 +175,22 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		role := s.Role()
 		id, status := req.Int("id"), 0
 		if role != nil {
-			if id == loginDayIcon {
-				var err error
-				status, err = loginDayIconStatus(st, role.RID)
+			now := s.Now()
+			switch {
+			case id == icon:
+				open, err := iconOpen(role.RID)
 				if err != nil {
 					return err
 				}
-			} else {
-				seven, war := growthIconPeriods(role, s.Now())
+				status = b2i(open)
+			case slices.Contains(festivalIconIDs[:], id):
+				festival, err := readFestivalIcons(st, role, now)
+				if err != nil {
+					return err
+				}
+				status = b2i(festival.open(id))
+			default:
+				seven, war := growthIconPeriods(role, now)
 				status = b2i(growthIconPeriod(id, seven, war) != 0)
 			}
 		}
@@ -181,11 +201,11 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		state, err := st.LoginDay(role.RID)
+		state, err := load(role.RID)
 		if err != nil {
 			return err
 		}
-		return s.Send(21100, proto.Message{"status_list": list(role, state, s.Now()), "type": 1})
+		return s.Send(21100, proto.Message{"status_list": list(role, state, s.Now()), "type": loginType})
 	})
 	r.Handle(21101, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -196,11 +216,11 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		reply := func(code int, msg string) error {
 			return s.Send(21101, proto.Message{"code": code, "msg": msg, "day": day})
 		}
-		if day < 1 || day > int64(len(loginDays)) {
+		if day < 1 || day > int64(len(days)) {
 			return reply(0, "没有这一天")
 		}
 		if day > loginDayReached(role, s.Now()) {
-			state, err := st.LoginDay(role.RID)
+			state, err := load(role.RID)
 			if err != nil {
 				return err
 			}
@@ -210,10 +230,8 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 			return reply(0, "还没到这一天")
 		}
 		assets, items := map[int64]int64{}, map[int64]int64{}
-		for _, g := range loginDays[day-1] {
-			splitGains([]sellGain{{g[0], g[1]}}, 1, assets, items)
-		}
-		state, err := st.ClaimLoginDay(role.RID, day, assets, items)
+		splitGains(toGains(days[day-1]), 1, assets, items)
+		state, err := claim(role.RID, day, assets, items)
 		if errors.Is(err, store.ErrConflict) {
 			return reply(0, "奖励已经领取")
 		}
@@ -229,8 +247,8 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
-		if isH5RoleSession(s) && len(state.Taken) >= len(loginDays) {
-			return s.Send(10923, activityIcon(loginDayIcon, 0))
+		if len(state.Taken) >= len(days) && (sevenDayLogin || isH5RoleSession(s)) {
+			return s.Send(10923, activityIcon(icon, 0))
 		}
 		return nil
 	})
@@ -239,4 +257,5 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 // Register the persisted state without loading or changing gameplay data.
 func init() {
 	registerAdminModule(AdminModule{Key: store.LoginDayStateKey, Title: "登录天数/登录奖励", Window: "10922–10925、21100/21101", Scope: "role", New: adminState[store.LoginDayState]})
+	registerAdminModule(AdminModule{Key: store.SevenLoginDayStateKey, Title: "七天登录奖励", Window: "10922–10925、21100/21101", Scope: "role", New: adminState[store.LoginDayState]})
 }

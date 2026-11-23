@@ -55,7 +55,8 @@ type Config struct {
 		// original's "please name yourself" push (10342) once its main city is up, so the
 		// naming window opens and the first rename hands out the starter hero. Off by
 		// default: the guide that follows in the original is not built yet.
-		NewRoleFlow bool `yaml:"new_role_flow"`
+		NewRoleFlow   bool `yaml:"new_role_flow"`
+		SevenDayLogin bool `yaml:"seven_day_login"`
 	} `yaml:"gateway"`
 
 	Admin struct {

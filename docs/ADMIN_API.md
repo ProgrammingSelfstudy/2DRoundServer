@@ -55,7 +55,7 @@ demoting or disabling an admin, or changing their password, takes effect at once
 | `GET /api/reports?limit=` | read | what players reported (12770), newest first: `{id, rid, target_rid, target_srv_id, type, msg, created_at}`; the chat history the client attaches is not stored |
 | `GET /api/guilds?srv_id=&q=&limit=&offset=` | read | the guilds (all servers, or one) with `gid`, `srv_id`, `name`, `lev`, `members`, `leader`, `leader_rid`, `created_at`, biggest first; `q` matches the name; `{items, total}` |
 | `POST /api/guilds/{id}/disband` | write | dissolves a guild (members, applications and log go with it; the leader gets the leader's cool-down). Online members see it when they log in again; 404 for an unknown guild; audited as `guild.disband` |
-| `GET/POST /api/activities`, `PUT/DELETE /api/activities/{id}` | read / write | the schedule of the holiday activities (the client's action tabs, see "Activities" below); `GET` takes `srv_id` (that server's rows and the ones for every server), `limit`, `offset` and replies `{items, total}`; `POST`/`PUT` take `{srv_id, camp_id, bid, status, start_at, end_at, spec}` (`srv_id` empty = every server, `end_at` 0 = never ends, `status` 1 on / 0 off) and reply the row (201 / 200), 422 for a bad row or spec, 404 for an unknown id; audited as `activity.create` / `.update` / `.delete`. Nothing is pushed: the gateway notices the change within 15 seconds and tells the online roles to ask for the list again |
+| `GET/POST /api/activities`, `PUT/DELETE /api/activities/{id}` | read / write | the schedule of the holiday activities (the client's action tabs, see "Activities" below); `GET` takes `srv_id` (that server's rows and the ones for every server), `limit`, `offset` and replies `{items, total}`; `POST`/`PUT` take `{srv_id, camp_id, bid, status, start_at, end_at, spec}` (`srv_id` empty = every server, `end_at` 0 = never ends, `status` 1 on / 0 off) and reply the row (201 / 200), 422 for a bad row or spec, 404 for an unknown id; audited as `activity.create` / `.update` / `.delete`. The gateway checks for changes every 15 seconds and pushes icon changes (10923) and a schedule reload (16607) when needed |
 | `GET/POST /api/notices`, `PUT/DELETE /api/notices/{id}` | read / write | shown in the game's mailbox ("公告" tab); create and update reply with the notice plus `pushed` (online roles told) or `push_error`; delete replies `{ok, pushed}` |
 | `GET /api/backups`, `POST /api/backups` | manage | list the database backups (newest first, with `keep`), or make one now and prune the old ones; `{ok, name, size, pruned}`; the directory is never taken from the request; 409 when backups are not configured; audited as `backup.create` |
 | `POST /api/broadcast` `{msg}` | write | scrolls `msg` (1 to 100 characters) across the top of every online player's screen (12761 on the NoticeTop channel; not kept in the chat history); `{ok, pushed}`; 422 for a bad message, 502 when the gateway cannot be reached; audited as `broadcast` |
@@ -83,6 +83,11 @@ older. `spec` is an object (unknown keys are refused):
 The event labels are the ones the daily quests count (`questEvent`): `evt_cli_loaded` (the daily login), `evt_recruit`
 (one hero summon draw), `evt_friend_present` (one friend gift sent) and the fast-combat label of the campaign. A system
 that wants to feed more calls `questEvent` with a new label and the schedule can use it at once.
+
+For the H5 activity popup, an open row with `cli_type` 13 or 15 opens the corresponding container icon. For the four
+festival login icons, set `cli_type` to 908 (Lantern), 909 (server merge), 1101 (Spring Festival), or 1102 (Goddess Day).
+An ungrouped row (`cli_type` 0) with the original `bid` also works: `991011`, `1011`, `991024`, or `991025`, respectively.
+None has a built-in holiday window. For return icons 801 and 806, schedule `camp_id` 101; only eligible returning roles see them.
 
 ### Notices
 

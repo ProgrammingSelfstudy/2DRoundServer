@@ -181,7 +181,7 @@ func registerGame(gw *gateway.Server, st *store.Store, cfg *config.Config) func(
 	game.RegisterStory(gw.Router)
 	game.RegisterGuide(gw.Router)
 	game.RegisterWelfare(gw.Router, st)
-	game.RegisterLoginDay(gw.Router, st)
+	game.RegisterLoginDay(gw.Router, st, cfg.Gateway.SevenDayLogin)
 	game.RegisterHolidayConvert(gw.Router, st)
 	game.RegisterCrossArena(gw.Router, st)
 	game.RegisterSweet(gw.Router, st)

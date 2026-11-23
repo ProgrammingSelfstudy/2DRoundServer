@@ -41,7 +41,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 
 - 邮件（10800–10806）：`GET /api/mails` 查看发件、附件及领取汇总；`POST /api/mails` 保持 operator 发件权限。角色收件白名单 `GET /api/roles/{id}/tables/role_mails` 显示主题、已读、领取和软删除时间，不触发广播补投递，也不能代领或删除。
 - 公告、月签到、兑换码：公告与兑换码配置继续用 `/api/notices` 和 `/api/redeem-codes` 管理。角色的 `role_notice_reads`、`checkin` 和 `redeem_uses` 明细只读，不开放清除记录或代领。
-- 八日登录礼（21100/21101）：`GET /api/roles/{id}/modules/loginday` 只读已领取的 `taken` 列表。沿用创建日起按中国时间日历日解锁；领取记录与货币、物品发放在同一事务，重试不重复发放。H5 领完后立即收到图标关闭推送（10923）；其他客户端仍按原有查询（10922/10924/10925）得到关闭状态。沿用 `module_state`，无新表、迁移或后台写权限。
+- 登录礼（21100/21101）：`GET /api/roles/{id}/modules/loginday`（八日）及 `GET /api/roles/{id}/modules/sevenloginday`（七天）各自只读已领取的 `taken` 列表。沿用创建日起按中国时间日历日解锁；领取记录与货币、物品发放在同一事务，重试不重复发放。七天登录与 H5 八日登录领完后立即收到图标关闭推送（10923）。沿用 `module_state`，无新表、迁移或后台写权限。
 
 ## 玩家模块（80项）
 
@@ -115,6 +115,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `role_power` | 角色历史战力峰值（10306） | 原始JSON查看（read）；无重置/编辑 | 已接只读模块页签 | 卸下神装保留历史峰值，不开放修改峰值的写权限 | [role_power.go](../internal/game/role_power.go) |
 | role | `sandybeach` | 沙滩Boss（25400–25405） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [sandybeach.go](../internal/game/sandybeach.go) |
 | role | `sevengoal` | 七日目标（13604–13609） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [sevengoal.go](../internal/game/sevengoal.go) |
+| role | `sevenloginday` | 七天登录奖励（10922–10925、21100/21101） | 原始JSON `taken` 列表（read） | 保持只读；不开放重置/编辑 | 与八日登录分别记账；领取记录与奖励同事务 | [login_day_claim.go](../internal/store/login_day_claim.go) |
 | role | `skinlottery` | 世界征兵（26600–26602） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [skinlottery.go](../internal/game/skinlottery.go) |
 | role | `smashegg` | 砸金蛋个人状态（16680–16685） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [smashegg.go](../internal/game/smashegg.go) |
 | role | `snatch` | 节日夺宝（25700–25704、26300/26301） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [snatch.go](../internal/game/snatch.go) |

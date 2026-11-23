@@ -132,14 +132,14 @@ type retWorld struct {
 }
 
 type retCtx struct {
-	role                  *store.Role
-	d                     *retRole
-	w                     *retWorld
-	now                   time.Time
-	start, end            int64
-	open, returning       bool
-	openDay, until        int64
-	holidayDay, packetTTL int64
+	role            *store.Role
+	d               *retRole
+	w               *retWorld
+	now             time.Time
+	start, end      int64
+	open, returning bool
+	openDay, until  int64
+	packetTTL       int64
 }
 
 func (d *retRole) drawnOf(typeID int64) (n int64) {
@@ -151,14 +151,36 @@ func (d *retRole) drawnOf(typeID int64) (n int64) {
 	return
 }
 
+func (state *retRole) availability(start, end int64, now time.Time) (day, until int64, returning bool) {
+	if state.Start != start || state.Since <= 0 || now.Unix() < state.Since {
+		return 0, 0, false
+	}
+	from := dayStart(time.Unix(state.Since, 0))
+	day = (dayStart(now).Unix()-from.Unix())/86400 + 1
+	until = from.AddDate(0, 0, int(retCfg.Privilege.HolidayDay)).Unix()
+	if end > 0 {
+		until = min(until, end)
+	}
+	return day, until, now.Unix() < until
+}
+
+func loadReturnRole(st *store.Store, rid int64) (*retRole, error) {
+	state := &retRole{}
+	if _, err := st.LoadState(rid, retModule, state); err != nil {
+		return nil, err
+	}
+	return state, nil
+}
+
 func retLoad(st *store.Store, role *store.Role, now time.Time) (*retCtx, error) {
 	if fresh, err := st.RoleByID(role.RID); err == nil {
 		role = fresh
 	}
-	c := &retCtx{role: role, now: now, d: &retRole{}, w: &retWorld{}, holidayDay: retCfg.Privilege.HolidayDay, packetTTL: retNum("effect_time") * 3600}
-	if _, err := st.LoadState(role.RID, retModule, c.d); err != nil {
+	state, err := loadReturnRole(st, role.RID)
+	if err != nil {
 		return nil, err
 	}
+	c := &retCtx{role: role, now: now, d: state, w: &retWorld{}, packetTTL: retNum("effect_time") * 3600}
 	c.start, c.end, c.open = ActivityOpen(st, role.SrvID, retCamp, now)
 	if !c.open {
 		return c, nil
@@ -184,15 +206,7 @@ func retLoad(st *store.Store, role *store.Role, now time.Time) (*retCtx, error) 
 	if c.d.ShopDay == nil {
 		c.d.ShopDay = map[int64]int64{}
 	}
-	if c.d.Since > 0 {
-		from := dayStart(time.Unix(c.d.Since, 0))
-		c.openDay = (dayStart(now).Unix()-from.Unix())/86400 + 1
-		c.until = from.AddDate(0, 0, int(c.holidayDay)).Unix()
-		if c.end > 0 && c.end < c.until {
-			c.until = c.end
-		}
-		c.returning = c.openDay <= c.holidayDay && now.Unix() < c.until
-	}
+	c.openDay, c.until, c.returning = c.d.availability(c.start, c.end, now)
 	return c, nil
 }
 
@@ -220,12 +234,11 @@ func ReturnEntered(st *store.Store, role *store.Role, now time.Time) {
 	if prev == 0 || now.Unix()-prev < retAwayDays*86400 {
 		return
 	}
-	d := &retRole{}
-	if _, err := st.LoadState(role.RID, retModule, d); err != nil || (d.Start == start && d.Since > 0) {
+	state, err := loadReturnRole(st, role.RID)
+	if err != nil || (state.Start == start && state.Since > 0) {
 		return
 	}
-	*d = retRole{Start: start, Since: now.Unix()}
-	_ = st.SaveState(role.RID, retModule, d)
+	_ = st.SaveState(role.RID, retModule, &retRole{Start: start, Since: now.Unix()})
 }
 
 func retWith(s *gateway.Session, st *store.Store, fn func(c *retCtx) error) error {

@@ -81,13 +81,14 @@ func RegisterShop(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		typ := req.Int("type")
+		now := s.Now()
 		list := []proto.Message{}
 		for _, eid := range sortedShopIDs() {
 			g := shopGoods[eid]
 			if g.Type != typ {
 				continue
 			}
-			from, to, _ := g.limitWindow(s.Now())
+			from, to, _ := g.limitWindow(now)
 			got, err := st.ShopBought(role.RID, from, to)
 			if err != nil {
 				return err
@@ -146,11 +147,12 @@ func RegisterShop(r *gateway.Router, st *store.Store) {
 		case isH5RoleSession(s) && !h5ShopItemAllowed(g.Item):
 			return reply(0, "商品暂不可购买", 0)
 		}
-		from, to, limit := g.limitWindow(s.Now())
+		now := s.Now()
+		from, to, limit := g.limitWindow(now)
 		spendA, spendI, gainA, gainI := map[int64]int64{}, map[int64]int64{}, map[int64]int64{}, map[int64]int64{}
 		splitGains([]sellGain{{pay, g.Price * num}}, 1, spendA, spendI)
 		splitGains([]sellGain{{g.Item, g.Num * num}}, 1, gainA, gainI)
-		err := st.ShopBuy(role.RID, eid, dayKey(s.Now()), num, from, to, limit, spendA, spendI, gainA, gainI)
+		err := st.ShopBuy(role.RID, eid, dayKey(now), num, from, to, limit, spendA, spendI, gainA, gainI)
 		if err != nil {
 			if !errors.Is(err, store.ErrConflict) {
 				return err

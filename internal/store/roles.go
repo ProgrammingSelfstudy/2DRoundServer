@@ -1,6 +1,9 @@
 package store
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type Role struct {
 	RID         int64  `json:"rid"`
@@ -22,6 +25,12 @@ type Role struct {
 }
 
 const roleCols = `rid,account_id,srv_id,name,lev,sex,career,face_id,status,created_at,last_login_at,renamed,last_logout_at,vip_lev`
+const renameRoleSQL = `UPDATE roles SET name=?, sex=CASE WHEN renamed=0 THEN ? ELSE sex END, renamed=1 WHERE rid=?`
+
+var (
+	ErrRoleNameTaken = errors.New("store: role name taken")
+	ErrRenameChanged = errors.New("store: role rename state changed")
+)
 
 // DefaultFaceID is the face (avatar) of a role that never chose one. The original
 // server gives a new role the first hero's bid, 10401 (the 10301 of a new role in
@@ -90,7 +99,7 @@ func (s *Store) RolesByAccount(accountID int64, srvID string) ([]Role, error) {
 // tells the player the sex cannot be changed afterwards). It returns ErrConflict
 // when the name is taken on that server and ErrNotFound for an unknown role.
 func (s *Store) RenameRole(rid int64, name string, sex int) (*Role, error) {
-	res, err := s.db.Exec(`UPDATE roles SET name=?, sex=CASE WHEN renamed=0 THEN ? ELSE sex END, renamed=1 WHERE rid=?`, name, sex, rid)
+	res, err := s.db.Exec(renameRoleSQL, name, sex, rid)
 	if isUnique(err) {
 		return nil, ErrConflict
 	}
@@ -101,6 +110,36 @@ func (s *Store) RenameRole(rid int64, name string, sex int) (*Role, error) {
 		return nil, ErrNotFound
 	}
 	return s.RoleByID(rid)
+}
+
+// RenameRoleWithCost uses the observed rename state and commits the name and payment together.
+// ErrConflict means the balance was insufficient. A duplicate name or stale request spends nothing.
+func (s *Store) RenameRoleWithCost(rid int64, name string, sex, renamed int, cost map[int64]int64) (*Role, error) {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+	res, err := tx.Exec(renameRoleSQL+` AND renamed=? AND (renamed=0 OR name<>?)`, name, sex, rid, renamed, name)
+	if isUnique(err) {
+		return nil, ErrRoleNameTaken
+	}
+	if err != nil {
+		return nil, err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return nil, ErrRenameChanged
+	}
+	if len(cost) > 0 {
+		if err := spendTx(tx, rid, cost, nil); err != nil {
+			return nil, err
+		}
+	}
+	role, err := scanRole(tx.QueryRow(`SELECT `+roleCols+` FROM roles WHERE rid=?`, rid))
+	if err != nil {
+		return nil, err
+	}
+	return role, tx.Commit()
 }
 
 func (s *Store) TouchRoleLogin(rid int64) error {

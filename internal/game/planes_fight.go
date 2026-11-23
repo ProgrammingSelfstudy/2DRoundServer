@@ -47,7 +47,7 @@ func planesFightWithGuards(db *store.Store, fights *FightService, role *store.Ro
 		fs := store.FormationSlot{Pos: sl.Pos, PartnerID: sl.ID}
 		if sl.Flag == 1 {
 			hiredSlots = append(hiredSlots, fs)
-			hired[sl.ID] = store.Partner{PartnerID: sl.ID, RID: role.RID, BID: h.BID, Lev: int(h.Lev), Star: int(h.Star)}
+			hired[sl.ID] = store.Partner{PartnerID: sl.ID, RID: role.RID, BID: h.BID, Lev: int(h.Lev), Star: int(h.Star), BreakLev: int(h.Break)}
 		} else {
 			ownSlots = append(ownSlots, fs)
 		}

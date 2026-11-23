@@ -27,6 +27,20 @@ func (e *expSvc) partner(rid, id int64) (*store.Partner, error) {
 	return nil, nil
 }
 
+func expeditionDispatchProblem(h *store.Partner, h5 bool) string {
+	switch {
+	case h == nil:
+		return "英雄不存在"
+	case h5 && !h5HeroEligible(h.BID, h.Star):
+		return "只能派遣五星及以上英雄"
+	case h.ResSlot > 0:
+		return "原力水晶槽位中的英雄不能派遣"
+	case h.EndTime > 0:
+		return "临时英雄不能派遣"
+	}
+	return ""
+}
+
 // mySent (24405) is the hero the role lent to the friends.
 func (e *expSvc) mySent(s *gateway.Session, _ proto.Message) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
@@ -37,7 +51,7 @@ func (e *expSvc) mySent(s *gateway.Session, _ proto.Message) error {
 			if err != nil {
 				return err
 			}
-			if h != nil && (!h5 || h5HeroEligible(h.BID, h.Star)) {
+			if expeditionDispatchProblem(h, h5) == "" {
 				list = append(list, e.heroMessage(*h))
 			}
 		}
@@ -51,15 +65,11 @@ func (e *expSvc) dispatch(s *gateway.Session, req proto.Message) error {
 	return e.with(s, func(role *store.Role, st *expState) error {
 		refuse := func(msg string) error { return s.Send(24407, proto.Message{"code": 0, "msg": msg, "id": id}) }
 		h, err := e.partner(role.RID, id)
-		switch {
-		case err != nil:
+		if err != nil {
 			return err
-		case h == nil:
-			return refuse("英雄不存在")
-		case isH5RoleSession(s) && !h5HeroEligible(h.BID, h.Star):
-			return refuse("只能派遣五星及以上英雄")
-		case h.ResSlot > 0:
-			return refuse("原力水晶槽位中的英雄不能派遣")
+		}
+		if problem := expeditionDispatchProblem(h, isH5RoleSession(s)); problem != "" {
+			return refuse(problem)
 		}
 		st.Sent = id
 		if err := e.save(role.RID, st, nil); errors.Is(err, store.ErrConflict) {
@@ -95,7 +105,7 @@ func (e *expSvc) friendHeroes(s *gateway.Session, _ proto.Message) error {
 			if err != nil {
 				return err
 			}
-			if h == nil || h5 && !h5HeroEligible(h.BID, h.Star) {
+			if expeditionDispatchProblem(h, h5) != "" {
 				continue
 			}
 			m := e.heroMessage(*h)
@@ -115,9 +125,12 @@ func (e *expSvc) friendHeroes(s *gateway.Session, _ proto.Message) error {
 // hire (24408) hires a friend's lent hero for the day: three a day at most, none stronger than 150% of the role's best
 // hero, and a hero is hired ten times a day at most. The owner gets the client's drop for it.
 func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
-	rid, id := req.Int("rid"), req.Int("id")
+	rid, srvID, id := req.Int("rid"), req.Str("srv_id"), req.Int("id")
 	return e.with(s, func(role *store.Role, st *expState) error {
 		refuse := func(msg string) error { return s.Send(24408, proto.Message{"code": 0, "msg": msg}) }
+		if rid == role.RID || srvID != role.SrvID {
+			return refuse("只能雇佣本服好友的英雄")
+		}
 		h5 := isH5RoleSession(s)
 		var hired int64
 		for _, h := range st.Hired {
@@ -152,7 +165,7 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 		if err != nil {
 			return err
 		}
-		if fs.Sent != id || target == nil {
+		if fs.Sent != id || expeditionDispatchProblem(target, false) != "" {
 			return refuse("该英雄未派遣")
 		}
 		if h5 && !h5HeroEligible(target.BID, target.Star) {
@@ -169,10 +182,12 @@ func (e *expSvc) hire(s *gateway.Session, req proto.Message) error {
 		for _, h := range playablePartners(mine, h5) {
 			best = max(best, partnerMessage(h).Int("power"))
 		}
-		if partnerMessage(*target).Int("power")*1000 > best*expCfg.num("war_ratio") {
+		power := partnerMessage(*target).Int("power")
+		if power*1000 > best*expCfg.num("war_ratio") {
 			return refuse("雇佣英雄战力超过自身最高战力英雄的150%")
 		}
-		st.Hired = append(st.Hired, expHire{RID: rid, SrvID: owner.SrvID, PID: id, BID: target.BID, Lev: int64(target.Lev), Star: int64(target.Star), Per: 100})
+		st.Hired = append(st.Hired, expHire{RID: rid, SrvID: owner.SrvID, PID: id, BID: target.BID,
+			Lev: int64(target.Lev), Star: int64(target.Star), Break: int64(target.BreakLev), Power: power, Per: 100})
 		fs.Borrowed++
 		if err := e.st.CommitModuleState(expModule, expeditionChange(role.RID, st, nil), expeditionChange(rid, fs, expCfg.Drop())); errors.Is(err, store.ErrConflict) {
 			return refuse("远征进度已更新，请重试")
@@ -198,7 +213,10 @@ func (e *expSvc) hp(s *gateway.Session, _ proto.Message) error {
 			if owner != nil {
 				name = owner.Name
 			}
-			m := e.heroMessage(store.Partner{PartnerID: h.PID, BID: h.BID, Lev: int(h.Lev), Star: int(h.Star)})
+			m := e.heroMessage(store.Partner{PartnerID: h.PID, BID: h.BID, Lev: int(h.Lev), Star: int(h.Star), BreakLev: int(h.Break)})
+			if h.Power > 0 {
+				m["power"] = h.Power
+			}
 			m["rid"], m["srv_id"], m["name"], m["is_used"], m["hp_per"] = h.RID, h.SrvID, name, b2i(h.Used), h.Per
 			list = append(list, m)
 		}

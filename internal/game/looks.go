@@ -127,13 +127,13 @@ func validSignature(v string) bool {
 
 // ownedFaces are the heads a role may use: those of the heroes it has, the VIP ones and the ones
 // granted from the admin page (the client's tips say "获得X可解锁").
-func ownedFaces(st *store.Store, role *store.Role, now int64) ([]int64, error) {
+func ownedFaces(st *store.Store, role *store.Role, now int64, h5 bool) ([]int64, error) {
 	set := map[int64]bool{}
 	ps, err := st.PartnersOf(role.RID)
 	if err != nil {
 		return nil, err
 	}
-	for _, p := range ps {
+	for _, p := range playablePartners(ps, h5) {
 		set[p.BID] = true
 	}
 	if fresh, err := st.RoleByID(role.RID); err == nil {
@@ -185,6 +185,11 @@ func withSettings(st *store.Store, rid int64, m proto.Message) (proto.Message, e
 	// the same on every level-1 role of the original server (capture original-2026-10-22)
 	m["room_bbs_set"], m["is_open_home"] = cfg.BBSSet, 0
 	m["city_id"] = cfg.CityID
+	fans, err := st.FansOf(rid)
+	if err != nil {
+		return m, err
+	}
+	m["fans_num"] = fans
 	if cfg.LookID != 0 {
 		m["look_id"] = cfg.LookID
 	} else if face, _ := m["face_id"].(int); face >= 10000 { // 110401 for head 10401
@@ -239,7 +244,7 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		ids, err := ownedFaces(st, role, s.Now().Unix())
+		ids, err := ownedFaces(st, role, s.Now().Unix(), isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -255,7 +260,7 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 			return nil
 		}
 		id := req.Int("face_id")
-		ids, err := ownedFaces(st, role, s.Now().Unix())
+		ids, err := ownedFaces(st, role, s.Now().Unix(), isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -266,6 +271,11 @@ func RegisterLooks(r *gateway.Router, st *store.Store) {
 		if err := st.SetRoleFace(role.RID, int(id)); err != nil {
 			return err
 		}
+		fresh, err := st.RoleByID(role.RID)
+		if err != nil {
+			return err
+		}
+		s.SetRole(fresh)
 		return s.Send(10327, proto.Message{"code": 1, "msg": "", "face_id": id})
 	})
 

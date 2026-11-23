@@ -213,9 +213,8 @@ func (l *Login) enter(s *gateway.Session, req proto.Message, cmd uint16) error {
 
 // rename implements 10343. The client shows msg as a toast and, when code is 1,
 // takes name, sex and is_first_rename from the reply (role_controller.lua
-// rgp_hander10343). The first rename is free and also fixes the sex; later ones
-// keep the sex. What a later rename should cost is unknown, so it is free here
-// (policy, not protocol).
+// rgp_hander10343). The first rename is free and also fixes the sex. The H5
+// profile follows role_personal_space_tab_info_panel.lua and charges 200 gold thereafter.
 func (l *Login) rename(s *gateway.Session, req proto.Message) error {
 	role := s.Role()
 	if role == nil {
@@ -230,17 +229,36 @@ func (l *Login) rename(s *gateway.Session, req proto.Message) error {
 		return s.Send(10343, proto.Message{"code": code, "msg": msg, "name": r.Name, "sex": r.Sex, "is_first_rename": 1 - r.Renamed})
 	}
 	name, sex := req.Str("name"), int(req.Int("sex"))
+	h5 := isH5RoleSession(s)
 	switch {
-	case !validName(name):
+	case !validName(name) || h5 && utf8.RuneCountInString(name) > 6:
 		return reply(codeFail, "角色名不合法", fresh)
 	case fresh.Renamed == 0 && sex != 0 && sex != 1:
 		return reply(codeFail, "请选择性别", fresh)
 	case fresh.Renamed == 1 && name == fresh.Name:
 		return reply(codeFail, "新名字与当前名字相同", fresh)
 	}
-	updated, err := l.Store.RenameRole(fresh.RID, name, sex)
-	if errors.Is(err, store.ErrConflict) {
-		return reply(codeFail, "角色名已被使用", fresh)
+	var updated *store.Role
+	paid := h5 && fresh.Renamed != 0
+	if h5 {
+		var cost map[int64]int64
+		if paid {
+			cost = map[int64]int64{3: 200}
+		}
+		updated, err = l.Store.RenameRoleWithCost(fresh.RID, name, sex, fresh.Renamed, cost)
+		switch {
+		case errors.Is(err, store.ErrRoleNameTaken):
+			return reply(codeFail, "角色名已被使用", fresh)
+		case errors.Is(err, store.ErrConflict):
+			return reply(codeFail, "钻石不足", fresh)
+		case errors.Is(err, store.ErrRenameChanged):
+			return reply(codeFail, "角色信息已更新，请重试", fresh)
+		}
+	} else {
+		updated, err = l.Store.RenameRole(fresh.RID, name, sex)
+		if errors.Is(err, store.ErrConflict) {
+			return reply(codeFail, "角色名已被使用", fresh)
+		}
 	}
 	if err != nil {
 		return err
@@ -257,7 +275,10 @@ func (l *Login) rename(s *gateway.Session, req proto.Message) error {
 			return err
 		}
 	}
-	return reply(codeOK, msg, updated)
+	if err := reply(codeOK, msg, updated); err != nil || !paid {
+		return err
+	}
+	return sendAssets(s, l.Store, updated.RID)
 }
 
 // giveStarter grants a role its starter hero when it has none yet and tells the

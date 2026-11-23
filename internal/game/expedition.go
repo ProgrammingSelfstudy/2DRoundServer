@@ -73,6 +73,7 @@ var expCfg = func() *expConf {
 // expHire is a friend's hero hired for the day.
 type expHire struct {
 	RID, PID, BID, Lev, Star, Per int64
+	Break, Power                  int64
 	SrvID                         string
 	Used                          bool // won a fight already, cannot fight again
 }
@@ -336,27 +337,38 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 		}
 		var roster []pfHero
 		var slots []pfSlot
-		seen := map[int64]bool{}
+		seen, positions := map[int64]bool{}, map[int64]bool{}
+		var loaned bool
 		for _, p := range req.Arr("pos_info") {
-			id, owner := p.Int("id"), p.Int("owner_id")
-			if seen[id] || len(slots) == formMaxHeroes {
-				continue
+			id, owner, pos := p.Int("id"), p.Int("owner_id"), p.Int("pos")
+			srv := p.Str("owner_srv_id")
+			if seen[id] || positions[pos] || pos < 1 || pos > formMaxPos {
+				return refuse("阵容位置不正确")
 			}
+			seen[id], positions[pos] = true, true
 			if owner == 0 || owner == role.RID {
-				if h, ok := byID[id]; ok {
-					seen[id] = true
-					roster = append(roster, pfHero{Flag: 0, PID: id, BID: h.BID, Lev: int64(h.Lev), Star: int64(h.Star), HP: st.hurt(id)})
-					slots = append(slots, pfSlot{Pos: p.Int("pos"), ID: id, Flag: 0})
+				h, ok := byID[id]
+				hp := st.hurt(id)
+				if !ok || hp <= 0 || srv != "" && srv != role.SrvID {
+					return refuse("该英雄无法出战")
 				}
+				roster = append(roster, pfHero{PID: id, BID: h.BID, Lev: int64(h.Lev), Star: int64(h.Star), HP: hp})
+				slots = append(slots, pfSlot{Pos: pos, ID: id})
 				continue
 			}
-			for _, h := range st.Hired {
-				if h.PID == id && h.RID == owner && !h.Used && (!h5 || h5HeroEligible(h.BID, int(h.Star))) {
-					seen[id] = true
-					roster = append(roster, pfHero{Flag: 1, PID: id, BID: h.BID, Lev: h.Lev, Star: h.Star, HP: h.Per})
-					slots = append(slots, pfSlot{Pos: p.Int("pos"), ID: id, Flag: 1})
-				}
+			if loaned {
+				return refuse("每次只能上阵一个雇佣英雄")
 			}
+			if srv == "" {
+				srv = role.SrvID // older H5 clients omitted the same-server id
+			}
+			h, ok := st.hiredHero(owner, srv, id, h5)
+			if !ok {
+				return refuse("该雇佣英雄无法出战")
+			}
+			loaned = true
+			roster = append(roster, pfHero{Flag: 1, PID: id, BID: h.BID, Lev: h.Lev, Star: h.Star, Break: h.Break, HP: h.Per})
+			slots = append(slots, pfSlot{Pos: pos, ID: id, Flag: 1})
 		}
 		if len(slots) == 0 {
 			return refuse("请选择出战英雄")
@@ -388,6 +400,15 @@ func (e *expSvc) fight(s *gateway.Session, req proto.Message) error {
 			return e.settle(s, day, point, diff, pf, won)
 		})
 	})
+}
+
+func (st *expState) hiredHero(owner int64, srv string, id int64, h5 bool) (expHire, bool) {
+	for _, h := range st.Hired {
+		if h.PID == id && h.RID == owner && h.SrvID == srv && !h.Used && h.Per > 0 && (!h5 || h5HeroEligible(h.BID, int(h.Star))) {
+			return h, true
+		}
+	}
+	return expHire{}, false
 }
 
 func (e *expSvc) settle(s *gateway.Session, day, point, diff int64, fight *planesFightPlan, won bool) error {

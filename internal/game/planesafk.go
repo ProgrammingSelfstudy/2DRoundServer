@@ -38,7 +38,7 @@ const (
 
 type pfTile struct{ Line, Index, Evt, Power int64 }
 
-type pfHero struct{ Flag, PID, BID, Lev, Star, HP int64 } // HP in per cent
+type pfHero struct{ Flag, PID, BID, Lev, Star, HP, Break int64 } // HP in per cent
 
 type pfSlot struct{ Pos, ID, Flag int64 }
 

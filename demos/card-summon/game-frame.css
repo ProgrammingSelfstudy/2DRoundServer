@@ -1,0 +1,115 @@
+/* Mobile game frame: the same content and controls, arranged around the stage.
+   Keep the animation layers and desktop layout in their existing stylesheets. */
+@media (max-width: 780px) {
+  .app-shell {
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    background: #291835;
+  }
+  .site-header {
+    flex-basis: 48px;
+    height: 48px;
+    min-height: 48px;
+    padding: 0 14px;
+    color: #f3e8f9;
+    background: linear-gradient(180deg, #392544, #281831);
+    border-bottom: 1px solid #bca378;
+  }
+  .brand-mark { width: 25px; height: 25px; color: #dfc29a; }
+  .brand > span { font-size: 15px; }
+  .brand small { margin-top: 3px; color: #c0aaca; }
+  .sound-button {
+    padding-right: 0;
+    color: #e7d5ee;
+    background: transparent;
+    border-radius: 3px;
+  }
+  .sound-button:hover, .sound-button[aria-pressed="true"] { background: #69467c55; border-color: transparent; }
+
+  .experience { padding: 0; }
+  .stage { border: 0; border-radius: 0; box-shadow: none; }
+  .intro-panel > h1 {
+    order: 4;
+    align-self: stretch;
+    position: relative;
+    margin: 0;
+    padding: 10px 8px 9px;
+    text-align: center;
+    font-size: 23px;
+    line-height: 1.2;
+    letter-spacing: 1px;
+    color: #f4e6d2;
+    background: linear-gradient(110deg, #33213e, #5a326c 50%, #33213e);
+    border-top: 1px solid #bca378;
+    border-bottom: 1px solid #a98d6459;
+    text-shadow: 0 2px 3px #1d0b2a80;
+  }
+  .intro-panel > h1::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: calc(50% - 3px);
+    width: 6px;
+    height: 6px;
+    transform: rotate(45deg);
+    border: 1px solid #dfc799;
+    background: #654774;
+  }
+  .intro-panel > h1 span { color: #e7b4ff; }
+  .draw-controls {
+    order: 5;
+    gap: 6px 8px;
+    margin: 0;
+    padding: 10px 12px 8px;
+    background: linear-gradient(180deg, #392142, #26172f);
+  }
+  .quantity-picker { gap: 10px; }
+  .quantity-option {
+    border: 1px solid #886696;
+    border-radius: 3px 10px 3px 10px;
+    background: linear-gradient(180deg, #574065, #3e2a4b);
+    box-shadow: inset 0 1px 0 #e7d2f11f;
+  }
+  .quantity-option strong { color: #d1b9df; }
+  .quantity-option span { color: #dfcfe8; }
+  .quantity-option.selected {
+    border-color: #dfbe85;
+    background: linear-gradient(180deg, #8951ae, #623584);
+    box-shadow: inset 0 0 0 1px #f5dbb229, 0 0 12px #b575d51c;
+  }
+  .quantity-option.selected strong, .quantity-option.selected span { color: #fff0d4; }
+  .quantity-option:not(:disabled):hover { border-color: #f1d6a9; }
+  .primary-button {
+    min-height: 46px;
+    border: 1px solid #caa272;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #9a5cc3, #7a389e);
+    box-shadow: inset 0 1px 0 #ecd1ff55, 0 3px 8px #150b1d33;
+    color: #fff4df;
+  }
+  .primary-button:hover:not(:disabled) {
+    transform: none;
+    background: linear-gradient(180deg, #ad6ed4, #8743ab);
+    box-shadow: inset 0 1px 0 #ecd1ff55, 0 3px 8px #150b1d33;
+  }
+  .button-star { color: #f3d5a2; }
+  .carousel-controls { gap: 0; }
+  .carousel-controls button {
+    padding: 7px 9px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #dac5e6;
+  }
+  .carousel-controls button + button { border-left: 1px solid #a181b32e; }
+  .carousel-controls button:hover { background: #9165ac22; }
+  .replay-button { padding-right: 3px; color: #dac5e6; }
+  .control-note { color: #bca5c9; }
+  button:focus-visible, a:focus-visible { outline-color: #ead0a4; outline-offset: 2px; }
+}
+
+@media (max-width: 360px) {
+  .site-header { padding: 0 10px; }
+  .intro-panel > h1 { font-size: 21px; letter-spacing: .5px; }
+  .draw-controls { padding-right: 10px; padding-left: 10px; }
+  .carousel-controls button { padding-right: 7px; padding-left: 7px; }
+}

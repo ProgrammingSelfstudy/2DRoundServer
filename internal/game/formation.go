@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	formDrama     = 0 // PartnerConst.Fun_Form.Drama
-	formMaxHeroes = 6 // every formation of the client (data_form_data) has six positions
-	formMaxPos    = 6 // positions in 11212 are 1-6 (the capture of the original server saved six heroes)
-	formTypes     = 6 // data_form_data has six formations
+	formDrama     = 0  // PartnerConst.Fun_Form.Drama
+	formStarTower = 17 // PartnerConst.Fun_Form.Startower
+	formMaxHeroes = 6  // every formation of the client (data_form_data) has six positions
+	formMaxPos    = 6  // positions in 11212 are 1-6 (the capture of the original server saved six heroes)
+	formTypes     = 6  // data_form_data has six formations
 )
 
 // formCells is data_form_data of the client: for each formation type, the battle
@@ -103,10 +104,14 @@ func formationForRole(st *store.Store, rid, kind int64, h5 bool) (store.Formatio
 }
 
 func combatFormation(st *store.Store, rid int64, h5 bool) (formationTeam, error) {
+	return combatFormationFor(st, rid, formDrama, h5)
+}
+
+func combatFormationFor(st *store.Store, rid, kind int64, h5 bool) (formationTeam, error) {
 	if h5 {
-		return h5FormationTeamOf(st, rid, formDrama)
+		return h5FormationTeamOf(st, rid, kind)
 	}
-	form, err := formationOf(st, rid, formDrama)
+	form, err := formationOf(st, rid, kind)
 	if err != nil {
 		return formationTeam{}, err
 	}

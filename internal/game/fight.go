@@ -109,6 +109,7 @@ type activeBuff struct {
 	pct       int64
 	remain    int // rounds left; a shield does not count down
 	casterAtk int64
+	caster    *fightUnit
 	// casterMaxHP and base size a regen; negative statuses can be purged unless keep
 	casterMaxHP int64
 	base        string
@@ -148,11 +149,28 @@ const spiritPos = 41
 type fightUnit struct {
 	guild                      guildCombatBonus
 	pos, speed, hp, maxHP, atk int64
+	power                      int64
+	damage, taken, healing     int64
 	crit, critRatio            int64 // per mille; critRatio 1500 = x1.5
 	skills                     []int64
 	ours                       bool
 	lastCast                   map[int64]int // skill -> round of its last cast
 	buffs                      []*activeBuff
+}
+
+func (u *fightUnit) loseHP(source *fightUnit, amount int64) {
+	u.hp -= amount
+	u.taken += amount
+	if source != nil && source.ours != u.ours {
+		source.damage += amount
+	}
+}
+
+func (u *fightUnit) gainHP(source *fightUnit, amount int64) {
+	u.hp += amount
+	if source != nil {
+		source.healing += amount
+	}
 }
 
 // fightRound is what the client is sent for one round.
@@ -176,6 +194,8 @@ type fightState struct {
 	won    bool // how the script ends: the heroes win, or lose when they are all down or the rounds run out
 	cur    int
 	stage  fightStage
+	owner  *gateway.Session
+	played bool // all rounds were acknowledged through 20005
 	// combat is the client's fight type (0 = the campaign) and settle what ends the fight (nil = the
 	// campaign's own settling, passed by the caller).
 	combat int64
@@ -453,12 +473,13 @@ func (f *fightSim) addBuff(caster, t *fightUnit, r buffRule) proto.Message {
 		for _, b := range t.buffs {
 			if b.bid == r.Bid {
 				b.remain, b.casterAtk, b.casterMaxHP = rounds, atkOf(caster), caster.maxHP
+				b.caster = caster
 				return buffEntry(1, b, t.pos, end)
 			}
 		}
 	}
 	f.nextBuff++
-	b := &activeBuff{id: f.nextBuff, bid: r.Bid, kind: r.Kind, pct: r.Pct, remain: rounds, casterAtk: atkOf(caster),
+	b := &activeBuff{id: f.nextBuff, bid: r.Bid, kind: r.Kind, pct: r.Pct, remain: rounds, caster: caster, casterAtk: atkOf(caster),
 		casterMaxHP: caster.maxHP, base: r.Base, negative: r.Negative, keep: r.Keep}
 	t.buffs = append(t.buffs, b)
 	return buffEntry(1, b, t.pos, end)
@@ -474,36 +495,29 @@ func (f *fightSim) startOfRound() []proto.Message {
 			if len(u.buffs) == 0 {
 				continue
 			}
-			var dmg, heal int64
+			before := u.hp
+			var minHP int64
+			if u.ours { // our heroes are never killed by a status
+				minHP = 1
+			}
+			// Resolve damage before regeneration. Each status is credited for the HP it actually changes,
+			// including when several statuses reach the same cap in one round.
 			for _, b := range u.buffs {
-				switch b.kind {
-				case "dot":
-					d := b.casterAtk * b.pct / 100
-					if d < 1 {
-						d = 1
+				if b.kind == "dot" {
+					damage := min(max(1, b.casterAtk*b.pct/100), u.hp-minHP)
+					u.loseHP(b.caster, damage)
+				}
+			}
+			if u.hp > 0 {
+				for _, b := range u.buffs {
+					if b.kind != "regen" {
+						continue
 					}
-					dmg += d
-				case "regen":
 					base := b.casterAtk
 					if b.base == "maxhp" {
 						base = b.casterMaxHP
 					}
-					if h := base * b.pct / 100; h > 0 {
-						heal += h
-					}
-				}
-			}
-			if u.ours && dmg >= u.hp { // our heroes are never killed by a status
-				dmg = u.hp - 1
-			}
-			if dmg > u.hp {
-				dmg = u.hp
-			}
-			before := u.hp
-			u.hp -= dmg
-			if u.hp > 0 {
-				if u.hp += heal; u.hp > u.maxHP {
-					u.hp = u.maxHP
+					u.gainHP(b.caster, min(max(0, base*b.pct/100), u.maxHP-u.hp))
 				}
 			}
 			var entries []proto.Message
@@ -669,7 +683,11 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 			}
 			delta = -dmg
 		}
-		t.hp += delta
+		if delta < 0 {
+			t.loseHP(u, -delta)
+		} else if delta > 0 {
+			t.gainHP(u, delta)
+		}
 		for _, br := range rule.Buffs {
 			if br.Negative == (rule.Side == 1) {
 				if e := f.addBuff(u, t, br); e != nil {
@@ -761,12 +779,16 @@ func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRo
 // teamSide makes a role's own side of a fight: its campaign formation, and the 20027 objects (the spirit and
 // the heroes).
 func (f *FightService) teamSide(role *store.Role, h5 bool) ([]fightUnit, []proto.Message, store.Formation, error) {
+	return f.teamSideFor(role, formDrama, h5)
+}
+
+func (f *FightService) teamSideFor(role *store.Role, kind int64, h5 bool) ([]fightUnit, []proto.Message, store.Formation, error) {
 	// the starter hero is normally granted when the hero list is first opened; a
 	// role that fights before that gets it now (granted once, never twice)
 	if _, err := starterGrant(f.Store, role); err != nil {
 		return nil, nil, store.Formation{}, err
 	}
-	lineup, err := combatFormation(f.Store, role.RID, h5)
+	lineup, err := combatFormationFor(f.Store, role.RID, kind, h5)
 	if err != nil {
 		return nil, nil, lineup.form, err
 	}
@@ -865,7 +887,7 @@ func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, for
 			sids = append(sids, sk.Int("skill_bid"))
 			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
 		}
-		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"),
+		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), power: m.Int("power"),
 			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours, guild: guildCombatBonusOf(h)})
 		objects = append(objects, proto.Message{
 			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": 0}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
@@ -915,7 +937,7 @@ func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama
 	if f.active == nil {
 		f.active = map[int64]*fightState{}
 	}
-	f.active[role.RID] = &fightState{rounds: rounds, won: won}
+	f.active[role.RID] = &fightState{rounds: rounds, won: won, owner: s}
 	if f.passes == nil {
 		f.passes = map[int64]passRecord{}
 	}
@@ -943,11 +965,22 @@ func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama
 
 // begin starts a fight that was made elsewhere: the map and the fight data (no 13003, which is the campaign's own).
 func (f *FightService) begin(s *gateway.Session, role *store.Role, combat int64, intro proto.Message, rounds []fightRound, won bool, settle func(*gateway.Session, bool) error) error {
+	return f.beginFight(s, role, intro, &fightState{rounds: rounds, won: won, combat: combat, settle: settle})
+}
+
+func (f *FightService) hasFight(s *gateway.Session, rid int64) bool {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.active[rid] != nil && f.active[rid].owner == s
+}
+
+func (f *FightService) beginFight(s *gateway.Session, role *store.Role, intro proto.Message, fight *fightState) error {
 	f.mu.Lock()
 	if f.active == nil {
 		f.active = map[int64]*fightState{}
 	}
-	f.active[role.RID] = &fightState{rounds: rounds, won: won, combat: combat, settle: settle}
+	fight.owner = s
+	f.active[role.RID] = fight
 	f.mu.Unlock()
 	fillHalo(intro)
 	for _, m := range []struct {
@@ -955,7 +988,7 @@ func (f *FightService) begin(s *gateway.Session, role *store.Role, combat int64,
 		body proto.Message
 	}{
 		{20063, proto.Message{"type_list": []proto.Message{}}},
-		{20000, proto.Message{"combat_map": fightMap, "combat_type": combat}},
+		{20000, proto.Message{"combat_map": fightMap, "combat_type": fight.combat}},
 		{20027, intro},
 	} {
 		if err := s.Send(m.cmd, m.body); err != nil {
@@ -999,7 +1032,12 @@ func (f *FightService) skip(s *gateway.Session, settle func(won bool) error) err
 	}
 	f.mu.Lock()
 	st := f.active[role.RID]
-	delete(f.active, role.RID)
+	if st != nil && st.combat == combatStarTower && st.owner != s {
+		st = nil
+	}
+	if st != nil {
+		delete(f.active, role.RID)
+	}
 	f.mu.Unlock()
 	if st == nil {
 		return s.Send(20062, proto.Message{"code": 0, "msg": "当前没有可以跳过的战斗"})
@@ -1023,7 +1061,7 @@ func (f *FightService) advance(s *gateway.Session, cmd uint16, settle func(won b
 	f.mu.Lock()
 	st := f.active[role.RID]
 	f.mu.Unlock()
-	if st == nil {
+	if st == nil || (st.combat == combatStarTower && st.owner != s) {
 		return nil // not in a fight: stale confirmation
 	}
 	switch {
@@ -1044,6 +1082,11 @@ func (f *FightService) advance(s *gateway.Session, cmd uint16, settle func(won b
 			return s.Send(20002, roundStart(st.rounds[st.cur], st.cur, st.combatType()))
 		}
 		f.mu.Lock()
+		if f.active[role.RID] != st {
+			f.mu.Unlock()
+			return nil
+		}
+		st.played = true
 		delete(f.active, role.RID)
 		f.mu.Unlock()
 		if st.settle != nil {

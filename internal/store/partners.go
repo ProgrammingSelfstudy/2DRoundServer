@@ -294,6 +294,12 @@ func (s *Store) FreeSummonUsed(rid, group, day int64) (bool, error) {
 	return n > 0, err
 }
 
+func (s *Store) AdvancedSummonMisses(rid int64) (int, error) {
+	var misses int
+	err := s.db.QueryRow(`SELECT advanced_summon_misses FROM roles WHERE rid=?`, rid).Scan(&misses)
+	return misses, wrapNoRows(err)
+}
+
 // SummonResult is what one summon changes: the heroes it hands out, the cost, the
 // currencies it pays back and, for a free summon, the group and day to mark used.
 type SummonResult struct {
@@ -304,6 +310,9 @@ type SummonResult struct {
 	GainItems          map[int64]int64
 	FreeGroup, FreeDay int64        // FreeGroup 0 = not a free summon
 	Elite              *EliteSummon // the elite summon state after the draws, saved with them
+	// AdvancedDraw runs after payment inside the write transaction, so simultaneous draws use successive counters.
+	AdvancedDraw func(misses int) (seeds []PartnerSeed, gainItems map[int64]int64, next int, err error)
+	Capacity     int
 }
 
 // Summon applies a summon in one transaction and returns the new heroes in order.
@@ -325,6 +334,31 @@ func (s *Store) Summon(rid int64, r SummonResult) ([]Partner, error) {
 	}
 	if err := spendTx(tx, rid, r.SpendAssets, r.SpendItems); err != nil {
 		return nil, err
+	}
+	if r.AdvancedDraw != nil {
+		var misses int
+		if err := tx.QueryRow(`SELECT advanced_summon_misses FROM roles WHERE rid=?`, rid).Scan(&misses); err != nil {
+			return nil, err
+		}
+		seeds, items, next, err := r.AdvancedDraw(misses)
+		if err != nil {
+			return nil, err
+		}
+		r.Seeds, r.GainItems = seeds, items
+		if next != misses {
+			if _, err := tx.Exec(`UPDATE roles SET advanced_summon_misses=? WHERE rid=?`, next, rid); err != nil {
+				return nil, err
+			}
+		}
+	}
+	if r.Capacity > 0 && len(r.Seeds) > 0 {
+		var owned int
+		if err := tx.QueryRow(`SELECT COUNT(*) FROM partners WHERE rid=?`, rid).Scan(&owned); err != nil {
+			return nil, err
+		}
+		if owned+len(r.Seeds) > r.Capacity {
+			return nil, ErrHeroCapacity
+		}
 	}
 	if err := creditTx(tx, rid, r.GainAssets, r.GainItems); err != nil {
 		return nil, err

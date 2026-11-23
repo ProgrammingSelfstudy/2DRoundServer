@@ -21,23 +21,54 @@ type Replay struct {
 	IsCollected bool
 }
 
-// maxReplays is how many replays the server keeps; the oldest ones go first.
+// Each replay pool keeps its most recent fights, as well as collected or ranked recordings.
 const maxReplays = 5000
 
 // AddReplay keeps a fight and returns its id.
 func (s *Store) AddReplay(r Replay) (int64, error) {
-	res, err := s.db.Exec(`INSERT INTO replays(srv_id,combat_type,a_rid,b_rid,time,meta,data) VALUES(?,?,?,?,?,?,?)`,
+	if scoped, ok := s.db.(*transactionDB); ok {
+		return addReplayTx(scoped.Tx, r)
+	}
+	tx, err := s.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback()
+	id, err := addReplayTx(tx, r)
+	if err != nil {
+		return 0, err
+	}
+	return id, tx.Commit()
+}
+
+func addReplayTx(tx *sql.Tx, r Replay) (int64, error) {
+	id, err := insertReplay(tx, r)
+	if err != nil {
+		return 0, err
+	}
+	if err := pruneReplays(tx, false); err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func insertReplay(tx *sql.Tx, r Replay) (int64, error) {
+	res, err := tx.Exec(`INSERT INTO replays(srv_id,combat_type,a_rid,b_rid,time,meta,data) VALUES(?,?,?,?,?,?,?)`,
 		r.SrvID, r.CombatType, r.ARID, r.BRID, r.Time, r.Meta, r.Data)
 	if err != nil {
 		return 0, err
 	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
+	return res.LastInsertId()
+}
+
+func pruneReplays(tx *sql.Tx, tower bool) error {
+	pool := `combat_type<>7`
+	if tower {
+		pool = `combat_type=7`
 	}
-	// only the newest ones are kept, except those somebody collected
-	_, err = s.db.Exec(`DELETE FROM replays WHERE id <= ? AND id NOT IN (SELECT replay_id FROM replay_collects)`, id-maxReplays)
-	return id, err
+	_, err := tx.Exec(`DELETE FROM replays WHERE `+pool+` AND id <= (SELECT id FROM replays WHERE `+pool+` ORDER BY id DESC LIMIT 1 OFFSET ?)
+		AND id NOT IN (SELECT replay_id FROM replay_collects) AND id NOT IN (SELECT replay_id FROM star_tower_replay_records)`, maxReplays)
+	return err
 }
 
 const replayCols = `r.id,r.srv_id,r.combat_type,r.a_rid,r.b_rid,r.time,r.likes,r.shares,r.plays,r.public,r.meta,r.data,

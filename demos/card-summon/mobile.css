@@ -1,0 +1,186 @@
+/* Phone preview only. The existing 3D scene and animation timing stay intact;
+   its available height is measured by app.js to scale the same pack geometry. */
+@media (max-width: 780px) {
+  html { min-height: 100%; }
+  body { min-width: 280px; }
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    height: 100dvh;
+    min-height: 540px;
+    padding: env(safe-area-inset-top, 0px) max(14px, env(safe-area-inset-right, 0px)) max(10px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
+  }
+  .site-header {
+    flex: 0 0 56px;
+    height: 56px;
+    min-height: 56px;
+  }
+  .brand { gap: 8px; }
+  .brand-mark { width: 28px; height: 28px; }
+  .brand > span { font-size: 16px; letter-spacing: 1.5px; }
+  .brand small { margin-top: 4px; font-size: 6px; letter-spacing: 1.6px; }
+  .sound-button { min-height: 44px; padding: 7px 10px; font-size: 10px; border-color: transparent; }
+  #soundIcon { font-size: 17px; }
+  .header-edition, .site-footer { display: none; }
+
+  .experience {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 0 0;
+  }
+  .intro-panel { display: contents; }
+  .intro-panel > .eyebrow, .intro-copy, .series-meta, .intro-bottom { display: none; }
+  h1 {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    order: 1;
+    margin: 0 0 8px;
+    font-size: 22px;
+    line-height: 1.35;
+    letter-spacing: .5px;
+  }
+  h1 br { display: none; }
+  .stage {
+    order: 3;
+    flex: 1 1 0;
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    max-height: none;
+    aspect-ratio: auto;
+    border-radius: 6px;
+  }
+
+  .draw-controls {
+    order: 4;
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px 8px;
+    width: 100%;
+    margin: 10px 0 0;
+  }
+  .control-heading { display: none; }
+  .quantity-picker { grid-column: 1 / -1; gap: 8px; }
+  .quantity-option {
+    min-height: 44px;
+    justify-content: center;
+    gap: 9px;
+    padding: 6px 10px;
+  }
+  .quantity-option strong { font-size: 23px; line-height: 1; }
+  .quantity-option span { font-size: 11px; }
+  .primary-button {
+    grid-column: 1 / -1;
+    min-height: 46px;
+    margin: 0;
+    padding: 10px 18px;
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+  .button-star { font-size: 21px; }
+  .carousel-controls {
+    grid-column: 1;
+    grid-row: 3;
+    justify-content: flex-start;
+    gap: 6px;
+    margin: 0;
+  }
+  .carousel-controls button {
+    min-height: 44px;
+    padding: 7px 10px;
+    font-size: 10px;
+  }
+  .replay-button {
+    grid-column: 2;
+    grid-row: 3;
+    min-height: 44px;
+    margin: 0;
+    padding: 7px 2px 7px 5px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .replay-button span { font-size: 16px; margin-right: 2px; }
+  .control-note {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    margin: -2px 0 0;
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  .skip-button { top: 8px; right: 8px; bottom: auto; min-height: 44px; padding: 8px 11px; font-size: 10px; }
+  .skip-button span { padding-left: 5px; }
+  .card-presentation { padding: 32px 0 20px; }
+  .reveal-card { flex-shrink: 0; width: var(--mobile-card-width, 180px); }
+  .reveal-counter { margin-bottom: 8px; font-size: 14px; }
+  .reveal-counter span { font-size: 10px; }
+  .reveal-hint { margin-top: 10px; font-size: 9px; letter-spacing: 1px; }
+  .reveal-front, .reveal-back { border-radius: 8px; }
+  .rarity-badge {
+    top: 7px;
+    right: 7px;
+    padding: 3px 5px;
+    font-size: clamp(9px, calc(var(--mobile-card-width, 180px) * .065), 13px);
+  }
+  .card-caption { padding: 30px 5px 12px; }
+  .card-caption strong { margin: 5px 0 6px; font-size: clamp(11px, calc(var(--mobile-card-width, 180px) * .085), 19px); letter-spacing: 0; }
+  .card-caption > span:first-child { font-size: clamp(4px, calc(var(--mobile-card-width, 180px) * .03), 6px); letter-spacing: 1px; }
+  .card-caption > span:last-child { font-size: clamp(4px, calc(var(--mobile-card-width, 180px) * .028), 6px); letter-spacing: .5px; }
+  .opening-progress { bottom: 14px; gap: 7px; }
+  .opening-progress > span { font-size: 9px; letter-spacing: 1px; }
+  .stage.is-revealing[data-mode="ten"] .opening-progress { bottom: 12px; left: 14px; }
+  .stage.is-gathering .fleet-pose,
+  .stage.is-revealing[data-mode="ten"] .fleet-pose {
+    transform: translate3d(calc((var(--index) - 4.5) * 2px), calc(var(--index) * 2px + 24px + var(--gather-offset)), calc((10 - var(--index)) * 3px)) rotateY(0deg) rotateZ(calc((var(--index) - 4.5) * .7deg)) scale(var(--stack-scale));
+  }
+  .stage.is-revealing .pack-position,
+  .stage.is-results .pack-position {
+    transform: translateY(calc(100px * var(--single-scale))) scale(calc(var(--single-scale) * .8));
+  }
+
+  .results-panel { padding: 19px 13px 13px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .results-heading { gap: 8px; }
+  .results-heading .eyebrow { font-size: 7px; letter-spacing: 1.5px; }
+  .results-heading h2 { margin-top: 6px; font-size: 20px; }
+  .results-heading > span { font-size: 9px; }
+  .results-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px 6px; margin: 17px 0; }
+  .result-name { font-size: 9px; line-height: 1.4; margin-top: 5px; }
+  .results-grid.single { grid-template-columns: minmax(90px, var(--mobile-card-width, 150px)); margin: 17px 0; }
+  .results-grid.single .result-name { font-size: 12px; margin-top: 7px; }
+  .results-actions {
+    position: sticky;
+    bottom: -13px;
+    z-index: 2;
+    gap: 8px;
+    margin: 0 -13px -13px;
+    padding: 10px 13px 13px;
+    background: #faf6ff;
+  }
+  .results-actions p { max-width: none; font-size: 9px; }
+  .result-again { min-height: 44px; padding: 9px 12px; font-size: 11px; }
+  .result-again span { margin-left: 9px; }
+  .return-button { padding: 9px 10px; font-size: 10px; }
+  .single-return { bottom: 12px; }
+  .result-summary { gap: 7px; }
+}
+
+@media (max-width: 360px) {
+  .app-shell { padding-right: max(10px, env(safe-area-inset-right, 0px)); padding-left: max(10px, env(safe-area-inset-left, 0px)); }
+  h1 { font-size: 20px; letter-spacing: 0; }
+  .carousel-controls { gap: 4px; }
+  .carousel-controls button { padding-right: 8px; padding-left: 8px; }
+  .replay-button { font-size: 9px; }
+}
+
+/* A short landscape viewport scrolls naturally instead of squashing the scene. */
+@media (max-width: 780px) and (max-height: 520px) and (orientation: landscape) {
+  .app-shell { height: auto; min-height: 100svh; }
+  .experience { flex: none; }
+  .stage { flex: none; height: min(440px, 78vw); min-height: 280px; }
+}

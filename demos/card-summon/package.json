@@ -1,0 +1,12 @@
+{
+  "name": "tidal-archive-card-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone local card-opening animation demo",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "build": "node build-pack-textures.mjs && node build.mjs",
+    "check": "node --check app.js && node --check server.mjs && node --check build-pack-textures.mjs && node --check build.mjs"
+  }
+}

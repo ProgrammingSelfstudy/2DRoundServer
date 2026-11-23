@@ -91,18 +91,22 @@ var summonRand = rand.Float64
 
 // pickHero draws one hero base id from the pool by its chances.
 func pickHero(g *summonGroup, r float64) int64 {
+	return pickWeightedHero(g.Pool, r)
+}
+
+func pickWeightedHero(pool [][2]float64, roll float64) int64 {
 	total := 0.0
-	for _, p := range g.Pool {
-		total += p[1]
+	for _, entry := range pool {
+		total += entry[1]
 	}
-	x := r * total
-	for _, p := range g.Pool {
-		if x < p[1] {
-			return int64(p[0])
+	slot := roll * total
+	for _, entry := range pool {
+		if slot < entry[1] {
+			return int64(entry[0])
 		}
-		x -= p[1]
+		slot -= entry[1]
 	}
-	return int64(g.Pool[len(g.Pool)-1][0])
+	return int64(pool[len(pool)-1][0])
 }
 
 // summonCost works out what a summon of `times` draws with this payment kind
@@ -165,11 +169,9 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			if err != nil {
 				return nil, err
 			}
-			// H5 reads the advanced single's cooldown from key 5 when the page opens.
-			cooldown := int64(0)
-			if id == 300 {
-				cooldown = freeState(now, id, free).Int("free_cd_end")
-			}
+			// one entry per draw size the group offers; kv key 4 = free summons left (only the
+			// single draw can be free), key 5 = when that free draw returns after it was used.
+			cooldown := freeState(now, id, free).Int("free_cd_end")
 			draws := []proto.Message{}
 			if g, ok := summonTable[id]; ok {
 				sizes := append([]int64(nil), g.DrawList...)
@@ -197,7 +199,15 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		if err != nil {
 			return err
 		}
-		return s.Send(23200, proto.Message{"recruit_list": list, "is_share": 0, "is_day_share": 0, "must_five_num": 0})
+		remaining := 0
+		if isH5RoleSession(s) {
+			misses, err := st.AdvancedSummonMisses(role.RID)
+			if err != nil {
+				return err
+			}
+			remaining = h5Advanced.remaining(misses)
+		}
+		return s.Send(23200, proto.Message{"recruit_list": list, "is_share": 0, "is_day_share": 0, "must_five_num": remaining})
 	})
 	r.Handle(23202, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
@@ -230,18 +240,11 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 		if !allowed {
 			return nil
 		}
-		have, err := st.PartnersOf(role.RID)
-		if err != nil {
-			return err
-		}
 		buys, err := st.HeroSlotBuys(role.RID)
 		if err != nil {
 			return err
 		}
-		if !h5 && len(have)+int(times) > heroSlotCapacity(buys) {
-			return nil
-		}
-		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}}
+		res := store.SummonResult{SpendAssets: map[int64]int64{}, SpendItems: map[int64]int64{}, GainAssets: map[int64]int64{}, Capacity: heroSlotCapacity(buys)}
 		now := s.Now()
 		if kind == summonFree {
 			free, err := freeLeft(now, role.RID, gid)
@@ -264,16 +267,28 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 			res.GainAssets[h[0]] += h[1] * times
 		}
 		var draws summonDrawResults
-		for i := int64(0); i < times; i++ {
-			if !draws.addHero(&res, h5, pickHero(g, summonRand()), 0) {
-				return s.Send(12741, proto.Message{"msg": summonRewardUnavailable})
+		if h5 && gid == 300 {
+			res.AdvancedDraw = func(misses int) ([]store.PartnerSeed, map[int64]int64, int, error) {
+				return h5Advanced.draw(misses, times, &draws)
 			}
-		}
-		if h5 && summonRosterFull(len(have), len(res.Seeds), buys) {
-			return s.Send(12741, proto.Message{"msg": "英雄背包已满, 不能召唤英雄"})
+		} else {
+			for i := int64(0); i < times; i++ {
+				if !draws.addHero(&res, h5, pickHero(g, summonRand()), 0) {
+					return s.Send(12741, proto.Message{"msg": summonRewardUnavailable})
+				}
+			}
 		}
 		heroes, err := st.Summon(role.RID, res)
 		if err != nil {
+			if errors.Is(err, errSummonRewardUnavailable) {
+				return s.Send(12741, proto.Message{"msg": summonRewardUnavailable})
+			}
+			if errors.Is(err, store.ErrHeroCapacity) {
+				if h5 {
+					return s.Send(12741, proto.Message{"msg": "英雄背包已满, 不能召唤英雄"})
+				}
+				return nil
+			}
 			if !errors.Is(err, store.ErrConflict) {
 				return err
 			}
@@ -318,6 +333,8 @@ func RegisterSummon(r *gateway.Router, st *store.Store) {
 
 const summonRewardUnavailable = "该召唤奖励暂不可用"
 
+var errSummonRewardUnavailable = errors.New(summonRewardUnavailable)
+
 var summonHeroShards = func() map[int64]sellGain {
 	byHero := make(map[int64]sellGain)
 	for itemID, recipe := range backpackActions.HeroShards {
@@ -331,6 +348,7 @@ var summonHeroShards = func() map[int64]sellGain {
 
 type summonDrawResults struct {
 	rewards, bids, chips []proto.Message
+	remaining            int
 }
 
 func (draws *summonDrawResults) addHero(result *store.SummonResult, h5 bool, bid, fallbackCard int64) bool {
@@ -360,7 +378,7 @@ func (draws *summonDrawResults) addHero(result *store.SummonResult, h5 bool, bid
 
 func (draws summonDrawResults) message(group, times, flag int64) proto.Message {
 	return proto.Message{"group_id": group, "times": times, "flag": flag, "rewards": nonNil(draws.rewards),
-		"partner_bids": nonNil(draws.bids), "partner_chips": nonNil(draws.chips), "must_five_num": 0}
+		"partner_bids": nonNil(draws.bids), "partner_chips": nonNil(draws.chips), "must_five_num": draws.remaining}
 }
 
 func summonRosterFull(owned, grants, buys int) bool {

@@ -104,6 +104,7 @@ func TestArenaMatchRefreshAndCommitUseTheCurrentSlot(t *testing.T) {
 	}); !errors.Is(err, ErrConflict) {
 		t.Fatalf("stale match: %v", err)
 	}
+	var replayID int64
 	settle := func(tx *ArenaMatchTx) error {
 		a, err := tx.ArenaPlayerOf(rid, 1000, 1)
 		if err != nil {
@@ -113,7 +114,11 @@ func TestArenaMatchRefreshAndCommitUseTheCurrentSlot(t *testing.T) {
 		if err := tx.SaveArenaPlayer(a); err != nil {
 			return err
 		}
-		return tx.CreditReward(rid, map[int64]int64{1: 10}, nil)
+		if err := tx.CreditReward(rid, map[int64]int64{1: 10}, nil); err != nil {
+			return err
+		}
+		replayID, err = tx.AddReplay(Replay{SrvID: role.SrvID, ARID: rid, BRID: current.OppRID})
+		return err
 	}
 	results := make(chan error, 2)
 	start := make(chan struct{})
@@ -143,6 +148,9 @@ func TestArenaMatchRefreshAndCommitUseTheCurrentSlot(t *testing.T) {
 	}
 	if assets, err := s.RoleAssets(rid); err != nil || assets[1] != 10 {
 		t.Fatalf("reward: %v %v", assets, err)
+	}
+	if replay, err := s.ReplayByID(replayID, rid); err != nil || replay == nil || replay.ARID != rid || replay.BRID != current.OppRID {
+		t.Fatalf("settled replay: %+v %v", replay, err)
 	}
 	current.Status = 1
 	if got, err := s.ArenaSlots(rid); err != nil || !reflect.DeepEqual(got, []ArenaSlot{current}) {

@@ -1,0 +1,16 @@
+Generated with the built-in ImageGen tool (not CLI).
+Reference: assets/zoro-reference.png (user-provided screenshot, central pack).
+Output: assets/zoro-pack-art-hd.png
+
+Use case: precise-object-edit.
+Asset type: high-resolution front texture for a rotating 3D collectible card pack in an H5 demo.
+Input image: the provided screenshot is a reference only. Reconstruct ONLY the large central purple package front, without the surrounding UI, carousel, neighboring packages, rear packages, ground or reflections.
+
+Primary request: redraw this same purple Roronoa Zoro / ONE PIECE card-pack artwork as a crisp, high-definition flat orthographic packaging texture. This is a reconstruction from a small source, not an enlarged blurry screenshot. Preserve the original composition, character identity, pose, color placement, purple foil structure and pale gold divider line.
+
+Canvas: a single flat rectangular package face, portrait ratio 230:393, ideally 1536 x 2624 pixels or at least 1024 x 1744. The rectangular purple texture fills the entire canvas edge-to-edge. No white margin, no external background, no perspective, no 3D camera angle. This image will be mapped onto an existing 3D object.
+Layout: dark purple metallic sealed band across the upper ~12%; a crisp ivory-white and pale-gold horizontal divider at ~12%. Main illustrated area from ~13% to ~69%. Keep the bottom ~27% predominantly quiet deep purple with only subtle foil grain and a low-contrast purple energy haze, to receive typeset labels later. Bottom has purple/magenta horizontal crimped foil seal, about the last 4% of the image.
+Character/art: Roronoa Zoro, green / teal-green spiky hair, closed scarred left eye, muscular exposed chest, earrings, fierce grinning face angled DOWN and toward the LEFT of the image, three-sword style with a katana in his mouth. His head occupies the upper-left/middle of the illustrated region; his leaning torso occupies the right half. Keep the large diagonal dark steel sword and bright white blade streak crossing from lower-left toward upper-right, with sharp black and violet linework, magenta/violet lightning, white hot energy streaks and cyan-green hair highlights. Same side-facing downward pose as the central reference pack, NOT a new frontal portrait. Crisp manga/anime ink lines, clearly resolved hair spikes, facial features, sword edges and fabric edges; high-frequency detail with controlled clean edges.
+Text constraints: remove all original lettering, logos, barcode, company marks, Japanese titles and microtext completely. DO NOT render any text, letters, logos, symbols resembling lettering, typography or watermarks anywhere. Leave top and bottom bands ready for separately rendered vector labels.
+Avoid: blur, motion blur, soft focus, low-resolution pixelation, noisy oversharpening halos, the white mouse cursor, red rectangles, screenshot borders, multiple packs, reflections, shadows outside the texture, changed pose, front-facing Zoro, photorealism.
+Output: one opaque flat rectangular artwork texture only.

@@ -104,7 +104,7 @@ func summonRefusal(c *client, req proto.Message, want uint16) proto.Message {
 
 func TestSummonRefusalsByPlatform(t *testing.T) {
 	oldRand := summonRand
-	summonRand = func() float64 { return 0.99999 }
+	summonRand = func() float64 { return h5Advanced.shardChance + (1-h5Advanced.shardChance)/4 }
 	t.Cleanup(func() { summonRand = oldRand })
 	for _, tc := range []struct {
 		platform      string
@@ -131,6 +131,9 @@ func TestSummonRefusalsByPlatform(t *testing.T) {
 				}
 				if assets, err := st.RoleAssets(rid); err != nil || assets[3] != gems || assets[22] != 0 || assets[23] != 0 {
 					t.Fatalf("assets after refusal: %v (%v)", assets, err)
+				}
+				if misses, err := st.AdvancedSummonMisses(rid); err != nil || misses != 0 {
+					t.Fatalf("pity advanced after refusal: %d (%v)", misses, err)
 				}
 			}
 			ticketDraw := proto.Message{"group_id": 300, "times": 10, "recruit_type": summonItem}
@@ -252,6 +255,9 @@ func TestH5SummonConvertsLowStarDraws(test *testing.T) {
 			}
 			if tc.kind == summonFree && !freeUsed {
 				test.Fatal("shard-only draw did not consume the free summon")
+			}
+			if tc.cmd == 23201 && result.Int("must_five_num") != int64(h5Advanced.Pity) {
+				test.Fatalf("shard-only draw changed pity: %v", result)
 			}
 		})
 	}

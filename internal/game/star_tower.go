@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"errors"
+	"log"
 	"math/rand"
 	"strconv"
 	"time"
@@ -127,7 +128,7 @@ func awardMessages(list [][2]int64) []proto.Message {
 }
 
 // RegisterStarTower registers the star tower: 11320 the state, 11321 buy a challenge, 11322 climb a floor (the
-// result comes as 11323), 11324 sweep a cleared floor, 11325 the floor's best replays (none), 11327 the top
+// result comes as 11323), 11324 sweep a cleared floor, 11325 the floor's best replays, 11327 the top
 // three, 11328 take a milestone reward. A floor is fought like a campaign dungeon, but with the heroes' own
 // attack; the first win of a floor is free, every other fight or sweep takes one of the day's challenges
 // (2 free, 3 or more bought with gems). Our rules, not captured.
@@ -220,7 +221,7 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		return s.Send(11321, proto.Message{"result": 1, "msg": "购买成功", "count": towerCount(t, s.Now()), "buy_count": t.Bought})
 	})
 	// pay what a won floor gives and tell the client (11323)
-	finish := func(s *gateway.Session, role *store.Role, floor towerFloor, first, skip bool, t *store.StarTower) error {
+	finish := func(s *gateway.Session, role *store.Role, floor towerFloor, first bool, t *store.StarTower, report *towerReport) error {
 		gains := towerGains(floor.Award)
 		var firstGains [][2]int64
 		if first {
@@ -231,19 +232,19 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		if err := st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
 			return err
 		}
+		result := proto.Message{"result": 1, "max_tower": t.MaxTower, "tower": floor.Lev, "timer": 0, "count": towerCount(t, s.Now()),
+			"first_award": awardMessages(firstGains), "award": awardMessages(gains), "target_role_name": floor.Name,
+			"hurt_statistics": []proto.Message{}, "replay_id": 0, "is_skip": b2i(report == nil)}
+		if report != nil {
+			report.apply(st, result)
+		}
 		if err := sendAssets(s, st, role.RID); err != nil {
 			return err
 		}
 		if err := sendBackpack(s, st); err != nil {
 			return err
 		}
-		stats, _, _, _, err := damageTable(st, role, isH5RoleSession(s))
-		if err != nil {
-			return err
-		}
-		if err := s.Send(11323, proto.Message{"result": 1, "max_tower": t.MaxTower, "tower": floor.Lev, "timer": 0, "count": towerCount(t, s.Now()),
-			"first_award": awardMessages(firstGains), "award": awardMessages(gains), "target_role_name": floor.Name,
-			"hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": 0, "is_skip": b2i(skip)}); err != nil || skip {
+		if err := s.Send(11323, result); err != nil || report == nil {
 			return err
 		}
 		// the original follows every won floor with the milestones that changed: none, or "can be taken" (1)
@@ -268,6 +269,8 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		switch {
 		case !ok:
 			return refuse("等级不足")
+		case fights.hasFight(s, role.RID):
+			return refuse("当前正在战斗")
 		case n < 1 || n > int64(len(towerCfg.Floors)) || n > t.MaxTower+1:
 			return refuse("请先通关前面的层数")
 		}
@@ -279,7 +282,7 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 			}
 			t.Used++
 		}
-		team, objects, form, err := fights.teamSide(role, isH5RoleSession(s))
+		team, objects, form, err := fights.teamSideFor(role, formStarTower, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -295,7 +298,10 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 			foes = append(foes, unit)
 			objects = append(objects, obj)
 		}
-		rounds, won, _ := playFightOpts(team, foes, rngOf(), maxFightRounds, true)
+		rounds, won, sim := playFightOpts(team, foes, rngOf(), maxFightRounds, true)
+		if len(rounds) == 0 {
+			return refuse("该层暂无可挑战的守卫")
+		}
 		if !first {
 			if err := st.SaveStarTower(t); err != nil {
 				return err
@@ -313,29 +319,44 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		if err := s.Send(11322, proto.Message{"result": 1, "msg": ""}); err != nil {
 			return err
 		}
-		return fights.begin(s, role, combatStarTower, intro, rounds, won, func(s *gateway.Session, won bool) error {
-			if !won {
-				stats, _, _, _, err := damageTable(st, role, isH5RoleSession(s))
-				if err != nil {
-					return err
-				}
-				return s.Send(11323, proto.Message{"result": 2, "max_tower": t.MaxTower, "tower": n, "timer": 0, "count": towerCount(t, s.Now()), "first_award": []proto.Message{},
-					"award": []proto.Message{}, "target_role_name": floor.Name, "hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": 0, "is_skip": 0})
+		started := s.Now()
+		fight := &fightState{rounds: rounds, won: won, combat: combatStarTower}
+		fight.settle = func(s *gateway.Session, won bool) error {
+			now := s.Now()
+			var power int64
+			for _, u := range team {
+				power += u.power
 			}
+			report := &towerReport{stats: towerStatistics(sim, objects), durationMS: max(1, now.Sub(started).Milliseconds()), power: power, ranked: won && fight.played}
+			actor := replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: int64(role.FaceID), Power: power, Form: form.FormationType}
+			replayResult := proto.Message{"result": 2 - b2i(won), "target_role_name": floor.Name, "current_time": towerSeconds(report.durationMS),
+				"hurt_statistics": report.stats, "item_rewards": []proto.Message{}}
+			replay, err := encodeFightReplay(combatStarTower, actor, replaySide{Name: floor.Name}, intro, rounds, won, now.Unix(), replayResult)
+			if err != nil {
+				log.Printf("star tower: could not encode replay: %v", err)
+			}
+			report.replay = replay
 			fresh, err := st.StarTowerOf(role.RID)
 			if err != nil {
 				return err
 			}
-			towerCount(fresh, s.Now())
+			count := towerCount(fresh, now)
+			if !won {
+				result := proto.Message{"result": 2, "max_tower": fresh.MaxTower, "tower": n, "count": count, "first_award": []proto.Message{},
+					"award": []proto.Message{}, "target_role_name": floor.Name, "replay_id": 0, "is_skip": 0}
+				report.apply(st, result)
+				return s.Send(11323, result)
+			}
 			wasFirst := n > fresh.MaxTower
 			if wasFirst {
-				fresh.MaxTower, fresh.ClearedAt = n, s.Now().Unix()
+				fresh.MaxTower, fresh.ClearedAt = n, now.Unix()
 				if err := st.SaveStarTower(fresh); err != nil {
 					return err
 				}
 			}
-			return finish(s, role, floor, wasFirst, false, fresh)
-		})
+			return finish(s, role, floor, wasFirst, fresh, report)
+		}
+		return fights.beginFight(s, role, intro, fight)
 	})
 	r.Handle(11324, func(s *gateway.Session, req proto.Message) error {
 		role, t, ok, err := open(s)
@@ -361,13 +382,18 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 		if err := s.Send(11324, proto.Message{"result": 1, "msg": "", "count": towerCount(t, s.Now()), "buy_count": t.Bought}); err != nil {
 			return err
 		}
-		return finish(s, role, towerCfg.Floors[n-1], false, true, t)
+		return finish(s, role, towerCfg.Floors[n-1], false, t, nil)
 	})
-	r.Handle(11325, func(s *gateway.Session, _ proto.Message) error {
-		if s.Role() == nil {
+	r.Handle(11325, func(s *gateway.Session, req proto.Message) error {
+		role := s.Role()
+		if role == nil {
 			return nil
 		}
-		return s.Send(11325, proto.Message{"tower_replay_data": []proto.Message{}, "m_replay_id": 0, "my_time": 0})
+		reply, err := towerReplayList(st, role, req.Int("tower"))
+		if err != nil {
+			return err
+		}
+		return s.Send(11325, reply)
 	})
 	r.Handle(11327, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()

@@ -10,11 +10,9 @@ import (
 	"2droundserver/internal/store"
 )
 
-// The replays (vedio, 19901-19908; 20034 shares one from a result window, 20036 plays one). A fight that is worth a
-// replay is kept when it starts: the fight script is the same messages the client was sent (20027, then the 20002
-// and 20004 of every round), so a replay is played by the fight service like the fight itself. The lists show a
-// replay's two sides, kept next to the script. Our rules, not captured: only the arena keeps replays, a replay is
-// public (in the lists everybody sees) once somebody shared it, every role may like 10 replays a day.
+// The replays (vedio, 19901-19908; 20034 shares one from a result window, 20036 plays one). The fight script
+// keeps the introduction and round messages (20027, 20002 and 20004) so the fight service plays them back
+// in order. A replay's two sides are kept alongside the script. A replay is public in the library once shared.
 
 const (
 	vedioModule   = "vedio"
@@ -61,6 +59,7 @@ type replayData struct {
 	Won    bool          `json:"won"`
 	Intro  string        `json:"intro"`
 	Rounds []replayRound `json:"rounds"`
+	Report string        `json:"report,omitempty"` // optional 20006 snapshot for tower battle statistics
 }
 
 type replayRound struct {
@@ -89,21 +88,24 @@ func decodeWire(cmd uint16, s string) (proto.Message, error) {
 	return proto.Decode(proto.DefaultOptions(), sc.Recv[cmd], b)
 }
 
-// recordReplay keeps a fight (a attacked b) and returns the replay id; 0 when it could not be kept (the fight
-// itself goes on).
-func recordReplay(st *store.Store, combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64) int64 {
+func encodeFightReplay(combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64, report proto.Message) (store.Replay, error) {
 	d := replayData{Combat: combat, Won: won}
 	var err error
 	if d.Intro, err = encodeWire(20027, intro); err != nil {
-		return 0
+		return store.Replay{}, err
+	}
+	if report != nil {
+		if d.Report, err = encodeWire(20006, report); err != nil {
+			return store.Replay{}, err
+		}
 	}
 	for i, r := range rounds {
 		var rr replayRound
 		if rr.Start, err = encodeWire(20002, roundStart(r, i, combat)); err != nil {
-			return 0
+			return store.Replay{}, err
 		}
 		if rr.Plays, err = encodeWire(20004, roundPlays(r, i, combat)); err != nil {
-			return 0
+			return store.Replay{}, err
 		}
 		d.Rounds = append(d.Rounds, rr)
 	}
@@ -123,7 +125,16 @@ func recordReplay(st *store.Store, combat int64, a, b replaySide, intro proto.Me
 	}
 	meta, _ := json.Marshal(replayMeta{Won: won, A: a, B: b})
 	data, _ := json.Marshal(d)
-	id, err := st.AddReplay(store.Replay{SrvID: a.SrvID, CombatType: combat, ARID: a.RID, BRID: b.RID, Time: now, Meta: string(meta), Data: string(data)})
+	return store.Replay{SrvID: a.SrvID, CombatType: combat, ARID: a.RID, BRID: b.RID, Time: now, Meta: string(meta), Data: string(data)}, nil
+}
+
+// recordReplay keeps a fight and returns 0 if it could not be kept.
+func recordReplay(st *store.Store, combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64) int64 {
+	r, err := encodeFightReplay(combat, a, b, intro, rounds, won, now, nil)
+	if err != nil {
+		return 0
+	}
+	id, err := st.AddReplay(r)
 	if err != nil {
 		return 0
 	}
@@ -472,28 +483,42 @@ func (v *vedioSvc) play(s *gateway.Session, req proto.Message) error {
 	if server := req.Str("replay_srv_id"); server != "" && server != r.SrvID {
 		return refuse("录像不存在")
 	}
+	if r.CombatType == combatStarTower && r.SrvID != role.SrvID {
+		return refuse("录像不存在")
+	}
+	if v.fights.hasFight(s, role.RID) {
+		return refuse("当前正在战斗")
+	}
 	intro, rounds, d, err := fightOfReplay(r.Data)
 	if err != nil {
 		return refuse("录像已损坏")
 	}
+	var report proto.Message
+	if d.Report != "" {
+		if report, err = decodeWire(20006, d.Report); err != nil {
+			return refuse("录像已损坏")
+		}
+	}
 	if err := v.st.BumpReplay(r.ID, 0, 0, 1); err != nil {
 		return err
 	}
-	return v.fights.beginReplay(s, role, d.Combat, intro, rounds, d.Won)
+	return v.fights.beginReplay(s, role, d.Combat, intro, rounds, d.Won, report)
 }
 
-// beginReplay uses the captured 20000 -> 20036 -> 20027 startup, without the
-// live battle's 20063. A replay ends with a playback acknowledgement (result1,
-// combat+1000), not a second settlement or the attacking side's win/loss.
-func (f *FightService) beginReplay(s *gateway.Session, role *store.Role, combat int64, intro proto.Message, rounds []fightRound, won bool) error {
+// beginReplay uses the captured 20000 -> 20036 -> 20027 startup. It ends with
+// the 20006 playback report (combat+1000), carrying the archived outcome when supplied.
+func (f *FightService) beginReplay(s *gateway.Session, role *store.Role, combat int64, intro proto.Message, rounds []fightRound, won bool, report proto.Message) error {
+	if report == nil {
+		report = proto.Message{"result": 1, "item_rewards": []proto.Message{}, "hurt_statistics": []proto.Message{}}
+	}
+	report["combat_type"] = combat + 1000
 	f.mu.Lock()
 	if f.active == nil {
 		f.active = map[int64]*fightState{}
 	}
-	f.active[role.RID] = &fightState{rounds: rounds, won: won, combat: combat,
+	f.active[role.RID] = &fightState{rounds: rounds, won: won, combat: combat, owner: s,
 		settle: func(s *gateway.Session, _ bool) error {
-			return s.Send(20006, proto.Message{"result": 1, "combat_type": combat + 1000,
-				"item_rewards": []proto.Message{}, "hurt_statistics": []proto.Message{}})
+			return s.Send(20006, report)
 		}}
 	f.mu.Unlock()
 	fillHalo(intro)

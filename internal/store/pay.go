@@ -26,27 +26,52 @@ type PayOrder struct {
 	Operator    string `json:"operator"`
 	Note        string `json:"note"`
 	ProofAt     int64  `json:"proof_at"`
+	OfferID     int64  `json:"offer_id,omitempty"`
 }
 
-const payCols = `id,order_no,rid,srv_id,charge_id,amount_cents,status,created_at,paid_at,operator,note,proof_at`
+const payCols = `id,order_no,rid,srv_id,charge_id,amount_cents,status,created_at,paid_at,operator,note,proof_at,offer_id`
 
 func scanPay(sc interface{ Scan(...any) error }) (*PayOrder, error) {
 	var o PayOrder
-	err := sc.Scan(&o.ID, &o.OrderNo, &o.RID, &o.SrvID, &o.ChargeID, &o.AmountCents, &o.Status, &o.CreatedAt, &o.PaidAt, &o.Operator, &o.Note, &o.ProofAt)
+	err := sc.Scan(&o.ID, &o.OrderNo, &o.RID, &o.SrvID, &o.ChargeID, &o.AmountCents, &o.Status, &o.CreatedAt, &o.PaidAt, &o.Operator, &o.Note, &o.ProofAt, &o.OfferID)
 	return &o, wrapNoRows(err)
 }
 
 // CreatePayOrder opens an order; the number is made by the caller and must be new.
 func (s *Store) CreatePayOrder(o PayOrder) (*PayOrder, error) {
 	o.CreatedAt = s.unix()
-	res, err := s.db.Exec(`INSERT INTO pay_orders(order_no,rid,srv_id,charge_id,amount_cents,status,created_at) VALUES(?,?,?,?,?,0,?)`,
-		o.OrderNo, o.RID, o.SrvID, o.ChargeID, o.AmountCents, o.CreatedAt)
+	res, err := s.db.Exec(`INSERT INTO pay_orders(order_no,rid,srv_id,charge_id,amount_cents,status,created_at,offer_id) VALUES(?,?,?,?,?,0,?,?)
+		ON CONFLICT(rid,offer_id) WHERE offer_id<>0 AND status IN (0,1) DO NOTHING`,
+		o.OrderNo, o.RID, o.SrvID, o.ChargeID, o.AmountCents, o.CreatedAt, o.OfferID)
 	if err != nil {
 		return nil, err
+	}
+	if count, _ := res.RowsAffected(); count == 0 {
+		return nil, ErrConflict
 	}
 	o.ID, _ = res.LastInsertId()
 	o.Status = PayWaiting
 	return &o, nil
+}
+
+func (s *Store) PayOfferStatus(rid, offerID int64) (int, error) {
+	var status int
+	err := s.db.QueryRow(`SELECT status FROM pay_orders WHERE rid=? AND offer_id=? AND offer_id<>0 AND status IN (0,1)`, rid, offerID).Scan(&status)
+	return status, wrapNoRows(err)
+}
+
+func (s *Store) AssignPayOffer(no string, offerID int64) error {
+	res, err := s.db.Exec(`UPDATE pay_orders SET offer_id=? WHERE order_no=? AND status=0 AND offer_id=0`, offerID, no)
+	if isUnique(err) {
+		return ErrConflict
+	}
+	if err != nil {
+		return err
+	}
+	if count, _ := res.RowsAffected(); count == 0 {
+		return ErrConflict
+	}
+	return nil
 }
 
 func (s *Store) PayOrderByNo(no string) (*PayOrder, error) {

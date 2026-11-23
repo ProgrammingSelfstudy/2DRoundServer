@@ -69,7 +69,7 @@ func ptPairs(list [][]int64) [][2]int64 {
 
 // ptSnap is the state before the last fight, which "fight again" goes back to.
 type ptSnap struct {
-	Done, Left, Time int64
+	Done, Left, At, Power int64
 }
 
 type ptState struct {
@@ -179,6 +179,9 @@ func (p *ptSvc) rankOf(srv string, rid int64) (rank int64, rows []ptRankRow, err
 		if rows[i].Val != rows[j].Val {
 			return rows[i].Val > rows[j].Val
 		}
+		if rows[i].At == 0 || rows[j].At == 0 {
+			return rows[i].At != 0
+		}
 		return rows[i].At < rows[j].At
 	})
 	for i, row := range rows {
@@ -200,9 +203,16 @@ func (p *ptSvc) note(role *store.Role, st *ptState) error {
 	row := ptRankRow{RID: role.RID, Name: role.Name, SrvID: role.SrvID, Lev: int64(role.Lev), Face: int64(role.FaceID), Val: st.Done, At: st.At, Power: st.Power}
 	for i := range r.Rows {
 		if r.Rows[i].RID == role.RID {
-			r.Rows[i] = row
+			if st.Done == 0 {
+				r.Rows = append(r.Rows[:i], r.Rows[i+1:]...)
+			} else {
+				r.Rows[i] = row
+			}
 			return p.st.SaveGlobal(role.SrvID, ptRankModule, r)
 		}
+	}
+	if st.Done == 0 {
+		return nil
 	}
 	r.Rows = append(r.Rows, row)
 	return p.st.SaveGlobal(role.SrvID, ptRankModule, r)
@@ -274,7 +284,11 @@ func (p *ptSvc) redo(s *gateway.Session, _ proto.Message) error {
 		case st.Redo >= ptCfg.num("holiday_practise_tower_reset_time"):
 			return refuse("今日重新挑战次数已用完")
 		}
-		st.Done, st.Left, st.Time = st.Snap.Done, st.Snap.Left, st.Snap.Time
+		if st.Done != st.Snap.Done {
+			st.At, st.Power = st.Snap.At, st.Snap.Power
+		}
+		st.Done, st.Left = st.Snap.Done, st.Snap.Left
+		st.Time++
 		st.Snap = nil
 		st.Redo++
 		if err := p.note(role, st); err != nil {
@@ -338,7 +352,7 @@ func (p *ptSvc) fight(s *gateway.Session, req proto.Message) error {
 			return err
 		}
 		st.Time--
-		st.Snap = &ptSnap{Done: st.Done, Left: st.Left, Time: st.Time + 1}
+		st.Snap = &ptSnap{Done: st.Done, Left: st.Left, At: st.At, Power: st.Power}
 		return p.fights.begin(s, role, combatPT, intro, rounds, damage >= hp, func(s *gateway.Session, _ bool) error {
 			return p.settle(s, floor, damage, slots)
 		})

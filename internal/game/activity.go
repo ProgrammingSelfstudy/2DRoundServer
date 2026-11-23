@@ -498,18 +498,23 @@ func activitySignature(st *store.Store, srv string, now time.Time) string {
 }
 
 // WatchActivities tells the online roles (16607 with type 0, which makes the client ask for the list again) when the
-// set of open activities of their server changes. It checks every interval and returns when stop is closed.
+// set of open activities of their server changes, and pushes growth icon changes on period rollover.
+// It checks every interval and returns when stop is closed.
 func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now func() time.Time, stop <-chan struct{}) {
 	last := map[string]string{}
+	previous := now()
 	tick := func() {
+		current := now()
 		bySrv := map[string][]*gateway.Session{}
 		hub.Each(func(_ int64, s *gateway.Session) {
 			if role := s.Role(); role != nil {
 				bySrv[role.SrvID] = append(bySrv[role.SrvID], s)
+				_ = pushGrowthIconChanges(s, role, previous, current)
 			}
 		})
+		previous = current
 		for srv, sessions := range bySrv {
-			sig := activitySignature(st, srv, now())
+			sig := activitySignature(st, srv, current)
 			if prev, seen := last[srv]; seen && prev != sig {
 				for _, s := range sessions {
 					_ = s.Send(16607, proto.Message{"type": 0})

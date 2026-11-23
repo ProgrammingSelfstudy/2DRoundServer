@@ -9,7 +9,8 @@ import (
 )
 
 func ptEnv(t *testing.T) (*env, *client, *store.Role, int64) {
-	e := newEnv(t, 100*time.Hour)
+	e := newDungeonEnv(t)
+	e.setNow(actNow)
 	c, role := e.enter("up", "兔丼挑战者")
 	c.send(11000, proto.Message{})
 	c.waitFor(11000)
@@ -36,7 +37,7 @@ func TestPractiseTowerInfoAndBuy(t *testing.T) {
 	e, c, role, _ := ptEnv(t)
 	c.send(29100, proto.Message{})
 	b := c.waitFor(29100)
-	if b.Int("id") != 0 || b.Int("time") != 4 || b.Int("last_buy_time") != 4 || b.Int("radio") != 100 || b.Int("is_recombat") != 0 || b.Int("last_unixtime") <= time.Now().Unix() {
+	if b.Int("id") != 0 || b.Int("time") != 4 || b.Int("last_buy_time") != 4 || b.Int("radio") != 100 || b.Int("is_recombat") != 0 || b.Int("last_unixtime") <= actNow.Unix() {
 		t.Fatalf("29100: %v", b)
 	}
 	if err := e.st.Exchange(role.RID, map[int64]int64{}, map[int64]int64{}, map[int64]int64{3: 1000}, map[int64]int64{}); err != nil {
@@ -48,6 +49,7 @@ func TestPractiseTowerInfoAndBuy(t *testing.T) {
 		t.Fatalf("buy: %v", r)
 	}
 	b = c.waitFor(29100)
+	c.settle()
 	after, _ := e.st.RoleAssets(role.RID)
 	if b.Int("time") != 5 || b.Int("last_buy_time") != 3 || after[3] != before[3]-100 {
 		t.Fatalf("buying: %v, diamonds %v -> %v", b, before[3], after[3])
@@ -78,22 +80,36 @@ func TestPractiseTowerFightCarriesHPAndRedoUndoes(t *testing.T) {
 	c.waitFor(29100)
 	c.settle()
 	st := e.ptState(t, role)
-	hs, _ := e.st.PartnersOf(role.RID)
-	t.Logf("hero power %d, damage/power %.2f", partnerMessage(hs[0]).Int("power"), float64(res.Int("all_dps"))/float64(partnerMessage(hs[0]).Int("power")))
-	t.Logf("damage %d of %d, result %v, state %+v", res.Int("all_dps"), ptBossHP(1), res.Int("flag"), st)
-	if res.Int("number") != 1 || res.Int("all_dps") <= 0 || st.Time != 3 || st.Snap == nil {
+	if res.Int("number") != 1 || res.Int("flag") != 2 || res.Int("all_dps") <= 0 || st.Time != 3 || st.Snap == nil {
 		t.Fatalf("29102: %v, %+v", res, st)
 	}
-	if res.Int("flag") != 1 && st.Left != ptBossHP(1)-res.Int("all_dps") {
+	if st.Left != ptBossHP(1)-res.Int("all_dps") {
 		t.Fatalf("hp must carry over: %+v", st)
+	}
+	if err := e.st.Exchange(role.RID, nil, nil, map[int64]int64{3: 1000}, nil); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := e.st.RoleAssets(role.RID)
+	c.send(29104, proto.Message{})
+	if r := c.waitFor(29104); r.Int("flag") != 1 {
+		t.Fatalf("buy after combat: %v", r)
+	}
+	if b := c.waitFor(29100); b.Int("time") != 4 {
+		t.Fatalf("bought attempt missing: %v", b)
 	}
 	c.send(29103, proto.Message{})
 	if r := c.waitFor(29103); r.Int("flag") != 1 {
 		t.Fatalf("redo: %v", r)
 	}
 	b := c.waitFor(29100)
-	if b.Int("time") != 4 || b.Int("id") != 0 || b.Int("radio") != 100 || b.Int("is_recombat") != 0 {
+	if b.Int("time") != 5 || b.Int("id") != 0 || b.Int("radio") != 100 || b.Int("is_recombat") != 0 || b.Int("last_buy_time") != 3 {
 		t.Fatalf("after redo: %v", b)
+	}
+	c.settle()
+	after, _ := e.st.RoleAssets(role.RID)
+	st = e.ptState(t, role)
+	if st.Time != 5 || st.Bought != 1 || st.Left != 0 || after[3] != before[3]-100 {
+		t.Fatalf("redo must not undo a purchase: %+v, diamonds %d -> %d", st, before[3], after[3])
 	}
 	c.send(29103, proto.Message{})
 	if r := c.waitFor(29103); r.Int("flag") != 0 {
@@ -104,39 +120,78 @@ func TestPractiseTowerFightCarriesHPAndRedoUndoes(t *testing.T) {
 func TestPractiseTowerClearPaysOnceAndRanks(t *testing.T) {
 	e, c, role, hero := ptEnv(t)
 	st := e.ptState(t, role)
-	st.Day, st.Time, st.Left = dayKey(time.Now()), 4, 1 // one hp left: any hit kills
+	st.Day, st.Time, st.Left = dayKey(actNow), 4, 1
 	if err := e.st.SaveState(role.RID, ptModule, st); err != nil {
 		t.Fatal(err)
 	}
-	before, _ := e.st.RoleAssets(role.RID)
-	c.send(29101, ptTeam(hero))
-	c.waitFor(29101)
-	c.waitFor(20027)
-	c.send(20062, proto.Message{})
-	c.waitFor(20062)
-	res := c.waitFor(29102)
-	c.waitFor(29106)
-	c.waitFor(29100)
-	c.settle()
-	after, _ := e.st.RoleAssets(role.RID)
+	clear := func(floor int64) proto.Message {
+		t.Helper()
+		team := ptTeam(hero)
+		team["id"] = floor
+		c.send(29101, team)
+		if r := c.waitFor(29101); r.Int("flag") != 1 {
+			t.Fatalf("start floor %d: %v", floor, r)
+		}
+		c.waitFor(20027)
+		c.send(20062, proto.Message{})
+		c.waitFor(20062)
+		res := c.waitFor(29102)
+		if res.Int("flag") != 1 || res.Int("number") != floor {
+			t.Fatalf("clear floor %d: %v", floor, res)
+		}
+		c.waitFor(29106)
+		c.waitFor(29100)
+		c.settle()
+		return res
+	}
+	res := clear(1)
 	st = e.ptState(t, role)
-	if res.Int("flag") != 1 || len(res.Arr("reward")) != 1 || st.Done != 1 || st.Left != 0 || len(st.Paid) != 1 {
+	if len(res.Arr("reward")) != 1 || st.Done != 1 || st.Left != 0 || len(st.Paid) != 1 || st.Power <= 0 || st.At != actNow.Unix() {
 		t.Fatalf("clear: %v, %+v", res, st)
 	}
-	_ = before
-	_ = after
-	c.send(29105, proto.Message{})
-	r := c.waitFor(29105)
-	rows := r.Arr("practise_role_rank")
-	if r.Int("role_rank") != 1 || len(rows) != 1 || rows[0].Str("name") != "兔丼挑战者" || rows[0].Int("val") != 1 || r.Int("role_val") != 1 {
-		t.Fatalf("29105: %v", r)
+	checkRank := func(st *ptState) {
+		t.Helper()
+		c.send(29105, proto.Message{})
+		r := c.waitFor(29105)
+		rows := r.Arr("practise_role_rank")
+		if r.Int("role_rank") != 1 || len(rows) != 1 || rows[0].Str("name") != role.Name || rows[0].Int("val") != st.Done || r.Int("role_val") != st.Done || rows[0].Int("unixtime") != st.At || rows[0].Int("power") != st.Power || r.Int("role_unixtime") != st.At {
+			t.Fatalf("rank before/after redo: %v, want %+v", r, st)
+		}
 	}
-	// after a redo the floor is open again but its reward was paid and does not pay twice
+	checkRank(st)
+	prior := *st
+	st.Left = 1
+	if err := e.st.SaveState(role.RID, ptModule, st); err != nil {
+		t.Fatal(err)
+	}
+	partner, err := e.st.PartnerByID(role.RID, hero)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.UpgradePartner(role.RID, hero, partner.Lev, partner.BreakLev, partner.Lev+5, partner.BreakLev, nil, nil); err != nil {
+		t.Fatal(err)
+	}
+	e.advance(time.Minute)
+	if res := clear(2); len(res.Arr("reward")) == 0 {
+		t.Fatalf("first floor 2 clear: %v", res)
+	}
+	higher := e.ptState(t, role)
+	if higher.At <= prior.At || higher.Power <= prior.Power {
+		t.Fatalf("second clear must have new rank metadata: %+v vs %+v", higher, prior)
+	}
+	checkRank(higher)
 	c.send(29103, proto.Message{})
-	c.waitFor(29103)
+	if r := c.waitFor(29103); r.Int("flag") != 1 {
+		t.Fatalf("redo: %v", r)
+	}
 	c.waitFor(29100)
+	c.settle()
 	st = e.ptState(t, role)
-	if st.Done != 0 || !st.paid(1) {
+	if st.Done != prior.Done || st.Left != 1 || st.Time != prior.Time || st.At != prior.At || st.Power != prior.Power || !st.paid(1) || !st.paid(2) {
 		t.Fatalf("redo of a clear: %+v", st)
+	}
+	checkRank(&prior)
+	if res := clear(2); len(res.Arr("reward")) != 0 {
+		t.Fatalf("duplicate first clear reward: %v", res)
 	}
 }

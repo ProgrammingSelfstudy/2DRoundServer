@@ -24,24 +24,25 @@ import (
 var champJSON []byte
 
 const (
-	champModule    = "arenachamp"
-	combatChampion = 10 // BattleConst.Fight_Type.Champion
-	champKind      = 6  // PartnerConst.Fun_Form.ArenaChampion: the formation the match uses
-	champRobotBase = 4200000000
-	champSize      = 128
-	champGroups    = 4
-	champStepScore = 1
-	champStep32    = 32
-	champStep4     = 4
-	champScoreRnds = 6
-	champRounds    = 11 // 6 selection, 3 of the groups, 2 of the last four
-	champWinPoints = 100
-	champStartHour = 21
-	champStartMin  = 5
-	champGrace     = 2 * 3600 // an event found this long after its end is not played any more
-	champOddsMin   = 1200
-	champOddsMax   = 5000
-	champOddsSeed  = 600 // virtual chips on each side of a bet pool, so that an empty one pays 2.0
+	champModule         = "arenachamp"
+	combatChampion      = 10
+	combatCrossChampion = 31
+	champKind           = 6 // PartnerConst.Fun_Form.ArenaChampion: the formation the match uses
+	champRobotBase      = 4200000000
+	champSize           = 128
+	champGroups         = 4
+	champStepScore      = 1
+	champStep32         = 32
+	champStep4          = 4
+	champScoreRnds      = 6
+	champRounds         = 11 // 6 selection, 3 of the groups, 2 of the last four
+	champWinPoints      = 100
+	champStartHour      = 21
+	champStartMin       = 5
+	champGrace          = 2 * 3600 // an event found this long after its end is not played any more
+	champOddsMin        = 1200
+	champOddsMax        = 5000
+	champOddsSeed       = 600 // virtual chips on each side of a bet pool, so that an empty one pays 2.0
 )
 
 type champConf struct {
@@ -804,9 +805,17 @@ func (c *champSvc) fight(m *champMatch, a, b *champEntrant, rng *rand.Rand, now 
 	if len(au) == 0 || len(bu) == 0 {
 		return false
 	}
-	rounds, won := buildFight(au, bu, rng)
+	rounds, won, sim := playFight(au, bu, rng, maxFightRounds)
+	combat := int64(combatChampion)
+	if c.cross {
+		combat = combatCrossChampion
+	}
+	stage := int64(champSize)
+	if m.Step != champStepScore && m.Round > 0 {
+		stage = m.Step >> (m.Round - 1)
+	}
 	intro := proto.Message{
-		"combat_type": combatChampion, "formation": []proto.Message{{"group": 1, "formation_type": af, "formation_lev": 1}, {"group": 2, "formation_type": bf, "formation_lev": 1}},
+		"combat_type": combat, "formation": []proto.Message{{"group": 1, "formation_type": af, "formation_lev": 1}, {"group": 2, "formation_type": bf, "formation_lev": 1}},
 		"objects": append(ao, bo...), "is_auto": 0, "current_wave": 1, "total_wave": 1, "play_speed": 1,
 		"extra_args": []proto.Message{}, "string_ext_args": []proto.Message{}, "a_object_num": len(au), "actor_role_name": a.Name,
 		"target_role_name": b.Name, "suppress": 0, "halo_list": []proto.Message{},
@@ -816,8 +825,9 @@ func (c *champSvc) fight(m *champMatch, a, b *champEntrant, rng *rand.Rand, now 
 	if won {
 		m.Ret = 1
 	}
-	m.Replay = recordReplay(c.st, combatChampion, replaySide{RID: a.RID, SrvID: a.SrvID, Name: a.Name, Lev: a.Lev, Face: a.Face, Power: a.Power, Form: af},
-		replaySide{RID: b.RID, SrvID: b.SrvID, Name: b.Name, Lev: b.Lev, Face: b.Face, Power: b.Power, Form: bf}, intro, rounds, won, now)
+	m.Replay = recordReplay(c.st, combat, replaySide{RID: a.RID, SrvID: a.SrvID, Name: a.Name, Lev: a.Lev, Face: a.Face, Power: a.Power, Form: af},
+		replaySide{RID: b.RID, SrvID: b.SrvID, Name: b.Name, Lev: b.Lev, Face: b.Face, Power: b.Power, Form: bf},
+		intro, rounds, won, now, replayDetails{Map: fightMap, Stage: stage, Sim: sim})
 	return true
 }
 

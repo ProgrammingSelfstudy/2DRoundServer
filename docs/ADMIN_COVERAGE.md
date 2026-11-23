@@ -75,6 +75,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `encounter` | 英雄物语（27100–27104） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [encounter.go](../internal/game/encounter.go) |
 | role | `endless_trail` | 无尽试炼个人进度（23900–23913） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go)、[endless.go](../internal/game/endless.go)、[endless_run.go](../internal/game/endless_run.go) |
 | role | `escort` | 护送个人状态（24000–24020） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [escort.go](../internal/game/escort.go) |
+| role | `firegifts` | 触发限时钜惠（28000） | 原始JSON查看（read） | 只读 | 保存触发档位与截止时间；不得重置或重选已有订单的奖励 | [fire_gifts.go](../internal/game/fire_gifts.go) |
 | role | `firstcharge_*` | 四组首充窗口（21000/21001、21012–21014、21030–21033） | 原始JSON、逐窗口首充视图（read）；整窗重置（manage） | 已接查看/专用视图/白名单all重置 | 四个真实窗口后缀；重置删除该行且不发奖，后续领取仍受原规则约束 | [firstcharge.go](../internal/game/firstcharge.go) |
 | role | `fortunebag` | 福袋翻牌（28300–28308） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [fortunebag.go](../internal/game/fortunebag.go) |
 | role | `growway` | 成长之路（25830/25832） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [growway.go](../internal/game/growway.go) |

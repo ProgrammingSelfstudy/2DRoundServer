@@ -1119,7 +1119,7 @@ func (a *amSvc) fight(s *gateway.Session, c *amCtx, req proto.Message) error {
 		d.Time = c.now.Unix()
 		d.Replay = recordReplay(a.st, combatAMP, replaySide{RID: d.ARID, SrvID: d.ASrv, Name: mine[0].Name, Lev: mine[0].Lev, Face: mine[0].Face, Power: d.APower, Form: d.AForm},
 			replaySide{RID: d.BRID, SrvID: d.BSrv, Name: theirs[0].Name, Lev: theirs[0].Lev, Face: theirs[0].Face, Power: d.BPower, Form: d.BForm},
-			plan.intro, plan.rounds[i], d.Ret == 1, c.now.Unix())
+			plan.intro, plan.rounds[i], d.Ret == 1, c.now.Unix(), replayDetails{Map: fightMap})
 		plan.hurts[i]["replay_id"], plan.hurts[i]["a_name"], plan.hurts[i]["b_name"], plan.hurts[i]["ret"] = d.Replay, mine[0].Name, theirs[0].Name, d.Ret
 	}
 	c.me.Used++

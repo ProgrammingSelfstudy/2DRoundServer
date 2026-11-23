@@ -149,7 +149,7 @@ const spiritPos = 41
 type fightUnit struct {
 	guild                      guildCombatBonus
 	pos, speed, hp, maxHP, atk int64
-	power                      int64
+	power, breakLev            int64
 	damage, taken, healing     int64
 	crit, critRatio            int64 // per mille; critRatio 1500 = x1.5
 	skills                     []int64
@@ -178,6 +178,27 @@ type fightRound struct {
 	alive []int64         // positions alive at the start (20002)
 	start []proto.Message // what happens at the start: status ticks and their damage (20002)
 	plays []proto.Message // the attacks (20004)
+}
+
+func fightStatistics(sim *fightSim, objects []proto.Message) []proto.Message {
+	byPos := make(map[int64]fightUnit, len(sim.units))
+	for _, unit := range sim.units {
+		byPos[unit.pos] = unit
+	}
+	groups := map[int64][]proto.Message{1: {}, 2: {}}
+	for _, object := range objects {
+		unit, ok := byPos[object.Int("pos")]
+		if !ok {
+			continue
+		}
+		group := object.Int("group")
+		groups[group] = append(groups[group], proto.Message{
+			"rid": object.Int("owner_id"), "srvid": object.Str("owner_srv_id"), "id": object.Int("object_id"),
+			"bid": object.Int("object_bid"), "star": object.Int("star"), "lev": object.Int("lev"), "camp_type": object.Int("camp_type"),
+			"dps": unit.damage, "be_hurt": unit.taken, "cure": unit.healing, "ext_data": []proto.Message{},
+		})
+	}
+	return []proto.Message{{"type": 2, "partner_hurts": groups[2]}, {"type": 1, "partner_hurts": groups[1]}}
 }
 
 // fightStage is what the server waits for next.
@@ -823,16 +844,16 @@ func ownFightSide(role *store.Role, formType int64, formSlots []store.FormationS
 	return team, append(objects, heroObjects...)
 }
 
-func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64, h5 bool) ([]fightRound, bool, proto.Message, error) {
+func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64, h5 bool) ([]fightRound, bool, proto.Message, *fightSim, error) {
 	team, objects, form, err := f.teamSide(role, h5)
 	if err != nil {
-		return nil, false, nil, err
+		return nil, false, nil, nil, err
 	}
 	var foes []fightUnit
 	// the monsters of the dungeon that is being challenged
 	wave, ok := dungeonUnits[d.DunID]
 	if !ok || len(wave.Monsters) == 0 {
-		return nil, false, nil, errNoWave
+		return nil, false, nil, nil, errNoWave
 	}
 	for i, m := range wave.Monsters {
 		if i == len(monsterPos) {
@@ -851,14 +872,14 @@ func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64, h
 		"hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 	}
 	if len(team) == 0 {
-		return nil, false, nil, errNoHeroes
+		return nil, false, nil, nil, errNoHeroes
 	}
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	if f.Rand != nil {
 		rng = f.Rand()
 	}
-	rounds, won := buildFight(team, foes, rng)
-	return rounds, won, start, nil
+	rounds, won, sim := playFight(team, foes, rng, maxFightRounds)
+	return rounds, won, start, sim, nil
 }
 
 // sideUnits makes the fighters and their 20027 objects for the heroes in a formation: ours stand on the
@@ -887,7 +908,7 @@ func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, for
 			sids = append(sids, sk.Int("skill_bid"))
 			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
 		}
-		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), power: m.Int("power"),
+		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), power: m.Int("power"), breakLev: int64(h.BreakLev),
 			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours, guild: guildCombatBonusOf(h)})
 		objects = append(objects, proto.Message{
 			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": 0}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
@@ -906,7 +927,7 @@ var errNoWave = errors.New("the dungeon has no monsters")
 // start begins a fight: the confirmation of 13003, the map and the fight data.
 func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama, auto int64) error {
 	h5 := isH5RoleSession(s)
-	rounds, won, intro, err := f.fightSetup(role, d, auto, h5)
+	rounds, won, intro, sim, err := f.fightSetup(role, d, auto, h5)
 	if err != nil {
 		if h5 && errors.Is(err, errNoHeroes) {
 			return s.Send(13003, proto.Message{"code": 0, "msg": "没有可以出战的英雄"})
@@ -928,7 +949,7 @@ func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama
 			face = store.DefaultFaceID
 		}
 		id := recordReplay(f.Store, combatDrama, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power},
-			replaySide{Name: dungeonUnits[d.DunID].Group}, intro, rounds, true, s.Now().Unix())
+			replaySide{Name: dungeonUnits[d.DunID].Group}, intro, rounds, true, s.Now().Unix(), replayDetails{Map: fightMap, Sim: sim})
 		if id != 0 {
 			pass = &passRecord{Replay: id, Power: power, Time: int64(len(rounds)) * dramaPassSeconds}
 		}

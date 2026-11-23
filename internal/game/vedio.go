@@ -24,9 +24,50 @@ const (
 	vedioPage     = 30 // VedioConst.ReqVedioDataNum
 )
 
-// vedioTabCombat is the fight type each of the client's tabs (VedioConst.Tab_Index) lists; the tabs of the
-// fights this server has no replays of list nothing.
-var vedioTabCombat = map[int64]int64{1: combatArena}
+func vedioFilter(tab, condition int64) (store.ReplayFilter, bool) {
+	filter := store.ReplayFilter{}
+	switch tab {
+	case vedioTabHot, vedioTabNew:
+		filter.ByLikes = tab == vedioTabHot
+	case 1:
+		filter.CombatType = combatArena
+		bands := [...][2]int64{{}, {1, 10}, {11, 50}, {51, 100}, {101, 0}}
+		if condition < 0 || condition >= int64(len(bands)) {
+			return filter, false
+		}
+		filter.RankMin, filter.RankMax = bands[condition][0], bands[condition][1]
+		return filter, true
+	case 2, 7:
+		filter.CombatType = combatChampion
+		stages := []int64{0, 2, 4, 8, 16, 32, champSize}
+		if tab == 7 {
+			filter.CombatType = combatCrossChampion
+			stages = []int64{0, 2, 4, 8, 16, 32, 64, champSize}
+		}
+		if condition < 0 || condition >= int64(len(stages)) {
+			return filter, false
+		}
+		filter.Stage = stages[condition]
+		return filter, true
+	case 3:
+		filter.CombatType = 8
+		bands := [...][2]int64{{}, {151, 0}, {101, 150}, {51, 100}, {1, 50}}
+		if condition < 0 || condition >= int64(len(bands)) {
+			return filter, false
+		}
+		filter.LevelMin, filter.LevelMax = bands[condition][0], bands[condition][1]
+		return filter, true
+	case 4:
+		filter.CombatType = combatGuildWar
+	case 5:
+		filter.CombatType = combatLadder
+	case 6:
+		filter.CombatType = combatElite
+	default:
+		return filter, false
+	}
+	return filter, condition == 0
+}
 
 // replaySide is one side of a kept fight as the lists show it.
 type replaySide struct {
@@ -44,6 +85,9 @@ type replaySide struct {
 
 type replayHero struct {
 	ID, Pos, BID, Lev, Star, HP, HPMax int64
+	Break, Power, Attack, Speed        int64
+	DPS, Taken, Healing                int64
+	FinalHP                            *int64 `json:",omitempty"`
 }
 
 // replayMeta is what the lists need of a replay: A attacked B, and Won says A won.
@@ -59,7 +103,7 @@ type replayData struct {
 	Won    bool          `json:"won"`
 	Intro  string        `json:"intro"`
 	Rounds []replayRound `json:"rounds"`
-	Report string        `json:"report,omitempty"` // optional 20006 snapshot for tower battle statistics
+	Report string        `json:"report,omitempty"`
 }
 
 type replayRound struct {
@@ -88,11 +132,20 @@ func decodeWire(cmd uint16, s string) (proto.Message, error) {
 	return proto.Decode(proto.DefaultOptions(), sc.Recv[cmd], b)
 }
 
-func encodeFightReplay(combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64, report proto.Message) (store.Replay, error) {
+type replayDetails struct {
+	Map, Stage int64
+	Sim        *fightSim
+}
+
+func encodeFightReplay(combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64, details replayDetails, report proto.Message) (store.Replay, error) {
 	d := replayData{Combat: combat, Won: won}
 	var err error
 	if d.Intro, err = encodeWire(20027, intro); err != nil {
 		return store.Replay{}, err
+	}
+	if report == nil && details.Sim != nil {
+		report = proto.Message{"result": 2 - b2i(won), "target_role_name": b.Name,
+			"hurt_statistics": fightStatistics(details.Sim, intro.Arr("objects")), "item_rewards": []proto.Message{}}
 	}
 	if report != nil {
 		if d.Report, err = encodeWire(20006, report); err != nil {
@@ -109,8 +162,23 @@ func encodeFightReplay(combat int64, a, b replaySide, intro proto.Message, round
 		}
 		d.Rounds = append(d.Rounds, rr)
 	}
+	units := map[int64]fightUnit{}
+	if details.Sim != nil {
+		for _, unit := range details.Sim.units {
+			units[unit.pos] = unit
+		}
+	}
 	for _, o := range intro.Arr("objects") {
+		if o.Int("pos") == spiritPos {
+			continue
+		}
 		h := replayHero{ID: o.Int("object_id"), Pos: o.Int("pos"), BID: o.Int("object_bid"), Lev: o.Int("lev"), Star: o.Int("star"), HP: o.Int("hp"), HPMax: o.Int("hp_max")}
+		if unit, ok := units[h.Pos]; ok {
+			h.Break, h.Power, h.Attack, h.Speed = unit.breakLev, unit.power, unit.atk, unit.speed
+			h.DPS, h.Taken, h.Healing = unit.damage, unit.taken, unit.healing
+			finalHP := max(0, unit.hp)
+			h.FinalHP = &finalHP
+		}
 		if o.Int("group") == 1 {
 			a.Heroes = append(a.Heroes, h)
 			if a.Camp == 0 {
@@ -125,12 +193,13 @@ func encodeFightReplay(combat int64, a, b replaySide, intro proto.Message, round
 	}
 	meta, _ := json.Marshal(replayMeta{Won: won, A: a, B: b})
 	data, _ := json.Marshal(d)
-	return store.Replay{SrvID: a.SrvID, CombatType: combat, ARID: a.RID, BRID: b.RID, Time: now, Meta: string(meta), Data: string(data)}, nil
+	return store.Replay{SrvID: a.SrvID, CombatType: combat, ARID: a.RID, BRID: b.RID, Time: now, Meta: string(meta), Data: string(data),
+		CombatMap: details.Map, RoundCount: int64(len(rounds)), Stage: details.Stage}, nil
 }
 
 // recordReplay keeps a fight and returns 0 if it could not be kept.
-func recordReplay(st *store.Store, combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64) int64 {
-	r, err := encodeFightReplay(combat, a, b, intro, rounds, won, now, nil)
+func recordReplay(st *store.Store, combat int64, a, b replaySide, intro proto.Message, rounds []fightRound, won bool, now int64, details replayDetails) int64 {
+	r, err := encodeFightReplay(combat, a, b, intro, rounds, won, now, details, nil)
 	if err != nil {
 		return 0
 	}
@@ -212,11 +281,17 @@ func (v *vedioSvc) state(s *gateway.Session, rid int64) (*vedioState, error) {
 func (sd replaySide) listed(prefix string, m proto.Message) {
 	plist := []proto.Message{}
 	for _, h := range sd.Heroes {
-		plist = append(plist, proto.Message{"id": h.ID, "pos": h.Pos, "bid": h.BID, "lev": h.Lev, "star": h.Star, "break_lev": 0, "power": 0,
-			"hp": h.HP, "hp_max": h.HPMax, "dps": 0, "be_hurt": 0, "cure": 0, "ext": []proto.Message{}})
+		if h.Pos == spiritPos {
+			continue
+		}
+		plist = append(plist, proto.Message{"id": h.ID, "pos": h.Pos, "bid": h.BID, "lev": h.Lev, "star": h.Star, "break_lev": h.Break, "power": h.Power,
+			"hp": h.HP, "hp_max": h.HPMax, "dps": h.DPS, "be_hurt": h.Taken, "cure": h.Healing, "ext": []proto.Message{}})
 	}
 	m[prefix+"rid"], m[prefix+"srv_id"], m[prefix+"name"], m[prefix+"lev"] = sd.RID, sd.SrvID, sd.Name, sd.Lev
-	m[prefix+"face"], m[prefix+"power"], m[prefix+"rank"] = sd.Face, sd.Power, sd.Rank
+	m[prefix+"face"], m[prefix+"power"] = sd.Face, sd.Power
+	if sd.Rank <= 255 {
+		m[prefix+"rank"] = sd.Rank
+	}
 	m[prefix+"formation_type"], m[prefix+"camp_type"] = sd.Form, sd.Camp
 	m[prefix+"face_update_time"], m[prefix+"face_file"] = 0, ""
 	m[prefix+"plist"] = plist
@@ -230,7 +305,7 @@ func vedioEntry(r store.Replay, liked bool) proto.Message {
 	if meta.Won {
 		ret = 1
 	}
-	m := proto.Message{"name": "", "flag": b2i(liked), "is_collect": b2i(r.IsCollected), "id": r.ID, "combat_type": r.CombatType, "round": 0, "sec_type": 0,
+	m := proto.Message{"name": "", "flag": b2i(liked), "is_collect": b2i(r.IsCollected), "id": r.ID, "combat_type": r.CombatType, "round": min(255, r.RoundCount), "sec_type": r.Stage,
 		"ret": ret, "like": r.Likes, "share": r.Shares, "play": r.Plays, "time": r.Time, "ext": []proto.Message{}}
 	meta.A.listed("a_", m)
 	meta.B.listed("b_", m)
@@ -274,8 +349,7 @@ func (v *vedioSvc) mine(s *gateway.Session, req proto.Message) error {
 	return s.Send(19901, proto.Message{"type": req.Int("type"), "replay_list": v.entries(list, vs)})
 }
 
-// public answers 19902: a page of the replays everybody sees, for a tab of the main window. cond_type is the
-// client's filter (its meaning is not known to us, it is echoed).
+// public answers 19902: a page of the replays matching the tab and filter.
 func (v *vedioSvc) public(s *gateway.Session, req proto.Message) error {
 	role := s.Role()
 	if role == nil {
@@ -285,7 +359,7 @@ func (v *vedioSvc) public(s *gateway.Session, req proto.Message) error {
 	if err != nil {
 		return err
 	}
-	typ := req.Int("type")
+	typ, condition := req.Int("type"), req.Int("cond_type")
 	start, num := int(req.Int("start"))-1, int(req.Int("num")) // start counts from 1
 	if start < 0 {
 		start = 0
@@ -295,18 +369,13 @@ func (v *vedioSvc) public(s *gateway.Session, req proto.Message) error {
 	}
 	var list []store.Replay
 	total := 0
-	switch typ {
-	case vedioTabHot, vedioTabNew:
-		list, total, err = v.st.PublicReplays(role.RID, 0, typ == vedioTabHot, start, num)
-	default:
-		if combat, ok := vedioTabCombat[typ]; ok {
-			list, total, err = v.st.PublicReplays(role.RID, combat, false, start, num)
-		}
+	if filter, ok := vedioFilter(typ, condition); ok {
+		list, total, err = v.st.PublicReplays(role.RID, filter, start, num)
 	}
 	if err != nil {
 		return err
 	}
-	return s.Send(19902, proto.Message{"type": typ, "cond_type": req.Int("cond_type"), "start": req.Int("start"), "num": num, "len": total,
+	return s.Send(19902, proto.Message{"type": typ, "cond_type": condition, "start": req.Int("start"), "num": num, "len": total,
 		"replay_list": v.entries(list, vs)})
 }
 
@@ -435,13 +504,25 @@ func (v *vedioSvc) hero(s *gateway.Session, req proto.Message) error {
 	if err := json.Unmarshal([]byte(r.Meta), &meta); err != nil {
 		return err
 	}
-	for _, h := range append(append([]replayHero(nil), meta.A.Heroes...), meta.B.Heroes...) {
-		if h.ID != req.Int("partner_id") {
+	group := req.Int("type")
+	heroes := meta.A.Heroes
+	switch group {
+	case 2:
+		heroes = meta.B.Heroes
+	case 0:
+		heroes = append(heroes, meta.B.Heroes...)
+	}
+	for _, h := range heroes {
+		if h.ID != req.Int("partner_id") || h.Pos == spiritPos {
 			continue
 		}
-		return s.Send(19907, proto.Message{"replay_id": r.ID, "partner_id": h.ID, "type": req.Int("type"), "pos": h.Pos, "bid": h.BID, "lev": h.Lev,
-			"star": h.Star, "break_lev": 0, "power": 0, "now_hp": h.HP, "hp": h.HPMax, "atk": 0, "def": 0, "speed": 0, "crit_rate": 0, "crit_ratio": 0,
-			"hit_magic": 0, "dodge_magic": 0, "dps": 0, "behurt": 0, "cure": 0, "skills": []proto.Message{}, "eqms": []proto.Message{},
+		nowHP := h.HP
+		if h.FinalHP != nil {
+			nowHP = *h.FinalHP
+		}
+		return s.Send(19907, proto.Message{"replay_id": r.ID, "partner_id": h.ID, "type": group, "pos": h.Pos, "bid": h.BID, "lev": h.Lev,
+			"star": h.Star, "break_lev": h.Break, "power": h.Power, "now_hp": nowHP, "hp": h.HPMax, "atk": h.Attack, "def": 0, "speed": h.Speed, "crit_rate": 0, "crit_ratio": 0,
+			"hit_magic": 0, "dodge_magic": 0, "dps": h.DPS, "behurt": h.Taken, "cure": h.Healing, "skills": []proto.Message{}, "eqms": []proto.Message{},
 			"artifacts": []proto.Message{}, "ext": []proto.Message{}})
 	}
 	return nil
@@ -502,12 +583,12 @@ func (v *vedioSvc) play(s *gateway.Session, req proto.Message) error {
 	if err := v.st.BumpReplay(r.ID, 0, 0, 1); err != nil {
 		return err
 	}
-	return v.fights.beginReplay(s, role, d.Combat, intro, rounds, d.Won, report)
+	return v.fights.beginReplay(s, role, d.Combat, r.CombatMap, intro, rounds, d.Won, report)
 }
 
 // beginReplay uses the captured 20000 -> 20036 -> 20027 startup. It ends with
 // the 20006 playback report (combat+1000), carrying the archived outcome when supplied.
-func (f *FightService) beginReplay(s *gateway.Session, role *store.Role, combat int64, intro proto.Message, rounds []fightRound, won bool, report proto.Message) error {
+func (f *FightService) beginReplay(s *gateway.Session, role *store.Role, combat, combatMap int64, intro proto.Message, rounds []fightRound, won bool, report proto.Message) error {
 	if report == nil {
 		report = proto.Message{"result": 1, "item_rewards": []proto.Message{}, "hurt_statistics": []proto.Message{}}
 	}
@@ -522,7 +603,7 @@ func (f *FightService) beginReplay(s *gateway.Session, role *store.Role, combat 
 		}}
 	f.mu.Unlock()
 	fillHalo(intro)
-	if err := s.Send(20000, proto.Message{"combat_map": 0, "combat_type": combat}); err != nil {
+	if err := s.Send(20000, proto.Message{"combat_map": combatMap, "combat_type": combat}); err != nil {
 		return err
 	}
 	if err := s.Send(20036, proto.Message{"code": 1, "msg": ""}); err != nil {

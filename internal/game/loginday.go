@@ -60,6 +60,61 @@ func loginDayIconStatus(st *store.Store, rid int64) (int, error) {
 	return 1, nil
 }
 
+var growthIconIDs = [...]int64{503, 604, 605, 1503, 602, 603, 2503, 3503, 4503, 617}
+
+func growthIconPeriods(role *store.Role, now time.Time) (seven, war int64) {
+	seven, _, _ = sevenNow(role, now)
+	if sevenGoalCfg[seven] == nil {
+		seven = 0
+	}
+	war, _, _, _ = warNow(now)
+	if warOrderCfg[war] == nil {
+		war = 0
+	}
+	return
+}
+
+func growthIconPeriod(id, seven, war int64) int64 {
+	switch id {
+	case 503, 604, 605, 2503, 3503, 4503:
+		return seven
+	case 1503, 602:
+		switch seven {
+		case 2, 5, 8, 10, 12:
+			return seven
+		}
+	case 603:
+		switch seven {
+		case 3, 6, 9, 11, 13:
+			return seven
+		}
+	case 617:
+		return war
+	}
+	return 0
+}
+
+func activityIcon(id int64, status int) proto.Message {
+	return proto.Message{"id": id, "status": status, "int_args": []proto.Message{}, "ext_args": []proto.Message{}}
+}
+
+func pushGrowthIconChanges(s *gateway.Session, role *store.Role, previous, now time.Time) error {
+	prevSeven, prevWar := growthIconPeriods(role, previous)
+	seven, war := growthIconPeriods(role, now)
+	if seven == prevSeven && war == prevWar {
+		return nil
+	}
+	for _, id := range growthIconIDs {
+		period := growthIconPeriod(id, seven, war)
+		if period != growthIconPeriod(id, prevSeven, prevWar) {
+			if err := s.Send(10923, activityIcon(id, b2i(period != 0))); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // RegisterLoginDay registers the icon status (10922 the list, 10924 the same on request, 10925 one
 // icon by id; the ids this server has no activity for are told as not open) and the eight-day login gifts:
 // 21100 (the state of each day) and 21101 (take a reached day's reward).
@@ -94,22 +149,32 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 			if err != nil {
 				return err
 			}
-			return s.Send(cmd, proto.Message{"act_list": []proto.Message{{"id": loginDayIcon, "status": status,
-				"int_args": []proto.Message{}, "ext_args": []proto.Message{}}}})
+			list := []proto.Message{activityIcon(loginDayIcon, status)}
+			seven, war := growthIconPeriods(role, s.Now())
+			for _, id := range growthIconIDs {
+				list = append(list, activityIcon(id, b2i(growthIconPeriod(id, seven, war) != 0)))
+			}
+			return s.Send(cmd, proto.Message{"act_list": list})
 		}
 	}
 	r.Handle(10922, icons(10922))
 	r.Handle(10924, icons(10924))
 	r.Handle(10925, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
-		if role == nil || req.Int("id") != loginDayIcon {
-			return s.Send(10925, proto.Message{"id": req.Int("id"), "status": 0, "int_args": []proto.Message{}, "ext_args": []proto.Message{}})
+		id, status := req.Int("id"), 0
+		if role != nil {
+			if id == loginDayIcon {
+				var err error
+				status, err = loginDayIconStatus(st, role.RID)
+				if err != nil {
+					return err
+				}
+			} else {
+				seven, war := growthIconPeriods(role, s.Now())
+				status = b2i(growthIconPeriod(id, seven, war) != 0)
+			}
 		}
-		status, err := loginDayIconStatus(st, role.RID)
-		if err != nil {
-			return err
-		}
-		return s.Send(10925, proto.Message{"id": loginDayIcon, "status": status, "int_args": []proto.Message{}, "ext_args": []proto.Message{}})
+		return s.Send(10925, activityIcon(id, status))
 	})
 	r.Handle(21100, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
@@ -165,7 +230,7 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store) {
 			return err
 		}
 		if isH5RoleSession(s) && len(state.Taken) >= len(loginDays) {
-			return s.Send(10923, proto.Message{"id": loginDayIcon, "status": 0})
+			return s.Send(10923, activityIcon(loginDayIcon, 0))
 		}
 		return nil
 	})

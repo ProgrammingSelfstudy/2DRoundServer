@@ -19,6 +19,14 @@ func refuseArenaChallenge(s *gateway.Session, msg string) error {
 	return s.Send(20203, proto.Message{"code": 0, "msg": msg})
 }
 
+func arenaReplayRanks(st *store.Store, rid int64, opponent arenaOpp) (attacker, defender int64) {
+	attacker, _ = st.ArenaRank(rid)
+	if !opponent.Robot {
+		defender, _ = st.ArenaRank(opponent.RID)
+	}
+	return
+}
+
 func arenaStanding(st *store.Store, rid int64, srvID string, now time.Time) (*store.ArenaPlayer, error) {
 	a, err := st.ArenaPlayerOf(rid, arenaInitScore, now.Unix())
 	if err != nil {
@@ -215,17 +223,18 @@ func startArenaFight(s *gateway.Session, st *store.Store, fights *FightService, 
 		return refuseArenaChallenge(s, "对手已无法应战，请刷新列表")
 	}
 	intro := arenaFightIntro(role.Name, opp.Name, form.FormationType, oform, auto, len(team), append(objects, foeObjects...))
-	rounds, won := buildFight(team, foes, rng)
+	rounds, won, sim := playFight(team, foes, rng, maxFightRounds)
 	stats, bid, hurt, total := lineupDamageTable(role, form.Slots, attack.byID)
 	_, power := describeArenaLineup(form.Slots, attack.byID)
 	face := int64(role.FaceID)
 	if face == 0 {
 		face = store.DefaultFaceID
 	}
-	attacker := replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType}
-	defender := replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform}
+	attackerRank, defenderRank := arenaReplayRanks(st, role.RID, opp)
+	attacker := replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType, Rank: attackerRank}
+	defender := replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform, Rank: defenderRank}
 	saveReplay := func(st *store.Store) int64 {
-		return recordReplay(st, combatArena, attacker, defender, intro, rounds, won, now.Unix())
+		return recordReplay(st, combatArena, attacker, defender, intro, rounds, won, now.Unix(), replayDetails{Map: fightMap, Sim: sim})
 	}
 	result, paid, err := commitArenaFight(st, role.RID, slot, opp, attacker, int64(role.Sex), now, won, saveReplay)
 	switch {

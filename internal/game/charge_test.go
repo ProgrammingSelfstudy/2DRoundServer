@@ -11,7 +11,8 @@ import (
 )
 
 func TestChargeTiersAndOrders(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newGameEnv(t, time.Minute)
+	e.connect = serveTestPipe(t, e.gw, true)
 	e.setNow(actNow)
 	c, role := e.enter("ch1", "充值人")
 	c.send(16700, proto.Message{})
@@ -33,28 +34,23 @@ func TestChargeTiersAndOrders(t *testing.T) {
 	if r := c.waitFor(10947); r.Int("code") != 0 {
 		t.Fatalf("10947 not payable: %v", r)
 	}
-	c.send(10947, proto.Message{"charge_id": 4, "notify_url": ""}) // a diamond tier: paid in 快乐币 (pay_web), not by QR code
-	if r := c.waitFor(10947); r.Int("code") != 0 {
+	c.send(10947, proto.Message{"charge_id": 4, "notify_url": ""})
+	r = c.waitFor(10947)
+	if r.Int("code") != 1 || !strings.HasPrefix(r.Str("url"), "http://pay.test/pay/order/P") {
 		t.Fatalf("10947 for a diamond tier: %v", r)
 	}
+	no := strings.TrimPrefix(r.Str("url"), "http://pay.test/pay/order/")
 	c.send(10947, proto.Message{"charge_id": 30001, "notify_url": ""})
 	r = c.waitFor(10947)
 	if r.Int("code") != 1 || !strings.HasPrefix(r.Str("url"), "http://pay.test/pay/order/P") {
 		t.Fatalf("10947: %v", r)
 	}
-	if n, _ := e.st.PendingPayOrders(role.RID); n != 1 {
+	if n, _ := e.st.PendingPayOrders(role.RID); n != 2 {
 		t.Fatalf("%d orders wait after the QR order", n)
 	}
-	no := strings.TrimPrefix(r.Str("url"), "http://pay.test/pay/order/")
-	if _, err := e.st.PayOrderByNo(no); err != nil {
+	if err := e.st.CancelPayOrder(strings.TrimPrefix(r.Str("url"), "http://pay.test/pay/order/"), "t", ""); err != nil {
 		t.Fatal(err)
 	}
-	// the rest checks what confirming a tier order does (the admin can still confirm one made before the tier closed)
-	if _, err := e.st.CreatePayOrder(store.PayOrder{OrderNo: no + "t", RID: role.RID, SrvID: role.SrvID, ChargeID: 4, AmountCents: 3000}); err != nil {
-		t.Fatal(err)
-	}
-	e.st.CancelPayOrder(no, "t", "")
-	no = no + "t"
 	o, err := e.st.PayOrderByNo(no)
 	if err != nil || o.RID != role.RID || o.ChargeID != 4 || o.AmountCents != 3000 || o.Status != store.PayWaiting {
 		t.Fatalf("the order: %v %+v", err, o)
@@ -599,7 +595,7 @@ func TestLimitGiftOnLevelUp(t *testing.T) {
 }
 
 func TestOneCentGiftAndLoginInit(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newDungeonEnv(t)
 	e.setNow(actNow)
 	c, role := e.enter("oc1", "一分钱")
 	c.send(21021, proto.Message{})
@@ -637,6 +633,188 @@ func TestOneCentGiftAndLoginInit(t *testing.T) {
 	}
 	if after, _ := e.st.RoleAssets(role.RID); after[3] != before[3]+200 {
 		t.Fatalf("diamonds %d -> %d", before[3], after[3])
+	}
+}
+
+func TestDimeGiftOnlyUnlocksAfterManualConfirmation(t *testing.T) {
+	e := newDungeonEnv(t)
+	e.setNow(actNow)
+	c, role := e.enter("dime", "一毛礼包")
+	c.send(21016, proto.Message{"charge_id": oneDimeCharge})
+	if msg := c.waitFor(21016); msg.Int("status") != 1 {
+		t.Fatalf("dime product unavailable: %v", msg)
+	}
+	c.send(10947, proto.Message{"charge_id": oneDimeCharge})
+	msg := c.waitFor(10947)
+	if msg.Int("code") != 1 {
+		t.Fatalf("dime order: %v", msg)
+	}
+	no := strings.TrimPrefix(msg.Str("url"), "http://pay.test/pay/order/")
+	o, err := e.st.PayOrderByNo(no)
+	if err != nil || o.Status != store.PayWaiting || o.AmountCents != 10 || o.ChargeID != oneDimeCharge || o.OfferID != oneCentOffer {
+		t.Fatalf("dime order: %+v, %v", o, err)
+	}
+	if _, err := CreateChargeOrder(e.st, role, oneCentCharge, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("pending dime order must reserve the shared gift: %v", err)
+	}
+	if _, err := PayWebCharge(e.st, role, oneDimeCharge, 1, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("legacy pay_web must not deliver the dime gift: %v", err)
+	}
+	c.send(16652, proto.Message{"id": 1})
+	if r := c.waitFor(16652); r.Int("code") != 0 {
+		t.Fatalf("unpaid gift gave a reward: %v", r)
+	}
+	if charge, err := e.st.RoleCharge(role.RID); err != nil || charge.TotalCents != 0 || len(charge.Bought) != 0 {
+		t.Fatalf("opening an order credited a payment: %+v, %v", charge, err)
+	}
+	if o, err := ConfirmChargeOrder(e.st, no, "tester", "verified receipt"); err != nil || o.Status != store.PayDone {
+		t.Fatalf("confirm dime gift: %+v, %v", o, err)
+	}
+	c.send(16651, proto.Message{})
+	if r := c.waitFor(16651); r.Int("is_buy") != 1 || r.Arr("list")[0].Int("finish") != 1 {
+		t.Fatalf("confirmed dime gift didn't unlock period 1: %v", r)
+	}
+	c.send(16652, proto.Message{"id": 1})
+	if r := c.waitFor(16652); r.Int("code") != 1 {
+		t.Fatalf("claim confirmed dime gift: %v", r)
+	}
+	c.settle()
+	c.send(16652, proto.Message{"id": 1})
+	if r := c.waitFor(16652); r.Int("code") != 0 {
+		t.Fatalf("duplicate dime gift claim: %v", r)
+	}
+	if a, err := e.st.RoleAssets(role.RID); err != nil || a[3] != 200 {
+		t.Fatalf("dime gift diamonds: %v, %v", a, err)
+	}
+	for _, id := range []int64{oneCentCharge, oneDimeCharge} {
+		if _, err := CreateChargeOrder(e.st, role, id, actNow); !errors.Is(err, ErrNotPayable) {
+			t.Fatalf("gift product %d still payable after confirmation: %v", id, err)
+		}
+	}
+}
+
+func TestFireGiftOrdersPreserveTheAwardAcrossExpiry(t *testing.T) {
+	e := newDungeonEnv(t)
+	e.setNow(actNow)
+	c, role := e.enter("deals", "钜惠礼包")
+	const product = 1561
+	available := func(wanted int64) {
+		t.Helper()
+		c.send(21016, proto.Message{"charge_id": product})
+		if msg := c.waitFor(21016); msg.Int("status") != wanted {
+			t.Fatalf("wanted availability %d: %v", wanted, msg)
+		}
+	}
+	window := func(award int64, end time.Time) {
+		t.Helper()
+		c.send(28000, proto.Message{})
+		gifts := c.waitFor(28000).Arr("gifts")
+		if award == 0 && len(gifts) != 0 || award != 0 && (len(gifts) != 1 || gifts[0].Int("award_id") != award || gifts[0].Int("end_time") != end.Unix() || gifts[0].Int("count") != 0) {
+			t.Fatalf("offer %d to %v: %v", award, end, gifts)
+		}
+	}
+	place := func(award int64) *store.PayOrder {
+		t.Helper()
+		c.send(10947, proto.Message{"charge_id": product})
+		msg := c.waitFor(10947)
+		if msg.Int("code") != 1 {
+			t.Fatalf("create offer %d: %v", award, msg)
+		}
+		no := strings.TrimPrefix(msg.Str("url"), "http://pay.test/pay/order/")
+		o, err := e.st.PayOrderByNo(no)
+		if err != nil || o.Status != store.PayWaiting || o.AmountCents != 600 || o.OfferID != award {
+			t.Fatalf("offer order: %+v, %v", o, err)
+		}
+		return o
+	}
+	available(0)
+	window(0, time.Time{})
+	if _, err := CreateChargeOrder(e.st, role, product, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("direct order without eligible offer: %v", err)
+	}
+	if err := e.st.SetRoleLevel(role.RID, 35); err != nil {
+		t.Fatal(err)
+	}
+	window(101, actNow.Add(2*time.Hour))
+	available(1)
+	beforeAssets, _ := e.st.RoleAssets(role.RID)
+	beforeItems, _ := e.st.RoleItems(role.RID)
+	first := place(101)
+	available(0)
+	if _, err := PayWebCharge(e.st, role, product, 6, actNow); !errors.Is(err, ErrNotPayable) {
+		t.Fatalf("legacy pay_web must not deliver restricted offers: %v", err)
+	}
+	if assets, _ := e.st.RoleAssets(role.RID); assets[3] != beforeAssets[3] || assets[1] != beforeAssets[1] {
+		t.Fatalf("unconfirmed gift already granted assets: %v", assets)
+	}
+	if items, _ := e.st.RoleItems(role.RID); items[14001] != beforeItems[14001] {
+		t.Fatalf("unconfirmed gift already granted items: %v", items)
+	}
+	e.advance(time.Hour)
+	if err := e.st.SaveStarTower(&store.StarTower{RID: role.RID, MaxTower: 97}); err != nil {
+		t.Fatal(err)
+	}
+	window(101, actNow.Add(2*time.Hour))
+	e.advance(time.Hour)
+	window(113, actNow.Add(3*time.Hour))
+	second := place(113)
+	if err := e.st.CancelPayOrder(second.OrderNo, "tester", "wrong receipt"); err != nil {
+		t.Fatal(err)
+	}
+	available(1)
+	second = place(113)
+	for _, o := range []*store.PayOrder{first, second} {
+		if out, err := ConfirmChargeOrder(e.st, o.OrderNo, "tester", "verified receipt"); err != nil || out.Status != store.PayDone {
+			t.Fatalf("confirm offer %d: %+v, %v", o.OfferID, out, err)
+		}
+		if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "tester", "duplicate"); !errors.Is(err, store.ErrConflict) {
+			t.Fatalf("duplicate offer confirmation: %v", err)
+		}
+	}
+	if assets, _ := e.st.RoleAssets(role.RID); assets[3] != beforeAssets[3]+240 || assets[1] != beforeAssets[1]+500000 {
+		t.Fatalf("wrong confirmed offer assets: %v", assets)
+	}
+	if items, _ := e.st.RoleItems(role.RID); items[14001] != beforeItems[14001]+1 || items[29905] != beforeItems[29905]+50 {
+		t.Fatalf("wrong confirmed offer items for a reused product: %v", items)
+	}
+	if charge, err := e.st.RoleCharge(role.RID); err != nil || charge.TotalCents != 1200 || charge.VIPExp != 120 {
+		t.Fatalf("wrong confirmed offer totals: %+v, %v", charge, err)
+	}
+	available(0)
+	window(0, time.Time{})
+	e.advance(time.Hour)
+	window(0, time.Time{})
+}
+
+func TestFireGiftUsesPaidBandAndGuildCareer(t *testing.T) {
+	e := newDungeonEnv(t)
+	e.setNow(actNow)
+	c, role := e.enter("deals2", "进阶钜惠")
+	if err := e.st.SetRoleLevel(role.RID, 35); err != nil {
+		t.Fatal(err)
+	}
+	o, err := CreateChargeOrder(e.st, role, 3, actNow)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := ConfirmChargeOrder(e.st, o.OrderNo, "tester", "verified receipt"); err != nil {
+		t.Fatal(err)
+	}
+	if err := e.st.UpdateGuildSkills(role.RID, func(skills *store.GuildSkills) (map[int64]int64, map[int64]int64, map[int64]int64, map[int64]int64, error) {
+		skills.PvpAttrs[4] = map[int]int{}
+		return nil, nil, nil, nil, nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	c.send(28000, proto.Message{})
+	gifts := c.waitFor(28000).Arr("gifts")
+	if len(gifts) != 2 || gifts[0].Int("award_id") != 102 || gifts[1].Int("award_id") != 701 {
+		t.Fatalf("expected level 35's confirmed-payment band and career 4: %v", gifts)
+	}
+	for _, id := range []int64{1561, 1594, 1206} {
+		if _, err := CreateChargeOrder(e.st, role, id, actNow); !errors.Is(err, ErrNotPayable) {
+			t.Fatalf("unassigned gift %d: %v", id, err)
+		}
 	}
 }
 

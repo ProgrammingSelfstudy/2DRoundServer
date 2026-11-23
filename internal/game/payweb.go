@@ -33,7 +33,7 @@ func PayWebCharge(st *store.Store, role *store.Role, productID, money int64, now
 	if !ok {
 		return nil, ErrNoProduct
 	}
-	if !ChargeDeliverable(p) || isKlbProduct(p) {
+	if !ChargeDeliverable(p) || isKlbProduct(p) || productID == oneDimeCharge || fireGiftProducts[productID] {
 		return nil, ErrNotPayable
 	}
 	if money <= 0 || money*100 != p.Cents() {
@@ -41,12 +41,11 @@ func PayWebCharge(st *store.Store, role *store.Role, productID, money int64, now
 	}
 	unlock := st.LockRoleCharge(role.RID)
 	defer unlock()
-	if g, ok := chargeGuards[productID]; ok {
-		if err := g(st, role); err != nil {
-			return nil, err
-		}
+	offerID, err := chargeOrderOffer(st, role, p, now)
+	if err != nil {
+		return nil, err
 	}
-	o, err := st.CreatePayOrder(store.PayOrder{OrderNo: NewOrderNo(now, role.RID), RID: role.RID, SrvID: role.SrvID, ChargeID: productID, AmountCents: p.Cents()})
+	o, err := openChargeOrder(st, role, p, offerID, now)
 	if err != nil {
 		return nil, err
 	}

@@ -315,7 +315,7 @@ func TestCapturedReplayPlayback(t *testing.T) {
 	for i := range rounds {
 		rounds[i] = fightRound{alive: []int64{1, 6}, plays: []proto.Message{}}
 	}
-	id := recordReplay(e.st, 37, replaySide{RID: role.RID, SrvID: role.SrvID}, replaySide{}, intro, rounds, false, e.gw.Now().Unix())
+	id := recordReplay(e.st, 37, replaySide{RID: role.RID, SrvID: role.SrvID}, replaySide{}, intro, rounds, false, e.gw.Now().Unix(), replayDetails{})
 	if id == 0 {
 		t.Fatal("could not create the local replay fixture")
 	}

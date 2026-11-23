@@ -124,6 +124,7 @@ func sendChargeState(s *gateway.Session, st *store.Store, rid, diamonds int64) e
 // confirms it there.
 func RegisterCharge(r *gateway.Router, st *store.Store, payBase string) {
 	registerDailyGift(r, st)
+	registerFireGifts(r, st)
 	RegisterPrivilege(r, st)
 	r.Handle(16700, func(s *gateway.Session, _ proto.Message) error {
 		role := s.Role()
@@ -139,15 +140,20 @@ func RegisterCharge(r *gateway.Router, st *store.Store, payBase string) {
 	r.Handle(21016, func(s *gateway.Session, req proto.Message) error {
 		id := req.Int("charge_id")
 		p, ok := ChargeProductByID(id)
-		return s.Send(21016, proto.Message{"charge_id": id, "status": b2i(ok && ChargeDeliverable(p))})
+		status := ok && ChargeDeliverable(p)
+		if status && (isOneCentProduct(id) || fireGiftProducts[id]) {
+			_, err := chargeOrderOffer(st, s.Role(), p, s.Now())
+			if err != nil && !errors.Is(err, ErrNotPayable) {
+				return err
+			}
+			status = err == nil
+		}
+		return s.Send(21016, proto.Message{"charge_id": id, "status": b2i(status)})
 	})
 	r.Handle(10947, func(s *gateway.Session, req proto.Message) error {
 		role := s.Role()
 		if role == nil {
 			return nil
-		}
-		if p, ok := ChargeProductByID(req.Int("charge_id")); ok && IsChargeTier(p) {
-			return s.Send(10947, proto.Message{"code": 0, "url": ""}) // the diamond tiers are paid in 快乐币 (pay_web)
 		}
 		o, err := CreateChargeOrder(st, role, req.Int("charge_id"), s.Now())
 		switch {

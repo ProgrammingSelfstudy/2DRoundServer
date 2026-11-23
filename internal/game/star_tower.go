@@ -327,11 +327,11 @@ func RegisterStarTower(r *gateway.Router, st *store.Store) {
 			for _, u := range team {
 				power += u.power
 			}
-			report := &towerReport{stats: towerStatistics(sim, objects), durationMS: max(1, now.Sub(started).Milliseconds()), power: power, ranked: won && fight.played}
+			report := &towerReport{stats: fightStatistics(sim, objects), durationMS: max(1, now.Sub(started).Milliseconds()), power: power, ranked: won && fight.played}
 			actor := replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: int64(role.FaceID), Power: power, Form: form.FormationType}
 			replayResult := proto.Message{"result": 2 - b2i(won), "target_role_name": floor.Name, "current_time": towerSeconds(report.durationMS),
 				"hurt_statistics": report.stats, "item_rewards": []proto.Message{}}
-			replay, err := encodeFightReplay(combatStarTower, actor, replaySide{Name: floor.Name}, intro, rounds, won, now.Unix(), replayResult)
+			replay, err := encodeFightReplay(combatStarTower, actor, replaySide{Name: floor.Name}, intro, rounds, won, now.Unix(), replayDetails{Map: fightMap, Sim: sim}, replayResult)
 			if err != nil {
 				log.Printf("star tower: could not encode replay: %v", err)
 			}

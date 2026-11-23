@@ -338,7 +338,7 @@ func (l *ladderSvc) view(s *gateway.Session) (*ladderView, error) {
 	}
 	_, open := ladderWeek(now)
 	v := &ladderView{role: role, b: b, lr: lr, open: open}
-	if open {
+	if open && int64(role.Lev) >= ladderCfg.num("join_min_lev") {
 		if v.rank, err = l.join(role, b, now); err != nil {
 			return nil, err
 		}
@@ -455,6 +455,8 @@ func (l *ladderSvc) usable(v *ladderView) string {
 	switch {
 	case !v.open:
 		return "每周六00:00至周日23:00开启天梯争霸"
+	case int64(v.role.Lev) < ladderCfg.num("join_min_lev"):
+		return "等级不足，无法参加天梯争霸"
 	case v.rank == 0:
 		return "竞技场排名前" + itoa64(ladderCfg.num("arena_rank")) + "名才能参加天梯争霸"
 	}
@@ -504,6 +506,9 @@ func (l *ladderSvc) buy(s *gateway.Session, _ proto.Message) error {
 	v, err := l.view(s)
 	if err != nil {
 		return err
+	}
+	if msg := l.usable(v); msg != "" {
+		return l.refuse(s, 24305, msg)
 	}
 	if v.lr.Bought >= int64(len(ladderCfg.Buy)) {
 		return l.refuse(s, 24305, "当前已经购买达到上限")
@@ -644,7 +649,7 @@ func (l *ladderSvc) challenge(s *gateway.Session, req proto.Message) error {
 		"extra_args": []proto.Message{}, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name, "target_role_name": foe.Name,
 		"suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 	}
-	rounds, won := buildFight(team, foes, l.rng())
+	rounds, won, sim := playFight(team, foes, l.rng(), maxFightRounds)
 	if err := s.Send(24303, proto.Message{"code": 1, "msg": ""}); err != nil {
 		return err
 	}
@@ -653,15 +658,17 @@ func (l *ladderSvc) challenge(s *gateway.Session, req proto.Message) error {
 		face = store.DefaultFaceID
 	}
 	_, _, power, _ := lineupOf(l.st, role.RID)
-	replayID := recordReplay(l.st, combatLadder, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType},
-		replaySide{RID: foe.RID, SrvID: foe.SrvID, Name: foe.Name, Lev: foe.Lev, Face: foe.Face, Power: foe.Power, Form: oform}, intro, rounds, won, s.Now().Unix())
+	replayID := recordReplay(l.st, combatLadder, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType, Rank: v.rank},
+		replaySide{RID: foe.RID, SrvID: foe.SrvID, Name: foe.Name, Lev: foe.Lev, Face: foe.Face, Power: foe.Power, Form: oform, Rank: foe.Rank},
+		intro, rounds, won, s.Now().Unix(), replayDetails{Map: fightMap, Sim: sim})
+	stats := fightStatistics(sim, intro.Arr("objects"))
 	return fights.begin(s, role, combatLadder, intro, rounds, won, func(s *gateway.Session, won bool) error {
-		return l.settle(s, foe, won, replayID, face, power)
+		return l.settle(s, foe, won, replayID, face, power, stats)
 	})
 }
 
 // settle ends a fight: a win over a foe above exchanges the places, the prize is paid and the result (24307) sent.
-func (l *ladderSvc) settle(s *gateway.Session, foe ladderFoe, won bool, replayID, face, power int64) error {
+func (l *ladderSvc) settle(s *gateway.Session, foe ladderFoe, won bool, replayID, face, power int64, stats []proto.Message) error {
 	role := s.Role()
 	if role == nil {
 		return nil
@@ -741,10 +748,6 @@ func (l *ladderSvc) settle(s *gateway.Session, foe ladderFoe, won bool, replayID
 	if err := l.pay(role.RID, reward); err != nil {
 		return err
 	}
-	stats, _, _, _, err := damageTable(l.st, role, isH5RoleSession(s))
-	if err != nil {
-		return err
-	}
 	if err := sendAssets(s, l.st, role.RID); err != nil {
 		return err
 	}
@@ -761,7 +764,7 @@ func (l *ladderSvc) settle(s *gateway.Session, foe ladderFoe, won bool, replayID
 	if err := s.Send(24307, proto.Message{"result": result, "rid": foe.RID, "srv_id": foe.SrvID, "def_name": foe.Name, "def_lev": foe.Lev, "def_face": foe.Face,
 		"def_face_update_time": 0, "def_face_file": "", "def_change_rank": foe.Rank - defRank, "def_rank": defRank, "is_change_best_rank": best,
 		"atk_change_rank": old - rank, "atk_rank": rank, "reward": rewardMessages(reward), "target_role_name": foe.Name,
-		"hurt_statistics": []proto.Message{{"type": 1, "partner_hurts": stats}}, "replay_id": replayID}); err != nil {
+		"hurt_statistics": stats, "replay_id": replayID}); err != nil {
 		return err
 	}
 	// the new places: the list is drawn again around the new rank

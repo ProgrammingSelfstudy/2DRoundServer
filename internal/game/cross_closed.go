@@ -44,7 +44,7 @@ var closedReplies = map[uint16]proto.Message{
 	24815: {"quest_list": []proto.Message{}, "camp_id": 0}, 24817: {"quest_list": []proto.Message{}, "camp_id": 0},
 	25500: {"period": 0, "day_time": 0, "week_time": 0, "month_time": 0, "list": []proto.Message{}},
 	26521: {"camp_id": 0, "free_time": 0, "times": 0, "start_time": 0, "end_time": 0, "item_id": 0, "item_num": 0, "must_count": 0, "reward_list": []proto.Message{}, "award_list": []proto.Message{}},
-	28000: {"gifts": []proto.Message{}}, 28100: {"start_time": 0, "end_time": 0, "rsidue_gold": 0}, 28900: {"gift_list": []proto.Message{}},
+	28100: {"start_time": 0, "end_time": 0, "rsidue_gold": 0}, 28900: {"gift_list": []proto.Message{}},
 	10989: {"id": 0, "start_unixtime": 0}, 16666: {},
 }
 

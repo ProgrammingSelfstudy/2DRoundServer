@@ -11,6 +11,8 @@ import (
 const (
 	oneCentModule  = "onecentgift"
 	oneCentCharge  = 301 // the 1 yuan gift
+	oneDimeCharge  = 1705
+	oneCentOffer   = -1
 	oneCentPeriod1 = 1
 )
 
@@ -57,40 +59,32 @@ func (d *oneCentState) window(power int64) proto.Message {
 	return proto.Message{"period": oneCentPeriod1, "is_buy": b2i(d.Bought), "end_time": 0, "list": list}
 }
 
-func init() {
-	RegisterChargeGuard(oneCentCharge, func(st *store.Store, role *store.Role) error {
-		d := &oneCentState{}
-		if _, err := st.LoadState(role.RID, oneCentModule, d); err != nil {
-			return err
-		}
-		if d.Bought {
-			return errNotPayable("bought already")
-		}
-		return nil
-	})
-	RegisterChargeHook(oneCentCharge, func(st *store.Store, role *store.Role, _ ChargeProduct, _ int64) (map[int64]int64, map[int64]int64, error) {
-		d := &oneCentState{}
-		if _, err := st.LoadState(role.RID, oneCentModule, d); err != nil {
-			return nil, nil, err
-		}
-		if d.Bought {
-			return nil, nil, errNotPayable("bought already")
-		}
-		d.Bought = true
-		return map[int64]int64{}, map[int64]int64{}, st.SaveState(role.RID, oneCentModule, d)
-	})
+func isOneCentProduct(id int64) bool {
+	return id == oneCentCharge || id == oneDimeCharge
 }
 
-// RegisterOneCentGift registers the 1 yuan gift: 16651 the page, 16652 take a reward. The gift itself is bought as a top-up order
-// (product 301); its rewards come at once or when the power is reached.
+func loadOneCentState(st *store.Store, rid int64) (*oneCentState, error) {
+	d := &oneCentState{}
+	if _, err := st.LoadState(rid, oneCentModule, d); err != nil {
+		return nil, err
+	}
+	charge, err := st.RoleCharge(rid)
+	if err != nil {
+		return nil, err
+	}
+	d.Bought = d.Bought || charge.Bought["301"] > 0 || charge.Bought["1705"] > 0
+	return d, nil
+}
+
+// RegisterOneCentGift registers the shared 1 yuan / 0.1 yuan gift: 16651 the page, 16652 take a reward.
 func RegisterOneCentGift(r *gateway.Router, st *store.Store) {
 	load := func(s *gateway.Session) (*store.Role, *oneCentState, int64, error) {
 		role := s.Role()
 		if role == nil {
 			return nil, nil, 0, nil
 		}
-		d := &oneCentState{}
-		if _, err := st.LoadState(role.RID, oneCentModule, d); err != nil {
+		d, err := loadOneCentState(st, role.RID)
+		if err != nil {
 			return nil, nil, 0, err
 		}
 		heroes, err := st.PartnersOf(role.RID)

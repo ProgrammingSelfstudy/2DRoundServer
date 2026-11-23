@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"strconv"
 	"strings"
 	"testing"
 
 	"2droundserver/internal/game"
+	"2droundserver/internal/store"
 )
 
 func TestPayPages(t *testing.T) {
@@ -30,7 +32,7 @@ func TestPayPages(t *testing.T) {
 	s.Store.SetPayConfig("notice", "备注订单号")
 
 	// the call the client's pay function makes
-	klb, _ := game.ChargeProductByID(30001) // the 快乐币 panel's 38 yuan product: the diamond tiers are paid in 快乐币, not by QR code
+	klb, _ := game.ChargeProductByID(30001)
 	info := `{"roleId":"` + itoa(role.RID) + `","productId":30001,"price":38,"amount":38}`
 	client := &http.Client{CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}
 	resp, err := client.Get(ts.URL + "/pay/start?info=" + url.QueryEscape(info))
@@ -39,9 +41,6 @@ func TestPayPages(t *testing.T) {
 	}
 	resp.Body.Close()
 	loc := resp.Header.Get("Location")
-	if r0, err := client.Get(ts.URL + "/pay/start?info=" + url.QueryEscape(`{"roleId":"`+itoa(role.RID)+`","productId":4}`)); err != nil || r0.StatusCode != http.StatusUnprocessableEntity {
-		t.Fatalf("a diamond tier by QR code must be refused: %v %v", err, r0)
-	}
 	if resp.StatusCode != http.StatusFound || !strings.HasPrefix(loc, "/pay/order/P") {
 		t.Fatalf("start: %d %q", resp.StatusCode, loc)
 	}
@@ -109,6 +108,54 @@ func TestPayPages(t *testing.T) {
 	}
 	if code, _ := get(t, "GET", ts.URL+"/pay/order/nope"); code != 404 {
 		t.Fatalf("unknown order: %d", code)
+	}
+}
+
+func TestManualPayStartUsesCatalogPrice(t *testing.T) {
+	s := newTestLogin(t)
+	if err := s.Store.EnsureServer(s.Cfg.DefaultServer()); err != nil {
+		t.Fatal(err)
+	}
+	acc, err := s.Store.CreateAccount("symlf", "manual", "x", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	role, err := s.Store.CreateRole(acc.ID, "symlf_1", "手动付款", 1, 1, 10401)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request := func(path string) *httptest.ResponseRecorder {
+		out := httptest.NewRecorder()
+		s.Handler().ServeHTTP(out, httptest.NewRequest(http.MethodGet, path, nil))
+		return out
+	}
+	for _, product := range []struct {
+		id, cents int64
+		price     string
+	}{{4, 3000, "¥30"}, {1705, 10, "¥0.1"}} {
+		info := `{"roleId":"` + itoa(role.RID) + `","productId":` + itoa(product.id) + `,"price":0,"amount":0,"status":1}`
+		start := request("/pay/start?info=" + url.QueryEscape(info))
+		location := start.Header().Get("Location")
+		if start.Code != http.StatusFound || !strings.HasPrefix(location, "/pay/order/P") {
+			t.Fatalf("start %d: %d %q", product.id, start.Code, location)
+		}
+		no := strings.TrimPrefix(location, "/pay/order/")
+		o, err := s.Store.PayOrderByNo(no)
+		if err != nil || o.RID != role.RID || o.ChargeID != product.id || o.AmountCents != product.cents || o.Status != store.PayWaiting {
+			t.Fatalf("new manual order: %+v, %v", o, err)
+		}
+		if page := request(location); page.Code != http.StatusOK || !strings.Contains(page.Body.String(), product.price) || !strings.Contains(page.Body.String(), "等待付款") {
+			t.Fatalf("pending page: %d %s", page.Code, page.Body.String())
+		}
+		if status := request("/pay/status/" + no); status.Code != http.StatusOK || !strings.Contains(status.Body.String(), `"status":0`) {
+			t.Fatalf("pending status: %d %s", status.Code, status.Body.String())
+		}
+	}
+	if balance, err := s.Store.RoleAssets(role.RID); err != nil || balance[3] != 0 {
+		t.Fatalf("QR checkout credited diamonds: %v, %v", balance, err)
+	}
+	if charge, err := s.Store.RoleCharge(role.RID); err != nil || charge.TotalCents != 0 || charge.VIPExp != 0 {
+		t.Fatalf("QR checkout recorded a payment: %+v, %v", charge, err)
 	}
 }
 

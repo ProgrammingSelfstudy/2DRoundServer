@@ -1008,6 +1008,7 @@ func (c *caSvc) play(cx *caCtx, mine, theirs []caTeamData, foe caOpp, rng *rand.
 		mu, mo := sideUnits(cx.role.RID, cx.role.SrvID, mine[i].Slots, mine[i].FormType, mine[i].ByID, true)
 		tu, to := sideUnits(foe.RID, foe.SrvID, theirs[i].Slots, theirs[i].FormType, theirs[i].ByID, false)
 		var rounds []fightRound
+		var sim *fightSim
 		var ret int64
 		switch {
 		case len(mu) == 0 && len(tu) == 0:
@@ -1018,7 +1019,7 @@ func (c *caSvc) play(cx *caCtx, mine, theirs []caTeamData, foe caOpp, rng *rand.
 			ret = 2
 		default:
 			var won bool
-			rounds, won = buildFight(mu, tu, rng)
+			rounds, won, sim = playFight(mu, tu, rng, maxFightRounds)
 			ret = 2
 			if won {
 				ret = 1
@@ -1035,7 +1036,8 @@ func (c *caSvc) play(cx *caCtx, mine, theirs []caTeamData, foe caOpp, rng *rand.
 		intro := caIntro(mine[i].FormType, theirs[i].FormType, append(append([]proto.Message{}, mo...), to...), len(mu), cx.role.Name, foe.Name)
 		if rounds != nil {
 			d.Replay = recordReplay(c.st, caCombat, replaySide{RID: cx.role.RID, SrvID: cx.role.SrvID, Name: cx.role.Name, Lev: int64(cx.role.Lev), Face: face, Power: d.APower, Form: d.AForm},
-				replaySide{RID: foe.RID, SrvID: foe.SrvID, Name: foe.Name, Lev: foe.Lev, Face: foe.Face, Power: d.BPower, Form: d.BForm}, intro, rounds, ret == 1, cx.now.Unix())
+				replaySide{RID: foe.RID, SrvID: foe.SrvID, Name: foe.Name, Lev: foe.Lev, Face: foe.Face, Power: d.BPower, Form: d.BForm},
+				intro, rounds, ret == 1, cx.now.Unix(), replayDetails{Map: fightMap, Sim: sim})
 		}
 		p.hurts = append(p.hurts, proto.Message{"round": i + 1, "hurt_statistics": []proto.Message{}})
 		p.duels = append(p.duels, d)

@@ -752,7 +752,7 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			}
 		}
 		intro := arenaFightIntro(role.Name, opp.Name, form.FormationType, oform, req.Int("is_auto"), len(team), append(objects, foeObjects...))
-		rounds, won := buildFight(team, foes, rngOf())
+		rounds, won, sim := playFight(team, foes, rngOf(), maxFightRounds)
 		if err := acceptArenaChallenge(s, st, role.RID); err != nil {
 			return err
 		}
@@ -762,8 +762,10 @@ func RegisterArena(r *gateway.Router, st *store.Store) {
 			face = store.DefaultFaceID
 		}
 		_, _, power, _ := lineupOf(st, role.RID)
-		replayID := recordReplay(st, combatArena, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType},
-			replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform}, intro, rounds, won, s.Now().Unix())
+		attackerRank, defenderRank := arenaReplayRanks(st, role.RID, opp)
+		replayID := recordReplay(st, combatArena, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType, Rank: attackerRank},
+			replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform, Rank: defenderRank},
+			intro, rounds, won, s.Now().Unix(), replayDetails{Map: fightMap, Sim: sim})
 		return fights.begin(s, role, combatArena, intro, rounds, won, func(s *gateway.Session, won bool) error {
 			return settleArena(s, st, idx, opp, won, replayID)
 		})

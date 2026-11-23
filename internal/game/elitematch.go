@@ -489,7 +489,7 @@ func (e *eliteSvc) fight(s *gateway.Session, _ proto.Message) error {
 		"extra_args": []proto.Message{}, "string_ext_args": []proto.Message{}, "a_object_num": len(team), "actor_role_name": role.Name, "target_role_name": opp.Name,
 		"suppress": 0, "halo_list": []proto.Message{}, "hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 	}
-	rounds, won := buildFight(team, foes, e.rng())
+	rounds, won, sim := playFight(team, foes, e.rng(), maxFightRounds)
 	if err := s.Send(24903, proto.Message{"code": 1, "msg": ""}); err != nil {
 		return err
 	}
@@ -499,7 +499,8 @@ func (e *eliteSvc) fight(s *gateway.Session, _ proto.Message) error {
 	}
 	_, _, power, _ := lineupOf(e.st, role.RID)
 	replayID := recordReplay(e.st, combatElite, replaySide{RID: role.RID, SrvID: role.SrvID, Name: role.Name, Lev: int64(role.Lev), Face: face, Power: power, Form: form.FormationType},
-		replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform}, intro, rounds, won, now.Unix())
+		replaySide{RID: opp.RID, SrvID: opp.SrvID, Name: opp.Name, Lev: opp.Lev, Face: opp.Face, Power: opp.Power, Form: oform},
+		intro, rounds, won, now.Unix(), replayDetails{Map: fightMap, Sim: sim})
 	return fights.begin(s, role, combatElite, intro, rounds, won, func(s *gateway.Session, won bool) error {
 		return e.settle(s, opp, won, replayID, face, power, &eliteDetail{Replay: replayID, APower: power, AForm: form.FormationType, BForm: oform,
 			AList: sideHeroes(intro, 1), BList: sideHeroes(intro, 2)})

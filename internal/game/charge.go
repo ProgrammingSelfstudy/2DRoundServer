@@ -84,30 +84,22 @@ func ChargeProductByID(id int64) (ChargeProduct, bool) {
 func chargeTiers() []ChargeProduct {
 	var out []ChargeProduct
 	for id := int64(0); id < 100; id++ {
-		if p, ok := chargeTable[id]; ok && p.Type == 0 && p.Sort > 0 && strings.HasPrefix(p.Name, "普通充值") {
+		if p, ok := chargeTable[id]; ok && IsChargeTier(p) {
 			out = append(out, p)
 		}
 	}
 	return out
 }
 
-// IsChargeTier says whether a product is one of the diamond tiers of the top-up page. They are paid in 快乐币 (PayWebCharge); the
-// QR code orders (10947, /pay/start) refuse them.
+// IsChargeTier says whether a product is one of the diamond tiers of the top-up page.
 func IsChargeTier(p ChargeProduct) bool {
-	for _, t := range chargeTiers() {
-		if t.ID == p.ID {
-			return true
-		}
-	}
-	return false
+	return p.ID >= 0 && p.ID < 100 && p.Type == 0 && p.Sort > 0 && strings.HasPrefix(p.Name, "普通充值")
 }
 
-// ChargeDeliverable says whether a product can be paid for: the diamond tiers, and the ones an activity module delivers.
+// ChargeDeliverable says whether the server knows how to deliver a product.
 func ChargeDeliverable(p ChargeProduct) bool {
-	for _, t := range chargeTiers() {
-		if t.ID == p.ID {
-			return true
-		}
+	if IsChargeTier(p) || isOneCentProduct(p.ID) || fireGiftProducts[p.ID] {
+		return true
 	}
 	_, ok := chargeHooks[p.ID]
 	return ok
@@ -176,26 +168,77 @@ func NewOrderNo(now time.Time, rid int64) string {
 	return fmt.Sprintf("P%s%d%04d", now.In(dayZone).Format("20060102150405"), rid, rand.Intn(10000))
 }
 
-// CreateChargeOrder opens an order for a product; the price is the one in the table, whatever the client says.
+func chargeOrderOffer(st *store.Store, role *store.Role, p ChargeProduct, now time.Time) (int64, error) {
+	if role == nil || !ChargeDeliverable(p) {
+		return 0, ErrNotPayable
+	}
+	if g, ok := chargeGuards[p.ID]; ok {
+		if err := g(st, role); err != nil {
+			return 0, err
+		}
+	}
+	var offerID int64
+	switch {
+	case isOneCentProduct(p.ID):
+		state, err := loadOneCentState(st, role.RID)
+		if err != nil {
+			return 0, err
+		}
+		if state.Bought {
+			return 0, errNotPayable("bought already")
+		}
+		offerID = oneCentOffer
+	case fireGiftProducts[p.ID]:
+		active, err := activeFireGifts(st, role.RID, now)
+		if err != nil {
+			return 0, err
+		}
+		for _, window := range active {
+			if fireGiftAwards[window.AwardID].ChargeID == p.ID {
+				offerID = window.AwardID
+				break
+			}
+		}
+		if offerID == 0 {
+			return 0, errNotPayable("no active offer")
+		}
+	}
+	if offerID != 0 {
+		_, err := st.PayOfferStatus(role.RID, offerID)
+		if err == nil {
+			return 0, errNotPayable("there is already an order for this offer")
+		}
+		if !errors.Is(err, store.ErrNotFound) {
+			return 0, err
+		}
+	}
+	return offerID, nil
+}
+
+// CreateChargeOrder opens an order for a product at the server's catalog price.
 func CreateChargeOrder(st *store.Store, role *store.Role, chargeID int64, now time.Time) (*store.PayOrder, error) {
 	p, ok := chargeTable[chargeID]
 	if !ok {
 		return nil, ErrNoProduct
 	}
-	if !ChargeDeliverable(p) {
-		return nil, ErrNotPayable
-	}
-	if g, ok := chargeGuards[chargeID]; ok {
-		if err := g(st, role); err != nil {
-			return nil, err
-		}
+	offerID, err := chargeOrderOffer(st, role, p, now)
+	if err != nil {
+		return nil, err
 	}
 	if n, err := st.PendingPayOrders(role.RID); err != nil {
 		return nil, err
 	} else if n >= maxOpenOrders {
 		return nil, ErrTooManyOpen
 	}
-	return st.CreatePayOrder(store.PayOrder{OrderNo: NewOrderNo(now, role.RID), RID: role.RID, SrvID: role.SrvID, ChargeID: chargeID, AmountCents: p.Cents()})
+	return openChargeOrder(st, role, p, offerID, now)
+}
+
+func openChargeOrder(st *store.Store, role *store.Role, p ChargeProduct, offerID int64, now time.Time) (*store.PayOrder, error) {
+	o, err := st.CreatePayOrder(store.PayOrder{OrderNo: NewOrderNo(now, role.RID), RID: role.RID, SrvID: role.SrvID, ChargeID: p.ID, AmountCents: p.Cents(), OfferID: offerID})
+	if errors.Is(err, store.ErrConflict) {
+		return nil, errNotPayable("there is already an order for this offer")
+	}
+	return o, err
 }
 
 // ConfirmChargeOrder takes the money of an order as received: delivers the product, adds the VIP experience and raises the VIP
@@ -241,6 +284,29 @@ func confirmChargeLocked(st *store.Store, no, operator, note string, spendKlb in
 	}
 	bought := rc.Bought[fmt.Sprint(p.ID)]
 	assets, items := chargeGain(p, bought == 0)
+	switch {
+	case isOneCentProduct(p.ID):
+		state, err := loadOneCentState(st, o.RID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if state.Bought {
+			return nil, 0, store.ErrConflict
+		}
+		if o.OfferID != oneCentOffer {
+			if err := st.AssignPayOffer(no, oneCentOffer); err != nil {
+				return nil, 0, err
+			}
+		}
+	case fireGiftProducts[p.ID]:
+		offer, ok := fireGiftAwards[o.OfferID]
+		if !ok || offer.ChargeID != p.ID {
+			return nil, 0, ErrNotPayable
+		}
+		for _, item := range offer.Items {
+			splitGains([]sellGain{{item[0], item[1]}}, 1, assets, items)
+		}
+	}
 	var extra int64
 	if spendKlb > 0 {
 		ledger, err := st.RoleAssets(o.RID)
@@ -288,12 +354,14 @@ func confirmChargeLocked(st *store.Store, no, operator, note string, spendKlb in
 	return o, extra, err
 }
 
-// PayableProducts are the products that can be paid for now, the diamond tiers first and then the ones with a hook by id.
+// PayableProducts is the catalog, with diamond tiers first and other deliverable products ordered by ID.
 func PayableProducts() []ChargeProduct {
 	out := chargeTiers()
 	var ids []int64
-	for id := range chargeHooks {
-		ids = append(ids, id)
+	for id, p := range chargeTable {
+		if !IsChargeTier(p) && ChargeDeliverable(p) {
+			ids = append(ids, id)
+		}
 	}
 	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
 	for _, id := range ids {

@@ -74,7 +74,7 @@ func (c *client) sawWithin(cmd uint16, d time.Duration) bool {
 }
 
 func TestChampionSelectionBetAndGroups(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newDungeonEnv(t)
 	e.setNow(champT0.Add(10 * time.Second))
 	c, role := e.champRole("ch1", "冠军客")
 
@@ -138,6 +138,10 @@ func TestChampionSelectionBetAndGroups(t *testing.T) {
 		t.Fatalf("my match while it is fought: %v", mine)
 	}
 	replay := mine.Int("replay_id")
+	recording, err := e.st.ReplayByID(replay, role.RID)
+	if err != nil || recording == nil || recording.CombatType != combatChampion || recording.CombatMap != fightMap || recording.Stage != champSize || recording.RoundCount == 0 {
+		t.Fatalf("local tournament replay: %+v, %v", recording, err)
+	}
 	// it ended: the result shows, the log has it
 	e.setNow(champT0.Add(310 * time.Second))
 	c.send(20252, proto.Message{})
@@ -319,7 +323,7 @@ func TestChampionTickPushesWhenItMovesOn(t *testing.T) {
 }
 
 func TestCrossChampion(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newDungeonEnv(t)
 	// the 25th of October 2026 is a Sunday: the cross match starts at 12:00
 	sunday := champAt(25, 12, 0, 0)
 	e.setNow(sunday.Add(10 * time.Second))
@@ -361,5 +365,12 @@ func TestCrossChampion(t *testing.T) {
 		if ok, _ := e.st.LoadGlobal(role.SrvID, champModule, local); ok && local.Ev != nil {
 			t.Fatal("the local match was started by the cross one")
 		}
+	}
+	e.setNow(sunday.Add(130 * time.Second))
+	c.send(26202, proto.Message{})
+	replay := c.waitFor(26202).Int("replay_id")
+	recording, err := e.st.ReplayByID(replay, role.RID)
+	if err != nil || recording == nil || recording.CombatType != combatCrossChampion || recording.CombatMap != fightMap || recording.Stage != champSize || recording.RoundCount == 0 {
+		t.Fatalf("cross tournament replay: %+v, %v", recording, err)
 	}
 }

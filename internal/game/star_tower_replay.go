@@ -31,28 +31,6 @@ func (r *towerReport) apply(st *store.Store, result proto.Message) {
 
 func towerSeconds(ms int64) int64 { return (ms + 999) / 1000 }
 
-// towerStatistics pairs the actual simulated totals with the combat object snapshot, including foes and fallen units.
-func towerStatistics(sim *fightSim, objects []proto.Message) []proto.Message {
-	byPos := make(map[int64]fightUnit, len(sim.units))
-	for _, u := range sim.units {
-		byPos[u.pos] = u
-	}
-	groups := map[int64][]proto.Message{1: {}, 2: {}}
-	for _, o := range objects {
-		unit, ok := byPos[o.Int("pos")]
-		if !ok {
-			continue
-		}
-		group := o.Int("group")
-		groups[group] = append(groups[group], proto.Message{
-			"rid": o.Int("owner_id"), "srvid": o.Str("owner_srv_id"), "id": o.Int("object_id"),
-			"bid": o.Int("object_bid"), "star": o.Int("star"), "lev": o.Int("lev"), "camp_type": o.Int("camp_type"),
-			"dps": unit.damage, "be_hurt": unit.taken, "cure": unit.healing, "ext_data": []proto.Message{},
-		})
-	}
-	return []proto.Message{{"type": 2, "partner_hurts": groups[2]}, {"type": 1, "partner_hurts": groups[1]}}
-}
-
 func towerReplayList(st *store.Store, role *store.Role, floor int64) (proto.Message, error) {
 	entries := []proto.Message{}
 	response := proto.Message{"m_replay_id": 0, "my_time": 0}

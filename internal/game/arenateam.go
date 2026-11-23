@@ -1972,7 +1972,7 @@ func (a *atSvc) challenge(s *gateway.Session, req proto.Message) error {
 		d.Time = c.now.Unix()
 		d.Replay = recordReplay(a.st, combatTeam, replaySide{RID: d.ARID, SrvID: d.ASrv, Name: plan.mine[0].Name, Lev: plan.mine[0].Lev, Face: plan.mine[0].Face, Power: d.APower, Form: d.AForm},
 			replaySide{RID: d.BRID, SrvID: d.BSrv, Name: plan.theirs[0].Name, Lev: plan.theirs[0].Lev, Face: plan.theirs[0].Face, Power: d.BPower, Form: d.BForm},
-			plan.intro, plan.rounds[i], d.Ret == 1, c.now.Unix())
+			plan.intro, plan.rounds[i], d.Ret == 1, c.now.Unix(), replayDetails{Map: fightMap})
 	}
 	if c.t.Count >= atCfg.num("limit_number") {
 		c.t.AddTime = c.now.Unix() + atCfg.num("recovery_time")

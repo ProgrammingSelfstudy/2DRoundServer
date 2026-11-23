@@ -1,0 +1,32 @@
+{
+  "source": "restored client holiday_personal_fire_gift_data.lua",
+  "offers": [
+    {"id":101,"charge_id":1561,"level":35,"tower":0,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[14001,1],[1,500000],[22,500000]]},
+    {"id":102,"charge_id":1562,"level":35,"tower":0,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[14001,3],[10403,5],[22,800000]]},
+    {"id":103,"charge_id":1563,"level":35,"tower":0,"min_paid":101,"max_paid":999999,"seconds":7200,"items":[[3,1980],[14001,5],[10403,10],[22,1000000]]},
+    {"id":104,"charge_id":1561,"level":0,"tower":30,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[14001,1],[1,500000],[22,500000]]},
+    {"id":105,"charge_id":1562,"level":0,"tower":30,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[14001,3],[10403,5],[22,800000]]},
+    {"id":106,"charge_id":1563,"level":0,"tower":30,"min_paid":101,"max_paid":999999,"seconds":7200,"items":[[3,1980],[14001,5],[10403,10],[22,1000000]]},
+    {"id":107,"charge_id":1561,"level":0,"tower":65,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[14001,1],[10001,200],[22,500000]]},
+    {"id":108,"charge_id":1562,"level":0,"tower":65,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[14001,3],[10403,5],[22,800000]]},
+    {"id":110,"charge_id":1561,"level":0,"tower":77,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[14001,1],[10001,200],[22,500000]]},
+    {"id":111,"charge_id":1562,"level":0,"tower":77,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[14001,3],[10403,5],[22,800000]]},
+    {"id":113,"charge_id":1561,"level":0,"tower":97,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[29905,50]]},
+    {"id":114,"charge_id":1562,"level":0,"tower":97,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[29905,50],[10403,10]]},
+    {"id":116,"charge_id":1561,"level":0,"tower":156,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[29905,50]]},
+    {"id":117,"charge_id":1562,"level":0,"tower":156,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[29905,50],[10403,10]]},
+    {"id":201,"charge_id":1571,"level":80,"tower":0,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,120],[10603,1],[10040,10]]},
+    {"id":202,"charge_id":1572,"level":80,"tower":0,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[10603,2],[10040,30]]},
+    {"id":203,"charge_id":1573,"level":80,"tower":0,"min_paid":101,"max_paid":999999,"seconds":7200,"items":[[3,1980],[10603,3],[10040,100]]},
+    {"id":301,"charge_id":1581,"level":90,"tower":0,"min_paid":0,"max_paid":5,"seconds":7200,"items":[[3,60],[17009,100],[17011,1]]},
+    {"id":302,"charge_id":1582,"level":90,"tower":0,"min_paid":6,"max_paid":100,"seconds":7200,"items":[[3,680],[17009,200],[17011,10]]},
+    {"id":303,"charge_id":1583,"level":90,"tower":0,"min_paid":101,"max_paid":999999,"seconds":7200,"items":[[3,3280],[17009,800],[17011,25]]},
+    {"id":404,"charge_id":1591,"level":120,"tower":0,"min_paid":0,"max_paid":100,"seconds":7200,"items":[[3,300],[39493,1],[17210,2],[28,10]]},
+    {"id":405,"charge_id":1592,"level":120,"tower":0,"min_paid":100,"max_paid":300,"seconds":7200,"items":[[3,680],[39497,1],[17210,5],[28,50]]},
+    {"id":406,"charge_id":1593,"level":120,"tower":0,"min_paid":301,"max_paid":999999,"seconds":7200,"items":[[3,1980],[39501,1],[17210,16],[28,160]]},
+    {"id":501,"charge_id":1594,"guild_career":2,"min_paid":0,"max_paid":999999,"seconds":7200,"items":[[3,3280],[14001,4],[10006,30],[10,8000]]},
+    {"id":601,"charge_id":1595,"guild_career":3,"min_paid":0,"max_paid":999999,"seconds":7200,"items":[[3,3280],[14001,4],[10006,30],[10,8000]]},
+    {"id":701,"charge_id":1596,"guild_career":4,"min_paid":0,"max_paid":999999,"seconds":7200,"items":[[3,3280],[14001,4],[10006,30],[10,8000]]},
+    {"id":801,"charge_id":1597,"guild_career":5,"min_paid":0,"max_paid":999999,"seconds":7200,"items":[[3,3280],[14001,4],[10006,30],[10,8000]]}
+  ]
+}

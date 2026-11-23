@@ -5,12 +5,14 @@ import (
 	"errors"
 )
 
-// Replay is one kept fight. Meta is what the lists show of it and Data the fight script; both are opaque JSON to
-// the store.
+// Replay is one kept fight. Meta is the lineup snapshot and Data the fight script.
 type Replay struct {
 	ID          int64
 	SrvID       string
 	CombatType  int64
+	CombatMap   int64
+	RoundCount  int64
+	Stage       int64
 	ARID, BRID  int64
 	Time        int64
 	Likes       int64
@@ -53,8 +55,8 @@ func addReplayTx(tx *sql.Tx, r Replay) (int64, error) {
 }
 
 func insertReplay(tx *sql.Tx, r Replay) (int64, error) {
-	res, err := tx.Exec(`INSERT INTO replays(srv_id,combat_type,a_rid,b_rid,time,meta,data) VALUES(?,?,?,?,?,?,?)`,
-		r.SrvID, r.CombatType, r.ARID, r.BRID, r.Time, r.Meta, r.Data)
+	res, err := tx.Exec(`INSERT INTO replays(srv_id,combat_type,a_rid,b_rid,time,meta,data,combat_map,round_count,stage) VALUES(?,?,?,?,?,?,?,?,?,?)`,
+		r.SrvID, r.CombatType, r.ARID, r.BRID, r.Time, r.Meta, r.Data, r.CombatMap, r.RoundCount, r.Stage)
 	if err != nil {
 		return 0, err
 	}
@@ -71,7 +73,7 @@ func pruneReplays(tx *sql.Tx, tower bool) error {
 	return err
 }
 
-const replayCols = `r.id,r.srv_id,r.combat_type,r.a_rid,r.b_rid,r.time,r.likes,r.shares,r.plays,r.public,r.meta,r.data,
+const replayCols = `r.id,r.srv_id,r.combat_type,r.a_rid,r.b_rid,r.time,r.likes,r.shares,r.plays,r.public,r.meta,r.data,r.combat_map,r.round_count,r.stage,
   EXISTS(SELECT 1 FROM replay_collects c WHERE c.replay_id=r.id AND c.rid=?)`
 
 type rowScanner interface{ Scan(...any) error }
@@ -79,7 +81,8 @@ type rowScanner interface{ Scan(...any) error }
 func scanReplay(row rowScanner) (*Replay, error) {
 	var r Replay
 	var pub, col int64
-	if err := row.Scan(&r.ID, &r.SrvID, &r.CombatType, &r.ARID, &r.BRID, &r.Time, &r.Likes, &r.Shares, &r.Plays, &pub, &r.Meta, &r.Data, &col); err != nil {
+	if err := row.Scan(&r.ID, &r.SrvID, &r.CombatType, &r.ARID, &r.BRID, &r.Time, &r.Likes, &r.Shares, &r.Plays, &pub, &r.Meta, &r.Data,
+		&r.CombatMap, &r.RoundCount, &r.Stage, &col); err != nil {
 		return nil, err
 	}
 	r.Public, r.IsCollected = pub != 0, col != 0
@@ -122,20 +125,47 @@ func (s *Store) CollectedReplays(rid int64) ([]Replay, error) {
 	return s.replayList(`SELECT `+replayCols+` FROM replays r JOIN replay_collects c ON c.replay_id=r.id WHERE c.rid=? ORDER BY r.id DESC`, rid, rid)
 }
 
-// PublicReplays pages the replays shown to everybody. combat 0 = any fight type; byLikes sorts by likes, else the
-// newest come first. It also returns how many replays there are in all.
-func (s *Store) PublicReplays(viewer, combat int64, byLikes bool, start, num int) ([]Replay, int, error) {
+type ReplayFilter struct {
+	CombatType, Stage  int64
+	RankMin, RankMax   int64
+	LevelMin, LevelMax int64
+	ByLikes            bool
+}
+
+func (s *Store) PublicReplays(viewer int64, filter ReplayFilter, start, num int) ([]Replay, int, error) {
 	where, args := `r.public=1`, []any{}
-	if combat != 0 {
+	if filter.CombatType != 0 {
 		where += ` AND r.combat_type=?`
-		args = append(args, combat)
+		args = append(args, filter.CombatType)
+	}
+	if filter.Stage != 0 {
+		where += ` AND r.stage=?`
+		args = append(args, filter.Stage)
+	}
+	for _, band := range []struct {
+		field    string
+		min, max int64
+	}{{"rank", filter.RankMin, filter.RankMax}, {"lev", filter.LevelMin, filter.LevelMax}} {
+		if band.min == 0 {
+			continue
+		}
+		field := func(side string) string {
+			return `json_extract(CASE WHEN json_valid(r.meta) THEN r.meta END, '$.` + side + `.` + band.field + `')`
+		}
+		if band.max == 0 {
+			where += ` AND (` + field("a") + `>=? OR ` + field("b") + `>=?)`
+			args = append(args, band.min, band.min)
+		} else {
+			where += ` AND (` + field("a") + ` BETWEEN ? AND ? OR ` + field("b") + ` BETWEEN ? AND ?)`
+			args = append(args, band.min, band.max, band.min, band.max)
+		}
 	}
 	var total int
 	if err := s.db.QueryRow(`SELECT COUNT(*) FROM replays r WHERE `+where, args...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
 	order := `r.id DESC`
-	if byLikes {
+	if filter.ByLikes {
 		order = `r.likes DESC, r.id DESC`
 	}
 	list, err := s.replayList(`SELECT `+replayCols+` FROM replays r WHERE `+where+` ORDER BY `+order+` LIMIT ? OFFSET ?`, append(append([]any{viewer}, args...), num, start)...)

@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -37,7 +39,7 @@ func TestLadderClosedOutsideTheWeekend(t *testing.T) {
 }
 
 func TestLadderFightBuyQuickAndRewards(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newDungeonEnv(t)
 	e.setNow(ladderTime(24, 9))
 	c, role := e.enter("ld1", "天梯客")
 	if err := e.st.SetRoleLevel(role.RID, 60); err != nil {
@@ -71,7 +73,9 @@ func TestLadderFightBuyQuickAndRewards(t *testing.T) {
 	if r := c.waitFor(24303); r.Int("code") != 1 {
 		t.Fatalf("challenge: %v", r)
 	}
-	c.waitFor(20000)
+	if scene := c.waitFor(20000); scene.Int("combat_map") != fightMap {
+		t.Fatalf("ladder scene: %v", scene)
+	}
 	if intro := c.waitFor(20027); intro.Int("combat_type") != combatLadder {
 		t.Fatalf("intro: %v", intro)
 	}
@@ -81,6 +85,18 @@ func TestLadderFightBuyQuickAndRewards(t *testing.T) {
 	won := res.Int("result") == 1
 	if res.Int("replay_id") == 0 || len(res.Arr("reward")) == 0 {
 		t.Fatalf("result: %v", res)
+	}
+	replay, err := e.st.ReplayByID(res.Int("replay_id"), role.RID)
+	if err != nil || replay == nil || replay.CombatMap != fightMap || replay.RoundCount < 1 {
+		t.Fatalf("ladder replay: %+v, %v", replay, err)
+	}
+	_, _, script, err := fightOfReplay(replay.Data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, err := decodeWire(20006, script.Report)
+	if err != nil || len(report.Arr("hurt_statistics")) != 2 || !reflect.DeepEqual(report.Arr("hurt_statistics"), res.Arr("hurt_statistics")) {
+		t.Fatalf("archived ladder statistics: %v, %v, live %v", report, err, res.Arr("hurt_statistics"))
 	}
 	if won && (res.Int("atk_rank") != foe.Int("rank") || res.Int("atk_change_rank") != 1000-foe.Int("rank") || res.Int("is_change_best_rank") != 1) {
 		t.Fatalf("won but the places did not change: %v", res)
@@ -172,4 +188,97 @@ func TestLadderFightBuyQuickAndRewards(t *testing.T) {
 	if n := prizes(); n != 1 {
 		t.Fatalf("the prize was sent %d times", n)
 	}
+}
+
+func TestLadderBuyRequiresSeasonQualificationAndVIP(t *testing.T) {
+	e := newDungeonEnv(t)
+	e.setNow(ladderTime(21, 12))
+	c, role := e.enter("ldbuy", "天梯购次")
+	if err := e.st.Exchange(role.RID, nil, nil, map[int64]int64{3: 10000}, nil); err != nil {
+		t.Fatal(err)
+	}
+	buy := func(want int64) {
+		t.Helper()
+		c.send(24305, proto.Message{})
+		if r := c.waitFor(24305); r.Int("code") != want {
+			t.Fatalf("24305 wanted %d: %v", want, r)
+		}
+	}
+	state := func() ladderRole {
+		t.Helper()
+		var lr ladderRole
+		if _, err := e.st.LoadState(role.RID, ladderModule, &lr); err != nil {
+			t.Fatal(err)
+		}
+		return lr
+	}
+	checkUnchanged := func(bought int64) {
+		t.Helper()
+		c.settle()
+		assets, _ := e.st.RoleAssets(role.RID)
+		if lr := state(); lr.Bought != bought || assets[3] != 10000 {
+			t.Fatalf("refused purchase changed state: %+v, diamonds %d", lr, assets[3])
+		}
+	}
+	level := int(ladderCfg.num("join_min_lev"))
+	if err := e.st.SetRoleLevel(role.RID, level); err != nil {
+		t.Fatal(err)
+	}
+	buy(0)
+	checkUnchanged(0)
+	e.setNow(ladderTime(24, 9))
+	if err := e.st.SetRoleLevel(role.RID, level-1); err != nil {
+		t.Fatal(err)
+	}
+	buy(0)
+	checkUnchanged(0)
+	if err := e.st.SetRoleLevel(role.RID, level); err != nil {
+		t.Fatal(err)
+	}
+	for pos := int64(0); pos < ladderCfg.num("arena_rank"); pos++ {
+		other, err := e.st.CreateRole(role.AccountID, role.SrvID, fmt.Sprintf("天梯榜%d", pos), 0, 1, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := e.st.ArenaPlayerOf(other.RID, arenaInitScore+1, ladderTime(24, 8).Unix()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	buy(0)
+	checkUnchanged(0)
+	player, err := e.st.ArenaPlayerOf(role.RID, arenaInitScore, ladderTime(24, 9).Unix())
+	if err != nil {
+		t.Fatal(err)
+	}
+	player.Score += 2
+	if err := e.st.SaveArenaPlayer(player); err != nil {
+		t.Fatal(err)
+	}
+	for idx, price := range ladderCfg.Buy {
+		if price.Vip == 0 {
+			continue
+		}
+		lr := state()
+		lr.Bought = int64(idx)
+		if err := e.st.SaveState(role.RID, ladderModule, &lr); err != nil {
+			t.Fatal(err)
+		}
+		if err := e.st.SetRoleVIP(role.RID, int(price.Vip-1)); err != nil {
+			t.Fatal(err)
+		}
+		buy(0)
+		checkUnchanged(int64(idx))
+		if err := e.st.SetRoleVIP(role.RID, int(price.Vip)); err != nil {
+			t.Fatal(err)
+		}
+		buy(1)
+		info := c.waitFor(24300)
+		c.settle()
+		assets, _ := e.st.RoleAssets(role.RID)
+		if got := state(); got.Bought != int64(idx+1) || info.Int("buy_combat_num") != got.Bought || info.Int("can_combat_num") != ladderCfg.num("join_times")+got.Bought || assets[3] != 10000-price.Cost {
+			t.Fatalf("eligible purchase: %v, %+v, diamonds %d", info, got, assets[3])
+		}
+		return
+	}
+	t.Fatal("ladder configuration has no VIP-gated purchase")
 }

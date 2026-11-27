@@ -361,10 +361,30 @@ func (c *mineCtx) mineFoes(sl mineSlot) (arenaOpp, error) {
 	return o, nil
 }
 
-func (c *mineCtx) defenseMessages(o arenaOpp) []proto.Message {
+// defenseMessages lists the defenders of 20641. In a mine a role holds, id is the hero's partner id (the original's
+// panel looks the hero up by it, and 20642 names the same heroes); a guard's copies count from 1.
+func (c *mineCtx) defenseMessages(o arenaOpp, sl mineSlot) []proto.Message {
+	var pids []int64
+	if sl.RID != 0 && len(sl.Def) > 0 {
+		if heroes, err := c.a.st.PartnersOf(sl.RID); err == nil {
+			owned := map[int64]bool{}
+			for _, h := range heroes {
+				owned[h.PartnerID] = true
+			}
+			for _, d := range sl.Def {
+				if owned[d.PID] { // the same order mineFoes builds the lineup in
+					pids = append(pids, d.PID)
+				}
+			}
+		}
+	}
 	out := []proto.Message{}
 	for i, h := range o.Lineup {
-		out = append(out, proto.Message{"pos": h.Pos, "id": i + 1, "bid": h.BID, "lev": h.Lev, "star": h.Star, "use_skin": 0})
+		id := int64(i + 1)
+		if i < len(pids) && len(pids) == len(o.Lineup) {
+			id = pids[i]
+		}
+		out = append(out, proto.Message{"pos": h.Pos, "id": id, "bid": h.BID, "lev": h.Lev, "star": h.Star, "use_skin": 0})
 	}
 	return out
 }
@@ -396,7 +416,7 @@ func (a *adv) mineInfo(s *gateway.Session, req proto.Message) error {
 			}
 		}
 		return s.Send(20641, proto.Message{"room_id": room, "mine_id": sl.MineID, "rid": sl.RID, "srv_id": sl.SrvID, "name": o.Name, "lev": o.Lev, "face": o.Face,
-			"power": o.Power, "plunder_count": shown, "occupy_time": sl.Since, "defense": c.defenseMessages(o), "items": itemPairs(loot), "id": 0, "hallows_id": sl.Hallows})
+			"power": o.Power, "plunder_count": shown, "occupy_time": sl.Since, "defense": c.defenseMessages(o, *sl), "items": itemPairs(loot), "id": 0, "hallows_id": sl.Hallows})
 	})
 }
 

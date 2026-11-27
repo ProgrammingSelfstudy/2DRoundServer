@@ -496,6 +496,12 @@ func TestAdventureMineFightOccupyAndLeave(t *testing.T) {
 	if l.Int("occupy_count") != 1 || l.Arr("list")[0].Int("rid") != role.RID || l.Arr("list")[0].Int("status") != 2 {
 		t.Fatalf("held mine: %v", l)
 	}
+	// the held mine names its defenders by partner id (the defence team panel and 20642 use the same ids) and shows
+	// what it has made, not what a win would plunder
+	c.send(20641, proto.Message{"floor": 10, "room_id": 1})
+	if m := c.waitFor(20641); len(m.Arr("defense")) != 1 || m.Arr("defense")[0].Int("id") != hero || (len(m.Arr("items")) > 0 && m.Arr("items")[0].Int("num") != 0) {
+		t.Fatalf("held mine info: %v", m)
+	}
 	c.send(20652, proto.Message{})
 	if m := c.waitFor(20652).Arr("mine_list"); len(m) != 1 || m[0].Int("mine_id") != 101011 {
 		t.Fatalf("my mines: %v", m)

@@ -224,6 +224,24 @@ func TestAdventureSkillsPotionsAndBoxes(t *testing.T) {
 	if r := c.waitFor(20635); r.Int("code") != 0 {
 		t.Fatalf("box taken twice: %v", r)
 	}
+	// id 0 takes every box the kills have opened
+	st = e.advState(t, role)
+	st.Kills = 20
+	e.st.SaveState(role.RID, advModule, st)
+	c.send(20635, proto.Message{"id": 0})
+	if r := c.waitFor(20635); r.Int("code") != 1 {
+		t.Fatalf("take all: %v", r)
+	}
+	boxes := c.waitFor(20634).Arr("list")
+	for i, b := range boxes {
+		if want := map[bool]int64{true: 2, false: 0}[i < 4]; b.Int("status") != want {
+			t.Fatalf("box %d after taking all: %v", i+1, boxes)
+		}
+	}
+	c.send(20635, proto.Message{"id": 0})
+	if r := c.waitFor(20635); r.Int("code") != 0 {
+		t.Fatalf("nothing left to take: %v", r)
+	}
 }
 
 func TestAdventureRoomsCollectQuizNpcBoxAndNextFloor(t *testing.T) {

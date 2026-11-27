@@ -756,6 +756,9 @@ func (a *adv) doGuard(s *gateway.Session, role *store.Role, st *advState, r *adv
 				if err := a.finish(s, st, r); err != nil {
 					return err
 				}
+				if err := a.sendBoxes(s, st); err != nil { // the kills toward the round boxes, as captured after a win
+					return err
+				}
 			}
 			return a.sendHeroes(s, role, st)
 		})
@@ -1198,39 +1201,47 @@ func (a *adv) shopBuy(s *gateway.Session, req proto.Message) error {
 
 // boxes (20634) are the round boxes: one more opens at 5, 10, 15, 20 and 30 guards killed.
 func (a *adv) boxes(s *gateway.Session, _ proto.Message) error {
-	return a.with(s, func(role *store.Role, st *advState) error {
-		list := []proto.Message{}
-		for _, b := range advCfg.RoundRewards {
-			status := int64(0)
-			switch {
-			case st.BoxTaken[b.ID]:
-				status = 2
-			case st.Kills >= b.Count:
-				status = 1
-			}
-			list = append(list, proto.Message{"id": b.ID, "status": status})
-		}
-		return s.Send(20634, proto.Message{"list": list, "kill_mon": st.Kills})
-	})
+	return a.with(s, func(role *store.Role, st *advState) error { return a.sendBoxes(s, st) })
 }
 
+func (a *adv) sendBoxes(s *gateway.Session, st *advState) error {
+	list := []proto.Message{}
+	for _, b := range advCfg.RoundRewards {
+		status := int64(0)
+		switch {
+		case st.BoxTaken[b.ID]:
+			status = 2
+		case st.Kills >= b.Count:
+			status = 1
+		}
+		list = append(list, proto.Message{"id": b.ID, "status": status})
+	}
+	return s.Send(20634, proto.Message{"list": list, "kill_mon": st.Kills})
+}
+
+// takeBox (20635) takes a round box; id 0 takes every box the kills have opened, as the main window's box button sends
+// (capture 2026-10-29: 20635 {id 0}). The box list (20634) follows.
 func (a *adv) takeBox(s *gateway.Session, req proto.Message) error {
 	return a.with(s, func(role *store.Role, st *advState) error {
 		id := req.Int("id")
+		var prize [][2]int64
 		for _, b := range advCfg.RoundRewards {
-			if b.ID != id {
+			if (id != 0 && b.ID != id) || st.BoxTaken[b.ID] || st.Kills < b.Count {
 				continue
 			}
-			if st.BoxTaken[id] || st.Kills < b.Count {
-				return s.Send(20635, proto.Message{"code": 0, "msg": "无法领取"})
-			}
-			st.BoxTaken[id] = true
-			if err := a.gain(s, role, pairsOf(b.Items)); err != nil {
-				return err
-			}
-			return s.Send(20635, proto.Message{"code": 1, "msg": "领取成功"})
+			st.BoxTaken[b.ID] = true
+			prize = append(prize, pairsOf(b.Items)...)
 		}
-		return s.Send(20635, proto.Message{"code": 0, "msg": "无法领取"})
+		if len(prize) == 0 {
+			return s.Send(20635, proto.Message{"code": 0, "msg": "无法领取"})
+		}
+		if err := a.gain(s, role, prize); err != nil {
+			return err
+		}
+		if err := s.Send(20635, proto.Message{"code": 1, "msg": "领取成功"}); err != nil {
+			return err
+		}
+		return a.sendBoxes(s, st)
 	})
 }
 

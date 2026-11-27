@@ -386,9 +386,14 @@ func (a *adv) mineInfo(s *gateway.Session, req proto.Message) error {
 		if sl.RID == c.role.RID {
 			shown = sl.Plunder
 		}
+		// what a win plunders, or for the role's own mine what it has made so far (当前累计收益)
 		loot := [][2]int64{}
-		for _, b := range pairsOf(row.BaseItems) {
-			loot = append(loot, [2]int64{b[0], mineRate(c.adv.PassID, f, b[1])})
+		if sl.RID == c.role.RID {
+			loot, _ = mineOutput(*sl, s.Now().Unix())
+		} else {
+			for _, b := range pairsOf(row.BaseItems) {
+				loot = append(loot, [2]int64{b[0], mineRate(c.adv.PassID, f, b[1])})
+			}
 		}
 		return s.Send(20641, proto.Message{"room_id": room, "mine_id": sl.MineID, "rid": sl.RID, "srv_id": sl.SrvID, "name": o.Name, "lev": o.Lev, "face": o.Face,
 			"power": o.Power, "plunder_count": shown, "occupy_time": sl.Since, "defense": c.defenseMessages(o), "items": itemPairs(loot), "id": 0, "hallows_id": sl.Hallows})

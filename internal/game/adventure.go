@@ -298,7 +298,8 @@ func (a *adv) with(s *gateway.Session, fn func(role *store.Role, st *advState) e
 	if err != nil {
 		return err
 	}
-	if !ok || s.Now().Unix() >= st.End {
+	roundEnd := advRoundStart(s.Now()).Add(advRoundDays * 24 * time.Hour).Unix()
+	if !ok || s.Now().Unix() >= st.End || st.End > roundEnd { // a round saved by the seven-day version ends too late
 		st.newRound(s.Now())
 	} else if len(st.Rooms) != advGridSide*advGridSide { // a floor saved by the 13-room version
 		st.buildFloor(max(st.Floor, 1))
@@ -383,7 +384,7 @@ func (a *adv) partners(role *store.Role) (map[int64]store.Partner, error) {
 	return out, nil
 }
 
-// setForm (20605) chooses the heroes that go to the island (at most six, the first one fights).
+// setForm (20605) chooses the heroes that go to the island: at most five (data_explain "可选择5个英雄进行冒险"), the first one fights.
 func (a *adv) setForm(s *gateway.Session, req proto.Message) error {
 	return a.with(s, func(role *store.Role, st *advState) error {
 		byID, err := a.partners(role)
@@ -394,7 +395,7 @@ func (a *adv) setForm(s *gateway.Session, req proto.Message) error {
 		seen := map[int64]bool{}
 		for _, p := range req.Arr("plist") {
 			id := p.Int("id")
-			if _, ok := byID[id]; !ok || seen[id] || len(heroes) == formMaxHeroes {
+			if _, ok := byID[id]; !ok || seen[id] || len(heroes) == advMaxHeroes {
 				continue
 			}
 			seen[id] = true

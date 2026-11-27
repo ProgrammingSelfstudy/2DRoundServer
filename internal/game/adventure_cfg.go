@@ -38,6 +38,7 @@ const (
 	advKeyItem      = 10152
 	advOre          = 72001 // 炼神矿, the island's own currency
 	advRoundDays    = 2
+	advMaxHeroes    = 5 // data_explain: 可选择5个英雄进行冒险
 	combatAdventure = 6 // BattleConst.Fight_Type.Adventrue
 )
 

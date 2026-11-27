@@ -52,6 +52,12 @@ type mineRole struct {
 
 func mineConst(name string) int64 { return advCfg.Mine.Const[name].Val }
 
+// isMineFloor: the floors of the crystal mine (data_floor_data: 10, 20 … 100).
+func isMineFloor(floor int64) bool {
+	_, ok := advCfg.Mine.FloorData[strconv.FormatInt(floor, 10)]
+	return ok
+}
+
 // mineFloors are the floors that have mines, in order.
 func mineFloors() []int64 {
 	var out []int64

@@ -571,7 +571,7 @@ func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now
 		case <-stop:
 			return
 		case <-t.C:
-			watcher.tick(now())
+			gateway.Safe(nil, "activity watcher tick", func() { watcher.tick(now()) })
 		}
 	}
 }

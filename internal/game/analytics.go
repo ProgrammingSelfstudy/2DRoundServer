@@ -43,12 +43,14 @@ func RunAnalytics(st *store.Store, hub *gateway.Hub, logger *log.Logger, interva
 	for {
 		select {
 		case <-t.C:
-			if err := st.SampleOnline(hub.Count()); err != nil {
-				logger.Printf("analytics: online sample: %v", err)
-			}
-			if err := st.FlushCmds(); err != nil {
-				logger.Printf("analytics: command counts: %v", err)
-			}
+			gateway.Safe(logger, "analytics tick", func() {
+				if err := st.SampleOnline(hub.Count()); err != nil {
+					logger.Printf("analytics: online sample: %v", err)
+				}
+				if err := st.FlushCmds(); err != nil {
+					logger.Printf("analytics: command counts: %v", err)
+				}
+			})
 		case <-stop:
 			if err := st.FlushCmds(); err != nil {
 				logger.Printf("analytics: command counts: %v", err)

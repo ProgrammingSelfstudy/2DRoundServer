@@ -421,3 +421,45 @@ func TestOnCommandRunsOnlyAfterASuccessfulHandler(t *testing.T) {
 	default:
 	}
 }
+
+func TestHandlerPanicClosesOnlyThatConnection(t *testing.T) {
+	r := newRigWith(t, 5*time.Second, func(s *Server) {
+		s.Router.Handle(1166, func(*Session, proto.Message) error {
+			var m map[string]int
+			m["boom"] = 1 // nil map write
+			return nil
+		})
+	})
+	bad, good := r.dial(), r.dial()
+	write(t, good, r.frame(1169, nil))
+	r.expectPong(good)
+	write(t, bad, r.frame(1166, nil))
+	r.expectClosed(bad)
+	r.waitGone()
+	write(t, good, r.frame(1169, nil)) // the server and the other player are still there
+	r.expectPong(good)
+	c := r.dial() // and it still accepts new connections
+	write(t, c, r.frame(1169, nil))
+	r.expectPong(c)
+	logs := r.logs.String()
+	if !strings.Contains(logs, "PANIC") || !strings.Contains(logs, "cmd 1166") || !strings.Contains(logs, "server_test.go") {
+		t.Fatalf("the panic must be logged with the command and stack: %s", logs)
+	}
+}
+
+func TestSafeRecoversAndReports(t *testing.T) {
+	logs := &syncBuf{}
+	l := log.New(logs, "", 0)
+	if Safe(l, "tick", func() {}) {
+		t.Fatal("a normal run is not a panic")
+	}
+	ran := 0
+	for i := 0; i < 2; i++ { // a loop keeps going after a panicking tick
+		if !Safe(l, "tick", func() { ran++; panic("bad tick") }) {
+			t.Fatal("the panic was not reported")
+		}
+	}
+	if ran != 2 || !strings.Contains(logs.String(), "PANIC tick: bad tick") {
+		t.Fatalf("ran %d, log %s", ran, logs.String())
+	}
+}

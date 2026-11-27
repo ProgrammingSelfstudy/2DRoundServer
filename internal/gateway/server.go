@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -227,7 +228,7 @@ func (s *Server) handleConn(c net.Conn) {
 			}
 			return
 		}
-		if err := s.dispatch(sess, fr); err != nil {
+		if err := s.safeDispatch(sess, fr); err != nil {
 			if !errors.Is(err, ErrClose) {
 				s.Log.Printf("gw %s cmd %d: %v", sess.Remote, fr.Command, err)
 			}
@@ -239,6 +240,39 @@ func (s *Server) handleConn(c net.Conn) {
 func isTimeout(err error) bool {
 	var ne net.Error
 	return errors.As(err, &ne) && ne.Timeout()
+}
+
+// safeDispatch runs dispatch and turns a panic in decoding or in a handler into an error
+// that closes only this connection: one bad command must not take every player offline.
+// The session's state may be half-updated by the failed handler, so it is not kept.
+func (s *Server) safeDispatch(sess *Session, fr proto.Frame) (err error) {
+	defer func() {
+		if v := recover(); v != nil {
+			var rid int64
+			if r := sess.Role(); r != nil {
+				rid = r.RID
+			}
+			s.Log.Printf("PANIC gw %s rid %d cmd %d: %v\n%s", sess.Remote, rid, fr.Command, v, debug.Stack())
+			err = fmt.Errorf("panic: %v", v)
+		}
+	}()
+	return s.dispatch(sess, fr)
+}
+
+// Safe runs fn and logs a panic with its stack instead of letting it end the process. Background
+// loops wrap each tick in it, so one failing tick is skipped and the loop keeps running.
+func Safe(l *log.Logger, what string, fn func()) (panicked bool) {
+	defer func() {
+		if v := recover(); v != nil {
+			if l == nil {
+				l = log.Default()
+			}
+			l.Printf("PANIC %s: %v\n%s", what, v, debug.Stack())
+			panicked = true
+		}
+	}()
+	fn()
+	return false
 }
 
 func (s *Server) dispatch(sess *Session, fr proto.Frame) error {

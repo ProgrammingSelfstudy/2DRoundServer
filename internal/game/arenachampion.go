@@ -339,7 +339,7 @@ func (c *champSvc) Run(stop <-chan struct{}) {
 		case <-stop:
 			return
 		case <-t.C:
-			c.tick()
+			gateway.Safe(nil, "champion tick", c.tick)
 		}
 	}
 }

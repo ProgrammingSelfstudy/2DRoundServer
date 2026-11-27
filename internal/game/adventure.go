@@ -551,7 +551,7 @@ func (a *adv) act(s *gateway.Session, req proto.Message) error {
 			return reply(0, "该区域不存在")
 		}
 		e := r.cfg()
-		if e.EvtType == evtNext {
+		if e.EvtType == evtNext || (id == advDoorRoom && action == 1 && isMineFloor(st.Floor)) {
 			return a.nextFloor(s, role, st, r, reply)
 		}
 		if r.Status != roomOpen && !(e.EvtType == evtShop && r.Status == roomOver) {
@@ -1024,7 +1024,10 @@ func (a *adv) doShop(s *gateway.Session, role *store.Role, st *advState, r *advR
 }
 
 func (a *adv) nextFloor(s *gateway.Session, role *store.Role, st *advState, r *advRoom, reply func(int64, string) error) error {
-	if r.Status != roomOver || !st.Boss {
+	// a crystal mine floor (10, 20 …) is a stop: the original opens the mine window there instead of the rooms, and
+	// 继续冒险 sends 20620 {room 13, action 1} for the next floor
+	mineStop := isMineFloor(st.Floor)
+	if !mineStop && (r.Status != roomOver || !st.Boss) {
 		return reply(0, "击败守卫后才能前往下一层")
 	}
 	if st.Floor >= advFloors {
@@ -1051,8 +1054,10 @@ func (a *adv) nextFloor(s *gateway.Session, role *store.Role, st *advState, r *a
 	if err := a.sendRooms(s, st, 20602, nil); err != nil {
 		return err
 	}
-	if err := s.Send(20606, proto.Message{"items_list": itemMessages(got), "vip_buff": 0}); err != nil {
-		return err
+	if len(got) > 0 || !mineStop {
+		if err := s.Send(20606, proto.Message{"items_list": itemMessages(got), "vip_buff": 0}); err != nil {
+			return err
+		}
 	}
 	return reply(2, "")
 }

@@ -496,6 +496,12 @@ func TestAdventureMineFightOccupyAndLeave(t *testing.T) {
 	if l.Int("occupy_count") != 1 || l.Arr("list")[0].Int("rid") != role.RID || l.Arr("list")[0].Int("status") != 2 {
 		t.Fatalf("held mine: %v", l)
 	}
+	// the held mine names its defenders by partner id (the defence team panel and 20642 use the same ids) and shows
+	// what it has made, not what a win would plunder
+	c.send(20641, proto.Message{"floor": 10, "room_id": 1})
+	if m := c.waitFor(20641); len(m.Arr("defense")) != 1 || m.Arr("defense")[0].Int("id") != hero || (len(m.Arr("items")) > 0 && m.Arr("items")[0].Int("num") != 0) {
+		t.Fatalf("held mine info: %v", m)
+	}
 	c.send(20652, proto.Message{})
 	if m := c.waitFor(20652).Arr("mine_list"); len(m) != 1 || m[0].Int("mine_id") != 101011 {
 		t.Fatalf("my mines: %v", m)
@@ -569,5 +575,36 @@ func TestAdventureMineBoxesAttacksAndHallows(t *testing.T) {
 	c.send(20660, proto.Message{"floor": 10, "room_id": 1})
 	if r := c.waitFor(20660); r.Int("code") != 1 {
 		t.Fatalf("20660: %v", r)
+	}
+}
+
+// A crystal mine floor is a stop: the original opens the mine window there and 继续冒险 sends 20620 {room 13, action 1},
+// which goes on to the next floor without the boss and without a floor result.
+func TestAdventureMineFloorContinues(t *testing.T) {
+	e, c, role := advEnv(t)
+	advForm(t, e, c, role)
+	c.send(20600, proto.Message{})
+	c.waitFor(20600)
+	st := e.advState(t, role)
+	st.buildFloor(10)
+	st.PassID = 10
+	if err := e.st.SaveState(role.RID, advModule, st); err != nil {
+		t.Fatal(err)
+	}
+	c.send(20620, proto.Message{"room_id": 13, "action": 1})
+	if b := c.waitFor(20600); b.Int("id") != 11 {
+		t.Fatalf("20600 after the mine floor: %v", b)
+	}
+	c.waitFor(20602)
+	if r := c.waitFor(20620); r.Int("code") != 2 {
+		t.Fatalf("continue: %v", r)
+	}
+	if st := e.advState(t, role); st.Floor != 11 || st.PassID != 11 {
+		t.Fatalf("floor %d pass %d", st.Floor, st.PassID)
+	}
+	// an ordinary floor still needs its boss
+	c.send(20620, proto.Message{"room_id": 13, "action": 1})
+	if r := c.waitFor(20620); r.Int("code") == 2 {
+		t.Fatalf("left floor 11 without its boss: %v", r)
 	}
 }

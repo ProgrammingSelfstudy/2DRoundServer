@@ -16,6 +16,7 @@ const (
 	mineModule      = "adventure_mine"
 	mineWorldModule = "adventure_mine_world"
 	combatMine      = 30 // BattleConst.Fight_Type.AdventrueMine
+	formMine        = 23 // PartnerConst.Fun_Form.Adventure_Mine: the form panel saves it (11212) before 20643
 )
 
 // mineMu keeps one request at a time on the shared mines of the process.
@@ -51,6 +52,12 @@ type mineRole struct {
 }
 
 func mineConst(name string) int64 { return advCfg.Mine.Const[name].Val }
+
+// isMineFloor: the floors of the crystal mine (data_floor_data: 10, 20 … 100).
+func isMineFloor(floor int64) bool {
+	_, ok := advCfg.Mine.FloorData[strconv.FormatInt(floor, 10)]
+	return ok
+}
 
 // mineFloors are the floors that have mines, in order.
 func mineFloors() []int64 {
@@ -354,10 +361,30 @@ func (c *mineCtx) mineFoes(sl mineSlot) (arenaOpp, error) {
 	return o, nil
 }
 
-func (c *mineCtx) defenseMessages(o arenaOpp) []proto.Message {
+// defenseMessages lists the defenders of 20641. In a mine a role holds, id is the hero's partner id (the original's
+// panel looks the hero up by it, and 20642 names the same heroes); a guard's copies count from 1.
+func (c *mineCtx) defenseMessages(o arenaOpp, sl mineSlot) []proto.Message {
+	var pids []int64
+	if sl.RID != 0 && len(sl.Def) > 0 {
+		if heroes, err := c.a.st.PartnersOf(sl.RID); err == nil {
+			owned := map[int64]bool{}
+			for _, h := range heroes {
+				owned[h.PartnerID] = true
+			}
+			for _, d := range sl.Def {
+				if owned[d.PID] { // the same order mineFoes builds the lineup in
+					pids = append(pids, d.PID)
+				}
+			}
+		}
+	}
 	out := []proto.Message{}
 	for i, h := range o.Lineup {
-		out = append(out, proto.Message{"pos": h.Pos, "id": i + 1, "bid": h.BID, "lev": h.Lev, "star": h.Star, "use_skin": 0})
+		id := int64(i + 1)
+		if i < len(pids) && len(pids) == len(o.Lineup) {
+			id = pids[i]
+		}
+		out = append(out, proto.Message{"pos": h.Pos, "id": id, "bid": h.BID, "lev": h.Lev, "star": h.Star, "use_skin": 0})
 	}
 	return out
 }
@@ -379,12 +406,17 @@ func (a *adv) mineInfo(s *gateway.Session, req proto.Message) error {
 		if sl.RID == c.role.RID {
 			shown = sl.Plunder
 		}
+		// what a win plunders, or for the role's own mine what it has made so far (当前累计收益)
 		loot := [][2]int64{}
-		for _, b := range pairsOf(row.BaseItems) {
-			loot = append(loot, [2]int64{b[0], mineRate(c.adv.PassID, f, b[1])})
+		if sl.RID == c.role.RID {
+			loot, _ = mineOutput(*sl, s.Now().Unix())
+		} else {
+			for _, b := range pairsOf(row.BaseItems) {
+				loot = append(loot, [2]int64{b[0], mineRate(c.adv.PassID, f, b[1])})
+			}
 		}
 		return s.Send(20641, proto.Message{"room_id": room, "mine_id": sl.MineID, "rid": sl.RID, "srv_id": sl.SrvID, "name": o.Name, "lev": o.Lev, "face": o.Face,
-			"power": o.Power, "plunder_count": shown, "occupy_time": sl.Since, "defense": c.defenseMessages(o), "items": itemPairs(loot), "id": 0, "hallows_id": sl.Hallows})
+			"power": o.Power, "plunder_count": shown, "occupy_time": sl.Since, "defense": c.defenseMessages(o, *sl), "items": itemPairs(loot), "id": 0, "hallows_id": sl.Hallows})
 	})
 }
 
@@ -432,7 +464,7 @@ func (a *adv) mineAttack(s *gateway.Session, req proto.Message) error {
 		case c.attacksLeft() <= 0:
 			return refuse("挑战次数不足")
 		}
-		team, objects, form, err := a.fights.teamSide(c.role, isH5RoleSession(s))
+		team, objects, form, err := a.fights.teamSideFor(c.role, formMine, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -500,7 +532,7 @@ func (a *adv) mineSettle(s *gateway.Session, f, room int64, opp arenaOpp, won bo
 		}
 		p, _ := a.partners(c.role)
 		stats := []proto.Message{}
-		heroes, _ := formationForRole(a.st, c.role.RID, formDrama, isH5RoleSession(s))
+		heroes, _ := formationForRole(a.st, c.role.RID, formMine, isH5RoleSession(s))
 		for _, sl := range heroes.Slots {
 			if pp, ok := p[sl.PartnerID]; ok {
 				stats = append(stats, proto.Message{"rid": c.role.RID, "srvid": c.role.SrvID, "id": pp.PartnerID, "bid": pp.BID, "star": pp.Star, "lev": pp.Lev,

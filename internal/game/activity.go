@@ -632,8 +632,7 @@ func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now
 			gateway.Safe(nil, "activity watcher tick", func() { boundary = watcher.tick(now()) })
 			delay := every
 			if !boundary.IsZero() {
-				// tick may have run past the boundary it reported; Reset panics on d <= 0
-				delay = max(min(delay, boundary.Sub(now())), time.Millisecond)
+				delay = min(delay, boundary.Sub(now()))
 			}
 			t.Reset(delay)
 		}

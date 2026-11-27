@@ -282,9 +282,15 @@ func freezeDaysRank(st *store.Store, srv string, id int64, name string, list []r
 	return frozen, nil
 }
 
+// drDue caches when a realm's window ends and when that was read from the servers table.
+type drDue struct {
+	end     int64
+	checked time.Time
+}
+
 func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 	bindAdminGlobal(st, drModule, &drMu, nil)
-	var settledRealms sync.Map
+	var settledRealms, dueAt sync.Map // dueAt: realm -> drDue, so most commands skip the servers lookup
 	r.BeforeCommand(func(s *gateway.Session) error {
 		role := s.Role()
 		if role == nil {
@@ -293,7 +299,22 @@ func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 		if _, seen := settledRealms.Load(role.SrvID); seen {
 			return nil
 		}
-		settled, err := advanceDaysRank(st, role.SrvID, s.Now())
+		now := s.Now()
+		if v, ok := dueAt.Load(role.SrvID); ok {
+			// recheck at least every minute, so an admin change of open_time is picked up
+			if due := v.(drDue); now.Unix() < due.end && now.Sub(due.checked) < time.Minute && !now.Before(due.checked) {
+				return nil
+			}
+		}
+		start, err := drStart(st, role.SrvID)
+		if err != nil {
+			return err
+		}
+		dueAt.Store(role.SrvID, drDue{end: drEnd(start), checked: now})
+		if now.Unix() < drEnd(start) {
+			return nil
+		}
+		settled, err := settleDaysRank(st, role.SrvID, now)
 		if settled && err == nil {
 			settledRealms.Store(role.SrvID, true)
 		}

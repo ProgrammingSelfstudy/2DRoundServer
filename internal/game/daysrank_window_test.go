@@ -124,16 +124,25 @@ func TestDaysRankTaskDeltasUsePersistedProgress(t *testing.T) {
 	if err := env.st.Exchange(role.RID, map[int64]int64{3: 1}, map[int64]int64{72001: 16}, nil, nil); !errors.Is(err, store.ErrConflict) {
 		t.Fatalf("unaffordable debit: %v", err)
 	}
+	// exploring is revealing rooms: a soul potion fells guard 7 of a floor without empty rooms, which reveals rooms 1, 2
+	// and 6; the second potion finds no guard to fell and reveals nothing
+	sky := &advState{}
+	sky.newRound(actNow)
+	fixedFloor(sky, nil)
+	sky.Skills = map[int64]advSkillHold{2: {Num: 2}}
+	if err := env.st.SaveState(role.RID, advModule, sky); err != nil {
+		t.Fatal(err)
+	}
 	for attempt := range 2 {
-		player.send(20608, proto.Message{"room_id": 1})
-		if got := player.recv(20608); got.Int("code") != int64(1-attempt) {
+		player.send(20607, proto.Message{"skill_id": 2, "val": 7})
+		if got := player.waitFor(20607); got.Int("code") != int64(1-attempt) {
 			t.Fatalf("explore attempt %d: %v", attempt, got)
 		}
 		player.settle()
 	}
 	watcher.tick(actNow)
 	rows := player.recv(22702).Arr("feat_list")
-	values := map[int64]int64{1001: 1, 2001: 30, 2002: 35, 5001: 1, 5002: 1, 7001: 100, 7002: 120}
+	values := map[int64]int64{1001: 1, 2001: 30, 2002: 35, 5001: 3, 5002: 3, 7001: 100, 7002: 120}
 	if len(rows) != len(values) {
 		t.Fatalf("expected just changed tasks: %v", rows)
 	}

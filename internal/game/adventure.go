@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"sort"
 	"strconv"
@@ -25,7 +26,8 @@ const (
 type advRoom struct {
 	ID     int64
 	Status int64
-	Evt    int64
+	Evt    int64 // what the room holds, 0 for an empty room; the client sees it once the room is revealed
+	Res    int64 // the tile picture (res_id)
 	HPPer  int64 // permille of the guard's hp that is left
 	Qs     []int64
 	Step   int64
@@ -62,7 +64,9 @@ type advState struct {
 	Shop                   []advGood
 	Merchant               []advGood
 	Combats                int64
-	Explored               int64
+	Explored               int64           // rooms revealed, ever (seven-day ranking tasks)
+	LastRoom               int64           // 20600 room: the room revealed last (13 on a new floor)
+	Gains                  map[int64]int64 // what the rooms of this floor paid, shown by 20606 when the floor is left
 }
 
 // advCatalog is what the merchants and the island shop sell. The client has no list (the server makes it),
@@ -104,46 +108,90 @@ func (st *advState) room(id int64) *advRoom {
 	return nil
 }
 
-// buildFloor makes the rooms of a floor: the ones without a precondition can be opened at once.
+// buildFloor makes the 25 rooms of a floor (see advGuardRooms): the guards are open, room 13 shows the mysterious
+// man, the rest wait to be revealed.
 func (st *advState) buildFloor(floor int64) {
-	st.Floor, st.Boss = floor, false
+	rng := newRng()
+	st.Floor, st.Boss, st.PassNum, st.LastRoom = floor, false, 0, advDoorRoom
+	st.Gains = map[int64]int64{}
 	st.Rooms = st.Rooms[:0]
-	for _, p := range advLayout(floor) {
-		r := advRoom{ID: p.ID, Evt: advEventID(floor, p.Off), HPPer: 1000}
-		if len(p.Pre) == 0 {
-			r.Status = roomCanOpen
+	bag, tiles := advRoomBag(rng), advTerrain(floor)
+	for id := int64(1); id <= advGridSide*advGridSide; id++ {
+		r := advRoom{ID: id, HPPer: 1000, Res: tiles[rng.Intn(len(tiles))]}
+		if off, guard := advGuardRooms[id]; guard {
+			r.Evt, r.Status = advEventID(floor, off), roomOpen
+		} else if id == advDoorRoom {
+			r.Evt = advEventID(floor, advMystery)
+		} else {
+			if bag[0] != 0 {
+				r.Evt = advEventID(floor, bag[0])
+			}
+			bag = bag[1:]
 		}
 		st.Rooms = append(st.Rooms, r)
 	}
 }
 
-// refresh unlocks the rooms whose preconditions are over; it returns the rooms that changed.
-func (st *advState) refresh() []int64 {
-	var changed []int64
-	for _, p := range advLayout(st.Floor) {
-		r := st.room(p.ID)
-		if r == nil || r.Status != roomLock {
-			continue
-		}
-		ok := true
-		for _, pre := range p.Pre {
-			if q := st.room(pre); q == nil || q.Status != roomOver {
-				ok = false
+// blocked: a room next to a guard that still stands cannot be explored ("可探索无守卫区域" once it falls).
+func (st *advState) blocked(id int64) bool {
+	for _, n := range advNeighbours(id) {
+		if _, guard := advGuardRooms[n]; guard {
+			if q := st.room(n); q != nil && q.Status != roomOver {
+				return true
 			}
-		}
-		if p.ID == advDoorRoom { // the way on opens when the guard behind the mysterious room is down
-			if ok && st.Boss {
-				r.Status = roomOver
-				changed = append(changed, r.ID)
-			}
-			continue
-		}
-		if ok {
-			r.Status = roomCanOpen
-			changed = append(changed, r.ID)
 		}
 	}
-	return changed
+	return false
+}
+
+// reveal opens the way from a room that is over, as the original does: the hidden rooms around it that no standing
+// guard touches become visible (one 20603 with the room itself), then each shows what it holds (one 20603 each): an
+// event to deal with, the boss in place of the mysterious man, or an empty room that is over at once and reveals the
+// rooms around it in turn. It returns the 20603 room lists in the order they are sent.
+func (st *advState) reveal(from int64) [][]proto.Message {
+	var batches [][]proto.Message
+	queue := []int64{from}
+	for len(queue) > 0 {
+		at := queue[0]
+		queue = queue[1:]
+		var seen []int64
+		for _, n := range advNeighbours(at) {
+			r := st.room(n)
+			if _, guard := advGuardRooms[n]; guard || r == nil || r.Status != roomLock || st.blocked(n) {
+				continue
+			}
+			r.Status = roomCanOpen
+			seen = append(seen, n)
+		}
+		if len(seen) == 0 {
+			continue
+		}
+		first := []proto.Message{}
+		for _, id := range append([]int64{at}, seen...) {
+			first = append(first, st.roomMessage(*st.room(id)))
+		}
+		batches = append(batches, first)
+		for _, n := range seen {
+			r := st.room(n)
+			st.PassNum++
+			st.Explored++ // the seven-day ranking's "探索N个格子" counts the rooms revealed
+			st.LastRoom = n
+			switch {
+			case n == advDoorRoom:
+				if p := r.cfg().pairs(); r.cfg().EvtType == evtMysterious && len(p) > 0 {
+					r.Evt = p[0][0]
+				}
+				r.Status = roomOpen
+			case r.Evt == 0:
+				r.Status = roomOver
+				queue = append(queue, n)
+			default:
+				r.Status = roomOpen
+			}
+			batches = append(batches, []proto.Message{st.roomMessage(*r)})
+		}
+	}
+	return batches
 }
 
 func (st *advState) allOver() bool {
@@ -166,7 +214,7 @@ func (st *advState) heroOf(pid int64) *advHero {
 
 func (st *advState) skill(id int64) advSkillHold { return st.Skills[id] }
 
-// newRound starts a round: a round lasts a week, the island goes back to its first floor, the heroes are
+// newRound starts a round: a round lasts two days (advRoundStart), the island goes back to its first floor, the heroes are
 // whole again, and a round whose boxes were not all taken leaves a buff for the next one.
 func (st *advState) newRound(now time.Time) {
 	taken := int64(len(st.BoxTaken))
@@ -174,7 +222,8 @@ func (st *advState) newRound(now time.Time) {
 	if st.Start != 0 && taken < int64(len(advCfg.RoundRewards)) {
 		last = min(taken, 4)
 	}
-	st.Start, st.End = now.Unix(), now.Add(advRoundDays*24*time.Hour).Unix()
+	start := advRoundStart(now)
+	st.Start, st.End = start.Unix(), start.Add(advRoundDays*24*time.Hour).Unix()
 	st.PassNum, st.Kills, st.BoxTaken, st.LastNum = 0, 0, map[int64]bool{}, last
 	st.Skills, st.Combats, st.Merchant = map[int64]advSkillHold{}, 0, nil
 	st.Buffs = nil
@@ -191,11 +240,15 @@ func (st *advState) newRound(now time.Time) {
 }
 
 func (st *advState) roomMessage(r advRoom) proto.Message {
-	res := int64(1)
-	if m := advMapID(st.Floor); m >= 1 && int(m) <= len(advCfg.Map) {
-		res = advCfg.Map[m-1].ResID
+	evt := r.Evt
+	if r.Status < roomOpen && r.ID != advDoorRoom { // hidden or just seen: the client learns what it holds when it is revealed
+		evt = 0
 	}
-	return proto.Message{"id": r.ID, "status": r.Status, "lock": b2i(r.Status == roomLock), "evt_id": r.Evt, "res_id": res}
+	res := r.Res
+	if res == 0 {
+		res = 1
+	}
+	return proto.Message{"id": r.ID, "status": r.Status, "lock": 0, "evt_id": evt, "res_id": res}
 }
 
 type adv struct {
@@ -220,7 +273,6 @@ func RegisterAdventure(r *gateway.Router, db *store.Store) {
 	})
 	r.Handle(20605, a.setForm)
 	r.Handle(20610, a.selectHero)
-	r.Handle(20608, a.openRoom)
 	r.Handle(20620, a.act)
 	r.Handle(20609, a.skills)
 	r.Handle(20607, a.useSkill)
@@ -248,6 +300,8 @@ func (a *adv) with(s *gateway.Session, fn func(role *store.Role, st *advState) e
 	}
 	if !ok || s.Now().Unix() >= st.End {
 		st.newRound(s.Now())
+	} else if len(st.Rooms) != advGridSide*advGridSide { // a floor saved by the 13-room version
+		st.buildFloor(max(st.Floor, 1))
 	}
 	if st.Skills == nil {
 		st.Skills = map[int64]advSkillHold{}
@@ -266,18 +320,19 @@ func (a *adv) base(s *gateway.Session, _ proto.Message) error {
 }
 
 func sendBase(s *gateway.Session, st *advState) error {
-	return s.Send(20600, proto.Message{"pass_id": st.PassID, "pass_num": st.PassNum, "id": st.Floor, "room": 0, "is_kill_boss": b2i(st.Boss),
-		"map_id": advMapID(st.Floor), "is_all_finish": b2i(st.allOver()), "start_time": st.Start, "end_time": st.End, "current_id": st.Floor})
+	return s.Send(20600, (&adv{}).baseMessage(st))
 }
 
 func (a *adv) buffs(s *gateway.Session, _ proto.Message) error {
-	return a.with(s, func(role *store.Role, st *advState) error {
-		list := []proto.Message{}
-		for _, b := range st.Buffs {
-			list = append(list, proto.Message{"bid": b, "time": st.End})
-		}
-		return s.Send(20601, proto.Message{"buff_list": list, "holiday_buff_list": []proto.Message{}})
-	})
+	return a.with(s, func(role *store.Role, st *advState) error { return a.sendBuffs(s, st) })
+}
+
+func (a *adv) sendBuffs(s *gateway.Session, st *advState) error {
+	list := []proto.Message{}
+	for _, b := range st.Buffs {
+		list = append(list, proto.Message{"bid": b, "time": st.End})
+	}
+	return s.Send(20601, proto.Message{"buff_list": list, "holiday_buff_list": []proto.Message{}})
 }
 
 // sendRooms sends the rooms (all, or the ones listed) as cmd 20602 (all) or 20603 (an update).
@@ -375,32 +430,46 @@ func (a *adv) selectHero(s *gateway.Session, req proto.Message) error {
 	})
 }
 
-func (a *adv) openRoom(s *gateway.Session, req proto.Message) error {
-	return a.with(s, func(role *store.Role, st *advState) error {
-		id := req.Int("room_id")
-		r := st.room(id)
-		if r == nil || r.Status != roomCanOpen {
-			return s.Send(20608, proto.Message{"code": 0, "msg": "该区域暂时无法探索", "room_id": id})
-		}
-		if e := r.cfg(); e.EvtType == evtMysterious { // the mysterious room shows the guard behind it
-			if p := e.pairs(); len(p) > 0 {
-				r.Evt = p[0][0]
-			}
-		}
-		r.Status = roomOpen
-		st.Explored++
-		if err := s.Send(20608, proto.Message{"code": 1, "msg": "", "room_id": id}); err != nil {
-			return err
-		}
-		return a.sendRooms(s, st, 20603, []int64{id})
-	})
-}
-
-// finish marks a room over, unlocks what that opens and tells the client.
+// finish marks a room over, reveals what that opens and tells the client (20603 in the original's order, then 20600).
 func (a *adv) finish(s *gateway.Session, st *advState, r *advRoom) error {
 	r.Status = roomOver
-	changed := append([]int64{r.ID}, st.refresh()...)
-	return a.sendRooms(s, st, 20603, changed)
+	batches := st.reveal(r.ID)
+	if len(batches) == 0 || batches[0][0].Int("id") != r.ID {
+		batches = append([][]proto.Message{{st.roomMessage(*r)}}, batches...)
+	}
+	for _, list := range batches {
+		if err := s.Send(20603, proto.Message{"room_list": list}); err != nil {
+			return err
+		}
+	}
+	return s.Send(20600, a.baseMessage(st))
+}
+
+// roomGain pays what a room gives and adds it to the floor's list (20606).
+func (a *adv) roomGain(s *gateway.Session, role *store.Role, st *advState, list [][2]int64) error {
+	if len(list) == 0 {
+		return nil
+	}
+	if st.Gains == nil {
+		st.Gains = map[int64]int64{}
+	}
+	for _, g := range list {
+		st.Gains[g[0]] += g[1]
+	}
+	return a.gain(s, role, list)
+}
+
+// gainTip is the original's 12741 line for what a room paid: 获得<assets=1/>32000, or an item's name and amount.
+func gainTip(list [][2]int64) string {
+	text := "获得"
+	for _, g := range list {
+		if name, ok := ItemName(g[0]); ok && g[0] >= 1000 {
+			text += fmt.Sprintf("<div fontcolor=#d63cfc>%s</div><div fontcolor=#289b14>x</div><div fontcolor=#289b14>%d</div>", name, g[1])
+		} else {
+			text += fmt.Sprintf("<assets=%d/><div fontcolor=#289b14>%d</div>", g[0], g[1])
+		}
+	}
+	return text
 }
 
 func (a *adv) gain(s *gateway.Session, role *store.Role, list [][2]int64) error {
@@ -505,6 +574,8 @@ func (a *adv) act(s *gateway.Session, req proto.Message) error {
 			return a.doShop(s, role, st, r, action, ext, reply)
 		case evtSkill:
 			return a.doSkill(s, st, r, e, reply)
+		case evtBox:
+			return a.doBox(s, role, st, r, e, reply)
 		}
 		return reply(0, "该事件暂不支持")
 	})
@@ -516,23 +587,30 @@ func (a *adv) doBuff(s *gateway.Session, st *advState, r *advRoom, e advEventCfg
 		return reply(0, "没有可用的增益")
 	}
 	st.Buffs = append(st.Buffs, e.pairs()[i][0])
-	if err := s.Send(20622, proto.Message{}); err != nil {
+	if err := s.Send(12741, proto.Message{"msg": "获取BUFF"}); err != nil {
 		return err
 	}
 	if err := a.finish(s, st, r); err != nil {
 		return err
 	}
-	return reply(1, "获得增益效果")
+	if err := a.sendBuffs(s, st); err != nil {
+		return err
+	}
+	return reply(1, "")
 }
 
 func (a *adv) doCollect(s *gateway.Session, role *store.Role, st *advState, r *advRoom, e advEventCfg, reply func(int64, string) error) error {
-	if err := a.gain(s, role, pairsOf(e.BaseItems)); err != nil {
+	prize := pairsOf(e.BaseItems)
+	if err := a.roomGain(s, role, st, prize); err != nil {
+		return err
+	}
+	if err := s.Send(12741, proto.Message{"msg": gainTip(prize)}); err != nil {
 		return err
 	}
 	if err := a.finish(s, st, r); err != nil {
 		return err
 	}
-	return s.Send(20628, proto.Message{"msg": "收集成功", "items": itemMessages(pairsOf(e.BaseItems))})
+	return reply(1, "")
 }
 
 func (a *adv) doSkill(s *gateway.Session, st *advState, r *advRoom, e advEventCfg, reply func(int64, string) error) error {
@@ -636,7 +714,7 @@ func (a *adv) doGuard(s *gateway.Session, role *store.Role, st *advState, r *adv
 		"a_object_num": 1, "actor_role_name": role.Name, "target_role_name": unitCfg.Group, "suppress": 0, "halo_list": []proto.Message{},
 		"hallows_list": []proto.Message{{"group": 1, "max": 3, "val": 0}, {"group": 2, "max": 3, "val": 0}},
 	}
-	if err := reply(1, ""); err != nil {
+	if err := reply(2, ""); err != nil { // code 2: the client closes the event view and the fight begins
 		return err
 	}
 	roomID, heroID := r.ID, hero.PID
@@ -654,8 +732,10 @@ func (a *adv) doGuard(s *gateway.Session, role *store.Role, st *advState, r *adv
 				result = 1
 				r.HPPer = 0
 				st.Kills++
-				if e.EvtType == evtBoss {
+				if e.EvtType == evtBoss { // the boss leaves the way on in its room
 					st.Boss = true
+					st.PassID = max(st.PassID, st.Floor)
+					r.Evt = advEventID(st.Floor, 99999)
 				}
 			} else {
 				r.HPPer = max(foePer, 1)
@@ -676,16 +756,13 @@ func (a *adv) doGuard(s *gateway.Session, role *store.Role, st *advState, r *adv
 					return err
 				}
 			}
-			if err := a.sendHeroes(s, role, st); err != nil {
-				return err
-			}
-			return s.Send(20600, a.baseMessage(st))
+			return a.sendHeroes(s, role, st)
 		})
 	})
 }
 
 func (a *adv) baseMessage(st *advState) proto.Message {
-	return proto.Message{"pass_id": st.PassID, "pass_num": st.PassNum, "id": st.Floor, "room": 0, "is_kill_boss": b2i(st.Boss),
+	return proto.Message{"pass_id": st.PassID, "pass_num": st.PassNum, "id": st.Floor, "room": st.LastRoom, "is_kill_boss": b2i(st.Boss),
 		"map_id": advMapID(st.Floor), "is_all_finish": b2i(st.allOver()), "start_time": st.Start, "end_time": st.End, "current_id": st.Floor}
 }
 
@@ -722,7 +799,7 @@ func (a *adv) doGuess(s *gateway.Session, role *store.Role, st *advState, r *adv
 		}
 		return reply(0, "下注的资源不足")
 	}
-	if err := a.gain(s, role, [][2]int64{{stake[0], back}}); err != nil {
+	if err := a.roomGain(s, role, st, [][2]int64{{stake[0], back}}); err != nil {
 		return err
 	}
 	if err := s.Send(20621, proto.Message{"sel_val": finger, "ret_val": opp, "ret": ret, "items": itemMessages([][2]int64{{stake[0], back}})}); err != nil {
@@ -736,7 +813,17 @@ func (a *adv) doGuess(s *gateway.Session, role *store.Role, st *advState, r *adv
 
 func (a *adv) quizReward(e advEventCfg, right int64) [][2]int64 { return e.quiz()[right] }
 
-// doAnswer asks three questions; every answer counts as right because the client has no answer key.
+// advKnownAnswers are the right options the original server gave (capture 2026-11-04, SKY_NOTES.md: right of the 20623
+// that answers each question). The client has no answer key, so a question not listed here counts any answer as right.
+var advKnownAnswers = map[int64]int64{
+	50408: 1, 50414: 3, 50387: 3, 50431: 3, 50333: 4, 50399: 1, 50309: 1, 50401: 3, 50055: 2, 50413: 2, 50427: 4, 50031: 3,
+}
+
+// advQuizEnd is the original's line for the number of right answers (captured for 0-2; the one for three is ours).
+var advQuizEnd = []string{"运气真是不好呢~", "才对了一道，有点可惜啦~", "还差一道就能全对啦，加油！", "全部答对，太厉害啦！"}
+
+// doAnswer asks three questions (20623). ret 1 is right, ret 2 wrong; right is the right option of the question just
+// answered while bid is already the next question, as the original sends them.
 func (a *adv) doAnswer(s *gateway.Session, role *store.Role, st *advState, r *advRoom, e advEventCfg, action int64, ext map[int64]int64, reply func(int64, string) error) error {
 	if len(r.Qs) == 0 {
 		var ids []int64
@@ -750,12 +837,16 @@ func (a *adv) doAnswer(s *gateway.Session, role *store.Role, st *advState, r *ad
 		rng.Shuffle(len(ids), func(i, j int) { ids[i], ids[j] = ids[j], ids[i] })
 		r.Qs, r.Step, r.Right = ids[:3], 0, 0
 	}
-	push := func(ret, sel int64, bid int64, ret_msg string, ret_items [][2]int64) error {
-		return s.Send(20623, proto.Message{"ret": ret, "sel_val": sel, "right": sel, "num": min(r.Step+1, 3), "max": 3, "bid": bid, "ret_msg": ret_msg,
-			"now_items": itemMessages(a.quizReward(e, r.Right)), "max_items": itemMessages(a.quizReward(e, 3)), "ret_items": itemMessages(ret_items)})
+	push := func(ret, sel, right, bid int64, retMsg string, retItems [][2]int64) error {
+		now, top := itemMessages(a.quizReward(e, r.Right)), itemMessages(a.quizReward(e, 3))
+		if bid == 0 {
+			now, top = []proto.Message{}, []proto.Message{}
+		}
+		return s.Send(20623, proto.Message{"ret": ret, "sel_val": sel, "right": right, "num": min(r.Step+1, 3), "max": 3, "bid": bid, "ret_msg": retMsg,
+			"now_items": now, "max_items": top, "ret_items": itemMessages(retItems)})
 	}
 	if action == 0 {
-		if err := push(0, 0, r.Qs[r.Step], "", nil); err != nil {
+		if err := push(0, 0, 0, r.Qs[r.Step], "", nil); err != nil {
 			return err
 		}
 		return reply(1, "")
@@ -764,19 +855,27 @@ func (a *adv) doAnswer(s *gateway.Session, role *store.Role, st *advState, r *ad
 	if sel < 1 || sel > 4 {
 		return reply(0, "请选择答案")
 	}
-	r.Right++
+	right, known := advKnownAnswers[r.Qs[r.Step]]
+	if !known {
+		right = sel
+	}
+	ret := int64(2)
+	if sel == right {
+		ret = 1
+		r.Right++
+	}
 	r.Step++
 	if r.Step < 3 {
-		if err := push(1, sel, r.Qs[r.Step], "", nil); err != nil {
+		if err := push(ret, sel, right, r.Qs[r.Step], "", nil); err != nil {
 			return err
 		}
 		return reply(1, "")
 	}
 	prize := a.quizReward(e, r.Right)
-	if err := a.gain(s, role, prize); err != nil {
+	if err := a.roomGain(s, role, st, prize); err != nil {
 		return err
 	}
-	if err := push(1, sel, 0, "答题结束", prize); err != nil {
+	if err := push(ret, sel, right, 0, advQuizEnd[min(r.Right, 3)], prize); err != nil {
 		return err
 	}
 	if err := a.finish(s, st, r); err != nil {
@@ -785,21 +884,19 @@ func (a *adv) doAnswer(s *gateway.Session, role *store.Role, st *advState, r *ad
 	return reply(1, "")
 }
 
-// doNpc runs an npc: a quiz-like npc asks three of its questions and pays at the end, a one-question npc
-// (a trade or a remains to search) acts at once. The client does not say what they pay, so the pay is ours.
+// doNpc runs an npc: one question (20627 with the group of the client's npc table), and the answer ends it (20628), as
+// both captures show. The client does not say what an npc pays and the original's lines do not follow the question;
+// the pay is the captured kind: 37001 ×1-2 from the npc (14), 37001 ×2 or 100000 beli from the talking npc (15). A
+// question with a price (lose) pays 5 ore for it.
 func (a *adv) doNpc(s *gateway.Session, role *store.Role, st *advState, r *advRoom, e advEventCfg, action int64, ext map[int64]int64, reply func(int64, string) error) error {
 	groups := advCfg.Npc[strconv.FormatInt(r.Evt, 10)]
 	if len(groups) == 0 {
 		return reply(0, "没有对话")
 	}
 	if len(r.Qs) == 0 {
-		idx := newRng().Perm(len(groups))
-		for _, i := range idx[:min(3, len(groups))] {
-			r.Qs = append(r.Qs, int64(i))
-		}
-		r.Step = 0
+		r.Qs, r.Step = []int64{int64(newRng().Intn(len(groups)))}, 0
 	}
-	cur := groups[r.Qs[r.Step]]
+	cur := groups[r.Qs[0]]
 	if action == 0 {
 		if err := s.Send(20627, proto.Message{"evt_id": r.Evt, "id": cur[0].ID}); err != nil {
 			return err
@@ -812,9 +909,10 @@ func (a *adv) doNpc(s *gateway.Session, role *store.Role, st *advState, r *advRo
 	if pick < 1 || int(pick) > len(opts) {
 		return reply(0, "请选择")
 	}
-	o := opts[pick-1]
-	var prize [][2]int64
-	if len(o.Lose) > 0 {
+	o, rng := opts[pick-1], newRng()
+	prize, msg := [][2]int64{{37001, 1 + int64(rng.Intn(2))}}, "谢谢你的回答"
+	switch {
+	case len(o.Lose) > 0:
 		ok, err := a.pay(s, role, pairsOf(o.Lose))
 		if err != nil {
 			return err
@@ -822,27 +920,48 @@ func (a *adv) doNpc(s *gateway.Session, role *store.Role, st *advState, r *advRo
 		if !ok {
 			return reply(0, "资源不足")
 		}
-		prize = [][2]int64{{advOre, 5}}
-	} else if e.EvtType == evtNpcTalk && pick == 1 {
-		prize = [][2]int64{{1, 3000}}
+		prize, msg = [][2]int64{{advOre, 5}}, "交易成功"
+	case e.EvtType == evtNpcTalk && rng.Intn(2) == 0:
+		prize, msg = [][2]int64{{1, 100000}}, "咦，这次发财了"
+	case e.EvtType == evtNpcTalk:
+		prize, msg = [][2]int64{{37001, 2}}, "不好，上当了！"
 	}
-	r.Step++
-	if e.EvtType == evtNpc && int(r.Step) < len(r.Qs) {
-		if err := s.Send(20627, proto.Message{"evt_id": r.Evt, "id": groups[r.Qs[r.Step]][0].ID}); err != nil {
-			return err
-		}
-		return reply(1, "")
+	if err := a.roomGain(s, role, st, prize); err != nil {
+		return err
 	}
-	if e.EvtType == evtNpc {
-		prize = [][2]int64{{1, 5000 * r.Step}}
-	}
-	if err := a.gain(s, role, prize); err != nil {
+	if err := s.Send(20628, proto.Message{"msg": msg, "items": itemMessages(prize)}); err != nil {
 		return err
 	}
 	if err := a.finish(s, st, r); err != nil {
 		return err
 	}
-	return s.Send(20628, proto.Message{"msg": "对话结束", "items": itemMessages(prize)})
+	return reply(1, "")
+}
+
+// doBox opens the ancient treasure (evt type 4) with a key of the floor (lose 10152 ×1) and pays one of the shards it
+// shows (box_show_item), as captured: 20630 with the items, and code 0 with the hint when there is no key.
+func (a *adv) doBox(s *gateway.Session, role *store.Role, st *advState, r *advRoom, e advEventCfg, reply func(int64, string) error) error {
+	if len(e.BoxShow) == 0 {
+		return reply(0, "宝箱是空的")
+	}
+	ok, err := a.pay(s, role, pairsOf(e.Lose))
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return reply(0, "秘宝钥匙就藏在本层的某个角落噢")
+	}
+	prize := pairsOf([][]int64{e.BoxShow[newRng().Intn(len(e.BoxShow))]})
+	if err := a.roomGain(s, role, st, prize); err != nil {
+		return err
+	}
+	if err := s.Send(20630, proto.Message{"items": itemMessages(prize)}); err != nil {
+		return err
+	}
+	if err := a.finish(s, st, r); err != nil {
+		return err
+	}
+	return reply(1, "")
 }
 
 // merchantGoods picks the goods a merchant shows: three of the catalog, a fifth off.
@@ -908,27 +1027,30 @@ func (a *adv) nextFloor(s *gateway.Session, role *store.Role, st *advState, r *a
 		return reply(0, "已达冒险最顶层,请等待冒险重置")
 	}
 	cleared := st.Floor
-	st.PassID = max(st.PassID, cleared)
-	st.PassNum++
-	prize := pairsOf(advCfg.Floors[cleared-1].FloorReward)
-	if len(prize) > 0 {
-		if err := a.gain(s, role, prize); err != nil {
+	if prize := pairsOf(advCfg.Floors[cleared-1].FloorReward); len(prize) > 0 { // empty in the client's table
+		if err := a.roomGain(s, role, st, prize); err != nil {
 			return err
 		}
 	}
+	var got [][2]int64
+	for bid, num := range st.Gains {
+		got = append(got, [2]int64{bid, num})
+	}
+	sort.Slice(got, func(i, j int) bool { return got[i][0] < got[j][0] })
 	st.buildFloor(cleared + 1)
-	if len(prize) > 0 {
-		if err := s.Send(20606, proto.Message{"items_list": itemMessages(prize), "vip_buff": 0}); err != nil {
-			return err
-		}
-	}
-	if err := reply(1, ""); err != nil {
-		return err
-	}
+	st.PassID = max(st.PassID, st.Floor)
+	// the original order: the new floor (20600, 20602), what the floor left behind paid (20606: the floor result window),
+	// then code 2
 	if err := sendBase(s, st); err != nil {
 		return err
 	}
-	return a.sendRooms(s, st, 20602, nil)
+	if err := a.sendRooms(s, st, 20602, nil); err != nil {
+		return err
+	}
+	if err := s.Send(20606, proto.Message{"items_list": itemMessages(got), "vip_buff": 0}); err != nil {
+		return err
+	}
+	return reply(2, "")
 }
 
 func (a *adv) skills(s *gateway.Session, _ proto.Message) error {

@@ -43,45 +43,108 @@ func TestAdventureIslandAndRooms(t *testing.T) {
 	_, c, _ := advEnv(t)
 	c.send(20600, proto.Message{})
 	b := c.waitFor(20600)
-	if b.Int("id") != 1 || b.Int("current_id") != 1 || b.Int("pass_id") != 0 || b.Int("end_time")-b.Int("start_time") != 7*86400 {
+	start := b.Int("start_time")
+	if b.Int("id") != 1 || b.Int("current_id") != 1 || b.Int("pass_id") != 0 || b.Int("end_time")-start != 2*86400 ||
+		(start+8*3600)%86400 != 0 || ((start+8*3600)/86400)%2 != 1 || b.Int("room") != advDoorRoom {
 		t.Fatalf("20600: %v", b)
 	}
 	c.send(20602, proto.Message{})
 	rooms := c.waitFor(20602).Arr("room_list")
-	if len(rooms) != 13 {
+	if len(rooms) != 25 {
 		t.Fatalf("rooms: %d", len(rooms))
 	}
-	open := 0
 	for _, r := range rooms {
-		if r.Int("status") == roomCanOpen {
-			open++
+		id := r.Int("id")
+		off, guard := advGuardRooms[id]
+		switch {
+		case guard:
+			if r.Int("status") != roomOpen || r.Int("evt_id") != advEventID(1, off) {
+				t.Fatalf("guard: %v", r)
+			}
+		case id == advDoorRoom:
+			if r.Int("status") != roomLock || r.Int("evt_id") != advEventID(1, advMystery) {
+				t.Fatalf("room 13: %v", r)
+			}
+		default:
+			if r.Int("status") != roomLock || r.Int("evt_id") != 0 || r.Int("res_id") == 0 {
+				t.Fatalf("a hidden room shows itself: %v", r)
+			}
 		}
-		if r.Int("evt_id") == 0 {
-			t.Fatalf("room without an event: %v", r)
-		}
-	}
-	if open != 3 {
-		t.Fatalf("%d rooms open at the start", open)
-	}
-	c.send(20608, proto.Message{"room_id": 4}) // locked until room 1 is over
-	if r := c.waitFor(20608); r.Int("code") != 0 {
-		t.Fatalf("a locked room opened: %v", r)
 	}
 }
 
-func TestAdventureGuardFightAndUnlock(t *testing.T) {
+// fixedFloor gives floor 1 known contents: every other room holds beli unless set.
+func fixedFloor(st *advState, set map[int64]int64) {
+	st.buildFloor(1)
+	for i := range st.Rooms {
+		r := &st.Rooms[i]
+		if _, guard := advGuardRooms[r.ID]; guard || r.ID == advDoorRoom {
+			continue
+		}
+		r.Evt = advEventID(1, 7)
+		if off, ok := set[r.ID]; ok {
+			r.Evt = 0
+			if off != 0 {
+				r.Evt = advEventID(1, off)
+			}
+		}
+	}
+}
+
+func TestAdventureRevealRules(t *testing.T) {
+	st := &advState{}
+	fixedFloor(st, map[int64]int64{2: 0, 16: 0, 21: 0})
+	st.room(7).Status = roomOver
+	batches := st.reveal(7)
+	// rooms 1, 2 and 6 touch no other guard; 2 is empty and over at once; 3, 8, 11, 12 touch a standing guard
+	if len(batches) == 0 || len(batches[0]) != 4 || batches[0][0].Int("id") != 7 || batches[0][1].Int("status") != roomCanOpen || batches[0][1].Int("evt_id") != 0 {
+		t.Fatalf("first batch: %v", batches)
+	}
+	want := map[int64]int64{1: roomOpen, 2: roomOver, 6: roomOpen, 3: roomLock, 8: roomLock, 11: roomLock, 12: roomLock, advDoorRoom: roomLock}
+	for id, status := range want {
+		if st.room(id).Status != status {
+			t.Fatalf("room %d: %d, want %d", id, st.room(id).Status, status)
+		}
+	}
+	if st.PassNum != 3 || st.LastRoom != 6 {
+		t.Fatalf("pass_num %d room %d", st.PassNum, st.LastRoom)
+	}
+	// 17 falls: 16 and 21 are empty and open 22 in turn
+	st.room(17).Status = roomOver
+	st.reveal(17)
+	if st.room(16).Status != roomOver || st.room(21).Status != roomOver || st.room(22).Status != roomOpen || st.room(23).Status != roomLock {
+		t.Fatalf("empty rooms: %+v", st.Rooms)
+	}
+	// the last guards: the mysterious man turns into the boss
+	for _, g := range []int64{9, 19} {
+		st.room(g).Status = roomOver
+		st.reveal(g)
+	}
+	if door := st.room(advDoorRoom); door.Status != roomOpen || door.Evt != advEventID(1, 0) {
+		t.Fatalf("boss: %+v", door)
+	}
+	if st.PassNum != 21 {
+		t.Fatalf("every room revealed: %d", st.PassNum)
+	}
+	for _, r := range st.Rooms {
+		if r.Status == roomLock || r.Status == roomCanOpen {
+			t.Fatalf("room %d still hidden", r.ID)
+		}
+	}
+}
+
+func TestAdventureGuardFightAndReveal(t *testing.T) {
 	e, c, role := advEnv(t)
 	hero := advForm(t, e, c, role)
-	c.send(20608, proto.Message{"room_id": 1})
-	if r := c.waitFor(20608); r.Int("code") != 1 {
-		t.Fatalf("open: %v", r)
-	}
-	c.send(20620, proto.Message{"room_id": 1, "action": 0})
+	c.send(20620, proto.Message{"room_id": 7, "action": 0})
 	if r := c.waitFor(20624); r.Int("hp_per") != 100 {
 		t.Fatalf("guard hp: %v", r)
 	}
-	c.send(20620, proto.Message{"room_id": 1, "action": 1})
-	if r := c.waitFor(20620); r.Int("code") != 1 {
+	if r := c.waitFor(20620); r.Int("action") != 0 || r.Int("code") != 1 {
+		t.Fatalf("guard look: %v", r)
+	}
+	c.send(20620, proto.Message{"room_id": 7, "action": 1})
+	if r := c.waitFor(20620); r.Int("code") != 2 {
 		t.Fatalf("fight: %v", r)
 	}
 	if m := c.waitFor(20027); m.Int("combat_type") != combatAdventure {
@@ -92,16 +155,16 @@ func TestAdventureGuardFightAndUnlock(t *testing.T) {
 	res := c.waitFor(20006)
 	c.settle()
 	st := e.advState(t, role)
-	if res.Int("room_id") != 1 || res.Int("combat_type") != combatAdventure {
+	if res.Int("room_id") != 7 || res.Int("combat_type") != combatAdventure {
 		t.Fatalf("result: %v", res)
 	}
 	h := st.heroOf(hero)
 	if res.Int("result") == 1 {
-		if st.room(1).Status != roomOver || st.Kills != 1 || st.room(4).Status != roomCanOpen || st.room(5).Status != roomCanOpen {
+		if st.room(7).Status != roomOver || st.Kills != 1 || st.room(1).Status < roomOpen || st.room(6).Status < roomOpen || st.room(12).Status != roomLock {
 			t.Fatalf("a win did not open the way: %+v", st.Rooms)
 		}
-	} else if st.room(1).Status != roomOpen || st.room(1).HPPer >= 1000 {
-		t.Fatalf("a loss: %+v", st.room(1))
+	} else if st.room(7).Status != roomOpen || st.room(7).HPPer >= 1000 {
+		t.Fatalf("a loss: %+v", st.room(7))
 	}
 	if h == nil || h.Per > 1000 || res.Int("adventure_end_hp") != h.Per {
 		t.Fatalf("hero hp: %+v %v", h, res)
@@ -126,19 +189,19 @@ func TestAdventureSkillsPotionsAndBoxes(t *testing.T) {
 		t.Fatalf("heal result: %+v", st)
 	}
 	c.send(20611, proto.Message{})
-	if r := c.waitFor(20611); len(r.Arr("room_list")) != 3 { // rooms 1-3 are guards that can be fought
+	if r := c.waitFor(20611); len(r.Arr("room_list")) != 4 { // the four guards
 		t.Fatalf("guards: %v", r)
 	}
-	c.send(20607, proto.Message{"skill_id": 2, "val": 2})
+	c.send(20607, proto.Message{"skill_id": 2, "val": 7})
 	if r := c.waitFor(20607); r.Int("code") != 1 {
 		t.Fatalf("kill: %v", r)
 	}
 	c.settle()
 	st = e.advState(t, role)
-	if st.room(2).Status != roomOver || st.Kills != 1 || st.room(6).Status != roomCanOpen {
+	if st.room(7).Status != roomOver || st.Kills != 1 || st.room(1).Status < roomOpen {
 		t.Fatalf("kill result: %+v", st.Rooms)
 	}
-	c.send(20607, proto.Message{"skill_id": 2, "val": 3}) // no potion left
+	c.send(20607, proto.Message{"skill_id": 2, "val": 9}) // no potion left
 	if r := c.waitFor(20607); r.Int("code") != 0 {
 		t.Fatalf("no potion: %v", r)
 	}
@@ -146,7 +209,6 @@ func TestAdventureSkillsPotionsAndBoxes(t *testing.T) {
 	if r := c.waitFor(20636); r.Int("code") != 0 {
 		t.Fatalf("buy without gems: %v", r)
 	}
-	// boxes
 	c.send(20634, proto.Message{})
 	if r := c.waitFor(20634); r.Int("kill_mon") != 1 || len(r.Arr("list")) != 5 || r.Arr("list")[0].Int("status") != 0 {
 		t.Fatalf("boxes: %v", r)
@@ -164,79 +226,120 @@ func TestAdventureSkillsPotionsAndBoxes(t *testing.T) {
 	}
 }
 
-func TestAdventureRoomsCollectQuizGuessAndNextFloor(t *testing.T) {
+func TestAdventureRoomsCollectQuizNpcBoxAndNextFloor(t *testing.T) {
 	e, c, role := advEnv(t)
 	advForm(t, e, c, role)
 	c.send(20600, proto.Message{})
 	c.waitFor(20600)
 	st := e.advState(t, role)
-	for _, id := range []int64{1, 2, 3} {
-		st.room(id).Status = roomOver
+	// guard 7 down: 1 collects beli, 2 is the quiz, 6 rock paper scissors; guard 17 down: 11 the npc, 12 the treasure
+	fixedFloor(st, map[int64]int64{1: 7, 2: 9, 6: 22, 11: 14, 12: 17})
+	for _, g := range []int64{7, 17} {
+		st.room(g).Status = roomOver
+		st.reveal(g)
 	}
-	st.refresh()
+	st.Heroes = st.Heroes[:1]
 	if err := e.st.SaveState(role.RID, advModule, st); err != nil {
 		t.Fatal(err)
 	}
-	// room 4 collects beli
-	c.send(20608, proto.Message{"room_id": 4})
-	c.waitFor(20608)
 	before, _ := e.st.RoleAssets(role.RID)
-	c.send(20620, proto.Message{"room_id": 4, "action": 1})
-	c.waitFor(20628)
+	c.send(20620, proto.Message{"room_id": 1, "action": 1, "ext_list": []proto.Message{{"type": 4, "val": 1}}})
+	if tip := c.waitFor(12741); tip.Str("msg") == "" {
+		t.Fatalf("tip: %v", tip)
+	}
+	if b := c.waitFor(20600); b.Int("pass_num") != st.PassNum {
+		t.Fatalf("20600 after a room: %v", b)
+	}
+	if r := c.waitFor(20620); r.Int("code") != 1 {
+		t.Fatalf("collect: %v", r)
+	}
 	c.settle()
 	after, _ := e.st.RoleAssets(role.RID)
-	if after[1] <= before[1] || e.advState(t, role).room(4).Status != roomOver {
+	if after[1] <= before[1] || e.advState(t, role).room(1).Status != roomOver {
 		t.Fatalf("collect: %v -> %v", before[1], after[1])
 	}
-	// room 7 is the quiz: three questions, every answer is right
-	c.send(20608, proto.Message{"room_id": 7})
-	c.waitFor(20608)
-	c.send(20620, proto.Message{"room_id": 7, "action": 0})
-	if q := c.waitFor(20623); q.Int("ret") != 0 || q.Int("num") != 1 || q.Int("max") != 3 || q.Int("bid") == 0 {
+	// the quiz: a known question answered wrong counts as wrong, one without an answer key counts as right
+	st = e.advState(t, role)
+	st.room(2).Qs = []int64{50408, 50387, 1}
+	e.st.SaveState(role.RID, advModule, st)
+	c.send(20620, proto.Message{"room_id": 2, "action": 0})
+	if q := c.waitFor(20623); q.Int("ret") != 0 || q.Int("num") != 1 || q.Int("bid") != 50408 {
 		t.Fatalf("first question: %v", q)
 	}
-	for i := 0; i < 3; i++ {
-		c.send(20620, proto.Message{"room_id": 7, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": 1}}})
+	c.waitFor(20620)
+	for i, step := range []struct{ sel, ret, right, next int64 }{{1, 1, 1, 50387}, {1, 2, 3, 1}, {2, 1, 2, 0}} {
+		c.send(20620, proto.Message{"room_id": 2, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": step.sel}}})
 		q := c.waitFor(20623)
-		if (i < 2) != (q.Int("bid") != 0) || q.Int("ret") != 1 {
+		if q.Int("ret") != step.ret || q.Int("right") != step.right || q.Int("bid") != step.next {
 			t.Fatalf("answer %d: %v", i, q)
+		}
+		if i == 2 && q.Str("ret_msg") != advQuizEnd[2] {
+			t.Fatalf("end: %v", q)
 		}
 		c.waitFor(20620)
 	}
 	c.settle()
-	if e.advState(t, role).room(7).Status != roomOver {
-		t.Fatal("the quiz did not finish")
+	if st := e.advState(t, role); st.room(2).Status != roomOver || st.room(2).Right != 2 {
+		t.Fatalf("quiz: %+v", st.room(2))
 	}
-	// room 8 is the guessing game: a bet and a finger
-	c.send(20608, proto.Message{"room_id": 8})
-	c.waitFor(20608)
-	c.send(20620, proto.Message{"room_id": 8, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": 1}, {"type": 2, "val": 1}}})
+	// the npc asks one question
+	c.send(20620, proto.Message{"room_id": 11, "action": 0})
+	if q := c.waitFor(20627); q.Int("evt_id") != advEventID(1, 14) {
+		t.Fatalf("npc: %v", q)
+	}
+	c.waitFor(20620)
+	c.send(20620, proto.Message{"room_id": 11, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": 1}}})
+	if r := c.waitFor(20628); len(r.Arr("items")) != 1 {
+		t.Fatalf("npc answer: %v", r)
+	}
+	c.waitFor(20620)
+	c.settle()
+	if e.advState(t, role).room(11).Status != roomOver {
+		t.Fatal("the npc did not finish")
+	}
+	// the treasure wants a key
+	c.send(20620, proto.Message{"room_id": 12, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": 0}}})
+	if r := c.waitFor(20620); r.Int("code") != 0 || r.Str("msg") != "秘宝钥匙就藏在本层的某个角落噢" {
+		t.Fatalf("treasure without a key: %v", r)
+	}
+	if err := e.st.Exchange(role.RID, nil, nil, nil, map[int64]int64{advKeyItem: 1}); err != nil {
+		t.Fatal(err)
+	}
+	c.send(20620, proto.Message{"room_id": 12, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": 0}}})
+	if r := c.waitFor(20630); len(r.Arr("items")) != 1 {
+		t.Fatalf("treasure: %v", r)
+	}
+	c.waitFor(20620)
+	c.settle()
+	// the guessing game
+	c.send(20620, proto.Message{"room_id": 6, "action": 1, "ext_list": []proto.Message{{"type": 1, "val": 1}, {"type": 2, "val": 1}}})
 	if g := c.waitFor(20621); g.Int("sel_val") != 1 || g.Int("ret_val") < 1 || g.Int("ret_val") > 3 || len(g.Arr("items")) != 1 {
 		t.Fatalf("guess: %v", g)
 	}
 	c.waitFor(20620)
-	c.settle() // the guess answers before it saves; a late save must not land over the state saved below
-	// the way on opens only after the guard of room 11
-	st = e.advState(t, role)
-	if st.room(advDoorRoom).Status != roomLock {
-		t.Fatalf("door: %+v", st.room(advDoorRoom))
-	}
+	c.settle()
+	// the way on is the boss's room once the boss is down
 	c.send(20620, proto.Message{"room_id": advDoorRoom, "action": 1})
 	if r := c.waitFor(20620); r.Int("code") != 0 {
 		t.Fatalf("door opened early: %v", r)
 	}
+	st = e.advState(t, role)
+	gains := len(st.Gains)
 	st.Boss = true
-	st.room(advDoorRoom).Status = roomOver
+	st.room(advDoorRoom).Evt, st.room(advDoorRoom).Status = 99999, roomOver
 	e.st.SaveState(role.RID, advModule, st)
 	c.send(20620, proto.Message{"room_id": advDoorRoom, "action": 1})
-	if r := c.waitFor(20620); r.Int("code") != 1 {
-		t.Fatalf("next floor: %v", r)
-	}
-	if b := c.waitFor(20600); b.Int("id") != 2 || b.Int("pass_id") != 1 {
+	if b := c.waitFor(20600); b.Int("id") != 2 || b.Int("pass_id") != 2 || b.Int("pass_num") != 0 || b.Int("room") != advDoorRoom {
 		t.Fatalf("floor 2: %v", b)
 	}
-	if rooms := c.waitFor(20602).Arr("room_list"); len(rooms) != 13 || rooms[0].Int("evt_id") != advEventID(2, 1) {
+	if rooms := c.waitFor(20602).Arr("room_list"); len(rooms) != 25 || rooms[6].Int("evt_id") != advEventID(2, 1) {
 		t.Fatalf("rooms of floor 2: %v", rooms)
+	}
+	if got := c.waitFor(20606).Arr("items_list"); gains == 0 || len(got) != gains {
+		t.Fatalf("floor result: %v (%d kinds paid)", got, gains)
+	}
+	if r := c.waitFor(20620); r.Int("code") != 2 {
+		t.Fatalf("next floor: %v", r)
 	}
 }
 
@@ -271,12 +374,34 @@ func TestAdventureShopAndRoundReset(t *testing.T) {
 	}
 	c.settle() // 20600 answers before it saves the new round
 	st = e.advState(t, role)
-	if st.LastNum != 1 || len(st.Buffs) != 2 || len(st.BoxTaken) != 0 {
+	if st.LastNum != 1 || len(st.Buffs) != 2 || len(st.BoxTaken) != 0 || len(st.Rooms) != 25 {
 		t.Fatalf("round state: %+v", st)
 	}
 	c.send(20601, proto.Message{})
 	if r := c.waitFor(20601); len(r.Arr("buff_list")) != 2 {
 		t.Fatalf("buffs: %v", r)
+	}
+	// a floor saved by the 13-room version is laid out again
+	st.Rooms = st.Rooms[:13]
+	e.st.SaveState(role.RID, advModule, st)
+	c.send(20602, proto.Message{})
+	if rooms := c.waitFor(20602).Arr("room_list"); len(rooms) != 25 {
+		t.Fatalf("old floor: %d rooms", len(rooms))
+	}
+}
+
+func TestAdventureRoundStart(t *testing.T) {
+	for _, tc := range []struct{ now, start string }{
+		{"2026-11-04T13:02:02+08:00", "2026-11-04T00:00:00+08:00"},
+		{"2026-11-05T23:59:59+08:00", "2026-11-04T00:00:00+08:00"},
+		{"2026-11-06T00:00:00+08:00", "2026-11-06T00:00:00+08:00"},
+		{"2026-10-30T05:06:24+08:00", "2026-10-29T00:00:00+08:00"},
+	} {
+		now, _ := time.Parse(time.RFC3339, tc.now)
+		want, _ := time.Parse(time.RFC3339, tc.start)
+		if got := advRoundStart(now); !got.Equal(want) {
+			t.Fatalf("%s: %s, want %s", tc.now, got, want)
+		}
 	}
 }
 

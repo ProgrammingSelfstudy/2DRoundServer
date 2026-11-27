@@ -3,8 +3,10 @@ package game
 import (
 	_ "embed"
 	"encoding/json"
+	"math/rand"
 	"sort"
 	"strconv"
+	"time"
 )
 
 // adventure.json: the sky island adventure of the client (tools/extract_adventure.py).
@@ -35,7 +37,7 @@ const (
 	advDoorRoom     = 13 // the room of the way to the next floor (the client sends 13 for it)
 	advKeyItem      = 10152
 	advOre          = 72001 // 炼神矿, the island's own currency
-	advRoundDays    = 7
+	advRoundDays    = 2
 	combatAdventure = 6 // BattleConst.Fight_Type.Adventrue
 )
 
@@ -208,28 +210,80 @@ func (c *advConf) skill(id int64) (advSkillCfg, bool) {
 	return advSkillCfg{}, false
 }
 
-// advRoomPlan is one room of a floor: the event kind it holds (the last two digits of the event id) and the
-// rooms that must be over before it can be opened.
-type advRoomPlan struct {
-	ID  int64
-	Off int64
-	Pre []int64
+// The floor is the original's 5 × 5 grid (AdventureMainWindow: row 5, col 5), rooms 1-25 from the top left. Captured
+// (testdata/captures original-2026-10-27/24-sky-adventure.jsonl, original-2026-11-04/d01-sky.jsonl, floors 1-6): the
+// four guards stand in rooms 7, 17, 19 and 9 with the events xx01-xx04 and are the only rooms open at the start; room 13
+// holds the mysterious man xx06, which turns into the boss xx00 and then the way on (99999). The other twenty rooms
+// hold three or four empty rooms and the floor's events; which room holds what changes every floor.
+var advGuardRooms = map[int64]int64{7: 1, 17: 2, 19: 3, 9: 4} // room -> event offset
+
+const (
+	advGridSide = 5
+	advMystery  = 6 // event offset of the mysterious man in room 13
+)
+
+// advRoomBag is what the twenty other rooms of a floor hold: event offsets, 0 for an empty room. The counts are the
+// spread of the captured floors (3-4 empty, 2-5 beli, 1-3 ore, up to one quiz, one npc, ...); the exact draw is ours.
+func advRoomBag(rng *rand.Rand) []int64 {
+	pick := func(lo, hi int) int { return lo + rng.Intn(hi-lo+1) }
+	var bag []int64
+	add := func(off int64, n int) {
+		for i := 0; i < n; i++ {
+			bag = append(bag, off)
+		}
+	}
+	add(0, pick(3, 4))            // empty
+	add(9, 1)                     // quiz
+	add(14+int64(rng.Intn(2)), 1) // the npc (14) or the talking npc (15)
+	add(18, pick(1, 2))           // buff
+	add(24, pick(1, 2))           // merchant
+	add(19+int64(rng.Intn(3)), 1) // a potion
+	add(19+int64(rng.Intn(3)), pick(0, 1))
+	add(22, pick(0, 1)) // rock paper scissors
+	add(17, pick(0, 1)) // ancient treasure (needs the key)
+	add(23, pick(0, 1)) // the key
+	add(5, pick(1, 2))  // box
+	add(8, pick(1, 3))  // ore
+	for len(bag) < 20 {
+		bag = append(bag, 7) // beli
+	}
+	bag = bag[:20]
+	rng.Shuffle(len(bag), func(i, j int) { bag[i], bag[j] = bag[j], bag[i] })
+	return bag
 }
 
-// advLayout is the rooms of a floor. The client has no layout (the original server makes it), so this one is
-// ours: twelve rooms and the way on, spread over the twenty events each floor has.
-func advLayout(floor int64) []advRoomPlan {
-	skill := 19 + floor%3
-	return []advRoomPlan{
-		{1, 1, nil}, {2, 2, nil}, {3, 3, nil},
-		{4, 7, []int64{1}}, {5, 14, []int64{1}},
-		{6, 18, []int64{2}}, {7, 9, []int64{2}},
-		{8, 22, []int64{3}}, {9, 24, []int64{3}},
-		{10, skill, []int64{4, 5}},
-		{11, 6, []int64{1, 2, 3}},
-		{12, 4, []int64{6, 7}},
-		{advDoorRoom, 99999, []int64{11}},
+// advTerrain is the picture set of the room tiles (resource/adventure/img/<res_id>.png): floors 1-4 and 5 on use
+// different sets in the captures. Which tile a room shows is drawn per floor.
+func advTerrain(floor int64) []int64 {
+	if floor <= 4 {
+		return []int64{1, 1, 2, 2, 2, 2, 3, 4, 10, 11, 12, 13, 14}
 	}
+	return []int64{1, 3, 5, 6, 6, 7, 7, 8, 9, 9, 11, 12}
+}
+
+// advNeighbours are the up to eight rooms around a room of the grid.
+func advNeighbours(id int64) []int64 {
+	row, col := (id-1)/advGridSide, (id-1)%advGridSide
+	var out []int64
+	for dr := int64(-1); dr <= 1; dr++ {
+		for dc := int64(-1); dc <= 1; dc++ {
+			r, c := row+dr, col+dc
+			if (dr != 0 || dc != 0) && r >= 0 && r < advGridSide && c >= 0 && c < advGridSide {
+				out = append(out, r*advGridSide+c+1)
+			}
+		}
+	}
+	return out
+}
+
+// advRoundStart is the start of the round that holds now: rounds last two days and start at 00:00 Beijing time of the
+// odd days since the epoch (captured: 10-29, 11-04 00:00, each 172800 s).
+func advRoundStart(now time.Time) time.Time {
+	day := (now.Unix() + 8*3600) / 86400
+	if day%2 == 0 {
+		day--
+	}
+	return time.Unix(day*86400-8*3600, 0)
 }
 
 // advEventID is the event a room of a floor holds.

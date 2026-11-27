@@ -16,6 +16,7 @@ const (
 	mineModule      = "adventure_mine"
 	mineWorldModule = "adventure_mine_world"
 	combatMine      = 30 // BattleConst.Fight_Type.AdventrueMine
+	formMine        = 23 // PartnerConst.Fun_Form.Adventure_Mine: the form panel saves it (11212) before 20643
 )
 
 // mineMu keeps one request at a time on the shared mines of the process.
@@ -438,7 +439,7 @@ func (a *adv) mineAttack(s *gateway.Session, req proto.Message) error {
 		case c.attacksLeft() <= 0:
 			return refuse("挑战次数不足")
 		}
-		team, objects, form, err := a.fights.teamSide(c.role, isH5RoleSession(s))
+		team, objects, form, err := a.fights.teamSideFor(c.role, formMine, isH5RoleSession(s))
 		if err != nil {
 			return err
 		}
@@ -506,7 +507,7 @@ func (a *adv) mineSettle(s *gateway.Session, f, room int64, opp arenaOpp, won bo
 		}
 		p, _ := a.partners(c.role)
 		stats := []proto.Message{}
-		heroes, _ := formationForRole(a.st, c.role.RID, formDrama, isH5RoleSession(s))
+		heroes, _ := formationForRole(a.st, c.role.RID, formMine, isH5RoleSession(s))
 		for _, sl := range heroes.Slots {
 			if pp, ok := p[sl.PartnerID]; ok {
 				stats = append(stats, proto.Message{"rid": c.role.RID, "srvid": c.role.SrvID, "id": pp.PartnerID, "bid": pp.BID, "star": pp.Star, "lev": pp.Lev,

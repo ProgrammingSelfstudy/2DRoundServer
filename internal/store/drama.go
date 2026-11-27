@@ -24,7 +24,8 @@ func (s *Store) Drama(rid int64) (*Drama, error) {
 func (s *Store) SaveDrama(d Drama) error {
 	_, err := s.db.Exec(`INSERT INTO role_drama(rid,mode,chapter_id,dun_id,status,max_dun_id,is_first,updated_at) VALUES(?,?,?,?,?,?,?,?)
 		ON CONFLICT(rid) DO UPDATE SET mode=excluded.mode, chapter_id=excluded.chapter_id, dun_id=excluded.dun_id,
-		status=excluded.status, max_dun_id=excluded.max_dun_id, is_first=excluded.is_first, updated_at=excluded.updated_at`,
+		status=excluded.status, max_dun_id=excluded.max_dun_id, is_first=excluded.is_first,
+		updated_at=CASE WHEN excluded.max_dun_id<>role_drama.max_dun_id THEN excluded.updated_at ELSE role_drama.updated_at END`,
 		d.RID, d.Mode, d.ChapterID, d.DunID, d.Status, d.MaxDunID, b2i(d.IsFirst), s.unix())
 	return err
 }
@@ -39,7 +40,8 @@ func (s *Store) ClearDungeon(d Drama, assets, items map[int64]int64) error {
 	defer tx.Rollback()
 	if _, err := tx.Exec(`INSERT INTO role_drama(rid,mode,chapter_id,dun_id,status,max_dun_id,is_first,updated_at) VALUES(?,?,?,?,?,?,?,?)
 		ON CONFLICT(rid) DO UPDATE SET mode=excluded.mode, chapter_id=excluded.chapter_id, dun_id=excluded.dun_id,
-		status=excluded.status, max_dun_id=excluded.max_dun_id, is_first=excluded.is_first, updated_at=excluded.updated_at`,
+		status=excluded.status, max_dun_id=excluded.max_dun_id, is_first=excluded.is_first,
+		updated_at=CASE WHEN excluded.max_dun_id<>role_drama.max_dun_id THEN excluded.updated_at ELSE role_drama.updated_at END`,
 		d.RID, d.Mode, d.ChapterID, d.DunID, d.Status, d.MaxDunID, b2i(d.IsFirst), s.unix()); err != nil {
 		return err
 	}

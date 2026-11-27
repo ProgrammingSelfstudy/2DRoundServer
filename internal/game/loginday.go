@@ -155,6 +155,11 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store, sevenDayLogin bool) {
 				return err
 			}
 			list := []proto.Message{activityIcon(loginDayIcon, b2i(open && icon == loginDayIcon)), activityIcon(sevenLoginDayIcon, b2i(open && icon == sevenLoginDayIcon))}
+			daysRankOpen, err := daysRankIconOpen(st, role.SrvID, now)
+			if err != nil {
+				return err
+			}
+			list = append(list, activityIcon(drIcon, b2i(daysRankOpen)))
 			seven, war := growthIconPeriods(role, now)
 			for _, id := range growthIconIDs {
 				list = append(list, activityIcon(id, b2i(growthIconPeriod(id, seven, war) != 0)))
@@ -177,6 +182,12 @@ func RegisterLoginDay(r *gateway.Router, st *store.Store, sevenDayLogin bool) {
 		if role != nil {
 			now := s.Now()
 			switch {
+			case id == drIcon:
+				open, err := daysRankIconOpen(st, role.SrvID, now)
+				if err != nil {
+					return err
+				}
+				status = b2i(open)
 			case id == icon:
 				open, err := iconOpen(role.RID)
 				if err != nil {

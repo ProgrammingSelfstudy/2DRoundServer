@@ -62,6 +62,7 @@ type advState struct {
 	Shop                   []advGood
 	Merchant               []advGood
 	Combats                int64
+	Explored               int64
 }
 
 // advCatalog is what the merchants and the island shop sell. The client has no list (the server makes it),
@@ -387,6 +388,7 @@ func (a *adv) openRoom(s *gateway.Session, req proto.Message) error {
 			}
 		}
 		r.Status = roomOpen
+		st.Explored++
 		if err := s.Send(20608, proto.Message{"code": 1, "msg": "", "room_id": id}); err != nil {
 			return err
 		}

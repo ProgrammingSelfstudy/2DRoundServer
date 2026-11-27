@@ -23,6 +23,7 @@ type Handler func(s *Session, req proto.Message) error
 type Router struct {
 	handlers    map[uint16]Handler
 	enter       []Handler
+	before      []func(*Session) error
 	sendFilters map[uint16]func(*Session, proto.Message) proto.Message
 	strict      bool
 }
@@ -70,6 +71,8 @@ func (r *Router) RunEnter(s *Session) error {
 
 // Has reports whether a handler is registered for cmd.
 func (r *Router) Has(cmd uint16) bool { return r.handlers[cmd] != nil }
+
+func (r *Router) BeforeCommand(h func(*Session) error) { r.before = append(r.before, h) }
 
 type Server struct {
 	Schema *proto.Schema
@@ -297,6 +300,11 @@ func (s *Server) dispatch(sess *Session, fr proto.Frame) error {
 	if h == nil {
 		s.Log.Printf("gw %s cmd %d: no handler (payload %d bytes)", sess.Remote, fr.Command, len(fr.Payload))
 		return nil
+	}
+	for _, before := range s.Router.before {
+		if err := before(sess); err != nil {
+			return err
+		}
 	}
 	if err := h(sess, req); err != nil {
 		return err

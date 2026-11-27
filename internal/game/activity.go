@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"slices"
 	"sort"
 	"strings"
@@ -492,8 +493,9 @@ func activityEvent(s *gateway.Session, st *store.Store, rid int64, label string,
 // ---- the ticker
 
 type activitySnapshot struct {
-	entries []actEntry
-	at      time.Time
+	entries      []actEntry
+	at           time.Time
+	daysRankOpen bool
 }
 
 func readActivitySnapshot(st *store.Store, srv string, now time.Time) (activitySnapshot, error) {
@@ -507,13 +509,42 @@ type activityWatcher struct {
 	previous  time.Time
 	last      map[string]activitySnapshot
 	returning map[int64]bool
+	daysTasks map[daysRankViewer][]drTask
+}
+
+type daysRankViewer struct {
+	session *gateway.Session
+	rid     int64
 }
 
 func newActivityWatcher(st *store.Store, hub *gateway.Hub, now time.Time) *activityWatcher {
 	return &activityWatcher{st: st, hub: hub, previous: now, last: make(map[string]activitySnapshot)}
 }
 
-func (watcher *activityWatcher) tick(current time.Time) {
+func (watcher *activityWatcher) tick(current time.Time) time.Time {
+	starts := make(map[string]time.Time)
+	var next time.Time
+	servers, err := watcher.st.ListServers()
+	if err != nil {
+		log.Printf("daysrank: list realms: %v", err)
+	}
+	for _, server := range servers {
+		start := drServerStart(server)
+		starts[server.SrvID] = start
+		end := time.Unix(drEnd(start), 0)
+		boundary := end
+		if current.Before(start) {
+			boundary = start
+		}
+		if current.Before(boundary) && (next.IsZero() || boundary.Before(next)) {
+			next = boundary
+		}
+		if !current.Before(end) {
+			if _, err := settleDaysRank(watcher.st, server.SrvID, current); err != nil {
+				log.Printf("daysrank: settle %s: %v", server.SrvID, err)
+			}
+		}
+	}
 	bySrv := map[string][]*gateway.Session{}
 	watcher.hub.Each(func(_ int64, session *gateway.Session) {
 		if role := session.Role(); role != nil {
@@ -522,6 +553,7 @@ func (watcher *activityWatcher) tick(current time.Time) {
 		}
 	})
 	nextReturning := make(map[int64]bool)
+	nextDaysTasks := make(map[daysRankViewer][]drTask)
 	for srv, sessions := range bySrv {
 		after, err := readActivitySnapshot(watcher.st, srv, current)
 		if err != nil {
@@ -532,6 +564,14 @@ func (watcher *activityWatcher) tick(current time.Time) {
 			before, err = readActivitySnapshot(watcher.st, srv, watcher.previous)
 			if err != nil {
 				before = after
+			}
+		}
+		start, scheduled := starts[srv]
+		after.daysRankOpen = before.daysRankOpen
+		if scheduled {
+			after.daysRankOpen = drOpen(start, current)
+			if !seen {
+				before.daysRankOpen = drOpen(start, watcher.previous)
 			}
 		}
 		prevIcons := festivalIcons{schedule: festivalScheduleOf(before.entries), war: warIconPeriod(before.at)}
@@ -551,6 +591,21 @@ func (watcher *activityWatcher) tick(current time.Time) {
 			icons.returning = icons.schedule.returning(state, current)
 			nextReturning[role.RID] = icons.returning
 			_ = pushFestivalIconChanges(session, prevIcons, icons)
+			if before.daysRankOpen != after.daysRankOpen {
+				_ = session.Send(10923, activityIcon(drIcon, b2i(after.daysRankOpen)))
+			}
+			if after.daysRankOpen && scheduled {
+				viewer := daysRankViewer{session, role.RID}
+				previous := watcher.daysTasks[viewer]
+				nextDaysTasks[viewer] = previous
+				tasks, err := daysRankTasks(watcher.st, role.RID, drEnd(start), isH5RoleSession(session))
+				if err == nil {
+					delta := daysRankTaskDelta(previous, tasks)
+					if len(delta) == 0 || session.Send(22702, proto.Message{"feat_list": delta}) == nil {
+						nextDaysTasks[viewer] = tasks
+					}
+				}
+			}
 			if changed {
 				_ = session.Send(16607, proto.Message{"type": 0})
 			}
@@ -558,20 +613,29 @@ func (watcher *activityWatcher) tick(current time.Time) {
 		watcher.last[srv] = after
 	}
 	watcher.previous, watcher.returning = current, nextReturning
+	watcher.daysTasks = nextDaysTasks
+	return next
 }
 
 // WatchActivities pushes icon changes (10923) on rollover and tells online roles (16607) to reload the schedule
-// when its open rows change. It checks every interval and returns when stop is closed.
+// when its open rows change. It checks at intervals and at daysrank boundaries until stop is closed.
 func WatchActivities(st *store.Store, hub *gateway.Hub, every time.Duration, now func() time.Time, stop <-chan struct{}) {
 	watcher := newActivityWatcher(st, hub, now())
-	t := time.NewTicker(every)
+	t := time.NewTimer(0)
 	defer t.Stop()
 	for {
 		select {
 		case <-stop:
 			return
 		case <-t.C:
-			gateway.Safe(nil, "activity watcher tick", func() { watcher.tick(now()) })
+			var boundary time.Time
+			gateway.Safe(nil, "activity watcher tick", func() { boundary = watcher.tick(now()) })
+			delay := every
+			if !boundary.IsZero() {
+				// tick may have run past the boundary it reported; Reset panics on d <= 0
+				delay = max(min(delay, boundary.Sub(now())), time.Millisecond)
+			}
+			t.Reset(delay)
 		}
 	}
 }

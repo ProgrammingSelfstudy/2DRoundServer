@@ -28,7 +28,7 @@ func TestLoginDay(t *testing.T) {
 		t.Fatalf("day 1 only: %v", s)
 	}
 	c.send(10922, proto.Message{})
-	if l := c.waitFor(10922).Arr("act_list"); len(l) != len(growthIconIDs)+len(festivalIconIDs)+2 || l[0].Int("id") != loginDayIcon || l[0].Int("status") != 1 {
+	if l := c.waitFor(10922).Arr("act_list"); len(l) != len(growthIconIDs)+len(festivalIconIDs)+3 || l[0].Int("id") != loginDayIcon || l[0].Int("status") != 1 {
 		t.Fatalf("10922: %v", l)
 	}
 	c.send(10925, proto.Message{"id": loginDayIcon})
@@ -167,7 +167,7 @@ func TestGrowthActivityIconsFollowModulePeriods(t *testing.T) {
 		for _, cmd := range []uint16{10922, 10924} {
 			c.send(cmd, proto.Message{})
 			list := c.waitFor(cmd).Arr("act_list")
-			if len(list) != len(growthIconIDs)+len(festivalIconIDs)+2 {
+			if len(list) != len(growthIconIDs)+len(festivalIconIDs)+3 {
 				t.Fatalf("%d: %v", cmd, list)
 			}
 			byID := make(map[int64]proto.Message)

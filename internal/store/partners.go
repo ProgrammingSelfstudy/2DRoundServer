@@ -201,8 +201,10 @@ func spendTx(tx *sql.Tx, rid int64, assets, items map[int64]int64) error {
 			return ErrConflict
 		}
 	}
-	_, err := tx.Exec(`DELETE FROM role_items WHERE rid=? AND num<=0`, rid)
-	return err
+	if _, err := tx.Exec(`DELETE FROM role_items WHERE rid=? AND num<=0`, rid); err != nil {
+		return err
+	}
+	return recordDaysRankSpending(tx, rid, assets[3], items[72001])
 }
 
 // AscendPartner raises a hero's star by one, deletes the consumed heroes, takes the

@@ -5,9 +5,7 @@ import (
 	"errors"
 )
 
-// sqlStoreDB is implemented by the pool and a transaction-scoped Store. The
-// ordinary Store keeps all existing transaction boundaries. Only the gateway's
-// admin operation explicitly opts into a larger atomic unit of work.
+// sqlStoreDB is implemented by the pool and a transaction-scoped Store.
 type sqlStoreDB interface {
 	Exec(string, ...any) (sql.Result, error)
 	Query(string, ...any) (*sql.Rows, error)
@@ -29,13 +27,17 @@ func (d *transactionDB) Close() error {
 // The caller must already hold the owning gameplay service lock; scoped must not
 // escape fn, start a goroutine or perform unrelated nested transaction operations.
 func (s *Store) AdminTransaction(fn func(scoped *Store) error) error {
+	return s.withTransaction(func(scoped *Store, _ *sql.Tx) error { return fn(scoped) })
+}
+
+func (s *Store) withTransaction(fn func(scoped *Store, tx *sql.Tx) error) error {
 	tx, err := s.db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 	scoped := &Store{db: &transactionDB{tx}, now: s.now}
-	if err = fn(scoped); err != nil {
+	if err = fn(scoped, tx); err != nil {
 		return err
 	}
 	return tx.Commit()

@@ -66,7 +66,7 @@ func globalSeason(st *store.Store, srv string, state, service any, now time.Time
 		if err != nil {
 			return out, err
 		}
-		out = adminSeason{Supported: true, Key: dayKey(start), Start: start.Unix(), End: drEnd(start), Due: !b.Settled && now.Unix() > drEnd(start), Settled: b.Settled, History: b.Frozen}
+		out = adminSeason{Supported: true, Key: dayKey(start), Start: start.Unix(), End: drEnd(start), Due: !b.Settled && now.Unix() >= drEnd(start), Settled: b.Settled, History: b.Frozen}
 	case *gwWar:
 		out.Supported = true
 		out.Key = b.Key
@@ -168,7 +168,7 @@ func globalRanks(st *store.Store, srv string, state, service any, limit int) ([]
 					add(int64(i+1), map[string]any{"type": rk.ID, "rid": v.RID, "val": v.Val})
 				}
 			} else {
-				rows, err := ranking(st, srv, drTypes[rk.ID])
+				rows, err := daysRankStandings(st, srv, drTypes[rk.ID], false)
 				if err != nil {
 					return nil, err
 				}

@@ -3,8 +3,6 @@ package game
 import (
 	_ "embed"
 	"encoding/json"
-	"errors"
-	"sort"
 	"strconv"
 	"sync"
 	"time"
@@ -19,8 +17,21 @@ import (
 //go:embed data/daysrank.json
 var daysRankJSON []byte
 
-const drModule = "daysrank"
-const drH5ArenaKey = "arena_h5"
+const (
+	drModule       = "daysrank"
+	drIcon         = 108
+	drH5PartnerKey = "partner_h5"
+	drH5ArenaKey   = "arena_h5"
+	drH5PowerKey   = "power_h5"
+)
+
+type drQuest struct {
+	Desc, Label string
+	Param       []any
+	Target      int64
+	TargetVal   int64 `json:"target_val"`
+	Rewards     [][2]int64
+}
 
 var drCfg = func() (c struct {
 	Days       int64
@@ -34,13 +45,7 @@ var drCfg = func() (c struct {
 		Low, High int64
 		Rewards   [][2]int64
 	}
-	Quests map[string]struct {
-		Desc, Label string
-		Param       []any
-		Target      int64
-		TargetVal   int64 `json:"target_val"`
-		Rewards     [][2]int64
-	}
+	Quests   map[string]drQuest
 	QuestsOf map[string][]int64 `json:"quests_of"`
 }) {
 	if err := json.Unmarshal(daysRankJSON, &c); err != nil || len(c.Ranks) != 7 || len(c.Quests) == 0 {
@@ -114,15 +119,28 @@ func drStart(st *store.Store, srv string) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, err
 	}
+	return drServerStart(*sv), nil
+}
+
+func drServerStart(sv store.Server) time.Time {
 	at := sv.OpenTime
 	if at == 0 {
 		at = sv.CreatedAt
 	}
-	return dayStart(time.Unix(at, 0)), nil
+	return dayStart(time.Unix(at, 0))
 }
 
 // drEnd is when the window ends: the last second of the open day the table names.
 func drEnd(start time.Time) int64 { return start.Unix() + drCfg.Days*86400 - 1 }
+
+func drOpen(start time.Time, now time.Time) bool {
+	return !now.Before(start) && now.Unix() < drEnd(start)
+}
+
+func daysRankIconOpen(st *store.Store, srv string, now time.Time) (bool, error) {
+	start, err := drStart(st, srv)
+	return err == nil && drOpen(start, now), err
+}
 
 // dungeonReach is the place in the chain of the first dungeon with an id from the given one on: the table names a few ids
 // the chain does not have (10420), and reaching them means reaching what comes after.
@@ -153,16 +171,67 @@ func drQualifies(id, val int64) bool {
 	return true
 }
 
-type drFrozen struct{ RID, Val int64 }
+type drFrozen struct {
+	RID, Val int64
+	Role     *store.RankRole `json:",omitempty"`
+}
 
 type drWorld struct {
 	Settled bool
-	Frozen  map[string][]drFrozen // ranking id (or arena_h5) -> the first places at the end
+	Frozen  map[string][]drFrozen
 }
 
-type drRole struct{ Claimed []int64 }
-
 var drMu sync.Mutex
+
+func advanceDaysRank(st *store.Store, srv string, now time.Time) (bool, error) {
+	start, err := drStart(st, srv)
+	if err != nil || now.Unix() < drEnd(start) {
+		return false, err
+	}
+	return settleDaysRank(st, srv, now)
+}
+
+func settleDaysRank(st *store.Store, srv string, now time.Time) (bool, error) {
+	var status struct{ Settled bool }
+	if _, err := st.LoadGlobal(srv, drModule, &status); err != nil || status.Settled {
+		return status.Settled, err
+	}
+	drMu.Lock()
+	defer drMu.Unlock()
+	var settled bool
+	err := st.DaysRankSettlement(srv, func(tx *store.Store) error {
+		start, err := drStart(tx, srv)
+		if err != nil || now.Unix() < drEnd(start) {
+			return err
+		}
+		world := &drWorld{}
+		if _, err := tx.LoadGlobal(srv, drModule, world); err != nil {
+			return err
+		}
+		if world.Settled {
+			settled = true
+			return nil
+		}
+		if err := world.settle(tx, srv); err != nil {
+			return err
+		}
+		settled = true
+		return tx.SaveGlobal(srv, drModule, world)
+	})
+	return settled && err == nil, err
+}
+
+func drH5Pool(typ int64) string {
+	switch typ {
+	case rankPartner:
+		return drH5PartnerKey
+	case rankArena:
+		return drH5ArenaKey
+	case rankPower:
+		return drH5PowerKey
+	}
+	return ""
+}
 
 // settle freezes the rankings at the end and mails the rewards by place, once. The first place of a ranking whose value
 // is under the table's limit gets nothing.
@@ -172,11 +241,11 @@ func (w *drWorld) settle(st *store.Store, srv string) error {
 		typ := drTypes[rk.ID]
 		key := strconv.FormatInt(rk.ID, 10)
 		pools := []string{key}
-		if typ == rankArena {
-			pools = append(pools, drH5ArenaKey)
+		if h5Pool := drH5Pool(typ); h5Pool != "" {
+			pools = append(pools, h5Pool)
 		}
 		for _, pool := range pools {
-			list, err := rankingInPool(st, srv, typ, pool == drH5ArenaKey)
+			list, err := daysRankStandings(st, srv, typ, pool != key)
 			if err != nil {
 				return err
 			}
@@ -194,7 +263,7 @@ func (w *drWorld) settle(st *store.Store, srv string) error {
 func freezeDaysRank(st *store.Store, srv string, id int64, name string, list []rankEntry) ([]drFrozen, error) {
 	var frozen []drFrozen
 	for i, e := range list[:min(int(drCfg.LimitCount), len(list))] {
-		frozen = append(frozen, drFrozen{e.role.RID, e.val})
+		frozen = append(frozen, drFrozen{RID: e.role.RID, Val: e.val, Role: &e.role})
 		place := int64(i + 1)
 		if place == 1 && !drQualifies(id, e.val) {
 			continue
@@ -213,163 +282,85 @@ func freezeDaysRank(st *store.Store, srv string, id int64, name string, list []r
 	return frozen, nil
 }
 
-// daysQuestValue is what a quest counts for a role now; the events this server cannot measure stay at 0.
-func daysQuestValue(st *store.Store, rid int64, label string, param []any, target int64) (int64, error) {
-	switch label {
-	case "evt_dungeon_pass":
-		d, err := st.Drama(rid)
-		if err != nil {
-			if errors.Is(err, store.ErrNotFound) {
-				return 0, nil
-			}
-			return 0, err
-		}
-		return int64(b2i(d.MaxDunID != 0 && dungeonIndex[d.MaxDunID] >= dungeonReach(target))), nil
-	case "evt_partner": // heroes at a break step
-		heroes, err := st.PartnersOf(rid)
-		var n, step int64
-		if len(param) == 1 {
-			if pair, ok := param[0].([]any); ok && len(pair) == 2 {
-				f, _ := pair[1].(float64)
-				step = int64(f)
-			}
-		}
-		for _, h := range heroes {
-			if int64(h.BreakLev) >= step {
-				n++
-			}
-		}
-		return n, err
-	case "evt_power":
-		heroes, err := st.PartnersOf(rid)
-		return int64(b2i(rolePower(heroes) >= target)), err
-	case "evt_arena_fight":
-		_, battles, _, err := st.ArenaScoreOf(rid)
-		return battles, err
-	case "evt_star_tower_floor_pass":
-		t, err := st.StarTowerOf(rid)
-		return t.MaxTower, err
-	case "evt_dial":
-		return daysRankLive(st, rid, rankTreasure)
-	case "evt_endless_pass":
-		v, err := daysRankLive(st, rid, rankEndless)
-		return int64(b2i(v >= target)), err
-	}
-	return 0, nil
-}
-
-// RegisterDaysRank registers the seven-day ranking: from the day the server opens, for the days of the table, seven
-// rankings (campaign, star tower, lucky treasure, strongest hero, arena, endless trial, team power); at the end the first
-// places are frozen and get the rewards by mail, and the first place needs the value the table asks. Beside them the
-// quests of each ranking (22703, 22704). The cross-server list is empty. Titles are not given: there is no title system.
 func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 	bindAdminGlobal(st, drModule, &drMu, nil)
-	type ctx struct {
-		role       *store.Role
-		w          *drWorld
-		start, end int64
-		over       bool
-	}
-	load := func(s *gateway.Session) (*ctx, error) {
+	var settledRealms sync.Map
+	r.BeforeCommand(func(s *gateway.Session) error {
 		role := s.Role()
 		if role == nil {
-			return nil, nil
+			return nil
 		}
-		if fresh, err := st.RoleByID(role.RID); err == nil {
-			role = fresh
+		if _, seen := settledRealms.Load(role.SrvID); seen {
+			return nil
+		}
+		settled, err := advanceDaysRank(st, role.SrvID, s.Now())
+		if settled && err == nil {
+			settledRealms.Store(role.SrvID, true)
+		}
+		return err
+	})
+	r.Handle(22700, func(s *gateway.Session, req proto.Message) error {
+		role := s.Role()
+		if role == nil {
+			return nil
 		}
 		start, err := drStart(st, role.SrvID)
 		if err != nil {
-			return nil, err
-		}
-		c := &ctx{role: role, w: &drWorld{}, start: start.Unix(), end: drEnd(start)}
-		c.over = s.Now().Unix() > c.end
-		if _, err := st.LoadGlobal(role.SrvID, drModule, c.w); err != nil {
-			return nil, err
-		}
-		if c.over && !c.w.Settled {
-			if err := c.w.settle(st, role.SrvID); err != nil {
-				return nil, err
-			}
-			if err := st.SaveGlobal(role.SrvID, drModule, c.w); err != nil {
-				return nil, err
-			}
-		}
-		return c, nil
-	}
-	r.Handle(22700, func(s *gateway.Session, req proto.Message) error {
-		drMu.Lock()
-		defer drMu.Unlock()
-		c, err := load(s)
-		if c == nil {
 			return err
 		}
 		list := []proto.Message{}
-		if req.Int("is_cluster") == 0 {
+		if req.Int("is_cluster") == 0 && drOpen(start, s.Now()) {
 			for _, rk := range drCfg.Ranks {
-				list = append(list, proto.Message{"id": rk.ID, "end_time": c.end})
+				list = append(list, proto.Message{"id": rk.ID, "end_time": drEnd(start)})
 			}
 		}
 		return s.Send(22700, proto.Message{"is_cluster": req.Int("is_cluster"), "rank_list": list})
 	})
 	r.Handle(22701, func(s *gateway.Session, req proto.Message) error {
-		drMu.Lock()
-		defer drMu.Unlock()
-		c, err := load(s)
-		if c == nil {
-			return err
+		role := s.Role()
+		if role == nil {
+			return nil
 		}
-		id := req.Int("id")
-		typ, ok := drTypes[id]
-		if !ok {
-			return s.Send(22701, proto.Message{"id": id, "end_time": c.end, "rank": 0, "rank_list": []proto.Message{}})
-		}
-		roles, err := st.RankRoles(c.role.SrvID)
+		start, err := drStart(st, role.SrvID)
 		if err != nil {
 			return err
 		}
-		byRID := map[int64]store.RankRole{}
-		for _, x := range roles {
-			byRID[x.RID] = x
+		id, now := req.Int("id"), s.Now()
+		typ, ok := drTypes[id]
+		if !ok || now.Before(start) {
+			return s.Send(22701, proto.Message{"id": id, "end_time": drEnd(start), "rank": 0, "rank_list": []proto.Message{}})
 		}
 		var ents []rankEntry
 		myRank := int64(0)
-		key := sessionRankKey(st, s, typ)
-		if c.w.Settled {
-			frozen := c.w.Frozen[strconv.FormatInt(id, 10)]
-			h5Arena, splitArena := c.w.Frozen[drH5ArenaKey]
-			if key.h5Arena && splitArena {
-				frozen = h5Arena
+		h5 := drH5Pool(typ) != "" && isH5RoleSession(s)
+		if now.Unix() >= drEnd(start) {
+			if _, err := settleDaysRank(st, role.SrvID, now); err != nil {
+				return err
 			}
-			for _, f := range frozen {
-				if x, ok := byRID[f.RID]; ok {
-					if typ == rankArena && !splitArena {
-						inPool, err := st.ArenaRoleInPool(c.role.SrvID, f.RID, key.h5Arena)
-						if err != nil {
-							return err
-						}
-						if !inPool {
-							continue
-						}
-					}
-					ents = append(ents, rankEntry{x, f.Val})
-				}
+			world := &drWorld{}
+			if _, err := st.LoadGlobal(role.SrvID, drModule, world); err != nil {
+				return err
+			}
+			ents, err = world.standings(st, role.SrvID, id, typ, h5)
+			if err != nil {
+				return err
 			}
 			for i, e := range ents {
-				if e.role.RID == c.role.RID {
+				if e.role.RID == role.RID {
 					myRank = int64(i + 1)
 				}
 			}
 		} else {
-			full, err := key.snapshot(s.Now().Unix())
+			key := rankKey{st: st, srv: role.SrvID, typ: typ, h5Pool: h5, daysRank: true}
+			full, err := key.snapshot(now.Unix())
 			if err != nil {
 				return err
 			}
-			idx, _, err := rankSelf(st, c.role.RID, typ, full)
+			idx, err := daysRankPosition(st, role, typ, h5, full)
 			if err != nil {
 				return err
 			}
-			if idx >= 1 && idx <= drCfg.LimitCount {
+			if idx <= drCfg.LimitCount {
 				myRank = idx
 			}
 			ents = full[:min(int(drCfg.LimitCount), len(full))]
@@ -377,106 +368,15 @@ func RegisterDaysRank(r *gateway.Router, st *store.Store) {
 		rows := []proto.Message{}
 		for i, e := range ents {
 			rows = append(rows, proto.Message{"idx": i + 1, "name": e.role.Name, "lev": e.role.Lev, "face_id": e.role.FaceID, "avatar_id": 0,
-				"rid": e.role.RID, "srv_id": c.role.SrvID})
+				"rid": e.role.RID, "srv_id": role.SrvID})
 		}
-		return s.Send(22701, proto.Message{"id": id, "end_time": c.end, "rank": myRank, "rank_list": rows})
+		return s.Send(22701, proto.Message{"id": id, "end_time": drEnd(start), "rank": myRank, "rank_list": rows})
 	})
-
-	// the quests
-	questList := func(c *ctx, d *drRole) ([]proto.Message, error) {
-		var ids []int64
-		for _, rk := range drCfg.Ranks {
-			ids = append(ids, drCfg.QuestsOf[strconv.FormatInt(rk.ID, 10)]...)
-		}
-		sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-		out := []proto.Message{}
-		for _, id := range ids {
-			q := drCfg.Quests[strconv.FormatInt(id, 10)]
-			v, err := daysQuestValue(st, c.role.RID, q.Label, q.Param, q.Target)
-			if err != nil {
-				return nil, err
-			}
-			status := int64(questOpen)
-			switch {
-			case has(d.Claimed, id):
-				status = questClaimed
-			case v >= q.TargetVal:
-				status = questDone
-			}
-			out = append(out, proto.Message{"id": id, "finish": status, "end_time": c.end, "finish_time": 0,
-				"progress": []proto.Message{{"id": 1, "finish": b2i(v >= q.TargetVal), "target": q.Target, "target_val": q.TargetVal, "value": min(v, q.TargetVal)}}})
-		}
-		return out, nil
-	}
-	r.Handle(22703, func(s *gateway.Session, _ proto.Message) error {
-		drMu.Lock()
-		defer drMu.Unlock()
-		c, err := load(s)
-		if c == nil {
-			return err
-		}
-		d := &drRole{}
-		if _, err := st.LoadState(c.role.RID, drModule, d); err != nil {
-			return err
-		}
-		list, err := questList(c, d)
-		if err != nil {
-			return err
-		}
-		return s.Send(22703, proto.Message{"feat_list": list})
-	})
-	r.Handle(22704, func(s *gateway.Session, req proto.Message) error {
-		drMu.Lock()
-		defer drMu.Unlock()
-		c, err := load(s)
-		if c == nil {
-			return err
-		}
-		id := req.Int("quest_id")
-		refuse := func(msg string) error { return s.Send(22704, proto.Message{"result": 0, "msg": msg, "quest_id": id}) }
-		q, ok := drCfg.Quests[strconv.FormatInt(id, 10)]
-		d := &drRole{}
-		if _, err := st.LoadState(c.role.RID, drModule, d); err != nil {
-			return err
-		}
-		switch {
-		case !ok:
-			return refuse("任务不存在")
-		case c.over:
-			return refuse("活动已结束")
-		case has(d.Claimed, id):
-			return refuse("已经领取过了")
-		}
-		v, err := daysQuestValue(st, c.role.RID, q.Label, q.Param, q.Target)
-		if err != nil {
-			return err
-		}
-		if v < q.TargetVal {
-			return refuse("任务未完成")
-		}
-		ga, gi := map[int64]int64{}, map[int64]int64{}
-		for _, p := range q.Rewards {
-			splitGains([]sellGain{{p[0], p[1]}}, 1, ga, gi)
-		}
-		if err := st.Exchange(c.role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
-			return err
-		}
-		d.Claimed = append(d.Claimed, id)
-		if err := st.SaveState(c.role.RID, drModule, d); err != nil {
-			return err
-		}
-		if err := s.Send(22704, proto.Message{"result": 1, "msg": "领取成功", "quest_id": id}); err != nil {
-			return err
-		}
-		if err := sendAssets(s, st, c.role.RID); err != nil {
-			return err
-		}
-		return sendBackpack(s, st)
-	})
+	registerDaysRankTasks(r, st)
 }
 
 // Register the persisted state without loading or changing gameplay data.
 func init() {
 	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "global", View: adminGlobalView, Rank: globalRankFor(drModule), New: adminState[drWorld]})
-	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22700–22704", Scope: "role", New: adminState[drRole]})
+	registerAdminModule(AdminModule{Key: drModule, Title: "七天排行", Window: "22702–22704", Scope: "role", New: adminState[store.DaysRankRole]})
 }

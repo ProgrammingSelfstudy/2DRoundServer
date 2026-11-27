@@ -29,10 +29,11 @@ const (
 )
 
 type rankKey struct {
-	st      *store.Store
-	srv     string
-	typ     int64
-	h5Arena bool
+	st       *store.Store
+	srv      string
+	typ      int64
+	h5Pool   bool
+	daysRank bool
 }
 
 type rankSnap struct {
@@ -53,7 +54,7 @@ func rankingAt(st *store.Store, srvID string, typ int64, now int64) ([]rankEntry
 }
 
 func sessionRankKey(st *store.Store, s *gateway.Session, typ int64) rankKey {
-	return rankKey{st: st, srv: s.Role().SrvID, typ: typ, h5Arena: typ == rankArena && isH5RoleSession(s)}
+	return rankKey{st: st, srv: s.Role().SrvID, typ: typ, h5Pool: typ == rankArena && isH5RoleSession(s)}
 }
 
 func (k rankKey) snapshot(now int64) ([]rankEntry, error) {
@@ -62,7 +63,11 @@ func (k rankKey) snapshot(now int64) ([]rankEntry, error) {
 	if sn := rankSnaps[k]; sn != nil && now >= sn.at && now-sn.at < rankSnapshot {
 		return sn.list, nil
 	}
-	list, err := rankingInPool(k.st, k.srv, k.typ, k.h5Arena)
+	build := rankingInPool
+	if k.daysRank {
+		build = daysRankStandings
+	}
+	list, err := build(k.st, k.srv, k.typ, k.h5Pool)
 	if err != nil {
 		return nil, err
 	}

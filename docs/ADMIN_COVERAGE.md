@@ -53,7 +53,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | --- | --- | --- | --- | --- | --- | --- |
 | role | `activity` | 活动个人目标/领取（16601–16620、16687） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [activity.go](../internal/game/activity.go) |
 | role | `activitybox` | 日常活跃宝箱（20300/20301） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [activitybox.go](../internal/game/activitybox.go) |
-| role | `adventure` | 空岛冒险（20600–20636） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [adventure.go](../internal/game/adventure.go)、[adventure_mine.go](../internal/game/adventure_mine.go) |
+| role | `adventure` | 空岛冒险（20600–20636） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [adventure.go](../internal/game/adventure.go)、[adventure_mine.go](../internal/game/adventure_mine.go)、[daysrank_tasks.go](../internal/game/daysrank_tasks.go) |
 | role | `adventure_mine` | 空岛灵矿个人状态（20640–20660） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [adventure_mine.go](../internal/game/adventure_mine.go) |
 | role | `animate` | 元宵花灯/厨房（24801–24809） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [animate.go](../internal/game/animate.go) |
 | role | `arenachamp` | 本服冠军赛（20250–20282） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [arenachampion.go](../internal/game/arenachampion.go)、[arenachampion_view.go](../internal/game/arenachampion_view.go) |
@@ -64,7 +64,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `cyclegift` | 每周福利/月度礼包限购（21007） | 原始JSON、周/月礼包视图（read）；配置内charge ID重置（manage） | 已接查看/专用视图/单商品计数重置 | 白名单从12项配置生成；roll仅在查看副本中执行，重置只删指定Count键 | [cyclegift.go](../internal/game/cyclegift.go) |
 | role | `dailygift` | 每日礼包购买次数（21006） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；改购买次数会让限购和已发奖励对不上，不默认开放 | [dailygift.go](../internal/game/dailygift.go) |
 | role | `daycharge` | 每日首充（21010/21011） | 原始JSON、每日首充视图（read）；today重置（manage） | 已接查看/专用视图/当日重置 | 仅清当日Num/Taken并对齐Day；既有实付历史不变，须新充值达标 | [daycharge.go](../internal/game/daycharge.go) |
-| role | `daysrank` | 七天排行（22700–22704） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go) |
+| role | `daysrank` | 七天排行任务领取（22702–22704） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 领取记录和奖励原子提交；自由编辑/整行删除会破坏领奖约束 | [daysrank_tasks.go](../internal/game/daysrank_tasks.go)、[daysrank.go](../internal/store/daysrank.go) |
 | role | `dial` | 转盘抽奖/记录（16670–16676） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [dial.go](../internal/game/dial.go) |
 | role | `element` | 元素圣殿/领地挑战（25000–25006） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [element.go](../internal/game/element.go) |
 | role | `elfin` | 精灵/古树/队伍（26500–26564） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [elfin.go](../internal/game/elfin.go) |
@@ -191,6 +191,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | table | `cmd_daily` | 每日协议使用次数 | 汇总为最常用的前 50 个协议（read）；有专用页：运营数据 | 保留专用入口/不提供通用表视图 | 有专用页：运营数据；只统计汇总，不逐角色展示 | [052_analytics.sql](../internal/store/migrations/052_analytics.sql) |
 | table | `counters` | 成就累计计数 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [021_feats.sql](../internal/store/migrations/021_feats.sql) |
 | table | `daily_quests` | 日常任务进度/领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [015_daily_quests.sql](../internal/store/migrations/015_daily_quests.sql) |
+| table | `daysrank_spending` | 七天排行蓝钻/圣器精华消耗 | 无通用表视图或编辑 | 内部计数 | 不提供：冲榜消费计数由扣款事务维护 | [075_daysrank_spending.sql](../internal/store/migrations/075_daysrank_spending.sql) |
 | table | `drama_daily` | 推图每日扫荡 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
 | table | `drama_hook` | 挂机收益状态 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [017_drama_extras.sql](../internal/store/migrations/017_drama_extras.sql) |
 | table | `drama_milestones` | 推图里程碑领取 | 表视图注册：只读白名单分页/total；role表含COUNT摘要（read） | 已接API及通用表浏览，不提供任意逐表编辑/清空 | 归属隔离、稳定主键排序；文本上限4KB并标记truncated | [018_drama_milestones.sql](../internal/store/migrations/018_drama_milestones.sql) |

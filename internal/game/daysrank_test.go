@@ -51,7 +51,7 @@ func TestSevenDayArenaRankingsArePoolSpecific(t *testing.T) {
 	e.advance(time.Duration(drCfg.Days) * 24 * time.Hour)
 	check(native, nativeRole, "frozen")
 	check(h5, h5Role, "frozen")
-	legacy := &drWorld{Settled: true, Frozen: map[string][]drFrozen{"5": {{h5Role.RID, 1500}, {nativeRole.RID, 1100}}}}
+	legacy := &drWorld{Settled: true, Frozen: map[string][]drFrozen{"5": {{RID: h5Role.RID, Val: 1500}, {RID: nativeRole.RID, Val: 1100}}}}
 	if err := e.st.SaveGlobal(nativeRole.SrvID, drModule, legacy); err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestSevenDayArenaRankingsArePoolSpecific(t *testing.T) {
 }
 
 func TestSevenDayRanking(t *testing.T) {
-	e := newEnv(t, 100*time.Hour)
+	e := newDungeonEnv(t)
 	e.setNow(actNow)
 	if err := e.st.UpsertServer(store.Server{SrvID: "symlf_1", Name: "s1", Platform: "symlf", ZoneID: 1, Host: "127.0.0.1", Port: 8800, Status: 1, GroupID: 1,
 		OpenTime: actNow.Add(-2 * 24 * time.Hour).Unix()}); err != nil {

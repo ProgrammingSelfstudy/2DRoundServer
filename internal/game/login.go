@@ -151,6 +151,9 @@ func (l *Login) createRole(s *gateway.Session, req proto.Message) error {
 	if l.MaxRoles > 0 && len(existing) >= l.MaxRoles {
 		return fail("角色数量已达上限")
 	}
+	if _, err := advanceDaysRank(l.Store, l.SrvID, s.Now()); err != nil {
+		return err
+	}
 	// face_id is not part of the create request, so it starts at 0.
 	var role *store.Role
 	if name == "" {

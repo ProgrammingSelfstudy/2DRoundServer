@@ -153,6 +153,7 @@ type fightUnit struct {
 	damage, taken, healing     int64
 	crit, critRatio            int64 // per mille; critRatio 1500 = x1.5
 	skills                     []int64
+	openingMitigation          int64
 	ours                       bool
 	lastCast                   map[int64]int // skill -> round of its last cast
 	buffs                      []*activeBuff
@@ -506,6 +507,56 @@ func (f *fightSim) addBuff(caster, t *fightUnit, r buffRule) proto.Message {
 	return buffEntry(1, b, t.pos, end)
 }
 
+// The four grades of the battle-start mitigation talent and artifact skill share
+// one status icon (3102). Only the highest equipped or learned grade applies.
+func mitigationSkill(p store.Partner) int64 {
+	var best int64
+	consider := func(id int64) {
+		if id >= 750100 && id <= 750103 && id > best {
+			best = id
+		}
+	}
+	for _, talent := range p.Talents {
+		consider(talent.SkillID)
+	}
+	for _, art := range p.Artifacts {
+		for _, id := range art.Skills {
+			consider(id)
+		}
+	}
+	return best
+}
+
+func (f *fightSim) openingPassives() []proto.Message {
+	var plays []proto.Message
+	for i := range f.units {
+		u := &f.units[i]
+		id := u.openingMitigation
+		if id == 0 || u.hp <= 0 {
+			continue
+		}
+		grade := id - 750100
+		percent := [...]int64{10, 20, 30, 50}
+		rule := buffRule{Bid: 37020 + grade, Kind: "dmg_reduce", Pct: percent[grade], Rounds: 2, Chance: 100}
+		entry := f.addBuff(u, u, rule)
+		effect := roundStatusEffect(u, 1, 0, []proto.Message{entry})
+		effect["effect_bid"], effect["skill_bid_of_effect"] = 7501001+grade, id
+		plays = append(plays, proto.Message{"order": len(plays) + 1, "actor": u.pos, "target": u.pos,
+			"skill_bid": id, "talk_pos": 0, "talk_content": "", "effect_play": []proto.Message{effect}})
+	}
+	return plays
+}
+
+func roundStatusEffect(u *fightUnit, order int, change int64, entries []proto.Message) proto.Message {
+	return proto.Message{
+		"order": order, "actor": u.pos, "target": u.pos, "effect_bid": 0, "is_hit": 1, "is_crit": 0,
+		"hp_changed": change, "hp": u.hp, "is_dead": b2i(u.hp <= 0), "camp_restrain": 0,
+		"buff_list": nonNil(entries), "summon_list": []proto.Message{}, "sub_effect_play_list": []proto.Message{},
+		"is_blind": 0, "skill_bid_of_effect": 0, "actor_hp_changed": 0, "actor_is_dead": 0, "aid_actor": 0,
+		"total_hurt": 0, "hurt_reward": []proto.Message{},
+	}
+}
+
 // startOfRound plays the statuses at the start of a round: damage over time hits,
 // every status counts one round down (action 3) and the ones that ran out go
 // (action 2). The capture shows this as one play at the start of round 2.
@@ -525,7 +576,11 @@ func (f *fightSim) startOfRound() []proto.Message {
 			// including when several statuses reach the same cap in one round.
 			for _, b := range u.buffs {
 				if b.kind == "dot" {
-					damage := min(max(1, b.casterAtk*b.pct/100), u.hp-minHP)
+					amount := b.casterAtk * b.pct / 100
+					if b.base == "target_maxhp" {
+						amount = min(u.maxHP*b.pct/100, 10*b.casterAtk)
+					}
+					damage := min(max(1, amount), u.hp-minHP)
 					u.loseHP(b.caster, damage)
 				}
 			}
@@ -559,13 +614,7 @@ func (f *fightSim) startOfRound() []proto.Message {
 					entries = append(entries, buffEntry(3, b, u.pos, end))
 				}
 			}
-			effects = append(effects, proto.Message{
-				"order": len(effects) + 1, "actor": u.pos, "target": u.pos, "effect_bid": 0, "is_hit": 1, "is_crit": 0,
-				"hp_changed": u.hp - before, "hp": u.hp, "is_dead": b2i(u.hp <= 0), "camp_restrain": 0,
-				"buff_list": nonNil(entries), "summon_list": []proto.Message{}, "sub_effect_play_list": []proto.Message{},
-				"is_blind": 0, "skill_bid_of_effect": 0, "actor_hp_changed": 0, "actor_is_dead": 0, "aid_actor": 0,
-				"total_hurt": 0, "hurt_reward": []proto.Message{},
-			})
+			effects = append(effects, roundStatusEffect(u, len(effects)+1, u.hp-before, entries))
 		}
 	}
 	if len(effects) == 0 {
@@ -771,7 +820,9 @@ func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRo
 	for len(rounds) < maxRounds && len(f.alive(false)) > 0 && len(f.alive(true)) > 0 {
 		f.round = len(rounds) + 1
 		var r fightRound
-		if f.round > 1 {
+		if f.round == 1 {
+			r.start = f.openingPassives()
+		} else {
 			r.start = f.startOfRound()
 		}
 		if len(f.alive(false)) == 0 { // a status killed the last monster
@@ -909,9 +960,9 @@ func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, for
 			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
 		}
 		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), power: m.Int("power"), breakLev: int64(h.BreakLev),
-			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours, guild: guildCombatBonusOf(h)})
+			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours, guild: guildCombatBonusOf(h), openingMitigation: mitigationSkill(h)})
 		objects = append(objects, proto.Message{
-			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": 0}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
+			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": h.UseSkin}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
 			"face_id": 0, "group": group, "hp": m.Int("hp"), "hp_max": m.Int("hp"), "lev": h.Lev, "object_bid": h.BID, "object_id": h.PartnerID,
 			"object_name": info.Name, "object_type": 2, "owner_id": ownerRID, "owner_srv_id": ownerSrv, "pos": pos, "sex": 0, "skills": skills,
 			"sprites": []proto.Message{}, "star": h.Star,

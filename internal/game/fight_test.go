@@ -731,3 +731,53 @@ func TestAsuraSkillFiresFirstAndEveryThirdRound(t *testing.T) {
 		}
 	}
 }
+
+func TestOpeningMitigationUsesHighestEquippedGradeForTwoRounds(t *testing.T) {
+	hero := store.Partner{PartnerID: 20, BID: 70501, Star: 10, Lev: 1,
+		Talents:   []store.Talent{{Pos: 1, SkillID: 750101}},
+		Artifacts: []store.ArtPiece{{Skills: []int64{750100, 750102}, Pending: []int64{750103}}}}
+	team, _ := sideUnits(4, "local", []store.FormationSlot{{Pos: 1, PartnerID: hero.PartnerID}}, 1,
+		map[int64]store.Partner{hero.PartnerID: hero}, true)
+	if len(team) != 1 || team[0].openingMitigation != 750102 {
+		t.Fatalf("equipped skill was not transferred to the fighter: %+v", team)
+	}
+	sim := fightSim{units: team, round: 1, rng: rand.New(rand.NewSource(7))}
+	plays := sim.openingPassives()
+	if len(plays) != 1 || plays[0].Int("skill_bid") != 750102 || takenPct(&team[0]) != 70 {
+		t.Fatalf("wrong opening skill or damage: %v, %d", plays, takenPct(&team[0]))
+	}
+	entry := func(play proto.Message) proto.Message { return play.Arr("effect_play")[0].Arr("buff_list")[0] }
+	first := entry(plays[0])
+	if first.Int("buff_bid") != 37022 || first.Int("remain_round") != 2 || first.Int("target") != team[0].pos {
+		t.Fatalf("wrong starting buff: %v", first)
+	}
+	for round := 2; round <= 3; round++ {
+		sim.round = round
+		b := entry(sim.startOfRound()[0])
+		if b.Int("id") != first.Int("id") || b.Int("remain_round") != int64(3-round) {
+			t.Fatalf("round %d: %v", round, b)
+		}
+		if round == 2 && (b.Int("action_type") != 3 || takenPct(&team[0]) != 70) ||
+			round == 3 && (b.Int("action_type") != 2 || takenPct(&team[0]) != 100) {
+			t.Fatalf("round %d: %v, damage %d", round, b, takenPct(&team[0]))
+		}
+	}
+	if mitigationSkill(store.Partner{}) != 0 {
+		t.Fatal("an unequipped hero received the passive")
+	}
+}
+
+func TestCatClawPoisonUsesTargetMaxHPAndCasterAttackCap(t *testing.T) {
+	rule := skillTable[283101].Buffs[0]
+	rule.Chance = 100
+	for _, tc := range []struct{ hp, attack, damage int64 }{{10000, 80, 500}, {100000, 7, 70}} {
+		sim := fightSim{units: []fightUnit{{ours: true, pos: 1, hp: 1, maxHP: 1, atk: tc.attack},
+			{pos: 18, hp: tc.hp, maxHP: tc.hp}}, round: 1, rng: rand.New(rand.NewSource(4))}
+		sim.addBuff(&sim.units[0], &sim.units[1], rule)
+		sim.round = 2
+		effect := sim.startOfRound()[0].Arr("effect_play")[0]
+		if effect.Int("hp_changed") != -tc.damage || sim.units[0].damage != tc.damage {
+			t.Fatalf("HP %d, caster attack %d: %v", tc.hp, tc.attack, effect)
+		}
+	}
+}

@@ -66,6 +66,8 @@ for m in re.finditer(r"\n\t\[(\d+)\] = \{(.*?)\n\t\},?", blk, re.S):
     num = lambda rx: int(re.search(rx, desc).group(1))
     if "眩晕" in name or "无法行动" in desc:
         kind = "stun"
+    elif "最大不超过攻击力10倍" in desc and re.search(r"每回合损失【生命值上限\*(\d+)%】", desc):
+        kind, pct, base = "dot", num(r"生命值上限\*(\d+)%"), "target_maxhp"
     elif "每回合损失" in desc:
         kind, pct = "dot", int((re.search(r"施法者攻击力\*(\d+)%", desc) or [0, 0])[1])
     elif "免疫1次伤害" in desc:

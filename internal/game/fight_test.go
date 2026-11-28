@@ -2,6 +2,7 @@ package game
 
 import (
 	"math/rand"
+	"slices"
 	"testing"
 	"time"
 
@@ -463,6 +464,105 @@ func TestFightSpeedUp(t *testing.T) {
 	buffOn(&slow, "speed_up", 100, 2)
 	if speedOf(&slow) != 20 || speedOf(&slow) <= speedOf(&fast) {
 		t.Fatalf("speed %d", speedOf(&slow))
+	}
+}
+
+func checkTurnOrder(t *testing.T, r fightRound, want ...int64) {
+	t.Helper()
+	var got []int64
+	for _, play := range r.plays {
+		got = append(got, play.Int("actor"))
+	}
+	if !slices.Equal(got, want) {
+		t.Fatalf("turn order %v, want %v", got, want)
+	}
+}
+
+func TestFightSpeedTiesUseFormationColumnsThenPower(t *testing.T) {
+	normal := gentle(t)
+	unit := func(pos, speed, power int64) fightUnit {
+		return fightUnit{pos: pos, ours: pos <= 9, hp: 5000, maxHP: 5000, atk: 10,
+			speed: speed, power: power, skills: []int64{normal}}
+	}
+	team := []fightUnit{unit(1, 100, 999), unit(9, 100, 10), unit(8, 100, 200)}
+	foes := []fightUnit{unit(17, 100, 500), unit(10, 100, 20), unit(12, 100, 80), unit(18, 110, 1)}
+	r, _, _ := playFightOpts(team, foes, rand.New(rand.NewSource(1)), 1, true)
+	checkTurnOrder(t, r[0], 18, 8, 9, 1, 12, 10, 17)
+}
+
+func TestFightMidRoundSpeedChangesApplyFromNextRound(t *testing.T) {
+	normal := gentle(t)
+	slow := skillTable[151102].Buffs[0]
+	if slow.Kind != "speed_down" || slow.Pct != 15 || slow.Rounds != 2 || skillTable[151101].Buffs[0].Pct != 10 {
+		t.Fatalf("Flame Commandment slow: %+v", slow)
+	}
+	slow.Chance = 100
+	withSkill(t, 990071, skillRule{Type: "active_skill", CD: 10, Side: 1, How: "front", N: 1, Buffs: []buffRule{slow}})
+	team := []fightUnit{
+		{pos: 9, speed: 130, ours: true, hp: 5000, maxHP: 5000, skills: []int64{normal, 990071}},
+		{pos: 7, speed: 95, ours: true, hp: 5000, maxHP: 5000, skills: []int64{normal}},
+	}
+	enemy := foe(18, 5000, normal)
+	enemy.speed = 100
+	r, _, _ := playFightOpts(team, []fightUnit{enemy}, rand.New(rand.NewSource(1)), 4, true)
+	checkTurnOrder(t, r[0], 9, 18, 7)
+	checkTurnOrder(t, r[1], 9, 7, 18)
+	checkTurnOrder(t, r[2], 9, 7, 18)
+	checkTurnOrder(t, r[3], 9, 18, 7)
+
+	withSkill(t, 990072, skillRule{Type: "active_skill", CD: 10, Side: 5, How: "self", N: 1,
+		Buffs: []buffRule{{Bid: 10723, Kind: "speed_up", Pct: 8, Rounds: 1, Chance: 100}}})
+	team[1].skills = []int64{normal, 990072}
+	r, _, _ = playFightOpts(team[1:], []fightUnit{enemy}, rand.New(rand.NewSource(1)), 3, true)
+	checkTurnOrder(t, r[0], 18, 7)
+	checkTurnOrder(t, r[1], 7, 18)
+	checkTurnOrder(t, r[2], 18, 7)
+}
+
+func TestHeatFieldAffectsFirstTwoRoundsOfEachFight(t *testing.T) {
+	normal := gentle(t)
+	team := []fightUnit{{pos: 9, speed: 100, ours: true, hp: 5000, maxHP: 5000, skills: []int64{normal, 151401}}}
+	enemy := foe(18, 5000, normal)
+	enemy.speed = 105
+	for stage := 1; stage <= 2; stage++ {
+		r, _, _ := playFightOpts(team, []fightUnit{enemy}, rand.New(rand.NewSource(1)), 3, true)
+		if len(r[0].start) != 1 || r[0].start[0].Int("skill_bid") != 151401 {
+			t.Fatalf("stage %d opening %v", stage, r[0].start)
+		}
+		for i, remaining := range []int64{2, 1, 0} {
+			buff := r[i].start[0].Arr("effect_play")[0].Arr("buff_list")[0]
+			if buff.Int("buff_bid") != 23003 || buff.Int("remain_round") != remaining || buff.Int("target") != 18 {
+				t.Fatalf("stage %d, round %d: %v", stage, i+1, buff)
+			}
+		}
+		checkTurnOrder(t, r[0], 9, 18)
+		checkTurnOrder(t, r[1], 9, 18)
+		checkTurnOrder(t, r[2], 18, 9)
+	}
+
+	f := &fightSim{round: 1, rng: rand.New(rand.NewSource(1))}
+	field, active := skillTable[151401].Buffs[0], skillTable[151102].Buffs[0]
+	active.Chance = 100
+	f.addBuff(&team[0], &enemy, field)
+	f.addBuff(&team[0], &enemy, active)
+	if speedOf(&enemy) != 89 || len(f.purge(&enemy, 99)) != 1 || speedOf(&enemy) != 96 {
+		t.Fatal("the stronger slow should apply until purged, leaving the unpurgeable opening slow")
+	}
+}
+
+func TestHeatFieldRequiresEffectiveBreakFive(t *testing.T) {
+	for _, tc := range []struct {
+		base, shown int
+		want        bool
+	}{{4, 0, false}, {5, 0, true}, {0, 5, true}} {
+		ace := store.Partner{PartnerID: 1, BID: 10502, Star: 5, Lev: 80, BreakLev: tc.base}
+		if tc.shown > 0 {
+			ace.ResSlot, ace.ShownLev, ace.ShownBreak = 1, 80, tc.shown
+		}
+		team, _ := sideUnits(1, "local", []store.FormationSlot{{Pos: 1, PartnerID: 1}}, 1, map[int64]store.Partner{1: ace}, true)
+		if got := slices.Contains(team[0].skills, int64(151401)); got != tc.want {
+			t.Fatalf("break %d, resonant break %d: skill available %v", tc.base, tc.shown, got)
+		}
 	}
 }
 

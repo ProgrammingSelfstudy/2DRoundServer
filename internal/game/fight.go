@@ -97,7 +97,7 @@ type buffRule struct {
 // are only shown on the client.
 func (r buffRule) plays() bool {
 	switch r.Kind {
-	case "stun", "dot", "shield", "atk_down", "atk_up", "dmg_up", "crit_up", "crit_dmg_up", "dmg_reduce", "speed_up", "regen":
+	case "stun", "dot", "shield", "atk_down", "atk_up", "dmg_up", "crit_up", "crit_dmg_up", "dmg_reduce", "speed_up", "speed_down", "regen":
 		return true
 	}
 	return false
@@ -105,12 +105,14 @@ func (r buffRule) plays() bool {
 
 // activeBuff is a status on a unit while the script is made.
 type activeBuff struct {
-	id, bid   int64 // id is unique in the fight (the client tells buffs apart by it)
-	kind      string
-	pct       int64
-	remain    int // rounds left; a shield does not count down
-	casterAtk int64
-	caster    *fightUnit
+	id, bid         int64 // id is unique in the fight (the client tells buffs apart by it)
+	kind            string
+	pct             int64
+	remain          int   // rounds left; a shield does not count down
+	firstSpeedRound int   // the first turn order that uses this speed modifier
+	speedFlat       int64 // snapshotted contribution based on the caster
+	casterAtk       int64
+	caster          *fightUnit
 	// casterMaxHP and base size a regen; negative statuses can be purged unless keep
 	casterMaxHP int64
 	base        string
@@ -148,17 +150,20 @@ const spiritPos = 41
 
 // fightUnit is one fighter while the script is made.
 type fightUnit struct {
-	guild                      guildCombatBonus
-	pos, speed, hp, maxHP, atk int64
-	power, breakLev            int64
-	damage, taken, healing     int64
-	crit, critRatio            int64 // per mille; critRatio 1500 = x1.5
-	skills                     []int64
-	camp                       int64
-	openingMitigation          int64
-	ours                       bool
-	lastCast                   map[int64]int // skill -> round of its last cast
-	buffs                      []*activeBuff
+	guild                                  guildCombatBonus
+	pos, speed, hp, maxHP, atk             int64
+	power, breakLev                        int64
+	damage, taken, healing                 int64
+	crit, critRatio                        int64 // per mille; critRatio 1500 = x1.5
+	skills                                 []int64
+	camp                                   int64
+	openingMitigation                      int64
+	marineAura, sex, baseSpeed, level, def int64
+	training                               speedBonus
+	awakened                               bool
+	ours                                   bool
+	lastCast                               map[int64]int // skill -> round of its last cast
+	buffs                                  []*activeBuff
 }
 
 func (u *fightUnit) loseHP(source *fightUnit, amount int64) {
@@ -271,16 +276,20 @@ func skillEffect(sid int64) int64 { return sid/100*1000 + sid%100 }
 // and a heal needs someone hurt.
 func (u *fightUnit) usable(sid int64, round int, hurtAllies bool) bool {
 	r, ok := skillTable[sid]
+	if sid/10 == 77030 && !u.kingReady() {
+		return false
+	}
 	if !ok || r.Type != "active_skill" || r.Normal == 1 {
 		return false
 	}
 	if r.Side != 1 && r.Side != 2 && r.Side != 5 {
 		return false // the other target kinds are not understood yet
 	}
-	if r.pure() && !r.givesStatus() {
+	_, priority := initiative.First[sid]
+	if r.pure() && !r.givesStatus() && !priority {
 		return false // only statuses the script cannot play
 	}
-	if r.Heal > 0 && r.Dmg == 0 && (!hurtAllies || u.atk*r.Heal/100 == 0) {
+	if r.Heal > 0 && r.Dmg == 0 && (!hurtAllies || u.atk*r.Heal/100 == 0) && !(sid/100 == 5043 && sid%100 >= 2) {
 		return false // nobody to heal, or a heal of nothing
 	}
 	first := r.FireCD
@@ -299,6 +308,14 @@ func (u *fightUnit) usable(sid int64, round int, hurtAllies bool) bool {
 // pickSkill is the skill the unit casts in a round: its first usable active skill,
 // else its normal attack (the unit's first skill when none is marked normal).
 func (u *fightUnit) pickSkill(round int, hurtAllies bool) int64 {
+	for _, sid := range u.skills {
+		if _, first := initiative.First[sid]; first && u.usable(sid, round, hurtAllies) {
+			return sid
+		}
+		if sid/10 == 77030 && u.kingReady() {
+			return sid
+		}
+	}
 	for _, sid := range u.skills {
 		if u.usable(sid, round, hurtAllies) {
 			return sid
@@ -337,7 +354,7 @@ func pickTargets(cands []*fightUnit, r skillRule, rng *rand.Rand) []*fightUnit {
 	case "random":
 		rng.Shuffle(len(sorted), func(i, j int) { sorted[i], sorted[j] = sorted[j], sorted[i] })
 	case "max_atk":
-		sort.SliceStable(sorted, func(i, j int) bool { return sorted[i].atk > sorted[j].atk })
+		sort.SliceStable(sorted, func(i, j int) bool { return atkOf(sorted[i]) > atkOf(sorted[j]) })
 	case "min_hp": // the lowest share of health first
 		sort.SliceStable(sorted, func(i, j int) bool {
 			return sorted[i].hp*sorted[j].maxHP < sorted[j].hp*sorted[i].maxHP
@@ -353,11 +370,12 @@ func pickTargets(cands []*fightUnit, r skillRule, rng *rand.Rand) []*fightUnit {
 
 // fightSim is the state while the script is made.
 type fightSim struct {
-	units    []fightUnit
-	rng      *rand.Rand
-	round    int
-	nextBuff int64
-	maxEnemy int64
+	orderLocked bool // the acting order for the current round has already been decided
+	units       []fightUnit
+	rng         *rand.Rand
+	round       int
+	nextBuff    int64
+	maxEnemy    int64
 	// realDamage turns off the campaign's floor on the heroes' damage (a boss fight counts the damage)
 	realDamage bool
 	teamSize   int64 // heroes at the start; the monsters hit lighter when there are fewer
@@ -392,8 +410,24 @@ func (f *fightSim) alive(ours bool) []*fightUnit {
 func sumPct(u *fightUnit, kind string) int64 {
 	var n int64
 	for _, b := range u.buffs {
-		if b.kind == kind && b.remain > 0 {
+		if b.remain <= 0 {
+			continue
+		}
+		if b.kind == kind {
 			n += b.pct
+			continue
+		}
+		// Multi-stat statuses use a single native icon and a single instance.
+		def := initiative.Buffs[b.bid]
+		switch kind {
+		case "atk_up":
+			n += def.Atk
+		case "crit_up":
+			n += def.Crit
+		case "dmg_reduce":
+			n += def.Mitigation
+		case "dmg_up":
+			n += def.Damage
 		}
 	}
 	return n
@@ -425,8 +459,25 @@ func critOf(u *fightUnit) int64 {
 
 func critRatioOf(u *fightUnit) int64 { return u.critRatio + 10*sumPct(u, "crit_dmg_up") }
 
-// speedOf is the speed that orders the actions of a round, with speed-up statuses.
-func speedOf(u *fightUnit) int64 { return u.speed * (100 + sumPct(u, "speed_up")) / 100 }
+// The training camp breaks speed ties by battlefield column, then by power.
+// Cells 1–3 and 10–12 are the two front columns, facing each other.
+func battleColumn(pos int64) int64 {
+	column := (pos - 1) / 3
+	if pos <= 9 {
+		return 2 - column
+	}
+	return column
+}
+
+func actsBefore(a, b *fightUnit) bool {
+	if sa, sb := speedOf(a), speedOf(b); sa != sb {
+		return sa > sb
+	}
+	if ca, cb := battleColumn(a.pos), battleColumn(b.pos); ca != cb {
+		return ca < cb
+	}
+	return a.power > b.power
+}
 
 // dealtPct and takenPct scale the damage a unit deals and takes (damage-up and
 // damage-reduce statuses; the reduction stops at 90%).
@@ -478,8 +529,13 @@ func buffEntry(action int64, b *activeBuff, target int64, endRound int) proto.Me
 // addBuff gives a status to a unit when the chance comes up; it returns the
 // buff_list entry or nil. A status that does not stack only refreshes its rounds.
 func (f *fightSim) addBuff(caster, t *fightUnit, r buffRule) proto.Message {
-	if t.hp <= 0 {
+	if t.hp <= 0 || r.Negative && (t.hasBid(19851) || t.hasBid(63040) || r.Kind == "stun" && (t.hasBid(78231) || t.hasBid(77741) || t.hasBid(77102) || hasStatusGroup(t, 162))) {
 		return nil
+	}
+	native, known := initiative.Buffs[r.Bid]
+	var flat int64
+	if known && native.Stats.Caster != 0 {
+		flat = speedOf(caster) * native.Stats.Caster / 1000
 	}
 	control := caster.guild.control - t.guild.resistControl
 	if r.Kind == "stun" && control != 0 {
@@ -490,21 +546,37 @@ func (f *fightSim) addBuff(caster, t *fightUnit, r buffRule) proto.Message {
 		return nil
 	}
 	rounds, end := r.Rounds, f.round+r.Rounds
+	firstSpeedRound := 0
+	if r.Kind == "speed_up" || r.Kind == "speed_down" || native.Stats != (speedBonus{}) || native.Marine > 0 {
+		firstSpeedRound = f.round
+		if f.orderLocked {
+			firstSpeedRound++
+		}
+		end = firstSpeedRound + rounds - 1
+	}
 	if r.Kind == "shield" {
 		rounds, end = 1, shieldEnd
 	}
-	if !r.Stack {
-		for _, b := range t.buffs {
-			if b.bid == r.Bid {
-				b.remain, b.casterAtk, b.casterMaxHP = rounds, atkOf(caster), caster.maxHP
-				b.caster = caster
-				return buffEntry(1, b, t.pos, end)
+	// A refresh reuses the instance ID so the client keeps the same icon and stack count.
+	var replace *activeBuff
+	count := 0
+	for _, b := range t.buffs {
+		if b.bid == r.Bid || known && native.Type == 2 && initiative.Buffs[b.bid].Group == native.Group {
+			count++
+			if replace == nil || b.remain < replace.remain {
+				replace = b
 			}
 		}
 	}
+	if replace != nil && (!r.Stack || native.Cap > 0 && count >= native.Cap) {
+		replace.bid, replace.kind, replace.pct, replace.remain, replace.caster = r.Bid, r.Kind, r.Pct, rounds, caster
+		replace.keep, replace.negative, replace.speedFlat = r.Keep, r.Negative, flat
+		replace.casterAtk, replace.casterMaxHP, replace.firstSpeedRound = atkOf(caster), caster.maxHP, firstSpeedRound
+		return buffEntry(1, replace, t.pos, end)
+	}
 	f.nextBuff++
 	b := &activeBuff{id: f.nextBuff, bid: r.Bid, kind: r.Kind, pct: r.Pct, remain: rounds, caster: caster, casterAtk: atkOf(caster),
-		casterMaxHP: caster.maxHP, base: r.Base, negative: r.Negative, keep: r.Keep}
+		casterMaxHP: caster.maxHP, speedFlat: flat, base: r.Base, negative: r.Negative, keep: r.Keep, firstSpeedRound: firstSpeedRound}
 	t.buffs = append(t.buffs, b)
 	return buffEntry(1, b, t.pos, end)
 }
@@ -558,9 +630,12 @@ func (f *fightSim) openingPassives() []proto.Message {
 		rule := buffRule{Bid: 37020 + grade, Kind: "dmg_reduce", Pct: percent[grade], Rounds: 2, Chance: 100}
 		cast(u, id, 7501001+grade, rule, []*fightUnit{u})
 	}
-	// Zephyr's Marine Instructor is a single, non-stacking opening bonus on each friendly Marine.
+	// Heat Field applies before the first ordering, on either side. As with
+	// Marine Instructor, multiple casters on one side give a single opening effect.
 	for _, side := range []bool{true, false} {
 		var mentor *fightUnit
+		var ace *fightUnit
+		var field int64
 		var skill int64
 		var marines []*fightUnit
 		for _, ally := range f.alive(side) {
@@ -568,6 +643,9 @@ func (f *fightSim) openingPassives() []proto.Message {
 				marines = append(marines, ally)
 			}
 			for _, id := range ally.skills {
+				if isHeatField(id) && id > field {
+					ace, field = ally, id
+				}
 				if id >= 535201 && id <= 535204 && id > skill {
 					mentor, skill = ally, id
 				}
@@ -577,9 +655,15 @@ func (f *fightSim) openingPassives() []proto.Message {
 			rule := skillTable[skill]
 			cast(mentor, skill, rule.Effects[0], rule.Buffs[0], marines)
 		}
+		if ace != nil {
+			rule := skillTable[field]
+			cast(ace, field, rule.Effects[0], rule.Buffs[0], f.alive(!side))
+		}
 	}
 	return plays
 }
+
+func isHeatField(id int64) bool { return id >= 151401 && id <= 151404 }
 
 func roundStatusEffect(u *fightUnit, order int, change int64, entries []proto.Message) proto.Message {
 	return proto.Message{
@@ -632,7 +716,7 @@ func (f *fightSim) startOfRound() []proto.Message {
 			}
 			var entries []proto.Message
 			for _, b := range append([]*activeBuff(nil), u.buffs...) {
-				if b.kind != "shield" {
+				if b.kind != "shield" && (b.firstSpeedRound == 0 || f.round > b.firstSpeedRound) {
 					b.remain--
 				}
 				switch {
@@ -665,6 +749,18 @@ func (f *fightSim) startOfRound() []proto.Message {
 // a self skill (side 5), else units of the own side.
 func (f *fightSim) targetsOf(u *fightUnit, r skillRule, foes, friends []*fightUnit) []*fightUnit {
 	switch {
+	case r.Side == 1 && r.How == "front_middle":
+		var front []*fightUnit
+		for _, t := range foes {
+			cell := t.pos
+			if cell > 9 {
+				cell -= 10
+			}
+			if cell <= 6 {
+				front = append(front, t)
+			}
+		}
+		return front
 	case r.Side == 1:
 		return pickTargets(foes, r, f.rng)
 	case r.Side == 5 || r.How == "self":
@@ -713,23 +809,24 @@ func (f *fightSim) purge(t *fightUnit, n int) []proto.Message {
 // normally; a stunned unit does nothing. A pure status skill that would change
 // nothing is replaced by a normal attack. Returns the play, or nil.
 func (f *fightSim) act(u *fightUnit, order int) proto.Message {
-	if u.hp <= 0 || u.has("stun") != nil {
+	if u.hp <= 0 {
 		return nil
 	}
+	return f.castSkill(u, u.pickSkill(f.round, f.injured(u.ours)), order)
+}
+
+func (f *fightSim) castSkill(u *fightUnit, sid int64, order int) proto.Message {
 	foes, friends := f.alive(!u.ours), f.alive(u.ours)
-	if len(foes) == 0 {
+	if u.hp <= 0 || len(foes) == 0 {
 		return nil
 	}
-	hurt := false
-	for _, fr := range friends {
-		if fr.hp < fr.maxHP {
-			hurt = true
-		}
+	ignore, first := initiative.First[sid]
+	if u.has("stun") != nil && !ignore {
+		return nil
 	}
-	sid := u.pickSkill(f.round, hurt)
 	rule := skillTable[sid]
 	targets := f.targetsOf(u, rule, foes, friends)
-	if rule.pure() && !f.worth(rule, targets) {
+	if rule.pure() && !first && !(sid/100 == 5043 && sid%100 >= 2) && !f.worth(rule, targets) {
 		sid = u.normalSkill()
 		rule = skillTable[sid]
 		targets = f.targetsOf(u, rule, foes, friends)
@@ -739,7 +836,7 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 		return nil
 	}
 	eid := skillEffect(sid)
-	if sid >= 536101 && sid <= 536104 {
+	if len(rule.Effects) > 0 && (sid >= 536101 && sid <= 536104 || first) {
 		// Soul Pocus uses a separate attack effect from the normal attack at every grade.
 		eid = rule.Effects[0]
 	}
@@ -798,7 +895,7 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 			t.gainHP(u, delta)
 		}
 		for _, br := range rule.Buffs {
-			if br.Negative != (rule.Side == 1) {
+			if br.Negative != (rule.Side == 1) || handledSpeedStatus(sid, br.Bid) {
 				continue
 			}
 			// Soul Pocus always wounds a surviving target; the extra Soul Steal requires strictly lower attack.
@@ -823,6 +920,7 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 			"total_hurt": 0, "hurt_reward": []proto.Message{},
 		})
 	}
+	effects = f.afterSpeedAction(u, sid, effects)
 	return proto.Message{
 		"order": order, "actor": u.pos, "target": targets[0].pos, "skill_bid": sid, "talk_pos": 0, "talk_content": "",
 		"effect_play": effects,
@@ -863,12 +961,14 @@ func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRo
 	var rounds []fightRound
 	for len(rounds) < maxRounds && len(f.alive(false)) > 0 && len(f.alive(true)) > 0 {
 		f.round = len(rounds) + 1
+		f.orderLocked = false
 		var r fightRound
 		if f.round == 1 {
 			r.start = f.openingPassives()
 		} else {
 			r.start = f.startOfRound()
 		}
+		r.start = f.roundSpeedPassives(r.start)
 		if len(f.alive(false)) == 0 { // a status killed the last monster
 			rounds = append(rounds, r)
 			break
@@ -879,7 +979,19 @@ func playFightOpts(team []fightUnit, monsters []fightUnit, rng *rand.Rand, maxRo
 			}
 		}
 		order := append(f.alive(true), f.alive(false)...)
-		sort.SliceStable(order, func(i, j int) bool { return speedOf(order[i]) > speedOf(order[j]) })
+		priority := map[*fightUnit]bool{}
+		for _, u := range order {
+			sid := u.pickSkill(f.round, f.injured(u.ours))
+			ignore, first := initiative.First[sid]
+			priority[u] = first && (u.has("stun") == nil || ignore)
+		}
+		sort.SliceStable(order, func(i, j int) bool {
+			if priority[order[i]] != priority[order[j]] {
+				return priority[order[i]]
+			}
+			return actsBefore(order[i], order[j])
+		})
+		f.orderLocked = true
 		for _, u := range order {
 			if p := f.act(u, len(r.plays)+2); p != nil {
 				r.plays = append(r.plays, p)
@@ -939,10 +1051,23 @@ func ownFightSide(role *store.Role, formType int64, formSlots []store.FormationS
 	return team, append(objects, heroObjects...)
 }
 
-func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64, h5 bool) ([]fightRound, bool, proto.Message, *fightSim, error) {
-	team, objects, form, err := f.teamSide(role, h5)
+func (f *FightService) fightSetup(role *store.Role, d store.Drama, auto int64, h5 bool, now int64) ([]fightRound, bool, proto.Message, *fightSim, error) {
+	if _, err := starterGrant(f.Store, role); err != nil {
+		return nil, false, nil, nil, err
+	}
+	lineup, err := combatFormationFor(f.Store, role.RID, formDrama, h5)
 	if err != nil {
 		return nil, false, nil, nil, err
+	}
+	form := lineup.form
+	training, err := campaignTrainingOf(f.Store, role.RID, form, now)
+	if err != nil {
+		return nil, false, nil, nil, err
+	}
+	team, objects := ownFightSide(role, form.FormationType, form.Slots, lineup.byID)
+	for i := range team {
+		h := lineup.byID[objects[i+1].Int("object_id")]
+		team[i].addTraining(training.forHero(h))
 	}
 	var foes []fightUnit
 	// the monsters of the dungeon that is being challenged
@@ -999,12 +1124,19 @@ func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, for
 		pos := battleCell(formType, sl.Pos) + shift
 		skills := []proto.Message{}
 		var sids []int64
+		unlocked, hasSlots := initiative.Slots[brachKey(info, int(m.Int("break_lev")))]
 		for _, sk := range m.Arr("skills") {
-			sids = append(sids, sk.Int("skill_bid"))
-			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
+			id := sk.Int("skill_bid")
+			if hasSlots && sk.Int("pos") > unlocked {
+				continue
+			}
+			sids = append(sids, id)
+			skills = append(skills, proto.Message{"skill_bid": id, "end_round": 0})
 		}
-		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), power: m.Int("power"), breakLev: int64(h.BreakLev),
-			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), camp: int64(info.Camp), skills: sids, ours: ours, guild: guildCombatBonusOf(h), openingMitigation: mitigationSkill(h)})
+		u := fightUnit{pos: pos, sex: int64(b2i(initiative.Male[h.BID])), baseSpeed: m.Int("speed"), level: m.Int("lev"), def: m.Int("def"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), breakLev: m.Int("break_lev"),
+			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), camp: int64(info.Camp), skills: sids, ours: ours, guild: guildCombatBonusOf(h), openingMitigation: mitigationSkill(h)}
+		u.addTraining(skillSpeed(sids).plus(wornSpeed(h)))
+		units = append(units, u)
 		objects = append(objects, proto.Message{
 			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": h.UseSkin}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
 			"face_id": 0, "group": group, "hp": m.Int("hp"), "hp_max": m.Int("hp"), "lev": h.Lev, "object_bid": h.BID, "object_id": h.PartnerID,
@@ -1022,7 +1154,7 @@ var errNoWave = errors.New("the dungeon has no monsters")
 // start begins a fight: the confirmation of 13003, the map and the fight data.
 func (f *FightService) start(s *gateway.Session, role *store.Role, d store.Drama, auto int64) error {
 	h5 := isH5RoleSession(s)
-	rounds, won, intro, sim, err := f.fightSetup(role, d, auto, h5)
+	rounds, won, intro, sim, err := f.fightSetup(role, d, auto, h5, s.Now().Unix())
 	if err != nil {
 		if h5 && errors.Is(err, errNoHeroes) {
 			return s.Send(13003, proto.Message{"code": 0, "msg": "没有可以出战的英雄"})

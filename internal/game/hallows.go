@@ -81,7 +81,13 @@ type hwLookDef struct {
 	Time   int64     `json:"time"`
 }
 
+type hwCombatAttr struct {
+	Level int64    `json:"lev_limit"`
+	Attr  []hwAttr `json:"attr"`
+}
+
 type hwConf struct {
+	SkillAttr     [][]hwCombatAttr           `json:"skill_attr"`
 	Const         map[string]json.RawMessage `json:"const"`
 	RefineOpenLev int64                      `json:"refine_open_lev"`
 	AttrIDs       map[string]int64           `json:"attr_ids"`

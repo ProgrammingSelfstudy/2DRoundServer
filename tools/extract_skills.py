@@ -92,6 +92,8 @@ for m in re.finditer(r"\n\t\[(\d+)\] = \{(.*?)\n\t\},?", blk, re.S):
         kind, pct = "dmg_reduce", num(r"免伤提升(\d+)%")
     elif re.search(r"单位速度提升(\d+)%", desc):
         kind, pct = "speed_up", num(r"单位速度提升(\d+)%")
+    elif re.search(r"单位速度减少(\d+)%", desc):
+        kind, pct = "speed_down", num(r"单位速度减少(\d+)%")
     buffs[int(m.group(1))] = {"name": name, "kind": kind, "pct": pct, "duration": int(g("duration", "0") or 0),
                               "special": "无法" in desc, "base": base, "keep": bool(re.search(r"不会被驱散|无法被驱散|不可被驱散|不可驱散", desc)),
                               "stack": int(g("join_type", "0") or 0) == 1, "negative": int(g("positive_or_negative", "0") or 0) in (2, 3)}
@@ -182,9 +184,33 @@ for bid, r in sorted(rows.items()):
             how = "min_hp"
         elif best == "max_atk":
             how = "max_atk"
+    # Some opening/triggered skills are tagged passive or self in the raw row.
+    # These families describe their actual recipients and action explicitly.
+    group = r[3]
+    if group == 55610:
+        typ, side, how = "active_skill", 2, "max_atk"
+        n = pct(r"攻击最高的(\d+)位队友", des) or 99
+    if group in (51510, 950410):
+        typ = "active_skill"
+    if group == 53710:
+        side, how, n = 1, "all", 99
+        dmg = pct(r"造成(\d+)%的法术伤害", des)
+    if group == 25310:
+        how, n = "front_middle", 99
+    if group == 50430:
+        heal = pct(r"攻击力?(\d+)%的生命", des)
+    if group == 77030:
+        typ, side, how, n = "active_skill", 1, "front", 3
+        dmg = pct(r"造成(\d+)%", des)
     ids = []
     for ent in (r[23] if len(r) > 23 and isinstance(r[23], list) else []):
         ids.extend(ent if isinstance(ent, list) else [ent])
+    if group == 25310:
+        ids.append(23002 if bid % 10 >= 3 else 23001)
+    # Heat Field's description specifies the unpurgeable 8% opening slow.
+    # Its buff_des is empty at all four grades.
+    if 151401 <= bid <= 151404:
+        ids.append(23003)
     # statuses the buff_des list does not carry but the description names: look the
     # status up in the buff table by kind, percent and rounds
     def lookup(kind, want, rounds):
@@ -212,7 +238,7 @@ for bid, r in sorted(rows.items()):
         b = lookup(kind, int(m.group(1)), int(rounds.group(1)) if rounds else 0)
         if b:
             ids.append(b)
-    if "护盾" in des and not any(buffs.get(b, {}).get("kind") == "shield" for b in ids):
+    if group != 55610 and "护盾" in des and not any(buffs.get(b, {}).get("kind") == "shield" for b in ids):
         shield = next((b for b, v in sorted(buffs.items()) if v["kind"] == "shield"), None)
         if shield:
             ids.append(shield)
@@ -220,6 +246,8 @@ for bid, r in sorted(rows.items()):
     m = re.search(r"驱散(?:目标)?(所有|全部|(\d+)个)?(?:的)?负面", des)
     if m:
         purge = 99 if m.group(1) in ("所有", "全部") else int(m.group(2) or 1)
+    if group in (51510, 950410):
+        purge = 99
     pc = re.search(r"(\d+)%概率驱散", des)
     purge_chance = int(pc.group(1)) if pc else 100
     sk_buffs = []
@@ -230,6 +258,8 @@ for bid, r in sorted(rows.items()):
         # the description may call the status by another name than the buff table does
         # ("出血" for 灼烧, "晕眩" for 眩晕): by name first, else the first "N%概率"
         m = re.search(r"(\d+)%(?:的)?概率[^，。；]*?【" + re.escape(v["name"]) + "】", des) or re.search(r"(\d+)%(?:的)?概率", des)
+        if group == 55610 and b in range(50650, 50655):
+            v = dict(v, kind="shield")
         sk_buffs.append({"bid": b, "name": v["name"], "kind": v["kind"], "pct": v["pct"], "rounds": v["duration"],
                          "stack": v["stack"], "negative": v["negative"], "base": v["base"], "keep": v["keep"], "chance": int(m.group(1)) if m else 100})
     out[bid] = {"buffs": sk_buffs, "name": name, "normal": int(is_normal), "type": typ, "cd": cd, "fire_cd": fire_cd,

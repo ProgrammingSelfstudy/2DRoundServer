@@ -67,10 +67,10 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `daysrank` | 七天排行任务领取（22702–22704） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 领取记录和奖励原子提交；自由编辑/整行删除会破坏领奖约束 | [daysrank_tasks.go](../internal/game/daysrank_tasks.go)、[daysrank.go](../internal/store/daysrank.go) |
 | role | `dial` | 转盘抽奖/记录（16670–16676） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [dial.go](../internal/game/dial.go) |
 | role | `element` | 元素圣殿/领地挑战（25000–25006） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [element.go](../internal/game/element.go) |
-| role | `elfin` | 精灵/古树/队伍（26500–26564） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [elfin.go](../internal/game/elfin.go) |
+| role | `elfin` | 精灵/古树/队伍（26500–26564） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [campaign_speed.go](../internal/game/campaign_speed.go), [elfin.go](../internal/game/elfin.go) |
 | role | `elitematch` | 精英段位赛（24900–24946） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [elitematch.go](../internal/game/elitematch.go)、[elitematch_season.go](../internal/game/elitematch_season.go) |
 | role | `elitepass` | 段位赛令牌活动（24952–24955） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [elitepass.go](../internal/game/elitepass.go) |
-| role | `emoguoshi` | 恶魔果实图鉴（31101–31130） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [emoguoshi.go](../internal/game/emoguoshi.go) |
+| role | `emoguoshi` | 恶魔果实图鉴（31101–31130） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [campaign_speed.go](../internal/game/campaign_speed.go), [emoguoshi.go](../internal/game/emoguoshi.go) |
 | role | `empower` | 共鸣赋能（26420–26424） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [horcrux.go](../internal/store/horcrux.go) |
 | role | `encounter` | 英雄物语（27100–27104） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [encounter.go](../internal/game/encounter.go) |
 | role | `endless_trail` | 无尽试炼个人进度（23900–23913） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go)、[endless.go](../internal/game/endless.go)、[endless_run.go](../internal/game/endless_run.go) |
@@ -80,8 +80,8 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `fortunebag` | 福袋翻牌（28300–28308） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [fortunebag.go](../internal/game/fortunebag.go) |
 | role | `growway` | 成长之路（25830/25832） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [growway.go](../internal/game/growway.go) |
 | role | `guildmarket` | 公会宝库个人凭证（26900–26903） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [guildmarket.go](../internal/game/guildmarket.go) |
-| role | `halidom` | 元素信念（22200–22205） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [halidom.go](../internal/game/halidom.go) |
-| role | `hallows` | 神技（24100–24135） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [hallows.go](../internal/game/hallows.go) |
+| role | `halidom` | 元素信念（22200–22205） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [campaign_speed.go](../internal/game/campaign_speed.go), [halidom.go](../internal/game/halidom.go) |
+| role | `hallows` | 神技（24100–24135） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [campaign_speed.go](../internal/game/campaign_speed.go), [hallows.go](../internal/game/hallows.go) |
 | role | `heaven` | 天界（25200–25232） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [heaven.go](../internal/game/heaven.go) |
 | role | `heroexpedit` | 英雄远征（24400–24415） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [expedition_progress.go](../internal/game/expedition_progress.go)、[expedition_help.go](../internal/game/expedition_help.go) |
 | role | `holelite` | 节日精英召唤/新春赐福（23220–23222） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [holiday_elite.go](../internal/game/holiday_elite.go) |

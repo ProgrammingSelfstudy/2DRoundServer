@@ -94,11 +94,12 @@ func monsterOf(m monsterDef, idx int) (fightUnit, proto.Message) {
 	if hp < 1 {
 		hp = 1
 	}
-	var atk, speed int64 = hp / 8, 60
-	if head, err := strconv.ParseInt(m.Head, 10, 64); err == nil {
+	var atk, def, speed int64 = hp / 8, 0, 60
+	head, err := strconv.ParseInt(m.Head, 10, 64)
+	if err == nil {
 		if _, ok := partnerTable[head]; ok {
-			_, a, _, sp := partnerStats(store.Partner{BID: head, Lev: int(m.Lev), Star: lowestStar(head)})
-			atk, speed = a, sp*131/100
+			_, a, d, sp := partnerStats(store.Partner{BID: head, Lev: int(m.Lev), Star: lowestStar(head)})
+			atk, def, speed = a, d, sp*131/100
 		}
 	}
 	skills := []proto.Message{}
@@ -110,5 +111,7 @@ func monsterOf(m monsterDef, idx int) (fightUnit, proto.Message) {
 		"object_bid": m.Bid, "object_id": 0, "object_name": m.Name, "object_type": 3, "owner_id": 0, "owner_srv_id": "", "pos": pos,
 		"sex": 0, "skills": skills, "sprites": []proto.Message{}, "star": 0,
 	}
-	return fightUnit{pos: pos, camp: m.Camp, speed: speed, hp: hp, maxHP: hp, atk: atk, skills: sids}, obj
+	u := fightUnit{pos: pos, sex: int64(b2i(initiative.Male[head])), camp: m.Camp, baseSpeed: speed, level: m.Lev, def: def, hp: hp, maxHP: hp, atk: atk, skills: sids}
+	u.addTraining(skillSpeed(sids))
+	return u, obj
 }

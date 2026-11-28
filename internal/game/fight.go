@@ -55,7 +55,8 @@ type skillRule struct {
 	Purge       int   `json:"purge"`
 	PurgeChance int64 `json:"purge_chance"`
 	// Buffs are the statuses the skill adds to its targets, each with its chance.
-	Buffs []buffRule `json:"buffs"`
+	Buffs   []buffRule `json:"buffs"`
+	Effects []int64    `json:"effects"`
 }
 
 // pure reports a skill that neither hurts nor heals: it only adds statuses or purges.
@@ -153,6 +154,7 @@ type fightUnit struct {
 	damage, taken, healing     int64
 	crit, critRatio            int64 // per mille; critRatio 1500 = x1.5
 	skills                     []int64
+	camp                       int64
 	openingMitigation          int64
 	ours                       bool
 	lastCast                   map[int64]int // skill -> round of its last cast
@@ -529,6 +531,22 @@ func mitigationSkill(p store.Partner) int64 {
 
 func (f *fightSim) openingPassives() []proto.Message {
 	var plays []proto.Message
+	cast := func(caster *fightUnit, id, eid int64, rule buffRule, targets []*fightUnit) {
+		var effects []proto.Message
+		for _, target := range targets {
+			entry := f.addBuff(caster, target, rule)
+			if entry == nil {
+				continue
+			}
+			effect := roundStatusEffect(target, len(effects)+1, 0, []proto.Message{entry})
+			effect["actor"], effect["effect_bid"], effect["skill_bid_of_effect"] = caster.pos, eid, id
+			effects = append(effects, effect)
+		}
+		if len(effects) > 0 {
+			plays = append(plays, proto.Message{"order": len(plays) + 1, "actor": caster.pos, "target": effects[0].Int("target"),
+				"skill_bid": id, "talk_pos": 0, "talk_content": "", "effect_play": effects})
+		}
+	}
 	for i := range f.units {
 		u := &f.units[i]
 		id := u.openingMitigation
@@ -538,11 +556,27 @@ func (f *fightSim) openingPassives() []proto.Message {
 		grade := id - 750100
 		percent := [...]int64{10, 20, 30, 50}
 		rule := buffRule{Bid: 37020 + grade, Kind: "dmg_reduce", Pct: percent[grade], Rounds: 2, Chance: 100}
-		entry := f.addBuff(u, u, rule)
-		effect := roundStatusEffect(u, 1, 0, []proto.Message{entry})
-		effect["effect_bid"], effect["skill_bid_of_effect"] = 7501001+grade, id
-		plays = append(plays, proto.Message{"order": len(plays) + 1, "actor": u.pos, "target": u.pos,
-			"skill_bid": id, "talk_pos": 0, "talk_content": "", "effect_play": []proto.Message{effect}})
+		cast(u, id, 7501001+grade, rule, []*fightUnit{u})
+	}
+	// Zephyr's Marine Instructor is a single, non-stacking opening bonus on each friendly Marine.
+	for _, side := range []bool{true, false} {
+		var mentor *fightUnit
+		var skill int64
+		var marines []*fightUnit
+		for _, ally := range f.alive(side) {
+			if ally.camp == 4 {
+				marines = append(marines, ally)
+			}
+			for _, id := range ally.skills {
+				if id >= 535201 && id <= 535204 && id > skill {
+					mentor, skill = ally, id
+				}
+			}
+		}
+		if mentor != nil {
+			rule := skillTable[skill]
+			cast(mentor, skill, rule.Effects[0], rule.Buffs[0], marines)
+		}
 	}
 	return plays
 }
@@ -704,6 +738,11 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 	if len(targets) == 0 {
 		return nil
 	}
+	eid := skillEffect(sid)
+	if sid >= 536101 && sid <= 536104 {
+		// Soul Pocus uses a separate attack effect from the normal attack at every grade.
+		eid = rule.Effects[0]
+	}
 	pct := rule.Dmg
 	if pct == 0 {
 		pct = rule.Heal
@@ -759,10 +798,15 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 			t.gainHP(u, delta)
 		}
 		for _, br := range rule.Buffs {
-			if br.Negative == (rule.Side == 1) {
-				if e := f.addBuff(u, t, br); e != nil {
-					buffList = append(buffList, e)
-				}
+			if br.Negative != (rule.Side == 1) {
+				continue
+			}
+			// Soul Pocus always wounds a surviving target; the extra Soul Steal requires strictly lower attack.
+			if (br.Bid == 53616 || br.Bid == 53626 || br.Bid == 53636) && atkOf(t) >= atkOf(u) {
+				continue
+			}
+			if e := f.addBuff(u, t, br); e != nil {
+				buffList = append(buffList, e)
 			}
 		}
 		if rule.Purge > 0 && rule.Side != 1 && f.rng.Int63n(100) < rule.PurgeChance {
@@ -772,7 +816,7 @@ func (f *fightSim) act(u *fightUnit, order int) proto.Message {
 			t.buffs = nil
 		}
 		effects = append(effects, proto.Message{
-			"order": len(effects) + 1, "actor": u.pos, "target": t.pos, "effect_bid": skillEffect(sid), "is_hit": 1, "is_crit": crit,
+			"order": len(effects) + 1, "actor": u.pos, "target": t.pos, "effect_bid": eid, "is_hit": 1, "is_crit": crit,
 			"hp_changed": delta, "hp": t.hp, "is_dead": b2i(t.hp <= 0), "camp_restrain": 0,
 			"buff_list": nonNil(buffList), "summon_list": []proto.Message{}, "sub_effect_play_list": []proto.Message{},
 			"is_blind": 0, "skill_bid_of_effect": sid, "actor_hp_changed": 0, "actor_is_dead": 0, "aid_actor": 0,
@@ -960,7 +1004,7 @@ func sideUnits(ownerRID int64, ownerSrv string, slots []store.FormationSlot, for
 			skills = append(skills, proto.Message{"skill_bid": sk.Int("skill_bid"), "end_round": 0})
 		}
 		units = append(units, fightUnit{pos: pos, speed: m.Int("speed"), hp: m.Int("hp"), maxHP: m.Int("hp"), atk: m.Int("atk"), power: m.Int("power"), breakLev: int64(h.BreakLev),
-			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), skills: sids, ours: ours, guild: guildCombatBonusOf(h), openingMitigation: mitigationSkill(h)})
+			crit: m.Int("crit_rate") + baseCritRate, critRatio: m.Int("crit_ratio"), camp: int64(info.Camp), skills: sids, ours: ours, guild: guildCombatBonusOf(h), openingMitigation: mitigationSkill(h)})
 		objects = append(objects, proto.Message{
 			"camp_type": info.Camp, "career": info.Type, "extra_data": []proto.Message{{"extra_key": 5, "extra_value": h.UseSkin}, {"extra_key": 10, "extra_value": 0}, {"extra_key": 11, "extra_value": 0}},
 			"face_id": 0, "group": group, "hp": m.Int("hp"), "hp_max": m.Int("hp"), "lev": h.Lev, "object_bid": h.BID, "object_id": h.PartnerID,

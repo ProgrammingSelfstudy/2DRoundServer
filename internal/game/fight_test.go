@@ -781,3 +781,50 @@ func TestCatClawPoisonUsesTargetMaxHPAndCasterAttackCap(t *testing.T) {
 		}
 	}
 }
+
+func TestMarineInstructorBuffsOnlyFriendlyMarinesAtOpening(t *testing.T) {
+	sim := fightSim{round: 1, rng: rand.New(rand.NewSource(9)), units: []fightUnit{
+		{pos: 9, ours: true, camp: 4, hp: 100, atk: 100, skills: []int64{535204}},
+		{pos: 8, ours: true, camp: 4, hp: 100, atk: 100, skills: []int64{535201}},
+		{pos: 5, ours: true, camp: 5, hp: 100, atk: 100},
+		{pos: 18, camp: 4, hp: 100, atk: 100},
+		{pos: 7, ours: true, camp: 4, hp: 0, atk: 100},
+	}}
+	plays := sim.openingPassives()
+	if len(plays) != 1 || plays[0].Int("actor") != 9 || plays[0].Int("skill_bid") != 535204 {
+		t.Fatalf("opening plays: %v", plays)
+	}
+	effects := plays[0].Arr("effect_play")
+	if len(effects) != 2 {
+		t.Fatalf("targets: %v", effects)
+	}
+	for i, pos := range []int64{8, 9} {
+		b := effects[i].Arr("buff_list")[0]
+		if effects[i].Int("effect_bid") != 5352003 || effects[i].Int("actor") != 9 ||
+			b.Int("target") != pos || b.Int("buff_bid") != 53523 || b.Int("remain_round") != 99 {
+			t.Fatalf("wrong opening event: %v", effects[i])
+		}
+	}
+	for i, expected := range []int64{106, 106, 100, 100, 100} {
+		if got := atkOf(&sim.units[i]); got != expected {
+			t.Fatalf("pos %d attack = %d, want %d", sim.units[i].pos, got, expected)
+		}
+	}
+}
+
+func TestSoulPocusAlwaysWoundsButOnlyStealsFromLowerAttack(t *testing.T) {
+	for _, targetAttack := range []int64{99, 100, 101} {
+		sim := fightSim{round: 1, realDamage: true, rng: rand.New(rand.NewSource(2)), units: []fightUnit{
+			{ours: true, pos: 9, hp: 1000, maxHP: 1000, atk: 100, skills: []int64{536001, 536101}, lastCast: map[int64]int{}},
+			{pos: 18, hp: 10000, maxHP: 10000, atk: targetAttack},
+		}}
+		p := sim.act(&sim.units[0], 1)
+		if p.Int("skill_bid") != 536101 || !sim.units[1].hasBid(53615) || sim.units[1].hasBid(53616) != (targetAttack < 100) {
+			t.Fatalf("target attack %d, play %v", targetAttack, p)
+		}
+		effect := p.Arr("effect_play")[0]
+		if effect.Int("effect_bid") != 5361003 || effect.Int("hp_changed") != -169 || skillTable[536101].How != "random" {
+			t.Fatalf("wrong Soul Pocus hit: %v", effect)
+		}
+	}
+}

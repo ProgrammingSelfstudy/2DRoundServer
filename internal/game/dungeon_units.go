@@ -110,5 +110,5 @@ func monsterOf(m monsterDef, idx int) (fightUnit, proto.Message) {
 		"object_bid": m.Bid, "object_id": 0, "object_name": m.Name, "object_type": 3, "owner_id": 0, "owner_srv_id": "", "pos": pos,
 		"sex": 0, "skills": skills, "sprites": []proto.Message{}, "star": 0,
 	}
-	return fightUnit{pos: pos, speed: speed, hp: hp, maxHP: hp, atk: atk, skills: sids}, obj
+	return fightUnit{pos: pos, camp: m.Camp, speed: speed, hp: hp, maxHP: hp, atk: atk, skills: sids}, obj
 }

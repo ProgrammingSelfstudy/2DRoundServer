@@ -115,6 +115,9 @@ def damage_pct(des):
     """The damage percent of an attack skill from its description. "造成77%魔法伤害" first; the other ways the text says it, when that finds none:
     "造成189%的物理伤害", "造成伤害340%的物理伤害", "造成自身攻击力100%的真实伤害", "造成目标生命上限13%+自身攻击力250%的魔法伤害" (the percent of the
     attack), "两段共计(388%+...)" (the first percent)."""
+    m = re.search(r"使当前目标受到[^，。；]*?攻击力(\d+)%的法术伤害", des)
+    if m:
+        return int(m.group(1))
     m = re.search(r"造成(\d+)%(?:物理|魔法)?(?:伤害|物害|真实伤害)", des)
     if m:
         return int(m.group(1))
@@ -171,6 +174,8 @@ for bid, r in sorted(rows.items()):
             n, how = 99, "all"
         elif m:
             n, how = int(m.group(1)), "random"
+        elif "随机一个敌方单体" in des:
+            n, how = 1, "random"
         elif m2:
             n, how = int(m2.group(1)), "max_atk" if best == "max_atk" else ("min_hp" if best == "min_hp_per" else "front")
         elif best == "min_hp_per" or "生命最低" in des:

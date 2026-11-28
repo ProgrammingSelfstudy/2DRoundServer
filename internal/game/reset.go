@@ -162,7 +162,7 @@ func RegisterReset(r *gateway.Router, st *store.Store) {
 		return s.Send(11067, proto.Message{"partner_id": id, "end_time": now + rebornCooldown, "day_num": used + 1})
 	})
 	// offering: the heroes asked for, checked the same way by the preview and the act
-	offered := func(role *store.Role, req proto.Message) (ids []int64, assets, items map[int64]int64, msg string, err error) {
+	offered := func(role *store.Role, req proto.Message, preview bool) (ids []int64, assets, items map[int64]int64, msg string, err error) {
 		list := req.Arr("list")
 		if len(list) == 0 {
 			return nil, nil, nil, "没有放入英雄", nil
@@ -185,6 +185,10 @@ func RegisterReset(r *gateway.Router, st *store.Store) {
 			}
 			seen[id] = true
 			ids = append(ids, id)
+			if !preview {
+				// OfferPartners returns the currently worn pieces within its transaction.
+				p.Equips = nil
+			}
 			a, i := refund(*p)
 			for k, v := range a {
 				assets[k] += v
@@ -200,7 +204,7 @@ func RegisterReset(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		_, assets, items, msg, err := offered(role, req)
+		_, assets, items, msg, err := offered(role, req, true)
 		if err != nil {
 			return err
 		}
@@ -214,7 +218,7 @@ func RegisterReset(r *gateway.Router, st *store.Store) {
 		if role == nil {
 			return nil
 		}
-		ids, assets, items, msg, err := offered(role, req)
+		ids, assets, items, msg, err := offered(role, req, false)
 		if err != nil {
 			return err
 		}

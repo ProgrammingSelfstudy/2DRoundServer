@@ -95,8 +95,17 @@ func TestRebornAndOffer(t *testing.T) {
 	if r := ask(11075); r.Int("code") != 0 {
 		t.Fatalf("empty: %v", r)
 	}
+	e.give(c, role, map[int64]int64{40101: 1})
+	if err := e.st.EquipPiece(role.RID, hs[4].PartnerID, 1, 40101); err != nil {
+		t.Fatal(err)
+	}
+	before, err := e.st.RoleItems(role.RID)
+	if err != nil {
+		t.Fatal(err)
+	}
 	pre := ask(11075, hs[4].PartnerID)
-	if pre.Int("code") != 1 || len(pre.Arr("list")) != 1 || pre.Arr("list")[0].Int("id") != 16007 || pre.Arr("list")[0].Int("num") != 1 {
+	list := pre.Arr("list")
+	if pre.Int("code") != 1 || len(list) != 2 || list[0].Int("id") != 16007 || list[0].Int("num") != 1 || list[1].Int("id") != 40101 || list[1].Int("num") != 1 {
 		t.Fatalf("preview: %v", pre)
 	}
 	c.send(11076, proto.Message{"list": []proto.Message{{"partner_id": hs[4].PartnerID}}})
@@ -107,6 +116,16 @@ func TestRebornAndOffer(t *testing.T) {
 	}
 	if _, err := e.st.PartnerByID(role.RID, hs[4].PartnerID); err != store.ErrNotFound {
 		t.Fatalf("hero must be gone: %v", err)
+	}
+	after, err := e.st.RoleItems(role.RID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, item := range list {
+		id := item.Int("id")
+		if delta := after[id] - before[id]; delta != item.Int("num") {
+			t.Fatalf("item %d increased by %d, preview showed %d", id, delta, item.Int("num"))
+		}
 	}
 	if r := ask(11076, hs[4].PartnerID); r.Int("code") != 0 {
 		t.Fatalf("already gone: %v", r)

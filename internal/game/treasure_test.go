@@ -1,11 +1,38 @@
 package game
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"2droundserver/internal/proto"
+	"2droundserver/internal/store"
 )
+
+func checkTreasureDraw(t *testing.T, board, reply proto.Message, count int) {
+	t.Helper()
+	points, prizes, positions := reply.Arr("awards1"), reply.Arr("awards2"), reply.Arr("awards3")
+	if reply.Int("code") != 1 || len(points) != 1 || points[0].Int("bid") != 18 || points[0].Int("num") != int64(10*count) || len(prizes) != count || len(positions) != count {
+		t.Fatalf("draw %d: %v", count, reply)
+	}
+	slots := map[int64]trSlot{}
+	for _, sl := range board.Arr("rand_lists") {
+		p := sl.Int("pos")
+		slots[p] = trSlot{Pos: p, ID: sl.Int("id"), Status: sl.Int("status")}
+	}
+	for i, hit := range positions {
+		pos := hit.Int("pos")
+		sl := slots[pos]
+		item := trItems[sl.ID]
+		if sl.ID == 0 || sl.Status != 0 || prizes[i].Int("bid") != item.Item || prizes[i].Int("num") != item.Num {
+			t.Fatalf("pull %d: slot %v, prize %v", i, sl, prizes[i])
+		}
+		if pos%2 == 1 {
+			sl.Status = 1
+			slots[pos] = sl
+		}
+	}
+}
 
 func TestTreasureHunt(t *testing.T) {
 	e := newEnv(t, 100*time.Hour)
@@ -31,9 +58,7 @@ func TestTreasureHunt(t *testing.T) {
 	e.addItems(t, role, map[int64]int64{37001: 30})
 	c.send(16638, proto.Message{"type": 1, "type2": 1})
 	res := c.waitFor(16638)
-	if res.Int("code") != 1 || len(res.Arr("awards1")) != 1 || len(res.Arr("awards3")) != 1 {
-		t.Fatalf("draw: %v", res)
-	}
+	checkTreasureDraw(t, dd[0], res, 1)
 	st := c.waitFor(16639)
 	if l := c.waitFor(16641); l.Int("type") != 1 || len(l.Arr("log_list")) != 1 {
 		t.Fatalf("log push: %v", l)
@@ -42,7 +67,7 @@ func TestTreasureHunt(t *testing.T) {
 	for _, sl := range st.Arr("rand_lists") {
 		taken += int(sl.Int("status"))
 	}
-	if st.Int("type") != 1 || st.Int("count") != 1 || st.Int("lucky") != 10 || taken != 1 {
+	if st.Int("type") != 1 || st.Int("count") != 1 || st.Int("lucky") != 10 || taken != int(res.Arr("awards3")[0].Int("pos")%2) {
 		t.Fatalf("after one draw: %v", st)
 	}
 	// the multi draw needs VIP 2
@@ -55,18 +80,7 @@ func TestTreasureHunt(t *testing.T) {
 	}
 	c.send(16643, proto.Message{"type": 1, "type2": 2})
 	res = c.waitFor(16643)
-	if res.Int("code") != 1 {
-		t.Fatalf("multi: %v", res)
-	}
-	var n int64
-	for _, a := range res.Arr("awards2") {
-		if a.Int("bid") != 18 {
-			n += a.Int("num")
-		}
-	}
-	if n != 14 {
-		t.Fatalf("a multi draw gives 14 pulls beside the wheel: %v", res)
-	}
+	checkTreasureDraw(t, st, res, 15)
 	st = c.waitFor(16639)
 	c.waitFor(16641)
 	if st.Int("count") != 16 || st.Int("lucky") != 160 {
@@ -122,5 +136,61 @@ func TestTreasureHunt(t *testing.T) {
 	c.send(16637, proto.Message{})
 	if l := c.waitFor(16637).Arr("dial_data")[0].Arr("log_list"); len(l) != 2 || l[0].Str("role_name") != "探宝人" {
 		t.Fatalf("log: %v", l)
+	}
+	// Advanced draws use their own tickets, count, gifts and refresh clock.
+	e.addItems(t, role, map[int64]int64{37002: 11})
+	c.send(16638, proto.Message{"type": 2, "type2": 1})
+	checkTreasureDraw(t, dd[1], c.waitFor(16638), 1)
+	advanced := c.waitFor(16639)
+	c.waitFor(16641)
+	c.send(16638, proto.Message{"type": 2, "type2": 2})
+	checkTreasureDraw(t, advanced, c.waitFor(16638), 10)
+	advanced = c.waitFor(16639)
+	c.waitFor(16641)
+	if advanced.Int("lucky") != 110 || advanced.Int("count") != 11 || advanced.Int("end_time") != 0 {
+		t.Fatalf("advanced: %v", advanced)
+	}
+	items, _ = e.st.RoleItems(role.RID)
+	before := items[37001]
+	c.send(16640, proto.Message{"type": 2, "id": 6})
+	if resp := c.waitFor(16640); resp.Int("code") != 1 {
+		t.Fatal(resp)
+	}
+	c.waitFor(16639)
+	items, _ = e.st.RoleItems(role.RID)
+	if items[37002] != 0 || items[37001] != before+10 {
+		t.Fatalf("advanced tickets and gift: %v", items)
+	}
+
+}
+
+func TestTreasureSettlementRollback(t *testing.T) {
+	e := newEnv(t, 100*time.Hour)
+	_, role := e.enter("tr_tx", "事务探宝")
+	e.addItems(t, role, map[int64]int64{37001: 12})
+	before, err := e.st.RoleAssets(role.RID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	failure := errors.New("unable to save treasure log")
+	err = e.st.ExchangeAndSave(role.RID, nil, map[int64]int64{37001: 12}, map[int64]int64{18: 150}, nil, func(tx *store.Store) error {
+		if err := tx.SaveState(role.RID, trModule, &trRole{Wheels: [2]trWheel{{Count: 15, Lucky: 150}, {}}}); err != nil {
+			return err
+		}
+		return failure
+	})
+	if !errors.Is(err, failure) {
+		t.Fatal(err)
+	}
+	items, err := e.st.RoleItems(role.RID)
+	if err != nil || items[37001] != 12 {
+		t.Fatalf("tickets after rollback: %v, %v", items, err)
+	}
+	after, err := e.st.RoleAssets(role.RID)
+	if err != nil || before[18] != after[18] {
+		t.Fatalf("points after rollback: %v, %v", after, err)
+	}
+	if exists, err := e.st.LoadState(role.RID, trModule, &trRole{}); err != nil || exists {
+		t.Fatalf("wheel after rollback: %v, %v", exists, err)
 	}
 }

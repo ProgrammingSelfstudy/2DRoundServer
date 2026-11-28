@@ -74,62 +74,85 @@ type trWorld struct{ Log [2][]trLog }
 
 var trMu sync.Mutex
 
-func trItemByID(id int64) trItem {
+var trItems = func() map[int64]trItem {
+	items := make(map[int64]trItem, len(trCfg.Items))
+	for _, item := range trCfg.Items {
+		items[item.ID] = item
+	}
+	return items
+}()
+
+// The original table lists a full pass over positions 1–8 for each level bracket.
+var trBoards = func() [2][][]trItem {
+	var boards [2][][]trItem
+	var last [2]int64
 	for _, it := range trCfg.Items {
-		if it.ID == id {
-			return it
+		groups := &boards[it.Type-1]
+		if len(*groups) == 0 || it.Pos < last[it.Type-1] {
+			*groups = append(*groups, nil)
+		}
+		last[it.Type-1] = it.Pos
+		i := len(*groups) - 1
+		(*groups)[i] = append((*groups)[i], it)
+	}
+	return boards
+}()
+
+func trTier(typ, lev int64) int {
+	pools := trCfg.Pools[itoa64(typ)]
+	for i, p := range pools {
+		if lev <= p.Max {
+			return i
 		}
 	}
-	return trItem{}
+	return len(pools) - 1
 }
 
-// trRoll fills a wheel: one item for each position out of the ones the table lists for it.
-func trRoll(w *trWheel, typ int64, rng *rand.Rand) {
+func trRoll(w *trWheel, typ, lev int64, rng *rand.Rand) {
+	board := trBoards[typ-1][trTier(typ, lev)]
 	w.Slots = w.Slots[:0]
 	for pos := int64(1); pos <= trCfg.Slots[typ-1]; pos++ {
-		var pool []trItem
-		for _, it := range trCfg.Items {
-			if it.Type == typ && it.Pos == pos {
-				pool = append(pool, it)
+		var choices []trItem
+		for _, it := range board {
+			if it.Pos == pos {
+				choices = append(choices, it)
 			}
 		}
-		if len(pool) > 0 {
-			w.Slots = append(w.Slots, trSlot{Pos: pos, ID: pool[rng.Intn(len(pool))].ID})
-		}
+		w.Slots = append(w.Slots, trSlot{Pos: pos, ID: choices[rng.Intn(len(choices))].ID})
 	}
 }
 
-// trPool is the multi draw pool of a wheel for a level.
-func trPool(typ, lev int64) [][2]float64 {
-	pools := trCfg.Pools[itoa64(typ)]
-	for _, p := range pools {
-		if lev >= p.Min && lev <= p.Max {
-			return p.Award
-		}
-	}
-	return pools[len(pools)-1].Award
-}
-
-func trPick(pool [][2]float64, rng *rand.Rand) int64 {
+// Select among the actual prizes on this wheel. The level table publishes item
+// weights, but omits some variants. Those keep a unit weight. The capture shows
+// special (odd) positions graying out and ordinary (even) positions repeating.
+func trDraw(w *trWheel, weights map[int64]float64, rng *rand.Rand) (trItem, bool) {
 	var total float64
-	for _, p := range pool {
-		total += p[1]
+	for _, sl := range w.Slots {
+		if sl.Status == 0 {
+			total += weights[sl.ID]
+		}
+	}
+	if total == 0 {
+		return trItem{}, false
 	}
 	n := rng.Float64() * total
-	for _, p := range pool {
-		if n < p[1] {
-			return int64(p[0])
+	for i := range w.Slots {
+		sl := &w.Slots[i]
+		if sl.Status != 0 {
+			continue
 		}
-		n -= p[1]
+		n -= weights[sl.ID]
+		if n < 0 {
+			if sl.Pos%2 == 1 {
+				sl.Status = 1
+			}
+			return trItems[sl.ID], true
+		}
 	}
-	return int64(pool[len(pool)-1][0])
+	return trItem{}, false
 }
 
-// RegisterTreasure registers the lucky treasure hunt, always open: two wheels of 8 items (lucky from level 10, advanced
-// from 30); one draw lands on a position of the wheel, the multi draws also pull from a pool by level; every draw adds
-// lucky value, which opens the five lucky gifts; a refresh puts new items on the wheel (free every 3 hours, else 30
-// diamonds); the wheel is new every day. Where the client has no table (which position a draw lands on, what a multi draw
-// pulls in addition) the rule is ours: not captured.
+// RegisterTreasure serves both wheels and their lucky gifts.
 func RegisterTreasure(r *gateway.Router, st *store.Store) {
 	bindAdminGlobal(st, trModule, &trMu, nil)
 	rng := newRng
@@ -153,7 +176,7 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 		for i := range c.d.Wheels {
 			w := &c.d.Wheels[i]
 			if w.Day != day || len(w.Slots) == 0 {
-				trRoll(w, int64(i+1), rng())
+				trRoll(w, int64(i+1), int64(c.role.Lev), rng())
 				w.Day = day
 			}
 		}
@@ -230,69 +253,63 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 				return refuse("VIP" + itoa64(o.Vip) + "开启")
 			}
 			w := &c.d.Wheels[typ-1]
-			var free []int
-			for i, sl := range w.Slots {
-				if sl.Status == 0 {
-					free = append(free, i)
-				}
-			}
-			if len(free) == 0 {
-				return refuse("请先刷新探宝奖励")
-			}
 			spendA, spendI := map[int64]int64{}, map[int64]int64{}
 			for _, p := range o.Expend {
 				splitGains([]sellGain{{p[0], p[1]}}, 1, spendA, spendI)
 			}
 			gainA, gainI := map[int64]int64{}, map[int64]int64{}
+			pool := trCfg.Pools[itoa64(typ)][trTier(typ, int64(c.role.Lev))].Award
+			weights := make(map[int64]float64, len(w.Slots))
+			for _, sl := range w.Slots {
+				weights[sl.ID] = 1
+				for _, pair := range pool {
+					if int64(pair[0]) == trItems[sl.ID].Item {
+						weights[sl.ID] = pair[1]
+						break
+					}
+				}
+			}
 			g := rng()
-			// the first draw lands on a position of the wheel, the others of a multi draw come from the pool
-			slot := &w.Slots[free[g.Intn(len(free))]]
-			won := trItemByID(slot.ID)
-			slot.Status = 1
-			awards1 := []proto.Message{{"bid": won.Item, "num": won.Num}}
-			splitGains([]sellGain{{won.Item, won.Num}}, 1, gainA, gainI)
-			picked := map[int64]int64{}
-			var order []int64
-			for i := int64(1); i < o.Count; i++ {
-				bid := trPick(trPool(typ, int64(c.role.Lev)), g)
-				if picked[bid] == 0 {
-					order = append(order, bid)
+			var awards1, awards2, positions []proto.Message
+			var logPrize trItem
+			for i := int64(0); i < o.Count; i++ {
+				won, ok := trDraw(w, weights, g)
+				if !ok {
+					return refuse("请先刷新探宝奖励")
 				}
-				picked[bid]++
-			}
-			awards2 := []proto.Message{}
-			for _, bid := range order {
-				awards2 = append(awards2, proto.Message{"bid": bid, "num": picked[bid]})
-				splitGains([]sellGain{{bid, picked[bid]}}, 1, gainA, gainI)
-			}
-			for _, p := range o.AddItem {
-				awards2 = append(awards2, proto.Message{"bid": p[0], "num": p[1]})
-				splitGains([]sellGain{{p[0], p[1]}}, 1, gainA, gainI)
-			}
-			if err := st.Exchange(c.role.RID, spendA, spendI, gainA, gainI); err != nil {
-				if errors.Is(err, store.ErrConflict) {
-					return refuse("探宝道具不足")
+				awards2 = append(awards2, proto.Message{"bid": won.Item, "num": won.Num})
+				positions = append(positions, proto.Message{"pos": won.Pos})
+				splitGains([]sellGain{{won.Item, won.Num}}, 1, gainA, gainI)
+				if i == 0 || won.Pos%2 == 1 {
+					logPrize = won
 				}
-				return err
+			}
+			for _, pair := range o.AddItem {
+				awards1 = append(awards1, proto.Message{"bid": pair[0], "num": pair[1]})
+				splitGains([]sellGain{{pair[0], pair[1]}}, 1, gainA, gainI)
 			}
 			w.Count += o.Count
 			w.Lucky += o.AddLucky
-			if err := st.SaveState(c.role.RID, trModule, c.d); err != nil {
-				return err
+			err = st.ExchangeAndSave(c.role.RID, spendA, spendI, gainA, gainI, func(tx *store.Store) error {
+				if err := tx.SaveState(c.role.RID, trModule, c.d); err != nil {
+					return err
+				}
+				world := &trWorld{}
+				if _, err := tx.LoadGlobal(c.role.SrvID, trModule, world); err != nil {
+					return err
+				}
+				log := append([]trLog{{Name: c.role.Name, Bid: logPrize.Item, Num: logPrize.Num}}, world.Log[typ-1]...)
+				world.Log[typ-1] = log[:min(len(log), trLogMax)]
+				return tx.SaveGlobal(c.role.SrvID, trModule, world)
+			})
+			if errors.Is(err, store.ErrConflict) {
+				return refuse("探宝道具不足")
 			}
-			world := &trWorld{}
-			if _, err := st.LoadGlobal(c.role.SrvID, trModule, world); err != nil {
-				return err
-			}
-			world.Log[typ-1] = append([]trLog{{Name: c.role.Name, Bid: won.Item, Num: won.Num}}, world.Log[typ-1]...)
-			if len(world.Log[typ-1]) > trLogMax {
-				world.Log[typ-1] = world.Log[typ-1][:trLogMax]
-			}
-			if err := st.SaveGlobal(c.role.SrvID, trModule, world); err != nil {
+			if err != nil {
 				return err
 			}
 			if err := s.Send(cmd, proto.Message{"code": 1, "msg": "", "frist_awards": []proto.Message{}, "awards1": awards1, "awards2": awards2,
-				"awards3": []proto.Message{{"pos": slot.Pos}}}); err != nil {
+				"awards3": positions}); err != nil {
 				return err
 			}
 			if err := s.Send(16639, wheelMsg(c, typ)); err != nil {
@@ -342,9 +359,6 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 		for _, p := range trCfg.Lucky[idx].Award {
 			splitGains([]sellGain{{p[0], p[1]}}, 1, ga, gi)
 		}
-		if err := st.Exchange(c.role.RID, map[int64]int64{}, map[int64]int64{}, ga, gi); err != nil {
-			return err
-		}
 		w.Claimed = append(w.Claimed, id)
 		// all five taken at the top value: the lucky value starts again
 		all := true
@@ -356,7 +370,10 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 		if all {
 			w.Lucky, w.Claimed = 0, nil
 		}
-		if err := st.SaveState(c.role.RID, trModule, c.d); err != nil {
+		if err := st.ExchangeAndSave(c.role.RID, nil, nil, ga, gi, func(tx *store.Store) error { return tx.SaveState(c.role.RID, trModule, c.d) }); err != nil {
+			return err
+		}
+		if err := sendGainList(s, guildGains(trCfg.Lucky[idx].Award)); err != nil {
 			return err
 		}
 		if err := s.Send(16640, proto.Message{"code": 1, "msg": "领取成功", "type": typ}); err != nil {
@@ -384,21 +401,18 @@ func RegisterTreasure(r *gateway.Router, st *store.Store) {
 		}
 		w := &c.d.Wheels[typ-1]
 		now := s.Now().Unix()
+		spendA, spendI := map[int64]int64{}, map[int64]int64{}
 		if now < w.EndTime {
-			// not free yet: the diamonds
-			spendA, spendI := map[int64]int64{}, map[int64]int64{}
 			splitGains([]sellGain{{trCfg.Refresh[0], trCfg.Refresh[1]}}, 1, spendA, spendI)
-			if err := st.Exchange(c.role.RID, spendA, spendI, map[int64]int64{}, map[int64]int64{}); err != nil {
-				if errors.Is(err, store.ErrConflict) {
-					return refuse("钻石不足")
-				}
-				return err
-			}
 		} else {
 			w.EndTime = now + trCfg.FreeTime
 		}
-		trRoll(w, typ, rng())
-		if err := st.SaveState(c.role.RID, trModule, c.d); err != nil {
+		trRoll(w, typ, int64(c.role.Lev), rng())
+		err = st.ExchangeAndSave(c.role.RID, spendA, spendI, nil, nil, func(tx *store.Store) error { return tx.SaveState(c.role.RID, trModule, c.d) })
+		if errors.Is(err, store.ErrConflict) {
+			return refuse("钻石不足")
+		}
+		if err != nil {
 			return err
 		}
 		if err := s.Send(16642, proto.Message{"code": 1, "msg": "", "type": typ}); err != nil {

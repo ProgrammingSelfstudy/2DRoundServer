@@ -100,11 +100,14 @@ func RegisterShop(r *gateway.Router, st *store.Store) {
 		return s.Send(13401, proto.Message{"code": 1, "msg": "", "type": typ, "is_half": 0, "item_list": list})
 	})
 	// 13403 / 13405 belong to the shops that deal a random, refreshing list. The tavern shop
-	// (VarietyShop, type 4) answers with the one list we captured; the others (the recovery
+	// (type 4) and treasure shop (type 16) serve captured shelves. The others (the recovery
 	// shop, the skill shop) we have no goods for, so they are empty and refreshing says so.
 	// Without an answer the tab kept showing the list of the page before it. refresh_time is
 	// an hour on, so the client does not ask again at once.
 	r.Handle(13403, func(s *gateway.Session, req proto.Message) error {
+		if req.Int("type") == treasureShopType {
+			return handleTreasureShop(st, s, 13403, req)
+		}
 		if req.Int("type") == varietyShopType {
 			return varietyShow(st, 13403, false)(s, req)
 		}
@@ -112,6 +115,9 @@ func RegisterShop(r *gateway.Router, st *store.Store) {
 			"refresh_time": s.Now().Unix() + 3600, "item_list": []proto.Message{}})
 	})
 	r.Handle(13405, func(s *gateway.Session, req proto.Message) error {
+		if req.Int("type") == treasureShopType {
+			return handleTreasureShop(st, s, 13405, req)
+		}
 		if req.Int("type") == varietyShopType {
 			return varietyShow(st, 13405, true)(s, req)
 		}
@@ -119,6 +125,9 @@ func RegisterShop(r *gateway.Router, st *store.Store) {
 			"refresh_time": 0, "item_list": []proto.Message{}})
 	})
 	r.Handle(13407, func(s *gateway.Session, req proto.Message) error {
+		if req.Int("type") == treasureShopType {
+			return handleTreasureShop(st, s, 13407, req)
+		}
 		if req.Int("type") == varietyShopType {
 			return varietyBuy(st)(s, req)
 		}

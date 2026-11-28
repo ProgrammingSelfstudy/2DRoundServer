@@ -21,6 +21,8 @@ type Session struct {
 	Remote string
 	// Connected is when the connection was accepted.
 	Connected time.Time
+	// 13407 identifies an offer only by slot. The read loop remembers which shelf this connection saw.
+	TreasureShopView struct{ RID, Expires, Refreshes int64 }
 
 	wmu sync.Mutex // serialises writes (handlers and Hub pushes run concurrently)
 

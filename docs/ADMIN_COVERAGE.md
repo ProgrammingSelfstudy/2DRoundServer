@@ -128,6 +128,7 @@ go test ./internal/admincoverage ./internal/game -run 'Test(AdminCoverage|Scan|R
 | role | `touchgold` | 点金手（23606/23607） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [touchgold.go](../internal/game/touchgold.go) |
 | role | `trainingcamp` | 训练营（27600–27603） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [trainingcamp.go](../internal/game/trainingcamp.go) |
 | role | `treasure` | 幸运/高级探宝（16637–16643） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [daysrank.go](../internal/game/daysrank.go)、[treasure.go](../internal/game/treasure.go) |
+| role | `treasure_shop` | 探宝商城（13403/13405/13407） | 查看当前货架、已兑格子和刷新时间（read） | 在模块数据页签查看 | 兑换时货架、积分与背包一起结算 | [treasure_shop.go](../internal/game/treasure_shop.go) |
 | role | `vedio` | 录像个人收藏/点赞（19901–19908、20034/20036） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [vedio.go](../internal/game/vedio.go) |
 | role | `voyage` | 远航订单（23800–23806） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [voyage.go](../internal/game/voyage.go) |
 | role | `warorder` | 战令（25300–25309） | 原始JSON查看（read）；无可用重置/编辑 | 查看（模块数据页签）；重置/编辑待白名单审定 | 已接模块只读API/前端；自由编辑/整行删除会破坏进度和领奖约束，不能默认开放 | [warorder.go](../internal/game/warorder.go) |
